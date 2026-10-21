@@ -1,0 +1,70 @@
+{% liquid
+  assign featured_product = section.settings.featured_product
+  assign hero_variant = featured_product.selected_or_first_available_variant
+  assign presentation_image = section.settings.image | default: featured_product.featured_image
+  assign model_url = section.settings.model_url | default: featured_product.metafields.custom.cinematic_model.value.url
+  assign collection_url = section.settings.collection.url | default: routes.all_products_collection_url
+%}
+<section class="foundation" data-foundation data-loading-label="{{ 'foundation.model_loading' | t | escape }}" data-error-label="{{ 'foundation.model_error' | t | escape }}" data-context-lost-label="{{ 'foundation.model_interrupted' | t | escape }}" data-section-id="{{ section.id }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} aria-labelledby="FoundationTitle-{{ section.id }}">
+  <div class="foundation-stage">
+    <div class="foundation-plane" data-handoff-plane aria-hidden="true"></div>
+    {% if section.settings.eyebrow != blank %}<p class="stage-top">{{ section.settings.eyebrow | escape }}</p>{% endif %}
+    <h1 class="sr-only" id="FoundationTitle-{{ section.id }}">{{ section.settings.title_first | escape }} {{ section.settings.title_second | escape }}</h1>
+    <div class="foundation-title" aria-hidden="true">
+      <span class="type-mask" data-type-mask-primary><span class="title-line" data-title-primary>{{ section.settings.title_first | escape }}</span></span>
+      <span class="type-mask type-mask-secondary" data-type-mask-secondary><span class="title-line title-line-bottom" data-title-secondary>{{ section.settings.title_second | escape }}</span></span>
+    </div>
+    <div class="asset-frame" data-asset-frame>
+      <div class="asset-media" data-scene-host>
+        {% if presentation_image != blank %}
+          {{ presentation_image | image_url: width: 1800 | image_tag: class: 'foundation-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 64vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
+        {% elsif model_url == blank %}
+          <figure class="asset-empty concept-visual">
+            <img class="concept-shoe" src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" alt="{{ 'foundation.concept_alt' | t | escape }}" fetchpriority="high" loading="eager">
+            <figcaption class="concept-label">{{ 'foundation.concept_label' | t }}</figcaption>
+          </figure>
+        {% else %}
+          <div class="asset-empty model-fallback"><p>{{ 'foundation.asset_pending' | t }}</p></div>
+        {% endif %}
+        <p class="model-status" data-model-status role="status" aria-live="polite" hidden></p>
+      </div>
+    </div>
+    <div class="foundation-note">{% if section.settings.note_label != blank %}<span class="section-kicker">{{ section.settings.note_label | escape }}</span>{% endif %}<p>{{ section.settings.statement | escape }}</p></div>
+    <div class="foundation-bottom">
+      <div class="hero-product-information">
+        {% if featured_product != blank %}
+          <p class="hero-price">{{ hero_variant.price | money_with_currency }}</p>
+          <a class="hero-product-title" href="{{ featured_product.url }}">{{ featured_product.title | escape }}</a>
+          <p class="hero-availability">{% if hero_variant.available %}{{ 'products.available' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</p>
+        {% else %}
+          <p class="hero-price-pending">{{ 'foundation.product_pending' | t }}</p>
+          <p class="hero-product-title">{{ 'foundation.collection_preview' | t }}</p>
+        {% endif %}
+      </div>
+      {% if featured_product != blank %}
+        <a class="button button-accent hero-shop" data-magnetic href="{{ featured_product.url }}"><span class="hero-shop-content" data-magnetic-content><span>{% if hero_variant.available %}{{ 'foundation.view_product' | t }}{% else %}{{ 'foundation.view_details' | t }}{% endif %}</span>{% render 'icon', name: 'arrow-up' %}</span></a>
+      {% else %}
+        <a class="button button-accent hero-shop" data-magnetic href="{{ collection_url }}"><span class="hero-shop-content" data-magnetic-content><span>{{ section.settings.cta | escape }}</span>{% render 'icon', name: 'arrow-up' %}</span></a>
+      {% endif %}
+    </div>
+    <div class="chapter-track" aria-hidden="true"><span data-chapter-fill></span></div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Cinematic foundation",
+  "settings":[
+    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Design study"},
+    {"type":"text","id":"title_first","label":"First headline line","default":"FOOTWEAR"},
+    {"type":"text","id":"title_second","label":"Second headline line","default":"IN FOCUS"},
+    {"type":"text","id":"note_label","label":"Statement label","default":"Shape / Texture / Proportion"},
+    {"type":"textarea","id":"statement","label":"Brand statement","default":"A closer look at footwear, from the upper to the sole."},
+    {"type":"product","id":"featured_product","label":"Featured product"},
+    {"type":"collection","id":"collection","label":"Shopping collection"},
+    {"type":"image_picker","id":"image","label":"Licensed product presentation image","info":"Real imagery replaces the clearly labeled temporary concept visual."},
+    {"type":"url","id":"model_url","label":"Licensed .glb model URL","info":"Optional. Supply a licensed, optimized GLB and fallback image. Also supports the featured product custom.cinematic_model file metafield."},
+    {"type":"text","id":"cta","label":"Shopping link label","default":"Explore collection"}
+  ],
+  "presets":[{"name":"Cinematic foundation"}]
+}
+{% endschema %}

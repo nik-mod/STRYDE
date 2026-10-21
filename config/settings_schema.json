@@ -1,0 +1,63 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "STRYDE",
+    "theme_version": "0.1.0",
+    "theme_author": "STRYDE",
+    "theme_documentation_url": "https://shopify.dev/docs/storefronts/themes",
+    "theme_support_url": "https://help.shopify.com/"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "text",
+        "id": "brand_name",
+        "label": "Brand name",
+        "default": "STRYDE"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "background",
+        "label": "Sky blue background",
+        "default": "#41b4f0"
+      },
+      {
+        "type": "color",
+        "id": "foreground",
+        "label": "Ocean blue text",
+        "default": "#073653"
+      },
+      {
+        "type": "color",
+        "id": "accent",
+        "label": "Cyan accent",
+        "default": "#adfff5",
+        "info": "Buttons use the Text color above. Check contrast when changing the palette."
+      },
+      {
+        "type": "color",
+        "id": "surface",
+        "label": "Silver white surface",
+        "default": "#effaff"
+      },
+      {
+        "type": "color",
+        "id": "hero_type",
+        "label": "Oversized hero typography",
+        "default": "#c1fff8",
+        "info": "Decorative display color. Navigation, body copy and semantic heading use the Text color."
+      }
+    ]
+  }
+]

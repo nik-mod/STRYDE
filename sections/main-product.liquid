@@ -1,0 +1,37 @@
+{% liquid
+  assign selected_variant = product.selected_or_first_available_variant
+  assign form_id = 'ProductForm-' | append: section.id
+  assign product_image = selected_variant.featured_image | default: product.featured_image
+%}
+<section class="product-page page-shell" data-product-section>
+  <nav class="breadcrumbs micro" aria-label="{{ 'general.breadcrumbs' | t }}"><a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a><span aria-hidden="true">/</span><span>{{ product.title | escape }}</span></nav>
+  <div class="product-layout">
+    <div class="product-gallery">
+      <div class="product-primary-image" data-product-media>{% if product_image %}{{ product_image | image_url: width: 1600 | image_tag: widths: '400, 800, 1200, 1600', sizes: '(min-width: 900px) 56vw, 100vw', loading: 'eager', alt: product_image.alt }}{% else %}<p class="micro">{{ 'products.image_unavailable' | t }}</p>{% endif %}</div>
+      {% if product.images.size > 1 %}<div class="product-thumbnails">{% for image in product.images %}<a href="{{ image | image_url: width: 1800 }}" data-product-thumbnail data-image-url="{{ image | image_url: width: 1600 }}" data-image-alt="{{ image.alt | default: product.title | escape }}" aria-label="{{ 'products.view_image' | t }} {{ forloop.index }}">{{ image | image_url: width: 200 | image_tag: width: 100, height: 100, loading: 'lazy', alt: image.alt }}</a>{% endfor %}</div>{% endif %}
+    </div>
+    <div class="product-information">
+      {% if product.vendor != blank %}<p class="micro">{{ product.vendor | escape }}</p>{% endif %}
+      <h1 class="product-heading">{{ product.title | escape }}</h1>
+      <div class="price-line"><p data-product-price>{{ selected_variant.price | money_with_currency }}</p><s data-product-compare{% unless selected_variant.compare_at_price > selected_variant.price %} hidden{% endunless %}>{{ selected_variant.compare_at_price | money_with_currency }}</s></div>
+      {% form 'product', product, id: form_id, class: 'product-form' %}
+        {{ form.errors | default_errors }}
+        <label class="micro" for="Variant-{{ section.id }}">{{ 'products.choose_variant' | t }}</label>
+        <select id="Variant-{{ section.id }}" name="id" data-variant-select>
+          {% for variant in product.variants %}<option value="{{ variant.id }}"{% if variant == selected_variant %} selected{% endif %}{% unless variant.available %} disabled{% endunless %}>{{ variant.title | escape }} — {{ variant.price | money_with_currency }}{% unless variant.available %} — {{ 'products.sold_out' | t }}{% endunless %}</option>{% endfor %}
+        </select>
+        <label class="micro" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+        <input id="Quantity-{{ section.id }}" class="quantity-input" type="number" name="quantity" value="1" min="1" step="1" inputmode="numeric">
+        <p class="availability micro" data-product-availability role="status" aria-live="polite">{% if selected_variant.available %}{{ 'products.available' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</p>
+        <button class="button button-dark button-full" type="submit" name="add" data-add-to-cart{% unless selected_variant.available %} disabled{% endunless %}>{% if selected_variant.available %}{{ 'products.add_to_bag' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}{% render 'icon', name: 'plus' %}</button>
+      {% endform %}
+      <noscript><form action="{{ product.url }}" method="get" class="product-form"><label for="VariantNoScript-{{ section.id }}">{{ 'products.choose_variant' | t }}</label><select id="VariantNoScript-{{ section.id }}" name="variant">{% for variant in product.variants %}<option value="{{ variant.id }}"{% if variant == selected_variant %} selected{% endif %}>{{ variant.title | escape }}{% unless variant.available %} — {{ 'products.sold_out' | t }}{% endunless %}</option>{% endfor %}</select><button class="button" type="submit">{{ 'products.view_selection' | t }}</button></form></noscript>
+      {% if product.description != blank %}<div class="rte product-description">{{ product.description }}</div>{% endif %}
+      {% if product.metafields.custom.materials != blank %}<details class="product-details"><summary>{{ 'products.materials' | t }} {% render 'icon', name: 'plus' %}</summary><div class="rte">{{ product.metafields.custom.materials | metafield_tag }}</div></details>{% endif %}
+      {% if shop.shipping_policy.body != blank %}<a class="text-link" href="{{ shop.shipping_policy.url }}">{{ shop.shipping_policy.title | escape }} {% render 'icon', name: 'arrow' %}</a>{% endif %}
+      <script type="application/json" data-product-variants>{"variants":[{% for variant in product.variants %}{"id":{{ variant.id | json }},"available":{{ variant.available | json }},"price":{{ variant.price | money_with_currency | json }},"comparePrice":{{ variant.compare_at_price | money_with_currency | json }},"onSale":{% if variant.compare_at_price > variant.price %}true{% else %}false{% endif %},"image":{% if variant.featured_image %}{{ variant.featured_image | image_url: width: 1600 | json }}{% elsif product.featured_image %}{{ product.featured_image | image_url: width: 1600 | json }}{% else %}null{% endif %},"imageAlt":{{ variant.featured_image.alt | default: product.title | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}],"labels":{"available":{{ 'products.available' | t | json }},"soldOut":{{ 'products.sold_out' | t | json }},"add":{{ 'products.add_to_bag' | t | json }}}}</script>
+    </div>
+  </div>
+  <script type="application/ld+json">{{ product | structured_data }}</script>
+</section>
+{% schema %}{"name":"Product","settings":[]}{% endschema %}

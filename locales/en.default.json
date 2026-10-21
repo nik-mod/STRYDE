@@ -1,0 +1,82 @@
+{
+  "accessibility": {
+    "skip_to_content": "Skip to content"
+  },
+  "general": {
+    "home": "Home",
+    "main_navigation": "Main navigation",
+    "mobile_navigation": "Mobile navigation",
+    "footer_navigation": "Footer navigation",
+    "menu": "Open navigation",
+    "collection": "Collection",
+    "discover": "Discover",
+    "search": "Search",
+    "back_to_top": "Back to top",
+    "breadcrumbs": "Breadcrumbs",
+    "pagination": "Pagination",
+    "previous_page": "Previous page",
+    "next_page": "Next page",
+    "explore_collection": "Explore the collection",
+    "not_found": "Page not found",
+    "off_track": "Page not found",
+    "not_found_description": "The page you’re looking for has moved or is no longer available.",
+    "account": "Your account"
+  },
+  "foundation": {
+    "asset_pending": "Product image not provided",
+    "asset_pending_description": "The product study will appear here when the collection is ready.",
+    "scroll": "Scroll to study",
+    "featured": "Featured product",
+    "model_loading": "Loading product view…",
+    "model_error": "3D view unavailable. The product image remains available.",
+    "model_interrupted": "3D view interrupted. The product image remains available.",
+    "concept_alt": "Original silver and ice-blue futuristic sneaker concept; temporary artwork, not actual merchandise",
+    "concept_label": "Temporary concept visual · Not actual merchandise",
+    "product_pending": "Real product not selected",
+    "collection_preview": "Footwear study",
+    "view_product": "View product",
+    "view_details": "View details"
+  },
+  "products": {
+    "image_unavailable": "Product image unavailable",
+    "sold_out": "Sold out",
+    "from": "From",
+    "view_image": "View product image",
+    "choose_variant": "Choose an option",
+    "quantity": "Quantity",
+    "available": "Available",
+    "add_to_bag": "Add to bag",
+    "materials": "Materials",
+    "view_selection": "View selection"
+  },
+  "collection": {
+    "min_price": "Minimum",
+    "max_price": "Maximum",
+    "sort": "Sort by",
+    "apply": "Apply",
+    "remove_filter": "Remove filter",
+    "products": "products",
+    "empty": "No products found.",
+    "empty_description": "Adjust the filters to see more products.",
+    "clear": "Clear filters"
+  },
+  "cart": {
+    "title": "Your bag",
+    "your_selection": "Your selection",
+    "remove": "Remove",
+    "summary": "Order summary",
+    "subtotal": "Subtotal",
+    "shipping_at_checkout": "Taxes, discounts and shipping calculated at checkout.",
+    "update": "Update bag",
+    "checkout": "Checkout",
+    "empty": "Your bag is empty.",
+    "empty_description": "Browse the collection to add a product."
+  },
+  "search": {
+    "label": "Search the store",
+    "placeholder": "Search products",
+    "results_for": "results for",
+    "empty": "No results.",
+    "empty_description": "Try another product name or search term."
+  }
+}

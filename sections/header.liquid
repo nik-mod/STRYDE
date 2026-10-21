@@ -1,0 +1,24 @@
+<header class="site-header">
+  <a class="wordmark" href="{{ routes.root_url }}" aria-label="{{ settings.brand_name | default: shop.name | escape }} — {{ 'general.home' | t }}">
+    {% if settings.logo != blank %}{{ settings.logo | image_url: width: 400 | image_tag: widths: '120, 200, 400', width: 160, loading: 'eager', alt: settings.brand_name }}{% else %}{{ settings.brand_name | default: shop.name | escape }}{% endif %}
+  </a>
+  <nav class="desktop-nav" aria-label="{{ 'general.main_navigation' | t }}">
+    {% if section.settings.menu != blank %}{% for link in section.settings.menu.links %}<a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>{% endfor %}{% else %}<a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a>{% endif %}
+  </nav>
+  <div class="header-actions">
+    {% if shop.customer_accounts_enabled %}<a class="account-link icon-link" href="{{ routes.account_url }}" aria-label="{{ 'general.account' | t }}">{% render 'icon', name: 'account' %}</a>{% endif %}
+    <a class="icon-link" href="{{ routes.search_url }}" aria-label="{{ 'general.search' | t }}">{% render 'icon', name: 'search' %}</a>
+    <a class="bag-link" href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }} ({{ cart.item_count }})">{% render 'icon', name: 'bag' %}<span class="bag-count">{{ cart.item_count }}</span></a>
+    <details class="mobile-menu" data-mobile-menu>
+      <summary aria-label="{{ 'general.menu' | t }}"><span></span><span></span></summary>
+      <nav class="mobile-menu-panel" aria-label="{{ 'general.mobile_navigation' | t }}">
+        {% if section.settings.menu != blank %}{% for link in section.settings.menu.links %}<a href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}{% else %}<a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a>{% endif %}
+        <a href="{{ routes.search_url }}">{{ 'general.search' | t }}</a>
+        <a href="{{ routes.cart_url }}">{{ 'cart.title' | t }} ({{ cart.item_count }})</a>
+      </nav>
+    </details>
+  </div>
+</header>
+{% schema %}
+{"name":"Header","settings":[{"type":"link_list","id":"menu","label":"Navigation menu"}]}
+{% endschema %}
