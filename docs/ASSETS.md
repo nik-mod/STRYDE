@@ -1,6 +1,8 @@
 # Required merchant data and licensed assets
 
-No authentic product photographs, accurate specifications, reviews, prices, merchant story, GLB or shoebox model were supplied. The attached reference screenshots are not theme merchandise. The theme ships original generated concept artwork, identified by small `Concept artwork` tags wherever it stands in. Real merchant imagery/GLB takes priority and removes the tags. Do not represent reference artwork or generated approximations as merchandise.
+No authentic product photographs, accurate specifications, reviews, prices, merchant story, GLB or shoebox model were supplied. The attached reference screenshots are not theme merchandise. The theme ships original generated concept artwork, identified by `Concept artwork · Temporary` tags. Authentic merchant imagery/GLB takes priority. Keep the concept checkbox enabled for any temporary artwork uploaded through the new presentation pickers. Do not represent reference artwork or generated approximations as merchandise.
+
+The 2026-10-22 image expansion adds three optimized concept assets and centralized slots for Collection, Materials, Featured and Finale. **[Replacement guide and complete slot map](CONCEPT-IMAGES.md)** lists every picker, fallback, filename, dimensions, provenance and generation prompt.
 
 ## Bundled display font
 
@@ -8,7 +10,7 @@ No authentic product photographs, accurate specifications, reviews, prices, merc
 
 ## Temporary sky-blue concept asset
 
-Project asset: `assets/stryde-concept-v2.png` (1375 × 1144, PNG with transparency). This local copy is the only image referenced by the theme. Visible disclosure: small uppercase `Concept artwork` tags in the hero product-info block and on every image frame using the artwork. No fabricated price appears anywhere. Configured authentic image or model omits the concept image and its tags; reduced motion renders the static image with the same disclosure.
+Original project asset: `assets/stryde-concept-v2.png` (1375 × 1144, PNG with transparency). It remains the approved Hero/Deconstruction image and the Collection 01, Materials 01/03 and Finale fallback. The expansion's other three studies are listed in CONCEPT-IMAGES.md. Visible disclosure uses `Concept artwork · Temporary` tags, including the newly disclosed Materials frames. No fabricated price is added. Configured authentic imagery omits the fallback and its tag; reduced motion renders static imagery with the same disclosure.
 
 Generated on 2026-10-21 using the built-in `image_gen` tool, transparent-background mode, with no API/CLI fallback and no reference artwork supplied as an image input. The subsequent reframe used only the first generated concept as its edit target. This is an AI concept, not a manufacturer-authorized product render, specification or representation of available inventory. No product accuracy or production asset clearance is asserted.
 

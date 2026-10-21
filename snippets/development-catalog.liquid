@@ -1,0 +1,23 @@
+{% comment %}
+  Local preview view-model only. Not Shopify products, prices or product routes.
+  tools/preview.mjs supplies catalog only for an empty local /collections/all.
+  Merchant collection rendering remains in main-collection.liquid's native branch.
+{% endcomment %}
+<div class="study-register"><p>{{ catalog.size }} concept studies</p><p>COLOUR / FORM / PERSPECTIVE</p></div>
+<div class="study-grid" data-listing-grid>
+  {% for study in catalog %}
+    <article class="study-entry" data-listing-entry data-concept-entry>
+      <div class="study-image-field" style="--study-field: {{ study.field }}; --study-hue: {{ study.hue }}; --study-saturation: {{ study.saturation }}; --study-lightness: {{ study.lightness }}; --study-rotation: {{ study.rotation }};">
+        <div class="study-visual" data-listing-visual>
+          <img src="{{ study.asset | asset_url }}" width="{{ study.width }}" height="{{ study.height }}" loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}" decoding="async" alt="Temporary unbranded sneaker concept, {{ study.name | escape }}, {{ study.colorway | escape }} colour study">
+        </div>
+      </div>
+      <div class="study-information">
+        <span class="study-index" aria-hidden="true">{{ study.id }}</span>
+        <h2>{{ study.name | escape }}</h2>
+        <p class="study-colourway">{{ study.colorway | escape }}</p>
+        <p class="study-disclosure">Concept artwork · Temporary</p>
+      </div>
+    </article>
+  {% endfor %}
+</div>

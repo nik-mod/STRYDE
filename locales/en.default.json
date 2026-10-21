@@ -23,7 +23,10 @@
   },
   "assets": {
     "concept_alt": "STRYDE concept sneaker in silver and ice blue, floating three-quarter view",
-    "concept_tag": "Concept artwork"
+    "concept_tag": "Concept artwork · Temporary",
+    "concept_side_alt": "Temporary sneaker concept study, silver and cyan lateral side view",
+    "concept_rear_alt": "Temporary sneaker concept study, silver and cyan rear three-quarter view",
+    "concept_detail_alt": "Temporary concept detail study of silver ribs, ice-blue weave and a cyan chamber"
   },
   "hero": {
     "asset_pending": "Product imagery not provided",

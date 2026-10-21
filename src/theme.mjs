@@ -9,6 +9,7 @@ import { mountChapter } from './motion/chapters.mjs';
 import { mountHeader } from './motion/header.mjs';
 import { mountEnvironments } from './motion/environments.mjs';
 import { mountMagnetic } from './motion/magnetic.mjs';
+import { mountListing } from './motion/listing.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
 // All high-frequency work shares GSAP's clock. No second requestAnimationFrame loop.
@@ -114,11 +115,11 @@ function mount(scope = document) {
   ensureEnvironments(scope);
   const header = scope.matches?.('.site-header') ? scope : scope.querySelector?.('.site-header');
   if (header && !instances.has(header)) instances.set(header, mountHeader(header));
-  const roots = [...scope.querySelectorAll('[data-hero], [data-chapter], [data-product-section]')];
-  if (scope.matches?.('[data-hero], [data-chapter], [data-product-section]')) roots.push(scope);
+  const roots = [...scope.querySelectorAll('[data-hero], [data-chapter], [data-product-section], [data-listing-section]')];
+  if (scope.matches?.('[data-hero], [data-chapter], [data-product-section], [data-listing-section]')) roots.push(scope);
   for (const root of roots) {
     if (instances.has(root)) continue;
-    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : mountProduct(root));
+    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : root.matches('[data-listing-section]') ? mountListing(root, { gsap }) : mountProduct(root));
   }
   scope.querySelectorAll('[data-mobile-menu]').forEach(menu => {
     if (menu.dataset.bound) return; menu.dataset.bound = 'true';

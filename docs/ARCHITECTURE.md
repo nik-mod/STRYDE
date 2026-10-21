@@ -94,10 +94,14 @@ Reduced motion has no Lenis, pin, animated transform, scene chunk import or mode
 
 ## Performance and failure handling
 
+Campaign imagery now has a central fallback map in `snippets/presentation-image.liquid`, with eight named slots across Collection, Materials, Featured and Finale. It renders direct image children so existing motion selectors and transform owners remain intact. Section image pickers replace fallback artwork without source edits; a concept checkbox preserves disclosures on supplied temporary images. Product bindings retain their existing priority, and Collection standalone pickers cannot override assigned products. Supplied detail photographs reset the concept-only crop variables. See `CONCEPT-IMAGES.md` for the map, precedence and replacement procedure. No timeline, pin length or commerce controller was changed by the image expansion.
+
 The model starts loading only within 200px of the stage. Renderer DPR caps are 1.75 desktop / 1.25 mobile, with no post-processing or particle system. Intersection and document visibility pause draw calls. ResizeObserver updates aspect and renderer bounds without a per-frame layout read. WebGL context loss exposes the fallback; restoration resumes the same scene. Loading, import, network and renderer failures expose a polite status message.
 
 Disposal releases geometry, materials, shared textures, ImageBitmap sources, observers, subscriptions, renderer and canvas. Pending parse results are immediately disposed after an unload. Production FPS, GPU memory and actual GLB quality require licensed assets and physical-device profiling; none have been measured against real merchandise yet.
 
 ## Validation limits
+
+The empty local `/collections/all` route now receives ten concept view-models from `tools/fixtures/concept-catalog.mjs`, via the preview renderer's `section.preview_catalog` property. This property is absent from Shopify's SectionDrop and is not a schema setting or persisted theme JSON. The data file is excluded from uploadable theme folders. A separate Liquid concept branch contains no commerce links/forms/prices or simulated sorting/filtering; native populated collection rendering always has precedence. An empty real Shopify collection remains empty. `?concepts=0` exercises that native empty presentation locally; existing `?fixtures=1&image=1` exercises native-product rendering. See `DEVELOPMENT-CATALOG.md`.
 
 Local preview renders these same Liquid sources using a small Shopify-tag adapter and explicit fixtures. It cannot emulate Shopify's server, inventory, markets, tax, checkout, metafield formatting or filter provider. Commerce is disabled and POST requests return 405. Shopify store preview and checkout testing are required before release.

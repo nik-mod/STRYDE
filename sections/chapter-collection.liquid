@@ -41,14 +41,18 @@
       {% endfor %}
     {% else %}
       {% for index in (1..3) %}
+        {% liquid
+          assign image_key = 'scene_' | append: index | append: '_image'
+          assign concept_key = image_key | append: '_is_concept'
+          assign image_slot = 'collection_' | append: index
+        %}
         <article class="coll-scene" data-coll-scene style="--scene-field: {% cycle field_1, field_2, field_3 %}">
           <span class="coll-scene-num" aria-hidden="true">0{{ index }}</span>
           <div class="coll-scene-art">
             <div class="coll-scene-figure">
-              <span class="coll-scene-visual coll-tint-{% if index == 1 %}a{% elsif index == 2 %}b{% else %}c{% endif %}" data-coll-visual>
-                <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+              <span class="coll-scene-visual" data-coll-visual>
+                {% render 'presentation-image', slot: image_slot, image: section.settings[image_key], image_is_concept: section.settings[concept_key], sizes: '(min-width: 900px) 56vw, 92vw' %}
               </span>
-              <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
             </div>
           </div>
           <div class="coll-scene-copy">
@@ -71,7 +75,15 @@
     {"type":"color","id":"field_1","label":"Product 01 field","default":"#41b4f0"},
     {"type":"color","id":"field_2","label":"Product 02 field","default":"#7fa9f6"},
     {"type":"color","id":"field_3","label":"Product 03 field","default":"#4fc4d4"},
-    {"type":"text","id":"tile_title","label":"Concept tile title","default":"Concept"}
+    {"type":"text","id":"tile_title","label":"Concept tile title","default":"Concept"},
+    {"type":"header","content":"Standalone scene images"},
+    {"type":"paragraph","content":"Used only without an assigned collection. Assigned products always use their own images. Empty slots show labeled temporary artwork."},
+    {"type":"image_picker","id":"scene_1_image","label":"Scene 01 image"},
+    {"type":"checkbox","id":"scene_1_image_is_concept","label":"Scene 01 image is concept art","default":false},
+    {"type":"image_picker","id":"scene_2_image","label":"Scene 02 image"},
+    {"type":"checkbox","id":"scene_2_image_is_concept","label":"Scene 02 image is concept art","default":false},
+    {"type":"image_picker","id":"scene_3_image","label":"Scene 03 image"},
+    {"type":"checkbox","id":"scene_3_image_is_concept","label":"Scene 03 image is concept art","default":false}
   ],
   "presets":[{"name":"Collection reveal"}]
 }

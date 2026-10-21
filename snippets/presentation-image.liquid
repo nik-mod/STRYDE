@@ -1,0 +1,45 @@
+{% comment %}
+  Temporary campaign image map. Replace photographs in the section image pickers;
+  leave this map as the disclosed development fallback. See docs/CONCEPT-IMAGES.md.
+  image: merchant image; slot: collection_1..3, material_1..3, featured, finale.
+  image_is_concept applies ONLY to supplied images; bundled fallbacks always disclose.
+  crop_style applies to bundled artwork only. Merchant detail shots start uncropped.
+{% endcomment %}
+{% liquid
+  assign filename = 'stryde-concept-v2.png'
+  assign image_width = 1375
+  assign image_height = 1144
+  assign image_alt = 'assets.concept_alt' | t
+  case slot
+    when 'collection_1', 'material_1', 'material_3', 'finale'
+      assign filename = 'stryde-concept-v2.png'
+    when 'collection_2', 'featured'
+      assign filename = 'stryde-concept-side-v1.webp'
+      assign image_width = 1536
+      assign image_height = 1024
+      assign image_alt = 'assets.concept_side_alt' | t
+    when 'collection_3'
+      assign filename = 'stryde-concept-rear-v1.webp'
+      assign image_width = 1536
+      assign image_height = 1024
+      assign image_alt = 'assets.concept_rear_alt' | t
+    when 'material_2'
+      assign filename = 'stryde-concept-detail-v1.webp'
+      assign image_width = 1254
+      assign image_height = 1254
+      assign image_alt = 'assets.concept_detail_alt' | t
+  endcase
+  assign image_sizes = sizes | default: '(min-width: 900px) 48vw, 92vw'
+  assign supplied_crop = ''
+  if slot contains 'material_'
+    assign supplied_crop = '--zoom: 1; --tx: 0%; --ty: 0%;'
+  endif
+%}
+{% if image != blank %}
+  {{ image | image_url: width: 1600 | image_tag: class: 'presentation-image', loading: 'lazy', widths: '400, 700, 1000, 1600', sizes: image_sizes, style: supplied_crop, alt: image.alt }}
+{% else %}
+  <img class="presentation-image" src="{{ filename | asset_url }}" width="{{ image_width }}" height="{{ image_height }}" loading="lazy" style="{{ crop_style | escape }}" alt="{{ image_alt | escape }}" data-concept-image="{{ slot | escape }}">
+{% endif %}
+{% if image == blank or image_is_concept %}
+  <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
+{% endif %}

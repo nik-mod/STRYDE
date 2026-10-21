@@ -9,7 +9,7 @@ async function collection(settings = {}) {
   const source = await readFile('sections/chapter-collection.liquid', 'utf8');
   const schema = JSON.parse(source.match(/{%\s*schema\s*%}([\s\S]*?){%\s*endschema\s*%}/)[1]);
   const defaults = Object.fromEntries(schema.settings.filter(s => s.default !== undefined).map(s => [s.id, s.default]));
-  const engine = new Liquid();
+  const engine = new Liquid({ root: 'snippets', extname: '.liquid' });
   engine.registerFilter('t', key => key);
   engine.registerFilter('asset_url', file => `/assets/${file}`);
   engine.registerFilter('image_url', image => image.url);

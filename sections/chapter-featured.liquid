@@ -6,12 +6,9 @@
 <section class="chapter chapter-surface chapter-featured" data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
   <div class="feat-grid">
     <div class="frame feat-frame">
-      {% if presentation_image != blank %}
-        {{ presentation_image | image_url: width: 1600 | image_tag: class: 'feat-image', loading: 'lazy', widths: '400, 600, 900, 1200, 1600', sizes: '(min-width: 900px) 48vw, 92vw', alt: presentation_image.alt }}
-      {% else %}
-        <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
-        <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
-      {% endif %}
+      {% assign supplied_concept = false %}
+      {% if section.settings.image != blank %}{% assign supplied_concept = section.settings.image_is_concept %}{% endif %}
+      {% render 'presentation-image', slot: 'featured', image: presentation_image, image_is_concept: supplied_concept %}
     </div>
     <div class="feat-copy">
       <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
@@ -54,9 +51,10 @@
     {"type":"product","id":"product","label":"Featured product"},
     {"type":"collection","id":"collection","label":"Fallback collection link"},
     {"type":"text","id":"fallback_title","label":"Fallback title","default":"The first silhouette"},
-    {"type":"textarea","id":"story","label":"Story","default":"The one that started the story — a full-length translucent sole, a metal exoskeleton and a weave built to disappear on foot."},
+    {"type":"textarea","id":"story","label":"Story","default":"A study in contrast: pale-blue weave, sculptural silver ribs and a translucent cyan sole."},
     {"type":"text","id":"fallback_cta","label":"Fallback call to action","default":"Explore the collection"},
-    {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the product or concept image."}
+    {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the product or concept image. Leave empty to use the assigned product photo, then labeled concept art."},
+    {"type":"checkbox","id":"image_is_concept","label":"Presentation image is concept art","default":false}
   ],
   "presets":[{"name":"Featured product"}]
 }

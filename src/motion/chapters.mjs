@@ -121,7 +121,9 @@ function materials(root, gsap, { mobile }) {
     panels.forEach((panel, index) => {
       const image = panel.querySelector('.mat-frame > img');
       const crop = image ? readCrop(image) : null;
-      if (crop) gsap.set(image, { scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
+      // Discard pixel offsets parsed from the CSS fallback before applying the
+      // same crop with GSAP. Otherwise the translation accumulates twice.
+      if (crop) gsap.set(image, { x: 0, y: 0, scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
       const enter = index * phaseLength;
       const leave = enter + phaseLength;
       if (index > 0) {
@@ -176,7 +178,7 @@ function materials(root, gsap, { mobile }) {
     const image = panel.querySelector('.mat-frame > img');
     const crop = image ? readCrop(image) : null;
     if (image && crop) {
-      gsap.set(image, { scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
+      gsap.set(image, { x: 0, y: 0, scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
       gsap.fromTo(image, { scale: crop.zoom * 1.14, yPercent: crop.ty - 3 }, {
         scale: crop.zoom,
         yPercent: crop.ty,

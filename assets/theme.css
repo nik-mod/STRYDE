@@ -743,7 +743,7 @@ a.hero-name:hover {
 .mat-panel {
   min-height: 88svh;
   display: grid;
-  grid-template-columns: 1.05fr .95fr;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
   align-items: center;
   gap: clamp(36px, 5vw, 80px);
   padding: 10vh 0;
@@ -756,9 +756,13 @@ a.hero-name:hover {
 }
 .mat-frame {
   aspect-ratio: 1.04;
+  min-width: 0;
 }
 .mat-frame > img {
-  transform: scale(var(--zoom, 2.6)) translate(var(--tx, 0%), var(--ty, 0%));
+  position: absolute;
+  inset: 0;
+  /* Match GSAP's percentage translation: do not multiply offsets by the zoom. */
+  transform: translate(var(--tx, 0%), var(--ty, 0%)) scale(var(--zoom, 2.6));
 }
 .mat-index {
   font-size: 12px;
@@ -890,6 +894,7 @@ a.hero-name:hover {
 }
 .coll-scene-visual {
   display: block;
+  position: relative;
   will-change: transform;
 }
 .coll-scene-visual img {
@@ -911,9 +916,22 @@ a.hero-name:hover {
   font-size: 13px;
   text-align: center;
 }
-.coll-tint-a img { filter: hue-rotate(-10deg) saturate(1.05); }
-.coll-tint-b img { filter: hue-rotate(14deg) brightness(1.04); }
-.coll-tint-c img { filter: hue-rotate(-24deg) saturate(.92) brightness(.97); }
+/* Keep complete concept silhouettes in the established scene envelope. */
+.coll-scene-visual img[data-concept-image] {
+  aspect-ratio: 1375 / 1144;
+  object-fit: contain;
+}
+.mat-frame .asset-tag {
+  color: var(--ink);
+  background: var(--paper);
+  padding: 5px 8px;
+  opacity: 1;
+}
+.presentation-image ~ .asset-tag {
+  font-size: 10px;
+  letter-spacing: .12em;
+  opacity: 1;
+}
 .coll-scene-copy {
   position: relative;
   z-index: 2;
@@ -984,6 +1002,10 @@ a.hero-name:hover {
 }
 .feat-frame {
   aspect-ratio: .94;
+}
+/* Landscape concept studies need breathing room during the existing 1.08 drift. */
+.feat-frame > img[data-concept-image] {
+  padding: clamp(18px, 2.4vw, 34px);
 }
 .feat-copy .chapter-kicker {
   margin-bottom: 20px;
@@ -2279,16 +2301,18 @@ a.hero-name:hover {
 /* Materials — pinned macro journey (desktop classes applied by JS) */
 
 .chapter-materials.is-journey-host {
+  height: 100svh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   padding-top: calc(var(--header-height) + var(--preview-height) + 26px);
-  padding-bottom: 0;
+  padding-bottom: 32px;
 }
 .chapter-materials.is-journey-host .mat-panels {
   position: relative;
   flex: 1;
   min-height: 0;
+  margin-top: 32px;
 }
 .chapter-materials.is-journey-host .mat-panel {
   position: absolute;
@@ -2300,6 +2324,10 @@ a.hero-name:hover {
 }
 .chapter-materials.is-journey-host .mat-panel:first-child {
   opacity: 1;
+}
+.chapter-materials.is-journey-host .mat-frame {
+  height: 100%;
+  aspect-ratio: auto;
 }
 
 /* Technology — word masks, spine line, experimental heading */
@@ -2531,5 +2559,234 @@ a.hero-name:hover {
   }
   .finale-actions {
     margin-top: 26px;
+  }
+}
+
+/* Collection storefront — a footwear study index, distinct from the campaign. */
+.collection-page {
+  padding-right: clamp(20px, 4vw, 64px);
+  padding-left: clamp(20px, 4vw, 64px);
+}
+.collection-page-concepts .listing-heading {
+  margin-bottom: 22px;
+}
+.collection-page-concepts {
+  padding-top: calc(var(--header-height) + var(--preview-height) + 24px);
+}
+.listing-eyebrow {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+}
+.collection-page-concepts .listing-heading h1 {
+  margin: 0;
+  font-size: clamp(48px, 7.8vw, 126px);
+  font-weight: 820;
+  font-style: italic;
+  font-stretch: 100%;
+  line-height: 1.02;
+  letter-spacing: -.065em;
+}
+.listing-introduction {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  margin-top: 16px;
+}
+.listing-introduction p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.listing-introduction .listing-preview-note {
+  font-size: 11px;
+  font-weight: 500;
+}
+.study-register {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid var(--ink);
+  padding: 14px 0 16px;
+}
+.study-register p {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+.study-register p:first-child {
+  font-weight: 650;
+}
+.study-register p:last-child {
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+.study-grid,
+.collection-page .product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 50px 22px;
+}
+.study-entry {
+  min-width: 0;
+}
+.study-image-field {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.16;
+  overflow: hidden;
+  background: var(--study-field, var(--surface));
+}
+.study-visual {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 28px;
+  transform: translateY(0) scale(1);
+}
+.study-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  filter: hue-rotate(var(--study-hue, 0deg)) saturate(var(--study-saturation, 1)) brightness(var(--study-lightness, 1));
+  transform: rotate(var(--study-rotation, 0deg));
+}
+.study-information {
+  position: relative;
+  margin-top: 17px;
+  padding-top: 15px;
+  border-top: 1px solid var(--rule);
+}
+.study-index {
+  position: absolute;
+  right: 0;
+  top: 18px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.study-information h2 {
+  max-width: calc(100% - 32px);
+  margin: 0;
+  font-size: clamp(21px, 1.7vw, 28px);
+  font-weight: 720;
+  font-style: italic;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+.study-colourway {
+  margin: 7px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.study-disclosure {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.collection-page .product-card-media {
+  aspect-ratio: 1.08;
+}
+.collection-page .product-card-media img {
+  padding: 24px;
+}
+.collection-page .product-card-info h2 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+.collection-page .product-card-info p {
+  font-size: 13px;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .study-visual {
+    transition: transform .65s var(--ease-out);
+  }
+  .study-entry:hover .study-visual {
+    transform: translateY(-6px) scale(1.055);
+  }
+  .collection-page .product-card-media img {
+    transition: transform .65s var(--ease-out);
+  }
+  .collection-page .product-card:hover .product-card-media img,
+  .collection-page .product-card:focus-within .product-card-media img {
+    transform: translateY(-6px) scale(1.055);
+  }
+}
+@media (max-width: 1000px) {
+  .study-grid,
+  .collection-page .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 38px 20px;
+  }
+  .collection-page-concepts .listing-heading h1 {
+    font-size: 8.4vw;
+  }
+  .listing-introduction {
+    display: block;
+    margin-top: 20px;
+  }
+  .listing-introduction .listing-preview-note {
+    margin-top: 7px;
+  }
+}
+@media (max-width: 540px) {
+  .collection-page-concepts {
+    padding-top: calc(var(--header-height) + var(--preview-height) + 8px);
+  }
+  .collection-page-concepts .listing-heading {
+    margin-bottom: 18px;
+  }
+  .collection-page-concepts .listing-heading h1 {
+    max-width: 330px;
+    font-size: 14vw;
+    line-height: .98;
+  }
+  .listing-eyebrow {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+  .listing-introduction {
+    margin-top: 14px;
+  }
+  .listing-introduction p {
+    font-size: 12px;
+  }
+  .listing-introduction .listing-preview-note {
+    font-size: 10px;
+  }
+  .study-register {
+    padding-bottom: 13px;
+  }
+  .study-register p:last-child {
+    display: none;
+  }
+  .study-grid,
+  .collection-page .product-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+  .study-image-field,
+  .collection-page .product-card-media {
+    aspect-ratio: 1.12;
+  }
+  .study-visual {
+    padding: 26px;
+  }
+  .study-information h2 {
+    font-size: 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .collection-page .product-card:hover .product-card-media img,
+  .collection-page .product-card:focus-within .product-card-media img {
+    transform: none;
+    transition: none;
   }
 }

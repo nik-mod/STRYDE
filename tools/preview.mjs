@@ -2,6 +2,7 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Liquid } from 'liquidjs';
+import { conceptCatalog } from './fixtures/concept-catalog.mjs';
 
 const root = process.cwd();
 const engine = new Liquid({ root: [resolve('snippets')], extname: '.liquid', strictFilters: false });
@@ -20,7 +21,7 @@ engine.registerFilter('image_url', value => value?.url || '');
 engine.registerFilter('image_tag', (value, ...args) => {
   const attributes = Object.fromEntries(args.filter(arg => Array.isArray(arg) && arg.length === 2));
   const escape = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
-  return `<img src="${escape(value)}" ${Object.entries(attributes).filter(([key]) => ['class', 'width', 'height', 'alt', 'loading', 'fetchpriority'].includes(key)).map(([key, value]) => `${key}="${escape(value)}"`).join(' ')}>`;
+  return `<img src="${escape(value)}" ${Object.entries(attributes).filter(([key]) => ['class', 'width', 'height', 'alt', 'loading', 'fetchpriority', 'style', 'sizes'].includes(key)).map(([key, value]) => `${key}="${escape(value)}"`).join(' ')}>`;
 });
 function prepare(source) {
   return source.replace(/{%\s*schema\s*%}[\s\S]*?{%\s*endschema\s*%}/g, '')
@@ -69,7 +70,12 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
       }
     }
     if (type === 'chapter-collection' && populated) sectionSettings.collection = context.collection;
-    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings } });
+    // This additional render property does not exist on Shopify's SectionDrop.
+    // It is never a theme setting and never goes into collection.products.
+    // A populated native collection always wins; ?concepts=0 previews its empty UI.
+    const preview_catalog = type === 'main-collection' && pathname === '/collections/all' &&
+      context.collection.products_count === 0 && query.get('concepts') !== '0' ? conceptCatalog : undefined;
+    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_catalog } });
   }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));
   let content = '';
