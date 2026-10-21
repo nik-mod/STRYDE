@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import { heroPose, heroPhase, HERO_PHASES, CHAPTERS } from '../src/motion/contracts.mjs';
 import { environmentFor, ENVIRONMENTS } from '../src/motion/environments.mjs';
 import { magneticOffset, mountMagnetic } from '../src/motion/magnetic.mjs';
+import { Euler, Vector3 } from 'three';
+
+test('the opening model pose lifts the heel and exposes the upper in the reference direction',()=>{
+  const pose=heroPose(0),rotation=new Euler(pose.rotationX,pose.rotationY,pose.rotationZ);
+  const toe=new Vector3(-1,0,0).applyEuler(rotation),heel=new Vector3(1,0,0).applyEuler(rotation);
+  assert(heel.x>toe.x&&heel.y>toe.y,'Heel must sit above and right of the toe');
+  assert(new Vector3(0,1,0).applyEuler(rotation).z>0,'Upper must face the camera');
+});
 
 test('every chapter has a deterministic environment preset with finite lighting values', () => {
   assert.deepEqual(Object.keys(ENVIRONMENTS).sort(), [...CHAPTERS].sort());
@@ -36,7 +44,7 @@ test('seeking the same stop forward or backward restores the identical pose', ()
 test('the hero settles into a deterministic handoff pose for chapter 02', () => {
   const macro = heroPose(.72);
   const rest = heroPose(1);
-  assert.deepEqual(Object.keys(rest), ['rotationY', 'rotationZ', 'cameraZ', 'cameraY', 'fov', 'keyIntensity', 'rimIntensity']);
+  assert.deepEqual(Object.keys(rest), ['rotationX', 'rotationY', 'rotationZ', 'cameraZ', 'cameraY', 'fov', 'keyIntensity', 'rimIntensity']);
   assert.ok(Math.abs(rest.rotationY) < .2, 'rest rotation stays near centered');
   assert.ok(Math.abs(rest.rotationZ) < .1, 'rest tilt levels out');
   assert.ok(rest.cameraZ > macro.cameraZ, 'camera pulls back out of the macro close-up');

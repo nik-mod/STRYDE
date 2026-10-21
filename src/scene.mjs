@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { heroPose } from './motion/contracts.mjs';
+import { refinePreviewMaterial } from './scene-materials.mjs';
+import { fittedCameraZ } from './scene-framing.mjs';
 
 export function disposeObject(object) {
   const textures = new Set(); const materials = new Set(); const geometries = new Set();
@@ -33,12 +36,13 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
   let renderer; let disposed = false; let model; let visible = false; let contextLost = false;
   let dirty = true; let lastProgress = null;
+  const framingPoints = [], worldPoints = [];
   let unsubscribe = () => {}; let removeFrame = () => {}; let observer; let resizeObserver;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, .01, 100);
   camera.position.set(0, .1, 4.8);
   const rig = new THREE.Group(); scene.add(rig);
-  const ambient = new THREE.HemisphereLight(0xffffff, 0x6f9fc0, 2.6); scene.add(ambient);
+  const ambient = new THREE.HemisphereLight(0xffffff, 0x6f9fc0, 1.05); scene.add(ambient);
   const key = new THREE.DirectionalLight(0xffffff, 3.4); key.position.set(3, 4, 5); scene.add(key);
   const rim = new THREE.DirectionalLight(0xffffff, 2); rim.position.set(-3, 2, -2); scene.add(rim);
   const lights = [key, rim];
@@ -57,9 +61,10 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   signal.addEventListener('abort', cleanup, { once: true });
   try {
     setStatus(root.dataset.loadingLabel || 'Loading product view…');
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: innerWidth > 700, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = .9;
     renderer.domElement.setAttribute('aria-hidden', 'true');
     renderer.domElement.addEventListener('webglcontextlost', onLost);
     renderer.domElement.addEventListener('webglcontextrestored', onRestored);
@@ -69,7 +74,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       const width = host.clientWidth, height = host.clientHeight;
       if (!width || !height) return;
       // Bound GPU fill cost on large/retina screens without changing CSS size.
-      const ratio = Math.min(devicePixelRatio || 1, innerWidth > 700 ? 1.5 : 1, Math.sqrt(1600000 / (width * height)));
+      const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1600000 / (width * height)));
       renderer.setPixelRatio(ratio); renderer.setSize(width, height, false);
       camera.aspect = width / height; camera.updateProjectionMatrix(); dirty = true;
     };
@@ -80,24 +85,50 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     if (!response.ok) throw new Error(`Model response ${response.status}`);
     const bytes = await response.arrayBuffer();
     if (signal.aborted) return cleanup;
-    const gltf = await new GLTFLoader().parseAsync(bytes, new URL('.', url).href);
+    const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes, new URL('.', url).href);
     if (disposed || signal.aborted) { disposeObject(gltf.scene); return cleanup; }
     model = gltf.scene;
+    const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    model.traverse(node => {
+      for (const material of (Array.isArray(node.material) ? node.material : [node.material])) {
+        if (!material) continue;
+        for (const texture of [material.map, material.normalMap, material.roughnessMap, material.metalnessMap]) {
+          if (!texture) continue;
+          texture.anisotropy = anisotropy;
+          texture.needsUpdate = true;
+        }
+        if (root.dataset.modelYaw) {
+          if (material.normalMap && material.normalScale) material.normalScale.set(1.3, 1.3);
+          refinePreviewMaterial(material, THREE.ShaderChunk.normal_fragment_maps);
+        }
+      }
+    });
     model.rotation.y += THREE.MathUtils.degToRad(Number(root.dataset.modelYaw) || 0);
     const bounds = new THREE.Box3().setFromObject(model); const size = bounds.getSize(new THREE.Vector3()); const center = bounds.getCenter(new THREE.Vector3());
     if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty model');
     model.position.sub(center);
+    const modelBounds = new THREE.Box3().setFromObject(model);
+    const hull = model.userData.strydeFramingHull;
+    if (Array.isArray(hull) && hull.length > 3 && hull.length < 5000 && hull.every(point=>Array.isArray(point) && point.length === 3 && point.every(Number.isFinite))) {
+      const yaw = THREE.MathUtils.degToRad(Number(root.dataset.modelYaw) || 0), axis = new THREE.Vector3(0,1,0);
+      for (const point of hull) framingPoints.push(new THREE.Vector3().fromArray(point).applyAxisAngle(axis,yaw).sub(center));
+    } else {
+      // Merchant models without a baked hull retain a safe oriented-box fit.
+      for (const x of [modelBounds.min.x, modelBounds.max.x]) for (const y of [modelBounds.min.y, modelBounds.max.y]) for (const z of [modelBounds.min.z, modelBounds.max.z]) framingPoints.push(new THREE.Vector3(x,y,z));
+    }
+    for (let i = 0; i < framingPoints.length; i++) worldPoints.push(new THREE.Vector3());
     const mobileFit = innerWidth <= 700 ? .82 : 1;
     const scale = ((Number(root.dataset.modelSize) || 2.2) * mobileFit) / Math.max(size.x, size.y, size.z);
     rig.scale.setScalar(scale); rig.add(model);
     // The rig follows the same authored five-phase pose the image fallback
-    // scrubs against: rotation, camera dolly and lighting all derive from the
-    // shared heroPose(progress), never from accumulated deltas.
+    // scrubs against: rotation, lens, camera height and lighting derive from
+    // heroPose(progress). Distance fits the silhouette instead of stacking a
+    // second authored zoom on top. No property uses accumulated deltas.
     unsubscribe = bus.subscribe(state => {
       if (state.local === lastProgress) return;
       lastProgress = state.local;
       const pose = heroPose(state.local);
-      rig.rotation.set(0, pose.rotationY, pose.rotationZ);
+      rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ);
       camera.position.set(0, pose.cameraY, pose.cameraZ);
       if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
       key.intensity = pose.keyIntensity;
@@ -106,6 +137,11 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     });
     removeFrame = scheduler.add(() => {
       if (!dirty || !visible || document.hidden || contextLost || disposed) return;
+      if (framingPoints.length) {
+        rig.updateMatrixWorld(true);
+        for (let i = 0; i < framingPoints.length; i++) worldPoints[i].copy(framingPoints[i]).applyMatrix4(rig.matrixWorld);
+        camera.position.z = fittedCameraZ(worldPoints, { fov: camera.fov, aspect: camera.aspect, y: camera.position.y });
+      }
       renderer.render(scene, camera);
       dirty = false;
     });

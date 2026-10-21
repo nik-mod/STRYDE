@@ -319,7 +319,8 @@ function collection(root, gsap, { mobile, fine }) {
     }
     timeline
       .fromTo(art, { x: 0, xPercent: index === 0 ? 10 : 18, scale: .9, autoAlpha: 0 }, { x: 0, xPercent: 0, scale: 1, autoAlpha: 1, duration: span * .5, ease: 'power2.out' }, index === 0 ? 0 : at + span * .12)
-      .fromTo(num, { xPercent: index % 2 ? -18 : 22, autoAlpha: 0 }, { xPercent: 0, autoAlpha: 1, duration: span * .46, ease: 'power2.out' }, index === 0 ? .015 : at + span * .1)
+      // Keep the decorative index quiet: autoAlpha: 1 overrides CSS opacity.
+      .fromTo(num, { xPercent: index % 2 ? -18 : 22, autoAlpha: 0 }, { xPercent: 0, autoAlpha: .12, duration: span * .46, ease: 'power2.out' }, index === 0 ? .015 : at + span * .1)
       .fromTo(copy, { y: 46, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: span * .4, ease: 'power3.out', stagger: .02 }, index === 0 ? .05 : at + span * .24);
     // Continuous in-phase drift: the numeral and the product keep moving.
     timeline
@@ -330,13 +331,11 @@ function collection(root, gsap, { mobile, fine }) {
   // Exit: the final composition recedes while the stage resolves into the
   // featured chapter's surface — no blank frames.
   const last = scenes[scenes.length - 1];
-  // Exit: copy lifts away but the product stays on stage through the pin's
-  // end — the featured chapter arrives over the receding composition, so no
-  // blank frame can exist between the chapters.
+  // Keep the final title, context and link visible through the handoff. Fading
+  // these within the pin leaves an apparently broken, empty half-screen.
   timeline
-    .to(last.querySelector('.coll-scene-figure'), { scale: .88, yPercent: -10, duration: span * .3, ease: 'power1.inOut' }, .9)
-    .to(last.querySelectorAll('.coll-scene-copy > *'), { autoAlpha: 0, y: -26, duration: span * .22, ease: 'power1.in', stagger: .012 }, .9)
-    .to(last.querySelector('.coll-scene-num'), { yPercent: 14, duration: span * .28, ease: 'power1.in' }, .9)
+    .to(last.querySelector('.coll-scene-figure'), { scale: 1, yPercent: -2, duration: span * .3, ease: 'power1.inOut' }, .9)
+    .to(last.querySelector('.coll-scene-num'), { yPercent: 0, duration: span * .28, ease: 'power1.in' }, .9)
 
   return () => {
     disposeHover();
@@ -418,6 +417,11 @@ function finale(root, gsap, { mobile }) {
   wipeIn(root, gsap);
   const stage = root.querySelector('[data-finale-stage]');
   if (!stage) return;
+  const float = root.querySelector('[data-finale-float]');
+  const floating = float ? gsap.fromTo(float, { y: 0, rotation: -.8 }, {
+    y: -8, rotation: .8, duration: 3.6, repeat: -1, yoyo: true, ease: 'sine.inOut',
+    paused: true,
+  }) : null;
   const word = root.querySelector('[data-finale-word]');
   if (word) gsap.set(word, { x: 0, y: 0, xPercent: -50, yPercent: -50 });
   const timeline = gsap.timeline({
@@ -428,6 +432,7 @@ function finale(root, gsap, { mobile }) {
       pin: true,
       scrub: true,
       invalidateOnRefresh: true,
+      onToggle: self => { if (floating) self.isActive ? floating.play() : floating.pause(); },
     },
   });
   timeline
@@ -450,6 +455,7 @@ function finale(root, gsap, { mobile }) {
       ease: 'none',
     }, 0);
   }
+  if (timeline.scrollTrigger.isActive) floating?.play();
 }
 
 const CONTROLLERS = { deconstruction, materials, technology, collection, featured, brand, finale };

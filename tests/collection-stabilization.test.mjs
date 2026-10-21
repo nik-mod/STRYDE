@@ -31,13 +31,14 @@ test('collection fields keep their existing defaults and independently honor mer
 
 test('real collection scenes preserve native data without concept labels or substitute artwork', async () => {
   const product = {title:'Merchant shoe',url:'/products/merchant-shoe',price:24000,available:true,featured_image:{url:'/merchant.jpg'}};
-  const {html} = await collection({collection:{products_count:2,products:[product,{...product,featured_image:null,available:false}]}});
+  const {html} = await collection({use_tn_model:true,collection:{products_count:2,products:[product,{...product,featured_image:null,available:false}]}});
   assert.match(html, /href="\/products\/merchant-shoe"/);
   assert.match(html, /\/merchant\.jpg/);
   assert.match(html, /\$240 USD/);
   assert.match(html, /products.sold_out/);
   assert.match(html, /hero.asset_pending/);
-  assert.doesNotMatch(html, /assets.concept_tag|stryde-concept-v2/);
+  assert.doesNotMatch(html, /assets.concept_tag|stryde-concept-v2|data-model-editorial-image/);
+  assert.equal(((await collection({use_tn_model:true})).html.match(/data-model-editorial-image/g)||[]).length,3);
   assert.match((await collection()).html, /assets.concept_tag/);
 });
 

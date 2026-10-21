@@ -7,7 +7,7 @@
     <div class="mat-panel">
       <div class="frame mat-frame">
         {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
-          <img src="{{ 'tn-detail-1400.webp' | asset_url }}" srcset="{{ 'tn-detail-700.webp' | asset_url }} 700w, {{ 'tn-detail-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" style="--zoom: 1.12; --tx: 0%; --ty: 0%;" alt="Blue and white TN — detail view rendered from the 3D model">
+          <img src="{{ 'tn-angle-1400.webp' | asset_url }}" srcset="{{ 'tn-angle-700.webp' | asset_url }} 700w, {{ 'tn-angle-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" data-model-fullshot style="--zoom: 1.32; --tx: 0%; --ty: 0%;" alt="Blue and white TN — detail view rendered from the 3D model">
           <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
         {% else %}
         {% render 'presentation-image', slot: 'material_1', image: section.settings.panel_1_image, image_is_concept: section.settings.panel_1_image_is_concept, crop_style: '--zoom: 2.9; --tx: 12%; --ty: -18%;' %}
@@ -22,7 +22,7 @@
     <div class="mat-panel mat-panel-flip">
       <div class="frame mat-frame">
         {% if section.settings.use_tn_model and section.settings.panel_2_image == blank %}
-          <img src="{{ 'tn-profile-1400.webp' | asset_url }}" srcset="{{ 'tn-profile-700.webp' | asset_url }} 700w, {{ 'tn-profile-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" style="--zoom: 1.55; --tx: 0%; --ty: -2%;" alt="Blue and white TN — profile view rendered from the 3D model">
+          <img src="{{ 'tn-profile-1400.webp' | asset_url }}" srcset="{{ 'tn-profile-700.webp' | asset_url }} 700w, {{ 'tn-profile-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" data-model-fullshot style="--zoom: 1.15; --tx: 0%; --ty: 0%;" alt="Blue and white TN — profile view rendered from the 3D model">
           <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
         {% else %}
         {% render 'presentation-image', slot: 'material_2', image: section.settings.panel_2_image, image_is_concept: section.settings.panel_2_image_is_concept, crop_style: '--zoom: 1; --tx: 0%; --ty: 0%;' %}
@@ -37,7 +37,7 @@
     <div class="mat-panel">
       <div class="frame mat-frame">
         {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
-          <img src="{{ 'tn-sole-1400.webp' | asset_url }}" srcset="{{ 'tn-sole-700.webp' | asset_url }} 700w, {{ 'tn-sole-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" style="--zoom: 1.25; --tx: 0%; --ty: 0%;" alt="Blue and white TN — sole view rendered from the 3D model">
+          <img src="{{ 'tn-sole-1400.webp' | asset_url }}" srcset="{{ 'tn-sole-700.webp' | asset_url }} 700w, {{ 'tn-sole-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" data-model-fullshot style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Blue and white TN — sole view rendered from the 3D model">
           <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
         {% else %}
         {% render 'presentation-image', slot: 'material_3', image: section.settings.panel_3_image, image_is_concept: section.settings.panel_3_image_is_concept, crop_style: '--zoom: 2.5; --tx: -70%; --ty: -10%;' %}

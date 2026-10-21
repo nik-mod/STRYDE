@@ -55,7 +55,7 @@
               {% if section.settings.use_tn_model and section.settings[image_key] == blank %}{% assign use_tn_view = true %}{% endif %}
               <span class="coll-scene-visual" data-coll-visual>
                 {% if use_tn_view %}
-                  <img src="{{ tn_view | asset_url }}" srcset="{{ tn_view | replace: '-1400.webp', '-700.webp' | asset_url }} 700w, {{ tn_view | asset_url }} 1400w" sizes="(min-width: 900px) 56vw, 92vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — {{ tn_title | escape }} 3D model preview">
+                  <img data-model-editorial-image src="{{ tn_view | asset_url }}" srcset="{{ tn_view | replace: '-1400.webp', '-700.webp' | asset_url }} 700w, {{ tn_view | asset_url }} 1400w" sizes="(min-width: 900px) 56vw, 92vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — {{ tn_title | escape }} 3D model preview">
                   <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
                 {% else %}
                   {% render 'presentation-image', slot: image_slot, image: section.settings[image_key], image_is_concept: section.settings[concept_key], sizes: '(min-width: 900px) 56vw, 92vw' %}

@@ -2375,6 +2375,7 @@ body .journey-nav {
 /* Collection — pinned sequence stage (desktop class applied by JS) */
 
 .chapter-collection.is-sequenced {
+  height: 100svh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -2384,6 +2385,7 @@ body .journey-nav {
 }
 .chapter-collection.is-sequenced .coll-stage {
   flex: 1;
+  min-height: 0;
 }
 .chapter-collection.is-sequenced .coll-scene {
   position: absolute;
@@ -2395,16 +2397,18 @@ body .journey-nav {
 }
 .chapter-collection.is-sequenced .coll-scene-num {
   position: absolute;
-  font-size: clamp(220px, 30vw, 520px);
+  font-size: clamp(72px, min(10vw, 12svh), 140px);
+  line-height: 1;
 }
 .chapter-collection.is-sequenced .coll-scene:nth-of-type(odd) .coll-scene-num {
-  right: -3vw;
-  bottom: -.06em;
-  left: auto;
+  right: auto;
+  bottom: 9%;
+  left: -2vw;
 }
 .chapter-collection.is-sequenced .coll-scene:nth-of-type(even) .coll-scene-num {
-  left: -2vw;
-  bottom: -.06em;
+  right: -3vw;
+  left: auto;
+  bottom: 9%;
 }
 .chapter-collection.is-sequenced .coll-scene-art {
   position: absolute;
@@ -2416,7 +2420,21 @@ body .journey-nav {
 }
 .chapter-collection.is-sequenced .coll-scene-figure {
   pointer-events: auto;
-  width: min(54vw, 720px);
+  width: 60%;
+  height: 100%;
+}
+.chapter-collection.is-sequenced .coll-scene-visual {
+  height: 100%;
+}
+.chapter-collection.is-sequenced .coll-scene-visual img {
+  height: 100%;
+  object-fit: contain;
+}
+.chapter-collection.is-sequenced .coll-scene-art .asset-tag {
+  top: auto;
+  bottom: 20px;
+  left: 0;
+  right: auto;
 }
 .chapter-collection.is-sequenced .coll-scene:nth-of-type(odd) .coll-scene-figure {
   justify-self: start;

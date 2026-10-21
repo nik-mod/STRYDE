@@ -1,3 +1,39 @@
+# Tactile materials, complete views and living finale — 2026-10-22
+
+The existing model now has stronger render-time weave and pale-surface grain, clearer normal definition and less flat lighting. Original texture maps and geometry are retained. Materials and Deconstruction show complete TN views within measured framing limits. Collection indices are smaller and fully inset. Finale's shoe is larger with transparent image padding removed from the composition, width-safe typography and a gentle float/rock loop tied to the existing pin's active state. No extra viewer, ticker or scroll controller was introduced. Merchant imagery and commerce branches are preserved.
+
+Seven viewport checks pass for image alpha containment, whole indices, finale image/headline/controls inside the viewport, floating motion, offscreen pause, reduced-motion cleanup and shader/page errors. Additional deconstruction and no-JS framing checks pass. Build, 32 tests, validation and Theme Check pass. `SURFACE-POLISH.md` documents parameters, limitations and screenshot paths; it supersedes earlier crop and oversized-numeral descriptions below.
+
+# Larger hero and Collection framing — 2026-10-22
+
+The hero now fits the actual mesh silhouette using 3,546 convex-hull points baked offline into the GLB scene metadata. This removes the excess empty space in rotated bounding boxes and the unnecessarily distant camera floor. It uses a 94% safe area and retains the single idle-gated renderer. The model remains 327,498 triangles with unchanged textures; framing metadata brings its file size to 2,638,764 bytes. Merchant GLBs without metadata use original transformed bounding corners. `MODEL-DETAIL.md` includes the updated bake command and checksum.
+
+The six-viewport pixel checks passed all forward/reverse poses, resizing, idle draw gating and reduced-motion teardown, with no edge clipping or overflow. Compared at identical poses with the previous hero-detail captures, actual shoe pixel height is 1.25–1.75 times larger across the sampled viewports. Artifacts: `C:/Users/LENOVO_LEGION/.codex/visualizations/2026/10/21/01a15e09-43e7-7bb2-a336-868299c3d058/hero-scale/`.
+
+Collection figures use 60% stage width without the former 720px ceiling; only the labeled TN editorial images compensate for transparent padding with a 1.15 scale. The final scene stays at full scale through the exit. Native merchant images retain containment. All three scenes and reverse passes passed at six sizes, with clear copy/links, no horizontal overflow and reduced-motion flow. Screenshots: adjacent `collection-scale/`. Build, 32 tests, validation and Theme Check pass; no commit, push or deployment.
+
+# Hero clipping, detailed GLB and Collection exit — 2026-10-22
+
+The bundled hero model now retains 327,498 triangles from the original local export (previously 115,586), with original PBR images preserved byte-for-byte. Meshopt compression reduces the file from 4,293,624 to 2,541,660 bytes. The existing Three.js decoder is configured on GLTFLoader; only one viewer is mounted. See `MODEL-DETAIL.md` for source, commands, checksums and scope.
+
+Removed the live model's stacked DOM zoom. Camera fitting contains the rotated model after pose and viewport changes. A new unit test covers 101 poses at five aspect ratios. Chromium checks at 2048×1140, 1440×900, 1440×700, 768×1024, 390×844 and 375×667 confirm the 327,498-triangle mesh actually renders, occupied alpha pixels stay inside every canvas edge at intermediate forward/reverse poses, resizing remains safe, idle draws stay zero and reduced motion removes the canvas. The final Collection title and link now remain visible through its exit; both pinned and flowing modes were checked. The first browser script had an incorrect assumption that tablet Collection was pinned; its flowing-layout scroll setup was corrected and the complete six-viewport run passed.
+
+Artifacts: `C:/Users/LENOVO_LEGION/.codex/visualizations/2026/10/21/01a15e09-43e7-7bb2-a336-868299c3d058/hero-detail/`. Final build, 32 tests, validation of 62 theme files and Theme Check (40 files, zero offenses) pass. No commit, push or deployment.
+
+# Collection composition repair — 2026-10-22
+
+The pinned Collection now has a definite viewport height and a shrinkable stage. Its decorative numerals sit behind the product side of each mirrored scene, with animated opacity capped at 0.12 instead of overriding the CSS with solid ink. Images contain within the stage without the editorial scale enlargement; copy sizing also accounts for short viewports. The Collection link stays unobstructed. Native product markup and mobile/static flow are unchanged.
+
+Chromium checks passed all three scenes in forward and reverse order at 2048×1140, 1440×900, 1440×700, 768×1024, 390×844 and 375×667: no horizontal overflow, numeral/copy separation, visible pinned links, decoded images and reduced-motion teardown. Screenshots and geometry measurements: `C:/Users/LENOVO_LEGION/.codex/visualizations/2026/10/21/01a15e09-43e7-7bb2-a336-868299c3d058/collection-composition/`. Build, 31 tests, validation of 62 theme files and Theme Check (40 files, zero offenses) pass. No commit, push or deployment.
+
+# Scene, Materials and merge stabilization — 2026-10-22
+
+The latest local state combines the incoming model/editorial work with the existing presentation-image system. Four Liquid conflict blocks and the generated-bundle conflict were resolved without committing. Validation now rejects merge markers. The supplied model renders once in the hero; other chapters stay static. The opening reference pose is diagonal with a visible upper; the rest handoff remains level. Existing 2K maps receive better filtering, lighting/normal definition and a subtle preview-only fabric treatment; source geometry is unchanged.
+
+GPU draw-call checks confirm one canvas, zero idle/offscreen draws, scroll redraw and complete canvas removal in reduced-motion mode across four viewport sizes at DPR2. Canvas backing sizes stay below 1.6M pixels. Materials phases have one image each, remain below the heading and inside the viewport, and retain nonblank crops in forward/reverse, reduced-motion and no-JS checks. The ten-entry listing and native Shopify fixture/empty behavior were rechecked. Detailed changes, scope, measurements and screenshot paths are in `SCENE-STABILIZATION.md`. Older sections below are historical.
+
+Final build, 31 tests, validation of 62 theme files and Theme Check of 40 Liquid files pass. The all-eight-chapter sweep and reverse traversal pass at four viewports, including static hero edition/title separation and visible Finale controls at 375×667. A transient Windows mapped-file lock during concurrent builds was cleared by completing browser activity and rerunning the full test suite; it is recorded in SCENE-STABILIZATION.md.
+
 # Development product listing — 2026-10-22
 
 The actual `/collections/all` route now renders **10 non-purchasable concept sneakers** by default in standalone local preview. Three existing full-shoe assets supply ten named, explicitly temporary color/pose studies. No new product images, fabricated prices, inventory, reviews, ratings or buy links were added. The catalog data lives only in `tools/fixtures/concept-catalog.mjs`; Shopify collections/products remain native. `DEVELOPMENT-CATALOG.md` documents this boundary and the eventual Shopify Admin replacement workflow.

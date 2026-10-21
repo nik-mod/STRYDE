@@ -21,13 +21,14 @@ const span = (p, from, to) => smooth((p - from) / (to - from));
 export function heroPose(progress) {
   const p = clamp(progress);
   const rotationY = mix(-.38, .7, span(p, 0, .46)) + mix(0, .48, span(p, .46, .72)) - mix(0, 1.08, span(p, .72, .9));
-  const rotationZ = -.08 + mix(0, .06, span(p, 0, .46)) - mix(0, .06, span(p, .72, .9));
+  const rotationZ = .56 + mix(0, .06, span(p, 0, .46)) - mix(0, .7, span(p, .72, .9));
+  const rotationX = .26 + mix(0, .08, span(p, .46, .72)) - mix(0, .34, span(p, .72, .9));
   const cameraZ = 4.8 - mix(0, .65, span(p, 0, .46)) - mix(0, .55, span(p, .46, .72)) + mix(0, .7, span(p, .72, .9));
   const cameraY = .1 + mix(0, .06, span(p, .46, .72)) - mix(0, .08, span(p, .72, .9));
   const fov = 32 + mix(0, 3.2, span(p, .46, .72)) - mix(0, 3.2, span(p, .72, .9));
   const keyIntensity = 3.4 + mix(0, 1.1, span(p, .46, .72)) - mix(0, 1.1, span(p, .72, .9));
   const rimIntensity = 2 + mix(0, .7, span(p, .46, .72)) - mix(0, .7, span(p, .72, .9));
-  return { rotationY, rotationZ, cameraZ, cameraY, fov, keyIntensity, rimIntensity };
+  return { rotationX, rotationY, rotationZ, cameraZ, cameraY, fov, keyIntensity, rimIntensity };
 }
 
 // Phase label for the current scroll position (shared with the DOM path).

@@ -1,5 +1,9 @@
 # Required merchant data and licensed assets
 
+**Latest model revision (2026-10-22):** the bundled hero GLB retains 327,498 triangles from the original local export, replacing the reduced 115,586-triangle geometry. The compressed file, including a baked silhouette hull for closer camera framing, is 2,638,764 bytes. Original 2048px PBR maps are unchanged. `MODEL-DETAIL.md` records the source, reproducible commands, checksums, decoder and camera fitting. This supersedes the geometry-unchanged note from the earlier stabilization below.
+
+**Current workspace update (2026-10-22):** the incoming model work now supplies `nike-tn-blue-white.glb` and static `tn-*.webp` editorial views. The homepage uses that existing model in one hero viewer, with model-preview labeling; this stabilization did not generate or replace its geometry. It has three 2048px PBR maps. See `SCENE-STABILIZATION.md` for pose/material rendering and performance changes, and the existing `reference/tn-blue-white/` records for the incoming model work. The concept assets/replacement guide below remain available for fallback and the separate local collection listing.
+
 No authentic product photographs, accurate specifications, reviews, prices, merchant story, GLB or shoebox model were supplied. The attached reference screenshots are not theme merchandise. The theme ships original generated concept artwork, identified by `Concept artwork · Temporary` tags. Authentic merchant imagery/GLB takes priority. Keep the concept checkbox enabled for any temporary artwork uploaded through the new presentation pickers. Do not represent reference artwork or generated approximations as merchandise.
 
 The 2026-10-22 image expansion adds three optimized concept assets and centralized slots for Collection, Materials, Featured and Finale. **[Replacement guide and complete slot map](CONCEPT-IMAGES.md)** lists every picker, fallback, filename, dimensions, provenance and generation prompt.

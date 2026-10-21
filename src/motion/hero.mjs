@@ -55,13 +55,13 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   // Phase 02 → 03 — transform: the shoe grows, the first line masks out.
   timeline
     .to(line1, { yPercent: -114, ease: 'power2.in', duration: .2 }, DEPTH_END + .02)
-    .to(art, { scale: 1.22, xPercent: -2, rotation: 3, ease: 'power1.inOut', duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
+    .to(art, { scale: hasModel ? 1 : 1.22, xPercent: hasModel ? 0 : -2, rotation: hasModel ? 0 : 3, ease: 'power1.inOut', duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
     .to(float, { yPercent: -9, duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
     .to(ring, { scale: 1.14, opacity: .75, duration: TRANSFORM_END - DEPTH_END }, DEPTH_END);
 
   // Phase 03 → 04 — macro: the product dominates, the second line masks out.
   timeline
-    .to(art, { scale: 1.62, yPercent: 6, rotation: -3, ease: 'power1.inOut', duration: MACRO_END - TRANSFORM_END }, TRANSFORM_END)
+    .to(art, { scale: hasModel ? 1 : 1.62, yPercent: hasModel ? 0 : 6, rotation: hasModel ? 0 : -3, ease: 'power1.inOut', duration: MACRO_END - TRANSFORM_END }, TRANSFORM_END)
     .to(line2, { yPercent: 114, ease: 'power2.in', duration: .18 }, TRANSFORM_END + .02)
     .to(ring, { opacity: 0, scale: 1.22, duration: .16 }, TRANSFORM_END + .04)
     .to(copy, { opacity: 0, duration: .12 }, TRANSFORM_END);
@@ -69,7 +69,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   // Phase 04 → 05 — handoff: settle into the deterministic pose shared with
   // chapter 02; the stage color resolves into the next chapter's surface.
   timeline
-    .to(art, { scale: 1.3, xPercent: 0, yPercent: 0, rotation: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
+    .to(art, { scale: hasModel ? 1 : 1.3, xPercent: 0, yPercent: 0, rotation: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
     .to(float, { yPercent: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
     .to(stage, { backgroundColor: surface, ease: 'power1.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
     .to(foot, { opacity: 0, y: -34, ease: 'power2.in', duration: .14 }, MACRO_END)
