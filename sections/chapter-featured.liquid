@@ -3,14 +3,14 @@
   assign selected_variant = product.selected_or_first_available_variant
   assign presentation_image = section.settings.image | default: product.featured_image
 %}
-<section class="chapter chapter-surface chapter-featured" data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
+<section id="chapter-featured" class="chapter chapter-surface chapter-featured" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
   <div class="feat-grid">
     <div class="frame feat-frame">
       {% if presentation_image != blank %}
         {{ presentation_image | image_url: width: 1600 | image_tag: class: 'feat-image', loading: 'lazy', widths: '400, 600, 900, 1200, 1600', sizes: '(min-width: 900px) 48vw, 92vw', alt: presentation_image.alt }}
       {% else %}
-        <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
-        <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
+        {% if section.settings.use_tn_model %}<img src="{{ 'tn-angle-1400.webp' | asset_url }}" srcset="{{ 'tn-angle-700.webp' | asset_url }} 700w, {{ 'tn-angle-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — angle view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
+        <span class="asset-tag">{% if section.settings.use_tn_model %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</span>
       {% endif %}
     </div>
     <div class="feat-copy">
@@ -50,6 +50,7 @@
 {
   "name":"Featured product",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"06 — Featured"},
     {"type":"product","id":"product","label":"Featured product"},
     {"type":"collection","id":"collection","label":"Fallback collection link"},

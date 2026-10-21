@@ -23,7 +23,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   const cueLine = root.querySelector('[data-hero-cue-line]');
   if (!stage) return;
 
-  const travel = mobile ? 1.5 : 2.5;
+  const travel = mobile ? 1.1 : 2.1;
   let intro = null;
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },

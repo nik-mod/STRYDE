@@ -1,11 +1,11 @@
 {
   "current": {
     "brand_name": "STRYDE",
-    "background": "#41b4f0",
-    "foreground": "#073653",
-    "accent": "#adfff5",
-    "surface": "#effaff",
-    "hero_type": "#c1fff8"
+    "background": "#b7ddef",
+    "foreground": "#102b3b",
+    "accent": "#dcf3fa",
+    "surface": "#f2f5f4",
+    "hero_type": "#2d708e"
   },
   "presets": {
     "STRYDE": {

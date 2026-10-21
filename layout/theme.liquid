@@ -15,6 +15,7 @@
       :root { --paper: {{ settings.background | default: '#41b4f0' }}; --ink: {{ settings.foreground | default: '#073653' }}; --accent: {{ settings.accent | default: '#adfff5' }}; --surface: {{ settings.surface | default: '#effaff' }}; --hero-type: {{ settings.hero_type | default: '#c1fff8' }}; }
     </style>
     {{ 'theme.css' | asset_url | stylesheet_tag }}
+    {{ 'refinements.css' | asset_url | stylesheet_tag }}
     <script>document.documentElement.classList.replace('no-js','js');</script>
     <script type="module" src="{{ 'theme.js' | asset_url }}"></script>
   </head>
@@ -22,6 +23,7 @@
     <a class="skip-link" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
     {% sections 'header-group' %}
     <main id="MainContent" tabindex="-1">{{ content_for_layout }}</main>
+    {% if request.page_type == 'index' %}{% render 'journey-nav' %}{% endif %}
     {% sections 'footer-group' %}
     <div class="sr-only" id="CartStatus" role="status" aria-live="polite"></div>
   </body>

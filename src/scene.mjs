@@ -76,9 +76,10 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     const gltf = await new GLTFLoader().parseAsync(bytes, new URL('.', url).href);
     if (disposed || signal.aborted) { disposeObject(gltf.scene); return cleanup; }
     model = gltf.scene;
+    model.rotation.y += THREE.MathUtils.degToRad(Number(root.dataset.modelYaw) || 0);
     const bounds = new THREE.Box3().setFromObject(model); const size = bounds.getSize(new THREE.Vector3()); const center = bounds.getCenter(new THREE.Vector3());
     if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty model');
-    model.position.sub(center); const scale = 2.2 / Math.max(size.x, size.y, size.z); rig.scale.setScalar(scale); rig.add(model);
+    model.position.sub(center); const scale = (Number(root.dataset.modelSize) || 2.2) / Math.max(size.x, size.y, size.z); rig.scale.setScalar(scale); rig.add(model);
     // The rig follows the same authored five-phase pose the image fallback
     // scrubs against: rotation, camera dolly and lighting all derive from the
     // shared heroPose(progress), never from accumulated deltas.

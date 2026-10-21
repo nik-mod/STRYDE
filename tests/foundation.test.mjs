@@ -61,10 +61,10 @@ test('home stages the eight cinematic chapters with honest temporary assets', as
   for (const chapter of ['deconstruction', 'materials', 'technology', 'collection', 'featured', 'brand', 'finale']) {
     assert.match(html, new RegExp(`data-chapter="${chapter}"`));
   }
-  assert.match(html, /Concept artwork/); assert.match(html, /STRYDE ONE/);
+  assert.match(html, /Concept artwork/); assert.match(html, /NIKE AIR MAX PLUS \/ TN/);
   assert.match(html, /LOCAL PREVIEW/); assert.match(html, /\/assets\/theme\.js/);
   assert.match(html, /stryde-concept-v2\.png/); assert.match(html, /href="\/account"/);
-  assert.doesNotMatch(html, /data-model-url=/); assert.doesNotMatch(html, /\$180|\$195/); assert.doesNotMatch(html, /name="add"/);
+  assert.match(html, /data-model-url="\/assets\/nike-tn-blue-white\.glb"/); assert.match(html, /nike-tn-reference\.png/); assert.doesNotMatch(html, /\$180|\$195/); assert.doesNotMatch(html, /name="add"/);
 });
 
 test('native empty routes render useful content and fixture commerce stays labeled', async () => {

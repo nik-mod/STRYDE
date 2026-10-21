@@ -111,7 +111,7 @@ function materials(root, gsap, { mobile }) {
       scrollTrigger: {
         trigger: root,
         start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * 2.2)}`,
+        end: () => `+=${Math.round(window.innerHeight * 1.65)}`,
         pin: true,
         scrub: true,
         invalidateOnRefresh: true,
@@ -287,7 +287,7 @@ function collection(root, gsap, { mobile, fine }) {
     scrollTrigger: {
       trigger: root,
       start: 'top top',
-      end: () => `+=${Math.round(window.innerHeight * (1.15 + scenes.length * 1.15))}`,
+      end: () => `+=${Math.round(window.innerHeight * (0.8 + scenes.length * .85))}`,
       pin: true,
       scrub: true,
       invalidateOnRefresh: true,
@@ -379,7 +379,7 @@ function featured(root, gsap) {
 
 /* -------------------------------------------------------- 07 — brand */
 
-function brand(root, gsap) {
+function brand(root, gsap, { mobile }) {
   wipeIn(root, gsap);
   const stage = root.querySelector('[data-brand-stage]');
   if (!stage) return;
@@ -388,7 +388,7 @@ function brand(root, gsap) {
     scrollTrigger: {
       trigger: stage,
       start: 'top top',
-      end: '+=160%',
+      end: mobile ? '+=55%' : '+=100%',
       pin: true,
       scrub: true,
       invalidateOnRefresh: true,
@@ -412,7 +412,7 @@ function brand(root, gsap) {
 
 /* ------------------------------------------------------- 08 — finale */
 
-function finale(root, gsap) {
+function finale(root, gsap, { mobile }) {
   wipeIn(root, gsap);
   const stage = root.querySelector('[data-finale-stage]');
   if (!stage) return;
@@ -422,7 +422,7 @@ function finale(root, gsap) {
     scrollTrigger: {
       trigger: stage,
       start: 'top top',
-      end: '+=200%',
+      end: mobile ? '+=70%' : '+=120%',
       pin: true,
       scrub: true,
       invalidateOnRefresh: true,

@@ -1,6 +1,7 @@
 {
   "accessibility": {
-    "skip_to_content": "Skip to content"
+    "skip_to_content": "Skip to content",
+    "chapters": "Explore the eight chapters"
   },
   "general": {
     "home": "Home",
@@ -18,8 +19,15 @@
     "not_found": "Page not found",
     "off_track": "Off the track",
     "explore_collection": "Explore the collection",
-    "not_found_description": "The page you’re looking for has moved or is no longer available.",
-    "account": "Your account"
+    "not_found_description": "The page you\u2019re looking for has moved or is no longer available.",
+    "account": "Your account",
+    "the_details": "The details",
+    "our_perspective": "Our perspective",
+    "explore_details": "Explore the details",
+    "materials": "In detail",
+    "form": "Form in motion",
+    "perspectives": "Perspectives",
+    "in_focus": "In focus"
   },
   "assets": {
     "concept_alt": "STRYDE concept sneaker in silver and ice blue, floating three-quarter view",
@@ -28,12 +36,15 @@
   "hero": {
     "asset_pending": "Product imagery not provided",
     "scroll": "Scroll",
-    "model_loading": "Loading product view…",
+    "model_loading": "Loading product view\u2026",
     "model_error": "3D view unavailable. Product imagery remains available.",
     "model_interrupted": "3D view interrupted. Product imagery remains available.",
     "add_to_cart": "Add to cart",
     "details": "Details",
-    "concept_tile_price": "Price on selection"
+    "concept_tile_price": "Price on selection",
+    "model_preview": "3D model preview",
+    "edition": "THE PERSPECTIVE SERIES / 001",
+    "perspective_study": "One silhouette. Three perspectives."
   },
   "products": {
     "image_unavailable": "Product image unavailable",

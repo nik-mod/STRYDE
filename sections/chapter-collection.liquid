@@ -8,7 +8,7 @@
   assign field_2 = section.settings.field_2 | default: '#7fa9f6'
   assign field_3 = section.settings.field_3 | default: '#4fc4d4'
 %}
-<section class="chapter chapter-paper chapter-collection" data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
+<section id="chapter-collection" class="chapter chapter-paper chapter-collection" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
   <div class="coll-head">
     <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
     <h2 class="chapter-heading" id="CollHeading-{{ section.id }}">
@@ -41,19 +41,20 @@
       {% endfor %}
     {% else %}
       {% for index in (1..3) %}
+        {% case index %}{% when 1 %}{% assign tn_view = 'tn-angle-1400.webp' %}{% assign tn_title = 'The first impression.' %}{% when 2 %}{% assign tn_view = 'tn-heel-1400.webp' %}{% assign tn_title = 'A change of direction.' %}{% when 3 %}{% assign tn_view = 'tn-top-1400.webp' %}{% assign tn_title = 'From another point of view.' %}{% endcase %}
         <article class="coll-scene" data-coll-scene style="--scene-field: {% cycle field_1, field_2, field_3 %}">
           <span class="coll-scene-num" aria-hidden="true">0{{ index }}</span>
           <div class="coll-scene-art">
             <div class="coll-scene-figure">
-              <span class="coll-scene-visual coll-tint-{% if index == 1 %}a{% elsif index == 2 %}b{% else %}c{% endif %}" data-coll-visual>
-                <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+              <span class="coll-scene-visual {% unless section.settings.use_tn_model %}coll-tint-{% if index == 1 %}a{% elsif index == 2 %}b{% else %}c{% endif %}{% endunless %}" data-coll-visual>
+                {% if section.settings.use_tn_model %}<img src="{{ tn_view | asset_url }}"  sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — angle view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
               </span>
-              <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
+              <span class="asset-tag">{% if section.settings.use_tn_model %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</span>
             </div>
           </div>
           <div class="coll-scene-copy">
-            <h3 class="coll-scene-name"><span class="scene-line"><span>{{ section.settings.tile_title | escape }} 0{{ index }}</span></span></h3>
-            <p class="coll-scene-price">{{ 'hero.concept_tile_price' | t }}</p>
+            <h3 class="coll-scene-name"><span class="scene-line"><span>{% if section.settings.use_tn_model %}{{ tn_title }}{% else %}{{ section.settings.tile_title | escape }} 0{{ index }}{% endif %}</span></span></h3>
+            <p class="coll-scene-price">{% if section.settings.use_tn_model %}{{ 'hero.perspective_study' | t }}{% else %}{{ 'hero.concept_tile_price' | t }}{% endif %}</p>
             <a class="coll-scene-link" href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a>
           </div>
         </article>
@@ -65,6 +66,7 @@
 {
   "name":"Collection reveal",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"05 — The collection"},
     {"type":"text","id":"heading","label":"Heading","default":"The lineup"},
     {"type":"collection","id":"collection","label":"Collection","info":"The first three products play as a cinematic sequence. Without a collection, labeled concept studies stand in."},

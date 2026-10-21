@@ -1,4 +1,4 @@
-<section class="chapter chapter-surface chapter-deconstruction" data-chapter="deconstruction" data-env="deconstruction" data-section-id="{{ section.id }}" aria-labelledby="DeconHeading-{{ section.id }}">
+<section id="chapter-deconstruction" class="chapter chapter-surface chapter-deconstruction" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="deconstruction" data-env="deconstruction" data-section-id="{{ section.id }}" aria-labelledby="DeconHeading-{{ section.id }}">
   <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
   <h2 class="chapter-heading" id="DeconHeading-{{ section.id }}">
     <span class="heading-line"><span>{{ section.settings.heading_line_1 | escape }}</span></span>
@@ -28,17 +28,17 @@
     </div>
     <div class="decon-visual">
       <div class="frame decon-frame">
-        <div class="decon-crop is-active" style="--zoom: 2.5; --tx: 10%; --ty: -14%;">
-          <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+        <div class="decon-crop is-active" style="--zoom: 1.25; --tx: 0%; --ty: 0%;">
+          {% if section.settings.use_tn_model %}<img src="{{ 'tn-angle-1400.webp' | asset_url }}" srcset="{{ 'tn-angle-700.webp' | asset_url }} 700w, {{ 'tn-angle-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — angle view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
         </div>
-        <div class="decon-crop" style="--zoom: 2.3; --tx: -12%; --ty: 4%;">
-          <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">
+        <div class="decon-crop" style="--zoom: 1.35; --tx: 0%; --ty: 0%;">
+          {% if section.settings.use_tn_model %}<img src="{{ 'tn-heel-1400.webp' | asset_url }}" srcset="{{ 'tn-heel-700.webp' | asset_url }} 700w, {{ 'tn-heel-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — heel view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
         </div>
-        <div class="decon-crop" style="--zoom: 2.1; --tx: 0%; --ty: 26%;">
-          <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">
+        <div class="decon-crop" style="--zoom: 1.2; --tx: 0%; --ty: 0%;">
+          {% if section.settings.use_tn_model %}<img src="{{ 'tn-sole-1400.webp' | asset_url }}" srcset="{{ 'tn-sole-700.webp' | asset_url }} 700w, {{ 'tn-sole-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — sole view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
         </div>
         <span class="decon-tick" aria-hidden="true"></span>
-        <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
+        <span class="asset-tag">{% if section.settings.use_tn_model %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</span>
       </div>
     </div>
   </div>
@@ -47,6 +47,7 @@
 {
   "name":"Deconstruction",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"02 — Anatomy"},
     {"type":"text","id":"heading_line_1","label":"Heading line one","default":"Anatomy of"},
     {"type":"text","id":"heading_line_2","label":"Heading line two","default":"a silhouette"},

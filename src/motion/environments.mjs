@@ -25,6 +25,10 @@ export function mountEnvironments(scope = document, { onChange } = {}) {
   const apply = name => {
     if (document.documentElement.dataset.env === name) return;
     document.documentElement.dataset.env = name;
+    document.querySelectorAll('[data-chapter-link]').forEach(link => {
+      if (link.dataset.chapterLink === name) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
     onChange?.(name);
   };
   const observer = new IntersectionObserver(entries => {
