@@ -3,16 +3,21 @@
   assign selected_variant = product.selected_or_first_available_variant
   assign presentation_image = section.settings.image | default: product.featured_image
 %}
-<section class="chapter chapter-finale" data-chapter="finale" data-env="finale" data-section-id="{{ section.id }}" aria-labelledby="FinaleHeading-{{ section.id }}">
+<section id="chapter-finale" class="chapter chapter-finale" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="finale" data-env="finale" data-section-id="{{ section.id }}" aria-labelledby="FinaleHeading-{{ section.id }}">
   <div class="finale-stage" data-finale-stage>
     <div class="finale-spot" aria-hidden="true" data-finale-spot></div>
-    <p class="finale-word" aria-hidden="true" data-finale-word>STRYDE</p>
+    <p class="finale-word" aria-hidden="true" data-finale-word>{{ settings.brand_name | default: shop.name | escape }}</p>
     <div class="finale-floor" aria-hidden="true" data-finale-floor></div>
     <div class="finale-inner" data-finale-inner>
       <div class="finale-shoe" data-finale-shoe>
+        {% if section.settings.use_tn_model and presentation_image == blank %}
+          <img src="{{ 'tn-profile-1400.webp' | asset_url }}" srcset="{{ 'tn-profile-700.webp' | asset_url }} 700w, {{ 'tn-profile-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — profile view rendered from the 3D model">
+          <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
+        {% else %}
         {% assign supplied_concept = false %}
         {% if section.settings.image != blank %}{% assign supplied_concept = section.settings.image_is_concept %}{% endif %}
         {% render 'presentation-image', slot: 'finale', image: presentation_image, image_is_concept: supplied_concept, sizes: '(min-width: 900px) 430px, 76vw' %}
+        {% endif %}
       </div>
       <p class="chapter-kicker finale-kicker">{{ section.settings.kicker | escape }}</p>
       <h2 class="finale-heading" id="FinaleHeading-{{ section.id }}">
@@ -41,6 +46,7 @@
 {
   "name":"Finale",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"08 — The finale"},
     {"type":"text","id":"heading_line_1","label":"Heading line one","default":"Make it"},
     {"type":"text","id":"heading_line_2","label":"Heading line two","default":"Yours"},

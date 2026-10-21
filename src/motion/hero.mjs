@@ -23,7 +23,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   const cueLine = root.querySelector('[data-hero-cue-line]');
   if (!stage) return;
 
-  const travel = mobile ? 1.5 : 2.5;
+  const travel = mobile ? 1.1 : 2.1;
   let intro = null;
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
@@ -109,6 +109,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
     if (depth) layers.push({ el: depth, x: gsap.quickTo(depth, 'x', { duration: .9, ease: 'power3.out' }), y: gsap.quickTo(depth, 'y', { duration: .9, ease: 'power3.out' }), scale: 16, yScale: 12 });
     if (type) layers.push({ el: type, x: gsap.quickTo(type, 'x', { duration: 1.1, ease: 'power3.out' }), y: gsap.quickTo(type, 'y', { duration: 1.1, ease: 'power3.out' }), scale: -7, yScale: -5 });
     const onMove = event => {
+      if (document.hidden || timeline.scrollTrigger?.progress >= 1) return;
       const rx = event.clientX / window.innerWidth - .5;
       const ry = event.clientY / window.innerHeight - .5;
       for (const layer of layers) {

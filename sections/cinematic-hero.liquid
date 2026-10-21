@@ -3,11 +3,18 @@
   assign hero_variant = featured_product.selected_or_first_available_variant
   assign presentation_image = section.settings.image | default: featured_product.featured_image
   assign model_url = section.settings.model_url | default: featured_product.metafields.custom.cinematic_model.value.url
+  assign bundled_tn = false
+  if model_url == blank and section.settings.use_tn_model and featured_product == blank and presentation_image == blank
+    assign model_url = 'nike-tn-blue-white.glb' | asset_url
+    assign bundled_tn = true
+  endif
   assign collection_url = section.settings.collection.url | default: routes.all_products_collection_url
 %}
-<section class="hero" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
+<section class="hero" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} {% if bundled_tn %} data-model-yaw="90" data-model-size="3.1"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
   <div class="hero-stage" data-hero-stage>
     <div class="hero-atmo" aria-hidden="true"></div>
+    <div class="hero-edition"><span>{{ 'hero.edition' | t }}</span><span>01 / TN</span></div>
+    <div class="hero-model-shadow" aria-hidden="true"></div>
     <h1 class="sr-only" id="HeroTitle-{{ section.id }}">{{ section.settings.headline_first | escape }} {{ section.settings.headline_second | escape }}</h1>
 
     <div class="hero-type" aria-hidden="true" data-hero-type>
@@ -26,6 +33,8 @@
           <div class="hero-media" data-scene-host>
             {% if presentation_image != blank %}
               {{ presentation_image | image_url: width: 1800 | image_tag: class: 'hero-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 58vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
+            {% elsif bundled_tn %}
+              <img class="hero-image" src="{{ 'tn-angle-1400.webp' | asset_url }}" width="1400" height="1050" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager">
             {% elsif model_url == blank %}
               <figure class="concept-visual">
                 <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" alt="{{ 'assets.concept_alt' | t | escape }}" fetchpriority="high" loading="eager">
@@ -51,11 +60,12 @@
           <a class="hero-name" href="{{ featured_product.url }}">{{ featured_product.title | escape }}</a>
           <p class="hero-availability">{% if hero_variant.available %}{{ 'products.available' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</p>
         {% else %}
-          <p class="hero-concept-kicker">{{ 'assets.concept_tag' | t }}</p>
+          <p class="hero-concept-kicker">{% if bundled_tn %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</p>
           <p class="hero-name">{{ section.settings.concept_name | escape }}</p>
         {% endif %}
       </div>
       <div class="hero-actions">
+        <a class="hero-editorial-link" href="#chapter-deconstruction">{{ 'general.explore_details' | t }} <span aria-hidden="true">↘</span></a>
         {% if featured_product != blank %}
           {% form 'product', featured_product, class: 'hero-form' %}
             <div class="hero-form-errors">{{ form.errors | default_errors }}</div>
@@ -89,6 +99,7 @@
     {"type":"text","id":"concept_name","label":"Fallback product name","default":"STRYDE ONE","info":"Shown when no featured product is selected."},
     {"type":"text","id":"cta","label":"Fallback call to action","default":"Explore the collection"},
     {"type":"header","content":"Media"},
+    {"type":"checkbox","id":"use_tn_model","label":"Use bundled blue and white TN model","default":false},
     {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the temporary concept artwork."},
     {"type":"url","id":"model_url","label":"Licensed .glb model URL","info":"Optional. Also supports the featured product custom.cinematic_model file metafield."}
   ],

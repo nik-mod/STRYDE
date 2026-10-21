@@ -25,8 +25,8 @@ test('campaign slots resolve to shipped assets and always disclose bundled conce
     assert.match(html,new RegExp(`data-concept-image="${slot}"`));
     assert.match(html,/loading="lazy"/);
   }
-  const html = await renderPreview('/');
-  const collection = html.match(/<section class="chapter chapter-paper chapter-collection"[\s\S]*?<\/section>/)[0];
+  const html = await renderPreview('/',new URLSearchParams('artwork=concept'));
+  const collection = html.match(/<section\b[^>]*\bchapter-collection\b[\s\S]*?<\/section>/)[0];
   assert.equal(new Set([...collection.matchAll(/src="([^"]+)"/g)].map(m=>m[1])).size,3);
   assert.equal((collection.match(/Concept artwork · Temporary/g)||[]).length,3);
   assert.doesNotMatch(collection,/coll-tint/);

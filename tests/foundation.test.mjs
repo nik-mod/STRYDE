@@ -61,10 +61,11 @@ test('home stages the eight cinematic chapters with honest temporary assets', as
   for (const chapter of ['deconstruction', 'materials', 'technology', 'collection', 'featured', 'brand', 'finale']) {
     assert.match(html, new RegExp(`data-chapter="${chapter}"`));
   }
-  assert.match(html, /Concept artwork/); assert.match(html, /STRYDE ONE/);
+  assert.match(html, /3D model preview/); assert.match(html, /NIKE AIR MAX PLUS \/ TN/);
   assert.match(html, /LOCAL PREVIEW/); assert.match(html, /\/assets\/theme\.js/);
-  assert.match(html, /stryde-concept-v2\.png/); assert.match(html, /href="\/account"/);
-  assert.doesNotMatch(html, /data-model-url=/); assert.doesNotMatch(html, /\$180|\$195/); assert.doesNotMatch(html, /name="add"/);
+  assert.match(html, /tn-angle-1400\.webp/); assert.match(html, /href="\/account"/);
+  assert.equal((html.match(/data-model-url=/g)||[]).length,1);
+  assert.match(html, /data-model-url="\/assets\/nike-tn-blue-white\.glb"/); assert.doesNotMatch(html, /\$180|\$195/); assert.doesNotMatch(html, /name="add"/);
 });
 
 test('native empty routes render useful content and fixture commerce stays labeled', async () => {
@@ -78,7 +79,8 @@ test('native empty routes render useful content and fixture commerce stays label
 test('hero product title, selected price and native add-to-cart use the selected Shopify product', async () => {
   const available = await renderPreview('/', new URLSearchParams('fixtures=1&variant=102'));
   assert.match(available, /Preview fixture \/ Footwear/); assert.match(available, /\$195\.00 USD/);
-  assert.match(available, /name="add"/); assert.match(available, /Concept artwork/);
+  assert.match(available, /name="add"/); assert.match(available, /3D model preview/);
+  assert.doesNotMatch(available, /data-model-url=/);
   assert.doesNotMatch(available, /STRYDE ONE/);
   const soldOut = await renderPreview('/', new URLSearchParams('fixtures=1&variant=103'));
   assert.match(soldOut, /Sold out/); assert.match(soldOut, /name="add" disabled/);
@@ -90,5 +92,5 @@ test('a configured hero image or model URL replaces the hero concept artwork', a
   const model = await renderPreview('/', new URLSearchParams('model=/licensed-test.glb'));
   assert.match(model, /data-model-url="\/licensed-test\.glb"/);
   assert.match(model, /Product imagery not provided/);
-  assert.match(model, /stryde-concept-v2\.png/); // later chapters still use labeled concept art
+  assert.match(model, /3D model preview/); // later chapters use static, disclosed model views
 });

@@ -61,6 +61,7 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
     const schema = JSON.parse(source.match(/{%\s*schema\s*%}([\s\S]*?){%\s*endschema\s*%}/)?.[1] || '{}');
     const defaults = Object.fromEntries((schema.settings || []).filter(setting => setting.default !== undefined).map(setting => [setting.id, setting.default]));
     const sectionSettings = { ...defaults, ...supplied };
+    if (query.get('artwork') === 'concept') sectionSettings.use_tn_model = false;
     if (type === 'cinematic-hero' || type === 'chapter-featured' || type === 'chapter-finale') {
       if (populated && type !== 'chapter-finale') { sectionSettings.featured_product = fixture; sectionSettings.product = fixture; }
       if (populated && type === 'chapter-finale') { sectionSettings.product = fixture; }

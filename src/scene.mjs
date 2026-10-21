@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { heroPose } from './motion/contracts.mjs';
-import { environmentFor } from './motion/environments.mjs';
 
 export function disposeObject(object) {
   const textures = new Set(); const materials = new Set(); const geometries = new Set();
@@ -33,6 +32,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const fallback = host.querySelector('.hero-image, .concept-visual, .model-fallback');
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
   let renderer; let disposed = false; let model; let visible = false; let contextLost = false;
+  let dirty = true; let lastProgress = null;
   let unsubscribe = () => {}; let removeFrame = () => {}; let observer; let resizeObserver;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, .01, 100);
@@ -53,21 +53,28 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     setStatus('');
   };
   const onLost = event => { event.preventDefault(); contextLost = true; if (fallback) fallback.hidden = false; setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product imagery remains available.'); };
-  const onRestored = () => { contextLost = false; if (fallback && model) fallback.hidden = true; setStatus(''); };
+  const onRestored = () => { contextLost = false; dirty = true; if (fallback && model) fallback.hidden = true; setStatus(''); };
   signal.addEventListener('abort', cleanup, { once: true });
   try {
     setStatus(root.dataset.loadingLabel || 'Loading product view…');
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: innerWidth > 700, powerPreference: 'low-power' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, innerWidth > 700 ? 1.75 : 1.25));
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: innerWidth > 700, powerPreference: 'high-performance' });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.domElement.setAttribute('aria-hidden', 'true');
     renderer.domElement.addEventListener('webglcontextlost', onLost);
     renderer.domElement.addEventListener('webglcontextrestored', onRestored);
     host.append(renderer.domElement);
-    const resize = () => { if (disposed) return; const { width, height } = host.getBoundingClientRect(); if (!width || !height) return; renderer.setSize(width, height, false); camera.aspect = width / height; camera.updateProjectionMatrix(); };
+    const resize = () => {
+      if (disposed) return;
+      const width = host.clientWidth, height = host.clientHeight;
+      if (!width || !height) return;
+      // Bound GPU fill cost on large/retina screens without changing CSS size.
+      const ratio = Math.min(devicePixelRatio || 1, innerWidth > 700 ? 1.5 : 1, Math.sqrt(1600000 / (width * height)));
+      renderer.setPixelRatio(ratio); renderer.setSize(width, height, false);
+      camera.aspect = width / height; camera.updateProjectionMatrix(); dirty = true;
+    };
     resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host); resize();
-    observer = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { rootMargin: '40px' }); observer.observe(host);
+    observer = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) dirty = true; }, { rootMargin: '40px' }); observer.observe(host);
     // Abortable fetch; decoding is disposed if the section disappears while parsing.
     const response = await fetch(url, { signal, credentials: 'omit' });
     if (!response.ok) throw new Error(`Model response ${response.status}`);
@@ -76,31 +83,31 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     const gltf = await new GLTFLoader().parseAsync(bytes, new URL('.', url).href);
     if (disposed || signal.aborted) { disposeObject(gltf.scene); return cleanup; }
     model = gltf.scene;
+    model.rotation.y += THREE.MathUtils.degToRad(Number(root.dataset.modelYaw) || 0);
     const bounds = new THREE.Box3().setFromObject(model); const size = bounds.getSize(new THREE.Vector3()); const center = bounds.getCenter(new THREE.Vector3());
     if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty model');
-    model.position.sub(center); const scale = 2.2 / Math.max(size.x, size.y, size.z); rig.scale.setScalar(scale); rig.add(model);
+    model.position.sub(center);
+    const mobileFit = innerWidth <= 700 ? .82 : 1;
+    const scale = ((Number(root.dataset.modelSize) || 2.2) * mobileFit) / Math.max(size.x, size.y, size.z);
+    rig.scale.setScalar(scale); rig.add(model);
     // The rig follows the same authored five-phase pose the image fallback
     // scrubs against: rotation, camera dolly and lighting all derive from the
     // shared heroPose(progress), never from accumulated deltas.
     unsubscribe = bus.subscribe(state => {
+      if (state.local === lastProgress) return;
+      lastProgress = state.local;
       const pose = heroPose(state.local);
       rig.rotation.set(0, pose.rotationY, pose.rotationZ);
       camera.position.set(0, pose.cameraY, pose.cameraZ);
       if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
       key.intensity = pose.keyIntensity;
       rim.intensity = pose.rimIntensity;
+      dirty = true;
     });
     removeFrame = scheduler.add(() => {
-      if (!visible || document.hidden || contextLost || disposed) return;
-      // Outside the hero, the active chapter environment eases the key/rim
-      // lights toward its preset — the base the future GLB chapters inherit.
-      // Inside the hero the authored pose remains the single owner.
-      if (bus.state.chapter !== 0) {
-        const env = environmentFor(document.documentElement.dataset.env);
-        key.intensity += (env.key - key.intensity) * .08;
-        rim.intensity += (env.rim - rim.intensity) * .08;
-      }
+      if (!dirty || !visible || document.hidden || contextLost || disposed) return;
       renderer.render(scene, camera);
+      dirty = false;
     });
     if (fallback) fallback.hidden = true; setStatus('');
   } catch (error) {

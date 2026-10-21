@@ -1,6 +1,6 @@
-<section class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}" aria-labelledby="BrandHeading-{{ section.id }}">
+<section id="chapter-brand" class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}" aria-labelledby="BrandHeading-{{ section.id }}">
   <div class="brand-stage" data-brand-stage>
-    <p class="brand-watermark" aria-hidden="true" data-brand-watermark>STRYDE</p>
+    <p class="brand-watermark" aria-hidden="true" data-brand-watermark>{{ settings.brand_name | default: shop.name | escape }}</p>
     <div class="brand-rule" aria-hidden="true"><span data-brand-rule></span></div>
     <h2 class="brand-lines" id="BrandHeading-{{ section.id }}">
       <span class="brand-line brand-line-quiet"><span>{{ section.settings.line_1 | escape }}</span></span>

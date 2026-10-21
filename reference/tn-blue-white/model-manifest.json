@@ -1,0 +1,16 @@
+{
+  "file": "assets/tn-blue-white-approximation.glb",
+  "bytes": 2299308,
+  "triangles": 71850,
+  "approximation": true,
+  "groups": [
+    "outsole",
+    "midsole",
+    "upper",
+    "laces",
+    "insole",
+    "heel_support",
+    "structural_support"
+  ],
+  "generator": "tools/models/build-tn-model.mjs"
+}

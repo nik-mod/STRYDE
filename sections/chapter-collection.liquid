@@ -8,7 +8,7 @@
   assign field_2 = section.settings.field_2 | default: '#7fa9f6'
   assign field_3 = section.settings.field_3 | default: '#4fc4d4'
 %}
-<section class="chapter chapter-paper chapter-collection" data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
+<section id="chapter-collection" class="chapter chapter-paper chapter-collection" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
   <div class="coll-head">
     <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
     <h2 class="chapter-heading" id="CollHeading-{{ section.id }}">
@@ -46,18 +46,26 @@
           assign concept_key = image_key | append: '_is_concept'
           assign image_slot = 'collection_' | append: index
         %}
+        {% case index %}{% when 1 %}{% assign tn_view = 'tn-angle-1400.webp' %}{% assign tn_title = 'The first impression.' %}{% when 2 %}{% assign tn_view = 'tn-heel-1400.webp' %}{% assign tn_title = 'A change of direction.' %}{% when 3 %}{% assign tn_view = 'tn-top-1400.webp' %}{% assign tn_title = 'From another point of view.' %}{% endcase %}
         <article class="coll-scene" data-coll-scene style="--scene-field: {% cycle field_1, field_2, field_3 %}">
           <span class="coll-scene-num" aria-hidden="true">0{{ index }}</span>
           <div class="coll-scene-art">
             <div class="coll-scene-figure">
+              {% assign use_tn_view = false %}
+              {% if section.settings.use_tn_model and section.settings[image_key] == blank %}{% assign use_tn_view = true %}{% endif %}
               <span class="coll-scene-visual" data-coll-visual>
-                {% render 'presentation-image', slot: image_slot, image: section.settings[image_key], image_is_concept: section.settings[concept_key], sizes: '(min-width: 900px) 56vw, 92vw' %}
+                {% if use_tn_view %}
+                  <img src="{{ tn_view | asset_url }}" srcset="{{ tn_view | replace: '-1400.webp', '-700.webp' | asset_url }} 700w, {{ tn_view | asset_url }} 1400w" sizes="(min-width: 900px) 56vw, 92vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — {{ tn_title | escape }} 3D model preview">
+                  <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
+                {% else %}
+                  {% render 'presentation-image', slot: image_slot, image: section.settings[image_key], image_is_concept: section.settings[concept_key], sizes: '(min-width: 900px) 56vw, 92vw' %}
+                {% endif %}
               </span>
             </div>
           </div>
           <div class="coll-scene-copy">
-            <h3 class="coll-scene-name"><span class="scene-line"><span>{{ section.settings.tile_title | escape }} 0{{ index }}</span></span></h3>
-            <p class="coll-scene-price">{{ 'hero.concept_tile_price' | t }}</p>
+            <h3 class="coll-scene-name"><span class="scene-line"><span>{% if use_tn_view %}{{ tn_title | escape }}{% else %}{{ section.settings.tile_title | escape }} 0{{ index }}{% endif %}</span></span></h3>
+            <p class="coll-scene-price">{% if use_tn_view %}{{ 'hero.perspective_study' | t }}{% else %}{{ 'hero.concept_tile_price' | t }}{% endif %}</p>
             <a class="coll-scene-link" href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a>
           </div>
         </article>
@@ -69,6 +77,7 @@
 {
   "name":"Collection reveal",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"05 — The collection"},
     {"type":"text","id":"heading","label":"Heading","default":"The lineup"},
     {"type":"collection","id":"collection","label":"Collection","info":"The first three products play as a cinematic sequence. Without a collection, labeled concept studies stand in."},

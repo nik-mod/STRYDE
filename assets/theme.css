@@ -2300,6 +2300,13 @@ a.hero-name:hover {
 
 /* Materials — pinned macro journey (desktop classes applied by JS) */
 
+/* Avoid re-blurring a moving WebGL surface behind fixed viewport chrome. */
+body .site-header,
+body .journey-nav {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .chapter-materials.is-journey-host {
   height: 100svh;
   min-height: 100svh;
@@ -2326,8 +2333,10 @@ a.hero-name:hover {
   opacity: 1;
 }
 .chapter-materials.is-journey-host .mat-frame {
-  height: 100%;
-  aspect-ratio: auto;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 1.04;
 }
 
 /* Technology — word masks, spine line, experimental heading */

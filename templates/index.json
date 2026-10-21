@@ -1,1 +1,110 @@
-{"sections":{"hero":{"type":"cinematic-hero","settings":{}},"deconstruction":{"type":"chapter-deconstruction","settings":{}},"materials":{"type":"chapter-materials","settings":{}},"technology":{"type":"chapter-technology","settings":{}},"collection":{"type":"chapter-collection","settings":{}},"featured":{"type":"chapter-featured","settings":{}},"brand":{"type":"chapter-brand","settings":{}},"finale":{"type":"chapter-finale","settings":{}}},"order":["hero","deconstruction","materials","technology","collection","featured","brand","finale"]}
+{
+  "sections": {
+    "hero": {
+      "type": "cinematic-hero",
+      "settings": {
+        "use_tn_model": true,
+        "concept_name": "NIKE AIR MAX PLUS / TN",
+        "description": "A familiar silhouette. A different perspective. Discover every curve of the blue-and-white TN.",
+        "headline_first": "BEYOND",
+        "headline_second": "ORDINARY.",
+        "cta": "Explore the collection"
+      }
+    },
+    "deconstruction": {
+      "type": "chapter-deconstruction",
+      "settings": {
+        "use_tn_model": true,
+        "heading_line_1": "Every line.",
+        "heading_line_2": "Every angle.",
+        "intro": "Follow the details that make this silhouette unmistakable. A closer look at the model, from its blue upper to its black outsole.",
+        "part_1_title": "Gradient upper",
+        "part_1_body": "Sky blue at the forefoot, deeper blue toward the heel. The color moves with the shape.",
+        "part_2_title": "Wave cage",
+        "part_2_body": "White ribs trace the side profile, framing the blue panels beneath.",
+        "part_3_title": "Visible Air",
+        "part_3_body": "A sculpted white midsole frames the visible cushioning windows.",
+        "part_4_title": "Black outsole",
+        "part_4_body": "The dark tread anchors the palette and defines the shoe from below.",
+        "part_5_title": "Finishing details",
+        "part_5_body": "White laces, a padded collar and a small side Swoosh complete the composition."
+      }
+    },
+    "materials": {
+      "type": "chapter-materials",
+      "settings": {
+        "use_tn_model": true,
+        "heading": "Closer changes everything.",
+        "panel_1_title": "Color with depth.",
+        "panel_1_body": "Move from the light blue forefoot into the deeper tones at the heel. The white cage gives every panel its own edge.",
+        "panel_2_title": "The signature line.",
+        "panel_2_body": "Curved ribs, layered panels and the side Swoosh. A study in the details of an instantly recognizable profile.",
+        "panel_3_title": "A different foundation.",
+        "panel_3_body": "Turn the silhouette over. Dark tread, blue accents and a sculpted arch give the underside its own identity."
+      }
+    },
+    "technology": {
+      "type": "chapter-technology",
+      "settings": {
+        "heading": "FORM IN MOTION",
+        "outline_word": "Perspective",
+        "row_1_title": "The profile",
+        "row_1_body": "A long, low silhouette with white waves moving across a blue upper.",
+        "row_2_title": "The contrast",
+        "row_2_body": "Bright white framing, translucent details and a dark outsole bring the layers into focus.",
+        "row_3_title": "The perspective",
+        "row_3_body": "Rotate, look closer, and follow how each surface catches the light."
+      }
+    },
+    "collection": {
+      "type": "chapter-collection",
+      "settings": {
+        "use_tn_model": true,
+        "kicker": "05 \u2014 The perspective edit",
+        "heading": "ONE. EVERY ANGLE.",
+        "tile_title": "TN study",
+        "field_1": "#d6eaf1",
+        "field_2": "#b9d5e6",
+        "field_3": "#dce6e9"
+      }
+    },
+    "featured": {
+      "type": "chapter-featured",
+      "settings": {
+        "use_tn_model": true,
+        "kicker": "06 \u2014 In focus",
+        "fallback_title": "BLUE BY NATURE.",
+        "story": "Blue mesh. White waves. A silhouette that speaks for itself. Explore the full collection to find your next pair."
+      }
+    },
+    "brand": {
+      "type": "chapter-brand",
+      "settings": {
+        "line_1": "Look closer.",
+        "line_2": "Move further.",
+        "line_3": "Stay curious.",
+        "manifesto": "For the details you notice on a second look. The lines that stay with you. The pair that makes an everyday route feel different. This is the STRYDE perspective."
+      }
+    },
+    "finale": {
+      "type": "chapter-finale",
+      "settings": {
+        "use_tn_model": true,
+        "heading_line_1": "YOUR NEXT",
+        "heading_line_2": "MOVE.",
+        "sub": "Find your perspective. Explore the collection.",
+        "cta": "Discover the collection"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "deconstruction",
+    "materials",
+    "technology",
+    "collection",
+    "featured",
+    "brand",
+    "finale"
+  ]
+}

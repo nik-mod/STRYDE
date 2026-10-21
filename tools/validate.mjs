@@ -7,6 +7,9 @@ for (const directory of roots) await walk(directory);
 const sections = new Set(files.filter(file => file.startsWith('sections/') && file.endsWith('.liquid')).map(file => file.slice(9, -7)));
 for (const file of files) {
   const source = await readFile(file, 'utf8');
+  if (/\.(liquid|js|css|json)$/.test(file)) {
+    assert.ok(!/^(?:<<<<<<< .+|=======|>>>>>>> .+)\r?$/m.test(source), `${file}: unresolved merge conflict`);
+  }
   if (file.endsWith('.json')) {
     const data = JSON.parse(source);
     if (file.startsWith('templates/') || /sections\/.*-group\.json$/.test(file)) {

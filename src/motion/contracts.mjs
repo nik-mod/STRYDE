@@ -20,7 +20,7 @@ const span = (p, from, to) => smooth((p - from) / (to - from));
 // No incremental transforms: the same input always returns the same pose in either direction.
 export function heroPose(progress) {
   const p = clamp(progress);
-  const rotationY = mix(-.34, .3, span(p, 0, .46)) + mix(0, .32, span(p, .46, .72)) - mix(0, .48, span(p, .72, .9));
+  const rotationY = mix(-.38, .7, span(p, 0, .46)) + mix(0, .48, span(p, .46, .72)) - mix(0, 1.08, span(p, .72, .9));
   const rotationZ = -.08 + mix(0, .06, span(p, 0, .46)) - mix(0, .06, span(p, .72, .9));
   const cameraZ = 4.8 - mix(0, .65, span(p, 0, .46)) - mix(0, .55, span(p, .46, .72)) + mix(0, .7, span(p, .72, .9));
   const cameraY = .1 + mix(0, .06, span(p, .46, .72)) - mix(0, .08, span(p, .72, .9));

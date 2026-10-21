@@ -1,4 +1,4 @@
-<section class="chapter chapter-surface chapter-materials" data-chapter="materials" data-env="materials" data-section-id="{{ section.id }}" aria-labelledby="MatHeading-{{ section.id }}">
+<section id="chapter-materials" class="chapter chapter-surface chapter-materials" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="materials" data-env="materials" data-section-id="{{ section.id }}" aria-labelledby="MatHeading-{{ section.id }}">
   <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
   <h2 class="chapter-heading" id="MatHeading-{{ section.id }}">
     <span class="heading-line"><span>{{ section.settings.heading | escape }}</span></span>
@@ -6,30 +6,45 @@
   <div class="mat-panels" data-mat-panels>
     <div class="mat-panel">
       <div class="frame mat-frame">
+        {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
+          <img src="{{ 'tn-detail-1400.webp' | asset_url }}" srcset="{{ 'tn-detail-700.webp' | asset_url }} 700w, {{ 'tn-detail-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" style="--zoom: 1.12; --tx: 0%; --ty: 0%;" alt="Blue and white TN — detail view rendered from the 3D model">
+          <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
+        {% else %}
         {% render 'presentation-image', slot: 'material_1', image: section.settings.panel_1_image, image_is_concept: section.settings.panel_1_image_is_concept, crop_style: '--zoom: 2.9; --tx: 12%; --ty: -18%;' %}
+        {% endif %}
       </div>
       <div class="mat-copy">
-        <p class="mat-index">01 / Woven</p>
+        <p class="mat-index">01 / Color</p>
         <h3>{{ section.settings.panel_1_title | escape }}</h3>
         <p>{{ section.settings.panel_1_body | escape }}</p>
       </div>
     </div>
     <div class="mat-panel mat-panel-flip">
       <div class="frame mat-frame">
+        {% if section.settings.use_tn_model and section.settings.panel_2_image == blank %}
+          <img src="{{ 'tn-profile-1400.webp' | asset_url }}" srcset="{{ 'tn-profile-700.webp' | asset_url }} 700w, {{ 'tn-profile-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" style="--zoom: 1.55; --tx: 0%; --ty: -2%;" alt="Blue and white TN — profile view rendered from the 3D model">
+          <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
+        {% else %}
         {% render 'presentation-image', slot: 'material_2', image: section.settings.panel_2_image, image_is_concept: section.settings.panel_2_image_is_concept, crop_style: '--zoom: 1; --tx: 0%; --ty: 0%;' %}
+        {% endif %}
       </div>
       <div class="mat-copy">
-        <p class="mat-index">02 / Metal</p>
+        <p class="mat-index">02 / Structure</p>
         <h3>{{ section.settings.panel_2_title | escape }}</h3>
         <p>{{ section.settings.panel_2_body | escape }}</p>
       </div>
     </div>
     <div class="mat-panel">
       <div class="frame mat-frame">
+        {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
+          <img src="{{ 'tn-sole-1400.webp' | asset_url }}" srcset="{{ 'tn-sole-700.webp' | asset_url }} 700w, {{ 'tn-sole-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" style="--zoom: 1.25; --tx: 0%; --ty: 0%;" alt="Blue and white TN — sole view rendered from the 3D model">
+          <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
+        {% else %}
         {% render 'presentation-image', slot: 'material_3', image: section.settings.panel_3_image, image_is_concept: section.settings.panel_3_image_is_concept, crop_style: '--zoom: 2.5; --tx: -70%; --ty: -10%;' %}
+        {% endif %}
       </div>
       <div class="mat-copy">
-        <p class="mat-index">03 / Clear</p>
+        <p class="mat-index">03 / Foundation</p>
         <h3>{{ section.settings.panel_3_title | escape }}</h3>
         <p>{{ section.settings.panel_3_body | escape }}</p>
       </div>
@@ -40,6 +55,7 @@
 {
   "name":"Materials",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"03 — Materials"},
     {"type":"text","id":"heading","label":"Heading","default":"In detail"},
     {"type":"text","id":"panel_1_title","label":"Panel 01 title","default":"Engineered mesh"},
