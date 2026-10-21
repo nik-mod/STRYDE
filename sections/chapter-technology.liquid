@@ -1,0 +1,45 @@
+<section class="chapter chapter-dark chapter-technology" data-chapter="technology" data-env="technology" data-section-id="{{ section.id }}" aria-labelledby="TechHeading-{{ section.id }}">
+  <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
+  <h2 class="chapter-heading tech-heading" id="TechHeading-{{ section.id }}">
+    {% assign tech_words = section.settings.heading | split: ' ' %}
+    {% for word in tech_words %}
+      <span class="heading-word"><span class="heading-word-inner">{{ word | upcase | escape }}</span></span>{% unless forloop.last %} {% endunless %}
+    {% endfor %}
+  </h2>
+  <p class="tech-word" aria-hidden="true" data-tech-word>{{ section.settings.outline_word | upcase | escape }}</p>
+  <div class="tech-rows" data-tech-rows>
+    <span class="tech-spine" aria-hidden="true" data-tech-spine></span>
+    <div class="tech-row">
+      <span class="tech-num" aria-hidden="true">01</span>
+      <h3>{{ section.settings.row_1_title | escape }}</h3>
+      <p>{{ section.settings.row_1_body | escape }}</p>
+    </div>
+    <div class="tech-row">
+      <span class="tech-num" aria-hidden="true">02</span>
+      <h3>{{ section.settings.row_2_title | escape }}</h3>
+      <p>{{ section.settings.row_2_body | escape }}</p>
+    </div>
+    <div class="tech-row">
+      <span class="tech-num" aria-hidden="true">03</span>
+      <h3>{{ section.settings.row_3_title | escape }}</h3>
+      <p>{{ section.settings.row_3_body | escape }}</p>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Technology",
+  "settings":[
+    {"type":"text","id":"kicker","label":"Kicker","default":"04 — Technology"},
+    {"type":"text","id":"heading","label":"Heading","default":"Built to move"},
+    {"type":"text","id":"outline_word","label":"Outlined background word","default":"Motion"},
+    {"type":"text","id":"row_1_title","label":"Row 01 title","default":"Cushioning"},
+    {"type":"textarea","id":"row_1_body","label":"Row 01 body","default":"Translucent chambers through the full midsole absorb impact and give it back on the next stride."},
+    {"type":"text","id":"row_2_title","label":"Row 02 title","default":"Support"},
+    {"type":"textarea","id":"row_2_body","label":"Row 02 body","default":"A metal exoskeleton holds the midfoot from both sides without a single extra gram."},
+    {"type":"text","id":"row_3_title","label":"Row 03 title","default":"Traction"},
+    {"type":"textarea","id":"row_3_body","label":"Row 03 body","default":"A sculpted clear outsole reads the ground and keeps its grip in the wet."}
+  ],
+  "presets":[{"name":"Technology"}]
+}
+{% endschema %}

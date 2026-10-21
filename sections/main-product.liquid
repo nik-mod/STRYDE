@@ -12,7 +12,7 @@
     </div>
     <div class="product-information">
       {% if product.vendor != blank %}<p class="micro">{{ product.vendor | escape }}</p>{% endif %}
-      <h1 class="product-heading">{{ product.title | escape }}</h1>
+      <h1 class="product-heading">{{ product.title | upcase | escape }}</h1>
       <div class="price-line"><p data-product-price>{{ selected_variant.price | money_with_currency }}</p><s data-product-compare{% unless selected_variant.compare_at_price > selected_variant.price %} hidden{% endunless %}>{{ selected_variant.compare_at_price | money_with_currency }}</s></div>
       {% form 'product', product, id: form_id, class: 'product-form' %}
         {{ form.errors | default_errors }}

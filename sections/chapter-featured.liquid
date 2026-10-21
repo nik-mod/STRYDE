@@ -1,0 +1,63 @@
+{% liquid
+  assign product = section.settings.product
+  assign selected_variant = product.selected_or_first_available_variant
+  assign presentation_image = section.settings.image | default: product.featured_image
+%}
+<section class="chapter chapter-surface chapter-featured" data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
+  <div class="feat-grid">
+    <div class="frame feat-frame">
+      {% if presentation_image != blank %}
+        {{ presentation_image | image_url: width: 1600 | image_tag: class: 'feat-image', loading: 'lazy', widths: '400, 600, 900, 1200, 1600', sizes: '(min-width: 900px) 48vw, 92vw', alt: presentation_image.alt }}
+      {% else %}
+        <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+        <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
+      {% endif %}
+    </div>
+    <div class="feat-copy">
+      <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
+      <h2 class="feat-title" id="FeatHeading-{{ section.id }}">
+        <span class="heading-line"><span>{% if product != blank %}{{ product.title | upcase | escape }}{% else %}{{ section.settings.fallback_title | upcase | escape }}{% endif %}</span></span>
+      </h2>
+      {% if product != blank %}
+        <p class="feat-price"><span data-feat-price>{{ selected_variant.price | money_with_currency }}</span>{% if selected_variant.compare_at_price > selected_variant.price %}<s>{{ selected_variant.compare_at_price | money_with_currency }}</s>{% endif %}</p>
+      {% endif %}
+      <p class="feat-story">{{ section.settings.story | escape }}</p>
+      <div class="feat-actions">
+        {% if product != blank %}
+          {% form 'product', product, class: 'feat-form' %}
+            <div class="hero-form-errors">{{ form.errors | default_errors }}</div>
+            {% unless product.has_only_default_variant %}
+              <label class="sr-only" for="FeatVariant-{{ section.id }}">{{ 'products.choose_variant' | t }}</label>
+              <select id="FeatVariant-{{ section.id }}" name="id">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}"{% if variant == selected_variant %} selected{% endif %}{% unless variant.available %} disabled{% endunless %}>{{ variant.title | escape }}{% unless variant.available %} — {{ 'products.sold_out' | t }}{% endunless %}</option>
+                {% endfor %}
+              </select>
+            {% else %}
+              <input type="hidden" name="id" value="{{ selected_variant.id }}">
+            {% endunless %}
+            <button class="hero-cart" type="submit" name="add"{% unless selected_variant.available %} disabled{% endunless %}>{% if selected_variant.available %}{{ 'hero.add_to_cart' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</button>
+          {% endform %}
+          <a class="hero-details" href="{{ product.url }}">{{ 'hero.details' | t }}</a>
+        {% else %}
+          <a class="hero-cart" href="{{ section.settings.collection.url | default: routes.all_products_collection_url }}">{{ section.settings.fallback_cta | escape }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Featured product",
+  "settings":[
+    {"type":"text","id":"kicker","label":"Kicker","default":"06 — Featured"},
+    {"type":"product","id":"product","label":"Featured product"},
+    {"type":"collection","id":"collection","label":"Fallback collection link"},
+    {"type":"text","id":"fallback_title","label":"Fallback title","default":"The first silhouette"},
+    {"type":"textarea","id":"story","label":"Story","default":"The one that started the story — a full-length translucent sole, a metal exoskeleton and a weave built to disappear on foot."},
+    {"type":"text","id":"fallback_cta","label":"Fallback call to action","default":"Explore the collection"},
+    {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the product or concept image."}
+  ],
+  "presets":[{"name":"Featured product"}]
+}
+{% endschema %}

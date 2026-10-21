@@ -1,10 +1,14 @@
 # Required merchant data and licensed assets
 
-No authentic product photographs, accurate specifications, reviews, prices, merchant story, GLB or shoebox model were supplied. The attached reference screenshots are not theme merchandise. The visual-direction refinement adds original generated concept artwork, visibly identified as temporary and not actual merchandise. Real merchant imagery/GLB takes priority. Do not represent reference artwork or generated approximations as merchandise.
+No authentic product photographs, accurate specifications, reviews, prices, merchant story, GLB or shoebox model were supplied. The attached reference screenshots are not theme merchandise. The theme ships original generated concept artwork, identified by small `Concept artwork` tags wherever it stands in. Real merchant imagery/GLB takes priority and removes the tags. Do not represent reference artwork or generated approximations as merchandise.
+
+## Bundled display font
+
+`assets/archivo-var.woff2` (upright) and `assets/archivo-var-italic.woff2` (italic) — Archivo variable (weight + width axes), latin subset, SIL Open Font License 1.1 (license copy: `docs/ARCHIVO-OFL.txt`). Source: Google Fonts / Omnibus-Type via the fontsource CDN (downloaded 2026-10-21, `archivo:vf@latest latin-standard`). ~190 KB total, preloaded in `layout/theme.liquid`, self-hosted, no runtime CDN dependency. Shopify assets are flat, so the woff2 files live in the assets root.
 
 ## Temporary sky-blue concept asset
 
-Project asset: `assets/stryde-concept-v2.png` (1375 × 1144, PNG with transparency). This local copy is the only file referenced by the theme. Visible disclosure: `Temporary concept visual · Not actual merchandise`. The generic collection identity has no fabricated price. Configured authentic image or model omits the concept image and its label; reduced motion renders the static image with the same disclosure.
+Project asset: `assets/stryde-concept-v2.png` (1375 × 1144, PNG with transparency). This local copy is the only image referenced by the theme. Visible disclosure: small uppercase `Concept artwork` tags in the hero product-info block and on every image frame using the artwork. No fabricated price appears anywhere. Configured authentic image or model omits the concept image and its tags; reduced motion renders the static image with the same disclosure.
 
 Generated on 2026-10-21 using the built-in `image_gen` tool, transparent-background mode, with no API/CLI fallback and no reference artwork supplied as an image input. The subsequent reframe used only the first generated concept as its edit target. This is an AI concept, not a manufacturer-authorized product render, specification or representation of available inventory. No product accuracy or production asset clearance is asserted.
 
@@ -55,4 +59,4 @@ Optional product metafields:
 
 Future chapters need authenticated technology copy, component-to-callout mapping, material data, campaign content and product-to-model/variant mapping. Define and validate those structures together with the relevant milestone; they are not currently fabricated in theme data.
 
-M01's optional viewer normalizes a supplied GLB and provides a modest deterministic inspection pose. Merchant verification is required for framing, scale, material fidelity and licensing. It is not an exploded shoe or a completed cinematic product presentation.
+M02's optional viewer normalizes a supplied GLB and drives it with the five-phase deterministic `heroPose(progress)` — the same phase boundaries the image fallback scrubs — covering rotation, camera dolly/fov and key/rim lighting. `captureHandoff({ camera, rig, lights })` exports the exact outgoing state for the chapter-02 deconstruction controller. Merchant verification is required for framing, scale, material fidelity and licensing. The image fallback performs planar motion only and never simulates 3D.

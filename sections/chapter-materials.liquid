@@ -1,0 +1,54 @@
+<section class="chapter chapter-surface chapter-materials" data-chapter="materials" data-env="materials" data-section-id="{{ section.id }}" aria-labelledby="MatHeading-{{ section.id }}">
+  <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
+  <h2 class="chapter-heading" id="MatHeading-{{ section.id }}">
+    <span class="heading-line"><span>{{ section.settings.heading | escape }}</span></span>
+  </h2>
+  <div class="mat-panels" data-mat-panels>
+    <div class="mat-panel">
+      <div class="frame mat-frame">
+        <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" style="--zoom: 2.9; --tx: 12%; --ty: -18%;" alt="Macro view of the woven upper material, concept artwork">
+      </div>
+      <div class="mat-copy">
+        <p class="mat-index">01 / Woven</p>
+        <h3>{{ section.settings.panel_1_title | escape }}</h3>
+        <p>{{ section.settings.panel_1_body | escape }}</p>
+      </div>
+    </div>
+    <div class="mat-panel mat-panel-flip">
+      <div class="frame mat-frame">
+        <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" style="--zoom: 2.7; --tx: -16%; --ty: -8%;" alt="Macro view of the metallic support cage, concept artwork">
+      </div>
+      <div class="mat-copy">
+        <p class="mat-index">02 / Metal</p>
+        <h3>{{ section.settings.panel_2_title | escape }}</h3>
+        <p>{{ section.settings.panel_2_body | escape }}</p>
+      </div>
+    </div>
+    <div class="mat-panel">
+      <div class="frame mat-frame">
+        <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" style="--zoom: 2.5; --tx: -4%; --ty: 24%;" alt="Macro view of the translucent sole chambers, concept artwork">
+      </div>
+      <div class="mat-copy">
+        <p class="mat-index">03 / Clear</p>
+        <h3>{{ section.settings.panel_3_title | escape }}</h3>
+        <p>{{ section.settings.panel_3_body | escape }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Materials",
+  "settings":[
+    {"type":"text","id":"kicker","label":"Kicker","default":"03 — Materials"},
+    {"type":"text","id":"heading","label":"Heading","default":"In detail"},
+    {"type":"text","id":"panel_1_title","label":"Panel 01 title","default":"Engineered mesh"},
+    {"type":"textarea","id":"panel_1_body","label":"Panel 01 body","default":"A pale-blue weave with visible grain — open where the foot runs hot, tight where it needs to hold."},
+    {"type":"text","id":"panel_2_title","label":"Panel 02 title","default":"Satin exoskeleton"},
+    {"type":"textarea","id":"panel_2_body","label":"Panel 02 body","default":"Brushed metal ribs wrap the midfoot, reading light differently from every angle."},
+    {"type":"text","id":"panel_3_title","label":"Panel 03 title","default":"Ice-clear chambers"},
+    {"type":"textarea","id":"panel_3_body","label":"Panel 03 body","default":"The midsole keeps nothing hidden: translucent polymer chambers show exactly what carries the stride."}
+  ],
+  "presets":[{"name":"Materials"}]
+}
+{% endschema %}

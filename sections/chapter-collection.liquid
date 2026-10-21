@@ -1,0 +1,69 @@
+{% liquid
+  assign collection = section.settings.collection
+  assign has_products = false
+  if collection != blank and collection.products_count > 0
+    assign has_products = true
+  endif
+%}
+<section class="chapter chapter-paper chapter-collection" data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
+  <div class="coll-head">
+    <div>
+      <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
+      <h2 class="chapter-heading" id="CollHeading-{{ section.id }}">
+        <span class="heading-line"><span>{{ section.settings.heading | upcase | escape }}</span></span>
+      </h2>
+    </div>
+    {% if has_products %}<p class="coll-count">{{ collection.products_count }} {{ 'collection.products' | t }}</p>{% endif %}
+  </div>
+  <div class="coll-viewport" data-coll-viewport>
+    <div class="coll-track" data-coll-track>
+      {% if has_products %}
+        {% for product in collection.products limit: 8 %}
+          <article class="coll-card">
+            <span class="coll-card-index" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+            <a class="coll-card-media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+              <span class="coll-card-visual" data-coll-visual>
+                {% if product.featured_image %}
+                  {{ product.featured_image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '300, 450, 600, 900', sizes: '(min-width: 900px) 34vw, 78vw', alt: product.featured_image.alt }}
+                {% endif %}
+              </span>
+            </a>
+            <div class="coll-card-info">
+              <h3><a href="{{ product.url }}">{{ product.title | escape }}</a></h3>
+              <p>{% if product.price_varies %}{{ 'products.from' | t }} {% endif %}{{ product.price | money_with_currency }}</p>
+              {% unless product.available %}<p class="coll-tag">{{ 'products.sold_out' | t }}</p>{% endunless %}
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        {% for index in (1..3) %}
+          <article class="coll-card">
+            <span class="coll-card-index" aria-hidden="true">0{{ index }}</span>
+            <div class="coll-card-media">
+              <span class="coll-card-visual coll-tint-{% if index == 1 %}a{% elsif index == 2 %}b{% else %}c{% endif %}" data-coll-visual>
+                <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+              </span>
+              <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
+            </div>
+            <div class="coll-card-info">
+              <h3>{{ section.settings.tile_title | escape }} 0{{ index }}</h3>
+              <p>{{ 'hero.concept_tile_price' | t }}</p>
+            </div>
+          </article>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Collection reveal",
+  "settings":[
+    {"type":"text","id":"kicker","label":"Kicker","default":"05 — The collection"},
+    {"type":"text","id":"heading","label":"Heading","default":"The lineup"},
+    {"type":"collection","id":"collection","label":"Collection","info":"Products render as a horizontal reel. Without a collection, labeled concept tiles stand in."},
+    {"type":"text","id":"tile_title","label":"Concept tile title","default":"Concept"}
+  ],
+  "presets":[{"name":"Collection reveal"}]
+}
+{% endschema %}

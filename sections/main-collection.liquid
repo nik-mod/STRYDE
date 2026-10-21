@@ -1,5 +1,5 @@
 <section class="page-shell collection-page">
-  <div class="page-heading"><span class="micro">{{ 'general.collection' | t }}</span><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
+  <div class="page-heading"><span class="micro">{{ 'general.collection' | t }}</span><h1>{{ collection.title | upcase | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
   {% paginate collection.products by 12 %}
     <form method="get" action="{{ collection.url }}" class="collection-controls">
       <div class="filter-groups">

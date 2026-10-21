@@ -4,7 +4,10 @@ import Lenis from 'lenis';
 import { createProgressBus } from './motion/contracts.mjs';
 import { mountProduct } from './commerce.mjs';
 import { createScope, createScheduler } from './motion/lifecycle.mjs';
-import { createFoundationStudy } from './motion/foundation-study.mjs';
+import { mountHero } from './motion/hero.mjs';
+import { mountChapter } from './motion/chapters.mjs';
+import { mountHeader } from './motion/header.mjs';
+import { mountEnvironments } from './motion/environments.mjs';
 import { mountMagnetic } from './motion/magnetic.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -22,14 +25,19 @@ function syncScroll() {
   if (isModalOpen()) lenis.stop(); else lenis.start();
 }
 
-function mountFoundation(root) {
+function getComputedStyleValue(root, name, fallback) {
+  const value = getComputedStyle(root).getPropertyValue(name).trim();
+  return value || fallback;
+}
+
+function mountHeroSection(root) {
   const bus = createProgressBus();
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
     media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
       if (!conditions.motion) return;
       const scope = createScope();
-      createFoundationStudy(root, { gsap, bus, mobile: conditions.mobile });
+      mountHero(root, { gsap, bus, mobile: conditions.mobile, hasModel: Boolean(root.dataset.modelUrl), fine: conditions.fine, surface: getComputedStyleValue(root, '--surface', '#effaff') });
       if (conditions.fine) {
         root.querySelectorAll('[data-magnetic]').forEach(element => scope.add(mountMagnetic(element, { gsap, signal: scope.signal })));
       }
@@ -56,10 +64,34 @@ function mountFoundation(root) {
   return () => { media.revert(); context.revert(); bus.dispose(); };
 }
 
+function mountChapterSection(root) {
+  const media = gsap.matchMedia();
+  const context = gsap.context(() => {
+    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
+      if (!conditions.motion) return;
+      return mountChapter(root, { gsap, mobile: conditions.mobile, fine: conditions.fine });
+    });
+  }, root);
+  return () => { media.revert(); context.revert(); };
+}
+
+let environmentDispose = null;
+function ensureEnvironments(scope) {
+  if (environmentDispose) return;
+  if (scope !== document && !scope.querySelector?.('[data-env]')) return;
+  environmentDispose = mountEnvironments(scope === document ? document : scope);
+}
+
 function mount(scope = document) {
-  const roots = [...scope.querySelectorAll('[data-foundation], [data-product-section]')];
-  if (scope.matches?.('[data-foundation], [data-product-section]')) roots.push(scope);
-  for (const root of roots) if (!instances.has(root)) instances.set(root, root.matches('[data-foundation]') ? mountFoundation(root) : mountProduct(root));
+  ensureEnvironments(scope);
+  const header = scope.matches?.('.site-header') ? scope : scope.querySelector?.('.site-header');
+  if (header) instances.set(header, mountHeader(header));
+  const roots = [...scope.querySelectorAll('[data-hero], [data-chapter], [data-product-section]')];
+  if (scope.matches?.('[data-hero], [data-chapter], [data-product-section]')) roots.push(scope);
+  for (const root of roots) {
+    if (instances.has(root)) continue;
+    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : mountProduct(root));
+  }
   scope.querySelectorAll('[data-mobile-menu]').forEach(menu => {
     if (menu.dataset.bound) return; menu.dataset.bound = 'true';
     menu.addEventListener('toggle', syncScroll);
@@ -76,5 +108,5 @@ reduceQuery.addEventListener('change', () => { syncScroll(); unmount(document); 
 const modalObserver = new MutationObserver(syncScroll);
 modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] });
 document.addEventListener('visibilitychange', () => { if (document.hidden) lenis?.stop(); else syncScroll(); });
-window.addEventListener('pagehide', () => { unmount(document); lenis?.destroy(); lenis = null; scheduler.setLenis(null); modalObserver.disconnect(); });
-window.addEventListener('pageshow', event => { if (event.persisted) { syncScroll(); mount(); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); } });
+window.addEventListener('pagehide', () => { unmount(document); environmentDispose?.(); environmentDispose = null; lenis?.destroy(); lenis = null; scheduler.setLenis(null); modalObserver.disconnect(); });
+window.addEventListener('pageshow', event => { if (event.persisted) { syncScroll(); mount(); environmentDispose = null; ensureEnvironments(document); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); } });

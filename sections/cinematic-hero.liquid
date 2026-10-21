@@ -1,0 +1,97 @@
+{% liquid
+  assign featured_product = section.settings.featured_product
+  assign hero_variant = featured_product.selected_or_first_available_variant
+  assign presentation_image = section.settings.image | default: featured_product.featured_image
+  assign model_url = section.settings.model_url | default: featured_product.metafields.custom.cinematic_model.value.url
+  assign collection_url = section.settings.collection.url | default: routes.all_products_collection_url
+%}
+<section class="hero" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
+  <div class="hero-stage" data-hero-stage>
+    <div class="hero-atmo" aria-hidden="true"></div>
+    <h1 class="sr-only" id="HeroTitle-{{ section.id }}">{{ section.settings.headline_first | escape }} {{ section.settings.headline_second | escape }}</h1>
+
+    <div class="hero-type" aria-hidden="true" data-hero-type>
+      <span class="hero-line hero-line-1"><span class="hero-line-inner" data-hero-line-1>{{ section.settings.headline_first | upcase | escape }}</span></span>
+      <span class="hero-line hero-line-2"><span class="hero-line-inner" data-hero-line-2>{{ section.settings.headline_second | upcase | escape }}</span></span>
+    </div>
+
+    <div class="hero-ring" aria-hidden="true" data-hero-ring>
+      <span class="hero-ring-dot hero-ring-dot-a"></span>
+      <span class="hero-ring-dot hero-ring-dot-b"></span>
+    </div>
+
+    <div class="hero-art" data-hero-art>
+      <div class="hero-float" data-hero-float>
+        <div class="hero-depth" data-hero-depth>
+          <div class="hero-media" data-scene-host>
+            {% if presentation_image != blank %}
+              {{ presentation_image | image_url: width: 1800 | image_tag: class: 'hero-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 58vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
+            {% elsif model_url == blank %}
+              <figure class="concept-visual">
+                <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" alt="{{ 'assets.concept_alt' | t | escape }}" fetchpriority="high" loading="eager">
+              </figure>
+            {% else %}
+              <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
+            {% endif %}
+            <p class="model-status" data-model-status role="status" aria-live="polite" hidden></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-copy" data-hero-copy>
+      <p>{{ section.settings.description | escape }}</p>
+    </div>
+
+    <div class="hero-foot" data-hero-foot>
+      <div class="hero-product-info">
+        {% if featured_product != blank %}
+          <p class="hero-price">{{ hero_variant.price | money_with_currency }}</p>
+          <div class="hero-info-rule" aria-hidden="true"></div>
+          <a class="hero-name" href="{{ featured_product.url }}">{{ featured_product.title | escape }}</a>
+          <p class="hero-availability">{% if hero_variant.available %}{{ 'products.available' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</p>
+        {% else %}
+          <p class="hero-concept-kicker">{{ 'assets.concept_tag' | t }}</p>
+          <p class="hero-name">{{ section.settings.concept_name | escape }}</p>
+        {% endif %}
+      </div>
+      <div class="hero-actions">
+        {% if featured_product != blank %}
+          {% form 'product', featured_product, class: 'hero-form' %}
+            <div class="hero-form-errors">{{ form.errors | default_errors }}</div>
+            <input type="hidden" name="id" value="{{ hero_variant.id }}">
+            <button class="hero-cart" type="submit" name="add" data-magnetic{% unless hero_variant.available %} disabled{% endunless %}><span data-magnetic-content>{% if hero_variant.available %}{{ 'hero.add_to_cart' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</span></button>
+          {% endform %}
+          <a class="hero-details" href="{{ featured_product.url }}">{{ 'hero.details' | t }}</a>
+        {% else %}
+          <a class="hero-cart" data-magnetic href="{{ collection_url }}"><span data-magnetic-content>{{ section.settings.cta | escape }}</span></a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="hero-cue" aria-hidden="true" data-hero-cue>
+      <span>{{ 'hero.scroll' | t }}</span>
+      <span class="hero-cue-line" data-hero-cue-line></span>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Cinematic hero",
+  "settings":[
+    {"type":"header","content":"Headline"},
+    {"type":"text","id":"headline_first","label":"First line","default":"Built for"},
+    {"type":"text","id":"headline_second","label":"Second line","default":"Velocity"},
+    {"type":"textarea","id":"description","label":"Description","default":"Translucent support, liquid metallic structure and weightless cushioning — one silhouette sculpted for forward motion."},
+    {"type":"header","content":"Commerce"},
+    {"type":"product","id":"featured_product","label":"Featured product"},
+    {"type":"collection","id":"collection","label":"Collection link"},
+    {"type":"text","id":"concept_name","label":"Fallback product name","default":"STRYDE ONE","info":"Shown when no featured product is selected."},
+    {"type":"text","id":"cta","label":"Fallback call to action","default":"Explore the collection"},
+    {"type":"header","content":"Media"},
+    {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the temporary concept artwork."},
+    {"type":"url","id":"model_url","label":"Licensed .glb model URL","info":"Optional. Also supports the featured product custom.cinematic_model file metafield."}
+  ],
+  "presets":[{"name":"Cinematic hero"}]
+}
+{% endschema %}

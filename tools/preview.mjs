@@ -9,6 +9,7 @@ let locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
 engine.registerFilter('t', key => key.split('.').reduce((value, part) => value?.[part], locale) || key);
 engine.registerFilter('asset_url', name => `/assets/${name}`);
 engine.registerFilter('stylesheet_tag', url => `<link rel="stylesheet" href="${url}">`);
+engine.registerFilter('preload_tag', (url, options = {}) => `<link rel="preload" href="${url}"${options.as ? ` as="${options.as}"` : ''}${options.type ? ` type="${options.type}"` : ''}${options.as === 'font' ? ' crossorigin' : ''}>`);
 engine.registerFilter('json', value => JSON.stringify(value ?? null));
 engine.registerFilter('money', value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0) / 100));
 engine.registerFilter('money_with_currency', value => `${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0) / 100)} USD`);
@@ -23,7 +24,11 @@ engine.registerFilter('image_tag', (value, ...args) => {
 });
 function prepare(source) {
   return source.replace(/{%\s*schema\s*%}[\s\S]*?{%\s*endschema\s*%}/g, '')
-    .replace(/{%\s*form\s+'product'[^%]*%}/g, '<form method="post" action="/cart/add" class="product-form">')
+    .replace(/{%\s*form\s+'product'[^%]*%}/g, match => {
+      const id = match.match(/id:\s*'([^']+)'/);
+      const className = match.match(/class:\s*'([^']+)'/);
+      return `<form method="post" action="/cart/add"${id ? ` id="${id[1]}"` : ''}${className ? ` class="${className[1]}"` : ''}>`;
+    })
     .replace(/{%\s*endform\s*%}/g, '</form>')
     .replace(/{%\s*paginate[^%]*%}|{%\s*endpaginate\s*%}/g, '');
 }
@@ -55,10 +60,15 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
     const schema = JSON.parse(source.match(/{%\s*schema\s*%}([\s\S]*?){%\s*endschema\s*%}/)?.[1] || '{}');
     const defaults = Object.fromEntries((schema.settings || []).filter(setting => setting.default !== undefined).map(setting => [setting.id, setting.default]));
     const sectionSettings = { ...defaults, ...supplied };
-    if (type === 'cinematic-foundation') {
-      if (populated) { sectionSettings.featured_product = fixture; sectionSettings.collection = context.collection; }
-      if (query.get('model')) sectionSettings.model_url = query.get('model');
+    if (type === 'cinematic-hero' || type === 'chapter-featured' || type === 'chapter-finale') {
+      if (populated && type !== 'chapter-finale') { sectionSettings.featured_product = fixture; sectionSettings.product = fixture; }
+      if (populated && type === 'chapter-finale') { sectionSettings.product = fixture; }
+      if (type === 'cinematic-hero') {
+        sectionSettings.collection = context.collection;
+        if (query.get('model')) sectionSettings.model_url = query.get('model');
+      }
     }
+    if (type === 'chapter-collection' && populated) sectionSettings.collection = context.collection;
     return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings } });
   }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));
@@ -82,7 +92,7 @@ export function createPreviewServer({ handleRequest, transformHTML = html => htm
       if (url.pathname.startsWith('/assets/')) {
         const path = resolve(root, `.${decodeURIComponent(url.pathname)}`);
         if (!path.startsWith(resolve(root, 'assets') + sep)) { res.writeHead(403); return res.end(); }
-        const type = ({ '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp' })[extname(path)] || 'application/octet-stream';
+        const type = ({ '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.woff': 'font/woff' })[extname(path)] || 'application/octet-stream';
         const data = await readFile(path); res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' }); return res.end(data);
       }
       const html = await renderPreview(url.pathname, url.searchParams);

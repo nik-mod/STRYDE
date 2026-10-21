@@ -1,4 +1,14 @@
-import { magneticOffset } from './study-state.mjs';
+import { clamp } from './contracts.mjs';
+
+export function magneticOffset(point, bounds, limit = 5) {
+  if (!bounds || bounds.width <= 0 || bounds.height <= 0) return { x: 0, y: 0 };
+  const strength = Math.max(0, Number.isFinite(limit) ? limit : 0);
+  const axis = value => clamp(value, -1, 1) * strength;
+  return {
+    x: axis((point.x - bounds.left - bounds.width / 2) / (bounds.width / 2)),
+    y: axis((point.y - bounds.top - bounds.height / 2) / (bounds.height / 2)),
+  };
+}
 
 // The anchor never moves: only its visual contents respond inside a stable hitbox.
 export function mountMagnetic(element, { gsap, signal, environment = window, limit = 5 }) {

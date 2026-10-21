@@ -9,6 +9,8 @@
     {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
     {% render 'social-meta' %}
     {{ content_for_header }}
+    {{ 'archivo-var.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2' }}
+    {{ 'archivo-var-italic.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2' }}
     <style>
       :root { --paper: {{ settings.background | default: '#41b4f0' }}; --ink: {{ settings.foreground | default: '#073653' }}; --accent: {{ settings.accent | default: '#adfff5' }}; --surface: {{ settings.surface | default: '#effaff' }}; --hero-type: {{ settings.hero_type | default: '#c1fff8' }}; }
     </style>

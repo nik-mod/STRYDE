@@ -1,4 +1,4 @@
-<section class="page-shell cart-page"><div class="page-heading"><span class="micro">{{ 'cart.your_selection' | t }}</span><h1>{{ 'cart.title' | t }}<sup>{{ cart.item_count }}</sup></h1></div>
+<section class="page-shell cart-page"><div class="page-heading"><span class="micro">{{ 'cart.your_selection' | t }}</span><h1>{{ 'cart.title' | t | upcase }}<sup>{{ cart.item_count }}</sup></h1></div>
   {% if cart.item_count > 0 %}
     <form action="{{ routes.cart_url }}" method="post" id="CartForm">
       <div class="cart-layout"><div class="cart-items">{% for item in cart.items %}<article class="cart-item">

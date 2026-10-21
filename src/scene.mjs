@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { foundationPose } from './motion/contracts.mjs';
+import { heroPose } from './motion/contracts.mjs';
+import { environmentFor } from './motion/environments.mjs';
 
 export function disposeObject(object) {
   const textures = new Set(); const materials = new Set(); const geometries = new Set();
@@ -15,11 +16,21 @@ export function disposeObject(object) {
   materials.forEach(material => material.dispose()); geometries.forEach(geometry => geometry.dispose());
 }
 
+// Outgoing scene state for the chapter 02 (deconstruction) controller. Chapter
+// 01's seek(1) must equal chapter 02's seek(0) for every shared property.
+export function captureHandoff({ camera, rig, lights }) {
+  return Object.freeze({
+    camera: Object.freeze({ position: camera.position.toArray(), quaternion: camera.quaternion.toArray(), fov: camera.fov }),
+    rig: Object.freeze({ position: rig.position.toArray(), quaternion: rig.quaternion.toArray(), scale: rig.scale.toArray() }),
+    lights: Object.freeze(lights.map(light => Object.freeze({ intensity: light.intensity, position: light.position.toArray() }))),
+  });
+}
+
 export async function mountScene({ root, url, bus, scheduler, signal }) {
   if (signal.aborted || matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};
   const host = root.querySelector('[data-scene-host]');
   const status = root.querySelector('[data-model-status]');
-  const fallback = host.querySelector('.foundation-image, .asset-empty');
+  const fallback = host.querySelector('.hero-image, .concept-visual, .model-fallback');
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
   let renderer; let disposed = false; let model; let visible = false; let contextLost = false;
   let unsubscribe = () => {}; let removeFrame = () => {}; let observer; let resizeObserver;
@@ -27,9 +38,10 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const camera = new THREE.PerspectiveCamera(32, 1, .01, 100);
   camera.position.set(0, .1, 4.8);
   const rig = new THREE.Group(); scene.add(rig);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x7c7a6f, 2.8));
+  const ambient = new THREE.HemisphereLight(0xffffff, 0x6f9fc0, 2.6); scene.add(ambient);
   const key = new THREE.DirectionalLight(0xffffff, 3.4); key.position.set(3, 4, 5); scene.add(key);
   const rim = new THREE.DirectionalLight(0xffffff, 2); rim.position.set(-3, 2, -2); scene.add(rim);
+  const lights = [key, rim];
   const cleanup = () => {
     if (disposed) return; disposed = true;
     unsubscribe(); removeFrame(); observer?.disconnect(); resizeObserver?.disconnect();
@@ -40,7 +52,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     if (fallback) fallback.hidden = false;
     setStatus('');
   };
-  const onLost = event => { event.preventDefault(); contextLost = true; if (fallback) fallback.hidden = false; setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product image remains available.'); };
+  const onLost = event => { event.preventDefault(); contextLost = true; if (fallback) fallback.hidden = false; setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product imagery remains available.'); };
   const onRestored = () => { contextLost = false; if (fallback && model) fallback.hidden = true; setStatus(''); };
   signal.addEventListener('abort', cleanup, { once: true });
   try {
@@ -67,13 +79,34 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     const bounds = new THREE.Box3().setFromObject(model); const size = bounds.getSize(new THREE.Vector3()); const center = bounds.getCenter(new THREE.Vector3());
     if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty model');
     model.position.sub(center); const scale = 2.2 / Math.max(size.x, size.y, size.z); rig.scale.setScalar(scale); rig.add(model);
-    unsubscribe = bus.subscribe(state => { const pose = foundationPose(state.local); rig.rotation.set(0, pose.rotationY, pose.rotationZ); camera.position.z = pose.cameraZ; });
-    removeFrame = scheduler.add(() => { if (visible && !document.hidden && !contextLost && !disposed) renderer.render(scene, camera); });
+    // The rig follows the same authored five-phase pose the image fallback
+    // scrubs against: rotation, camera dolly and lighting all derive from the
+    // shared heroPose(progress), never from accumulated deltas.
+    unsubscribe = bus.subscribe(state => {
+      const pose = heroPose(state.local);
+      rig.rotation.set(0, pose.rotationY, pose.rotationZ);
+      camera.position.set(0, pose.cameraY, pose.cameraZ);
+      if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
+      key.intensity = pose.keyIntensity;
+      rim.intensity = pose.rimIntensity;
+    });
+    removeFrame = scheduler.add(() => {
+      if (!visible || document.hidden || contextLost || disposed) return;
+      // Outside the hero, the active chapter environment eases the key/rim
+      // lights toward its preset — the base the future GLB chapters inherit.
+      // Inside the hero the authored pose remains the single owner.
+      if (bus.state.chapter !== 0) {
+        const env = environmentFor(document.documentElement.dataset.env);
+        key.intensity += (env.key - key.intensity) * .08;
+        rim.intensity += (env.rim - rim.intensity) * .08;
+      }
+      renderer.render(scene, camera);
+    });
     if (fallback) fallback.hidden = true; setStatus('');
   } catch (error) {
     if (signal.aborted || disposed) return cleanup;
     cleanup();
-    setStatus(root.dataset.errorLabel || '3D view unavailable. Product image remains available.');
+    setStatus(root.dataset.errorLabel || '3D view unavailable. Product imagery remains available.');
     console.warn('[STRYDE] Model unavailable:', error.message);
   }
   return cleanup;

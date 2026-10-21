@@ -1,0 +1,24 @@
+<section class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}" aria-labelledby="BrandHeading-{{ section.id }}">
+  <div class="brand-stage" data-brand-stage>
+    <p class="brand-watermark" aria-hidden="true" data-brand-watermark>STRYDE</p>
+    <div class="brand-rule" aria-hidden="true"><span data-brand-rule></span></div>
+    <h2 class="brand-lines" id="BrandHeading-{{ section.id }}">
+      <span class="brand-line brand-line-quiet"><span>{{ section.settings.line_1 | escape }}</span></span>
+      <span class="brand-line brand-line-loud"><span>{{ section.settings.line_2 | escape }}</span></span>
+      <span class="brand-line brand-line-quiet"><span>{{ section.settings.line_3 | escape }}</span></span>
+    </h2>
+    <p class="brand-manifesto">{{ section.settings.manifesto | escape }}</p>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Brand story",
+  "settings":[
+    {"type":"text","id":"line_1","label":"Line one","default":"Form"},
+    {"type":"text","id":"line_2","label":"Line two","default":"follows"},
+    {"type":"text","id":"line_3","label":"Line three","default":"forward."},
+    {"type":"textarea","id":"manifesto","label":"Manifesto","default":"STRYDE is a design practice disguised as a footwear label. Every silhouette starts as a question about motion — how weight shifts, how a foot lands, how a material can carry it — and nothing ships until the answer looks as good as it moves."}
+  ],
+  "presets":[{"name":"Brand story"}]
+}
+{% endschema %}

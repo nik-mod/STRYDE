@@ -1,0 +1,56 @@
+{% liquid
+  assign product = section.settings.product
+  assign selected_variant = product.selected_or_first_available_variant
+  assign presentation_image = section.settings.image | default: product.featured_image
+%}
+<section class="chapter chapter-finale" data-chapter="finale" data-env="finale" data-section-id="{{ section.id }}" aria-labelledby="FinaleHeading-{{ section.id }}">
+  <div class="finale-stage" data-finale-stage>
+    <div class="finale-spot" aria-hidden="true" data-finale-spot></div>
+    <div class="finale-floor" aria-hidden="true" data-finale-floor></div>
+    <div class="finale-inner" data-finale-inner>
+      <div class="finale-shoe" data-finale-shoe>
+        {% if presentation_image != blank %}
+          {{ presentation_image | image_url: width: 1000 | image_tag: loading: 'lazy', widths: '400, 600, 1000', sizes: '(min-width: 900px) 430px, 62vw', alt: presentation_image.alt }}
+        {% else %}
+          <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+        {% endif %}
+      </div>
+      <p class="chapter-kicker finale-kicker">{{ section.settings.kicker | escape }}</p>
+      <h2 class="finale-heading" id="FinaleHeading-{{ section.id }}">
+        <span class="heading-line"><span>{{ section.settings.heading_line_1 | upcase | escape }}</span></span>
+        <span class="heading-line finale-heading-loud"><span>{{ section.settings.heading_line_2 | upcase | escape }}</span></span>
+      </h2>
+      <p class="finale-sub">{{ section.settings.sub | escape }}</p>
+      {% if product != blank %}<p class="finale-price">{{ selected_variant.price | money_with_currency }}</p>{% endif %}
+      <div class="finale-actions">
+        {% if product != blank %}
+          {% form 'product', product, class: 'feat-form' %}
+            <div class="hero-form-errors">{{ form.errors | default_errors }}</div>
+            <input type="hidden" name="id" value="{{ selected_variant.id }}">
+            <button class="hero-cart" type="submit" name="add"{% unless selected_variant.available %} disabled{% endunless %}>{% if selected_variant.available %}{{ 'hero.add_to_cart' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</button>
+          {% endform %}
+          <a class="finale-ghost" href="{{ product.url }}">{{ 'hero.details' | t }}</a>
+        {% else %}
+          <a class="hero-cart" href="{{ section.settings.collection.url | default: routes.all_products_collection_url }}">{{ section.settings.cta | escape }}</a>
+          <a class="finale-ghost" href="{{ routes.search_url }}">{{ 'general.search' | t }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name":"Finale",
+  "settings":[
+    {"type":"text","id":"kicker","label":"Kicker","default":"08 — The finale"},
+    {"type":"text","id":"heading_line_1","label":"Heading line one","default":"Make it"},
+    {"type":"text","id":"heading_line_2","label":"Heading line two","default":"Yours"},
+    {"type":"textarea","id":"sub","label":"Closing line","default":"The journey ends where it started — on foot. The collection is open."},
+    {"type":"product","id":"product","label":"Featured product"},
+    {"type":"collection","id":"collection","label":"Fallback collection link"},
+    {"type":"text","id":"cta","label":"Fallback call to action","default":"Explore the collection"},
+    {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the product or concept image."}
+  ],
+  "presets":[{"name":"Finale"}]
+}
+{% endschema %}
