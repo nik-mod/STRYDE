@@ -859,15 +859,15 @@ a.hero-name:hover {
 }
 .coll-scene {
   position: relative;
-  min-height: 86svh;
   display: grid;
-  align-content: center;
-  padding: 6vh 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: clamp(32px, 5vw, 64px) 0;
 }
 .coll-scene-num {
-  position: absolute;
+  position: relative;
   z-index: 0;
-  font-size: clamp(170px, 26vw, 400px);
+  font-size: clamp(76px, 14vw, 140px);
   font-style: italic;
   font-weight: 300;
   font-stretch: 118%;
@@ -882,7 +882,7 @@ a.hero-name:hover {
 .coll-scene-art {
   position: relative;
   z-index: 1;
-  width: min(88vw, 780px);
+  width: min(100%, 780px);
 }
 .coll-scene-figure {
   position: relative;
@@ -901,6 +901,15 @@ a.hero-name:hover {
   position: absolute;
   right: 6px;
   top: 6px;
+  font-size: 11px;
+  opacity: .8;
+}
+.coll-image-pending {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  text-align: center;
 }
 .coll-tint-a img { filter: hue-rotate(-10deg) saturate(1.05); }
 .coll-tint-b img { filter: hue-rotate(14deg) brightness(1.04); }
@@ -909,6 +918,18 @@ a.hero-name:hover {
   position: relative;
   z-index: 2;
   max-width: 560px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chapter-collection:not(.is-sequenced) .asset-tag {
+  position: static;
+  display: block;
+  text-align: right;
+  margin-top: 10px;
+}
+.chapter-collection:not(.is-sequenced) .coll-scene-visual img {
+  max-height: 420px;
+  object-fit: contain;
 }
 .coll-scene-name {
   font-size: clamp(40px, 4.6vw, 84px);
@@ -937,7 +958,9 @@ a.hero-name:hover {
   font-size: 15px;
 }
 .coll-scene-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   margin-top: 20px;
   font-size: 13px;
   font-weight: 600;
@@ -1093,20 +1116,22 @@ a.hero-name:hover {
 /* finale */
 
 .chapter-finale {
-  background: linear-gradient(180deg, var(--ink-deep) 0%, var(--ink-deep) 66%, var(--surface) 100%);
+  --finale-tail: clamp(140px, 20vh, 240px);
+  background: linear-gradient(180deg, var(--ink-deep) 0%, var(--ink-deep) calc(100% - var(--finale-tail)), var(--surface) 100%);
   color: var(--surface);
   text-align: center;
   padding-top: clamp(120px, 18vh, 220px);
-  padding-bottom: clamp(140px, 20vh, 240px);
+  padding-bottom: var(--finale-tail);
 }
 .finale-shoe {
-  width: min(560px, 64vw);
-  margin: 0 auto clamp(28px, 5vh, 54px);
+  width: min(440px, 44vw, 44svh);
+  margin: 0 auto clamp(16px, 2vh, 24px);
   filter: drop-shadow(0 46px 40px rgba(0, 0, 0, .42));
 }
 .finale-kicker {
   justify-content: center;
   opacity: .65;
+  margin-bottom: 14px;
 }
 .finale-kicker::after {
   content: "";
@@ -1116,7 +1141,7 @@ a.hero-name:hover {
   flex: none;
 }
 .finale-heading {
-  font-size: clamp(52px, 8vw, 148px);
+  font-size: clamp(52px, 7vw, 100px);
   font-style: italic;
   font-weight: 870;
   font-stretch: 114%;
@@ -1135,7 +1160,7 @@ a.hero-name:hover {
 }
 .finale-sub {
   max-width: 46ch;
-  margin: 26px auto 0;
+  margin: 18px auto 0;
   font-size: 15px;
   line-height: 1.65;
   opacity: .8;
@@ -1146,7 +1171,7 @@ a.hero-name:hover {
   align-items: center;
   gap: 22px;
   flex-wrap: wrap;
-  margin-top: clamp(36px, 6vh, 60px);
+  margin-top: 24px;
 }
 .finale-actions .hero-cart {
   background: var(--surface);
@@ -1690,6 +1715,11 @@ a.hero-name:hover {
   min-height: 100svh;
   padding-bottom: 40px;
 }
+.no-js .hero-type {
+  position: relative;
+  inset: auto;
+  margin: calc(var(--header-height) + 24px) var(--gutter) 0;
+}
 .no-js .hero-art,
 .no-js .hero-copy,
 .no-js .hero-foot {
@@ -1925,23 +1955,31 @@ a.hero-name:hover {
     grid-column: 2;
   }
   .coll-scene {
-    min-height: 76svh;
-    padding: 4vh 0;
+    gap: 14px;
+    padding: 30px 0;
   }
   .coll-scene-num {
-    font-size: 34vw;
-    top: 1vh;
+    font-size: clamp(68px, 18vw, 108px);
   }
   .coll-scene-art {
-    width: 94%;
-    margin-left: 6%;
+    width: 100%;
   }
   .coll-scene-copy {
-    margin-top: -6vh;
-    padding: 0 var(--gutter);
+    margin-top: 0;
+    padding: 0;
   }
   .coll-scene-name {
     font-size: clamp(34px, 9vw, 54px);
+    line-height: 1.08;
+  }
+  .coll-scene-price {
+    margin-top: 10px;
+  }
+  .coll-scene-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px;
   }
   .feat-grid {
     grid-template-columns: 1fr;
@@ -1958,9 +1996,17 @@ a.hero-name:hover {
   }
   .finale-actions {
     flex-direction: column;
+    gap: 12px;
+  }
+  .chapter-finale {
+    --finale-tail: 84px;
+  }
+  .finale-shoe {
+    width: min(76vw, 300px, 35svh);
   }
   .finale-actions .hero-cart,
   .finale-actions .finale-ghost {
+    min-height: 48px;
     width: 100%;
     justify-content: center;
   }
@@ -2084,7 +2130,7 @@ a.hero-name:hover {
 
 @media (max-width: 700px) and (max-height: 700px) {
   .hero-type {
-    top: 7%;
+    top: calc(var(--header-height) + 18px);
     font-size: 15vw;
   }
   .hero-art {
@@ -2113,6 +2159,27 @@ a.hero-name:hover {
     height: auto;
     min-height: 100svh;
     padding-bottom: 40px;
+  }
+  .hero-type,
+  .hero-art,
+  .hero-copy,
+  .hero-foot {
+    position: relative;
+    inset: auto;
+  }
+  .hero-type {
+    margin: calc(var(--header-height) + 24px) var(--gutter) 0;
+  }
+  .hero-art {
+    height: 52svh;
+    margin: 24px auto;
+  }
+  .hero-copy {
+    width: auto;
+    margin: 0 var(--gutter);
+  }
+  .hero-foot {
+    margin: 32px var(--gutter) 0;
   }
   .hero-art,
   .hero-copy,
@@ -2287,18 +2354,20 @@ a.hero-name:hover {
   min-height: 0;
   padding: 0;
   display: block;
+  pointer-events: none;
 }
 .chapter-collection.is-sequenced .coll-scene-num {
+  position: absolute;
   font-size: clamp(220px, 30vw, 520px);
 }
 .chapter-collection.is-sequenced .coll-scene:nth-of-type(odd) .coll-scene-num {
   right: -3vw;
-  top: -5vw;
+  bottom: -.06em;
   left: auto;
 }
 .chapter-collection.is-sequenced .coll-scene:nth-of-type(even) .coll-scene-num {
   left: -2vw;
-  top: -5vw;
+  bottom: -.06em;
 }
 .chapter-collection.is-sequenced .coll-scene-art {
   position: absolute;
@@ -2328,6 +2397,9 @@ a.hero-name:hover {
   width: min(36vw, 500px);
   text-align: right;
 }
+.chapter-collection.is-sequenced .coll-scene-copy a {
+  pointer-events: auto;
+}
 .chapter-collection.is-sequenced .coll-scene:nth-of-type(even) .coll-scene-copy {
   left: 7%;
   right: auto;
@@ -2350,8 +2422,9 @@ a.hero-name:hover {
 
 .finale-stage {
   position: relative;
-  height: calc(100svh - var(--preview-height));
-  min-height: 620px;
+  min-height: calc(100svh - var(--preview-height));
+  height: auto;
+  padding-block: 24px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -2423,6 +2496,7 @@ a.hero-name:hover {
   }
   .finale-stage {
     min-height: 560px;
+    padding-block: 16px;
   }
   .finale-spot {
     width: 120vw;

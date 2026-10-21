@@ -1,4 +1,78 @@
-# Collection gallery refinement record
+# Milestone 02.6 stabilization — current status
+
+2026-10-21. This record supersedes the current-layout descriptions in the historical logs below. The takeover found a clean working tree at `1ce32df`; `d20960e` is its parent. No reset, clean, commit, push, merge, upload or deployment was performed. A pre-edit source snapshot is retained in `.work/m026-stabilization-baseline/`.
+
+**Status: Milestone 02.6 local visual/motion QA completed in Chromium on 2026-10-21.** The earlier approval-review usage-limit failure is historical. Browser execution is now available; the final brief explicitly requested completing the pending checks. Older unanswered approval-request statuses could not be inspected, and none were inferred. Authentic assets, real-store commerce and physical-device/cross-browser production validation remain separate requirements below.
+
+Prior uncommitted stabilization changes were preserved. A second pre-edit snapshot, including untracked source/tests, is in `.work/m026-final-qa-baseline/`; HEAD remains `1ce32df`. Nothing was committed, pushed, merged, reset, cleaned or deployed.
+
+## Implemented fixes
+
+- Collection flow: replaced absolutely positioned oversized numbering, `76svh` scene minimums and the copy's `-6vh` margin with separate number, art/disclosure and metadata grid rows. Removed the art's lateral offset and duplicate metadata gutter. Links have 44px minimum targets; long names wrap. Collection uses this unpinned flow at ≤900px and on coarse/no-hover pointers, including tablet/touch. Default fallback and reduced-motion markup use the same flow.
+- Scene fields are Theme Editor color settings (`field_1..3`), preserving #41b4f0 / #7fa9f6 / #4fc4d4 defaults. Unit rendering verifies independent custom values reach their scenes.
+- Removed incorrect concept tags from merchant product scenes; missing real imagery gets an unavailable message. Added the missing concept disclosure to the Finale fallback.
+- Collection's intro heading remains visible while approaching the pin instead of starting masked offscreen. Final product still remains visible through exit. Inactive absolute scene shells no longer intercept active scene links.
+- Hover keeps sequence-owned transforms untouched. The separate controller caches geometry, clamps image offsets, resets on leave and explicitly releases event-created tweens/listeners.
+- Hero's returned cleanup is now registered; duplicate header mounting cannot replace a live disposer with a no-op. Header unload cancels its queued frame and guards late callbacks. BFCache restoration retains one environment observer cleanup instead of mounting a second observer.
+- Brand watermark drift now moves ±3% around its CSS margin-based center; the previous −47% to −53% shifted it above that center a second time. Finale word drift now shares the full master pin timeline. Finale stage height can grow with its contents rather than permanently clipping controls/copy inside a fixed height.
+
+## Final browser-confirmed defects fixed
+
+- Collection metadata crossed the giant numerals. Numerals now occupy the lower corners, keeping cropped editorial scale while clearing product information.
+- The mirrored shoe retained an unintended 129.6px X offset after refresh. Explicit zero-pixel X poses on the sequence prevent that offset from compounding with percentage transforms; full shoes and disclosures remain framed.
+- Brand's early pin showed almost only a rule. Its first line is now visible on arrival; the watermark and remaining lines enter earlier without adding content or decoration.
+- The third Materials crop showed mostly blue space and the upper collar. Its authored crop now frames the heel's translucent chambers in the existing concept image; no replacement asset was created.
+- Finale controls were below the viewport during the pin (desktop control bottom was about 1019px in a 900px viewport). Viewport-aware shoe/type sizing and tighter internal spacing now fit controls, including the fixture price, at all four sizes. The finishing gradient is restricted to the outgoing tail, preserving contrast through the pin.
+- The Finale backdrop retained a −707px pixel shift alongside percentage centering. Explicit zero-pixel X/Y poses keep it centered while the word counter-drifts. Purchase controls use explicit from/to poses on rendered buttons/links, avoiding a stale 34px offset and transforms on display-contents forms.
+- Pagehide pin cleanup clamped the browser's saved position: a mid-Collection reload moved from 10518 to 8233, and product-back navigation moved from 9359 to 7074. A guarded, per-URL session checkpoint taken before teardown restores reload/history entries after fonts and pins settle. Verified final results are 10518→10518 and 9359→9359. Different viewports/motion modes and normal new navigation do not reuse an old checkpoint; inaccessible storage falls back to native restoration.
+- The short-phone header covered the opening headline. Its short-height offset is corrected. Reduced-motion and no-JS heroes now use separate text/art/copy/control flow rather than overlapping absolute layers.
+
+## All-chapter visual and pacing audit
+
+| Chapter | Source assessment / action | Browser status |
+| --- | --- | --- |
+| Hero | Five phases, 2.5× desktop / 1.5× mobile travel retained; short-phone header clearance and static fallbacks corrected | Entrance/middle/exit inspected at all four sizes |
+| Deconstruction | Crop crossfades, image/list rhythm and transitions retained | Entrance/middle/exit inspected at all four sizes |
+| Materials | 2.2× desktop macro pin retained; mobile panels flow; final crop corrected | Entrance/middle/exit and final crop inspected at all four sizes |
+| Technology | Wipe, word masks and row/spine timing retained | Entrance/middle/exit inspected at all four sizes |
+| Collection | Five-phase pin retained at desktop; full product framing and metadata/number separation corrected; tablet/touch flow retained | 41 forward/reverse checkpoints, 18 rapid seeks, wheel stress, resize, reload and native fixture link passed |
+| Featured | Existing image/copy parallax handoff retained | Entrance/middle/exit and Collection boundary inspected at all four sizes |
+| Brand | 1.6× pin retained; first line and earlier reveals remove the weak entrance | Entrance/middle/exit inspected at all four sizes |
+| Finale | 2× pin retained; centered backdrop, visible product entrance, fitted controls and dark pin surface | Entrance/middle/exit, word centering and fixture purchase-control fit passed at all four sizes |
+
+The all-chapter pacing pass used 96 representative screenshots plus supplemental final-state captures and actual wheel/reverse sweeps. No unintended blank stage or horizontal overflow was observed after fixes. Intentional macro crops, large numerals and negative space remain. Pin durations were retained; confirmed defects were corrected through timing, pose and composition. This is not physical-device profiling or a 60 FPS certification.
+
+## Executed automated validation
+
+- `npm run build`: passed.
+- `npm test`: **24/24 passed**, including four new settings/merchant-data/hover-teardown/header-frame regressions. The development integration actually starts a same-Liquid server without authentication and verifies CSS and source-JS refresh notifications. It needs loopback access; the first sandboxed run failed with EACCES, then the complete suite passed with approved loopback access.
+- `npm run validate`: passed, 40 theme files; eight-chapter order, schemas, section/snippet references and bundled imports validated.
+- `npm run theme:check`: passed, 35 files, zero offenses.
+- `npm run theme:package`: passed using the existing Shopify CLI process. `dist/stryde-m01.zip` contains all 40 theme files; archive/source SHA-256 checks match every entry, with no developer files included. The ZIP includes both local fonts, the existing concept asset, runtime/chunks, all eight chapter sections and commerce templates. The historical filename is retained by the existing tool and does not imply M01-only contents. No upload/publication occurred.
+
+## Executed browser regression
+
+Headless Chromium tested the running same-Liquid preview at `http://localhost:9292`, at **1440×900, 768×1024, 390×844 and 375×667**. All eight chapters were captured at entrance/middle/exit, inspected in contact sheets and checked in full-size critical captures. Tablet/mobile contexts also used touch/coarse-pointer emulation.
+
+- Collection: 21 forward and 20 reverse checkpoints restored identical transforms/opacity/visibility; 18 rapid seek jumps, slow wheel progression and a large reverse-wheel stress passed. Boundary reversals through Technology→Collection and Featured→Collection passed. No blank Collection checkpoint was observed.
+- Full Finale→Hero reverse sweeps ran at all four sizes, with 45 deterministic pinned-state comparisons total. Pin ownership remained unique: desktop 5, tablet 4, phones 3. Collection remains unpinned on tablet/touch.
+- Reload while mid-Collection restored exact scroll and scene state. Resize while pinned to tablet flow and back restored one Collection pin. Five unload/load cycles, including duplicate load events, left one owner. Hover scaled/lifted its nested wrapper, reset on leave and left the scrubbed figure transform untouched.
+- A configured same-Liquid collection fixture with image and native product URL was clicked successfully. Product-back navigation restored its exact prior Collection position. This validates local wiring, not a connected Shopify collection.
+- Finale fixture-price controls fit completely: bottom 826.9/900px desktop, 823.3/1024px tablet, 675.7/844px mobile and 624.0/667px small phone. The backdrop center matched its stage within 1px at all four sizes.
+- Reduced motion and JavaScript-disabled modes were actually emulated at all four sizes, including scrolled reloads. No pins remained; heading, art, copy and controls were separated; shopping access and no horizontal overflow passed. Short-phone opening-header clearance and mobile menu Escape close passed.
+- Product variants, collection sort, cart update/disabled fixture checkout and search forms passed on desktop/mobile. Local fixture transactions remained disabled. No browser page errors were recorded in the final regression suites.
+
+Browser-only instrumentation exposes the actual bundled GSAP/ScrollTrigger references in an intercepted response for assertions; it is not in theme source or ZIP. Screenshot tests omit only the development SSE refresh script to prevent unrelated source-save navigations while capturing. They run the actual Liquid, CSS and storefront runtime.
+
+Artifacts and runnable browser scripts are outside the theme, in `C:/Users/LENOVO_LEGION/.codex/visualizations/2026/10/21/01a15e09-43e7-7bb2-a336-868299c3d058/`. Final captures and JSON results (`audit`, `regression`, `reverse-sweeps`, `fallback`, `no-js`) are under `m026-final/`; scripts are named `playwright-m026-*.js`. Supplemental final crop/default Finale captures supersede the earlier exploratory images. No source-debug hooks ship.
+
+## Remaining production validation
+
+No requested local browser check remains blocked. Authentic Shopify inventory, markets, platform-generated errors, connected-store Collection hover and checkout remain unverified. Licensed product/box GLBs, real geometry/texture fidelity, physical touch devices, other browser engines and production GPU/frame-rate budgets require a later production pass; no assets were searched for or generated here. Native fixture checks are not live-store certification.
+
+## Historical Collection gallery refinement record (pre-02.6)
+
+The following entries were inherited from earlier development. References to a horizontal reel, old Finale and earlier test counts describe those historical versions, not the current sequence. Their “this session” wording belongs to their original authors.
 
 2026-10-21. The THE LINEUP collection chapter was refined (composition, numerals, framing, hover) on the M02.5 state without touching the horizontal ScrollTrigger architecture. All checks below were executed in this session.
 

@@ -4,9 +4,9 @@
   if collection != blank and collection.products_count > 0
     assign has_products = true
   endif
-  assign field_1 = '#41b4f0'
-  assign field_2 = '#7fa9f6'
-  assign field_3 = '#4fc4d4'
+  assign field_1 = section.settings.field_1 | default: '#41b4f0'
+  assign field_2 = section.settings.field_2 | default: '#7fa9f6'
+  assign field_3 = section.settings.field_3 | default: '#4fc4d4'
 %}
 <section class="chapter chapter-paper chapter-collection" data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
   <div class="coll-head">
@@ -26,10 +26,11 @@
               <span class="coll-scene-visual" data-coll-visual>
                 {% if product.featured_image %}
                   {{ product.featured_image | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '400, 700, 1000, 1400', sizes: '(min-width: 900px) 56vw, 92vw', alt: product.featured_image.alt }}
+                {% else %}
+                  <span class="coll-image-pending">{{ 'hero.asset_pending' | t }}</span>
                 {% endif %}
               </span>
             </a>
-            <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
           </div>
           <div class="coll-scene-copy">
             <h3 class="coll-scene-name"><span class="scene-line"><span><a href="{{ product.url }}">{{ product.title | escape }}</a></span></span></h3>
@@ -67,6 +68,9 @@
     {"type":"text","id":"kicker","label":"Kicker","default":"05 — The collection"},
     {"type":"text","id":"heading","label":"Heading","default":"The lineup"},
     {"type":"collection","id":"collection","label":"Collection","info":"The first three products play as a cinematic sequence. Without a collection, labeled concept studies stand in."},
+    {"type":"color","id":"field_1","label":"Product 01 field","default":"#41b4f0"},
+    {"type":"color","id":"field_2","label":"Product 02 field","default":"#7fa9f6"},
+    {"type":"color","id":"field_3","label":"Product 03 field","default":"#4fc4d4"},
     {"type":"text","id":"tile_title","label":"Concept tile title","default":"Concept"}
   ],
   "presets":[{"name":"Collection reveal"}]

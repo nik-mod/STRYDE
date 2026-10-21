@@ -6,8 +6,12 @@ export function mountHeader(header, environment = window) {
 
   let lastY = environment.scrollY || 0;
   let ticking = false;
+  let frame = null;
+  let disposed = false;
 
   const update = () => {
+    if (disposed) return;
+    frame = null;
     ticking = false;
     const y = environment.scrollY || 0;
     header.classList.toggle('is-solid', y > 24);
@@ -21,13 +25,16 @@ export function mountHeader(header, environment = window) {
   const onScroll = () => {
     if (!ticking) {
       ticking = true;
-      environment.requestAnimationFrame(update);
+      frame = environment.requestAnimationFrame(update);
     }
   };
 
   environment.addEventListener('scroll', onScroll, { passive: true });
   update();
   return () => {
+    if (disposed) return;
+    disposed = true;
+    if (frame !== null) environment.cancelAnimationFrame(frame);
     environment.removeEventListener('scroll', onScroll);
     delete header.dataset.headerBound;
     header.classList.remove('is-solid', 'is-hidden');

@@ -14,6 +14,7 @@
           {{ presentation_image | image_url: width: 1000 | image_tag: loading: 'lazy', widths: '400, 600, 1000', sizes: '(min-width: 900px) 430px, 62vw', alt: presentation_image.alt }}
         {% else %}
           <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">
+          <span class="asset-tag">{{ 'assets.concept_tag' | t }}</span>
         {% endif %}
       </div>
       <p class="chapter-kicker finale-kicker">{{ section.settings.kicker | escape }}</p>
