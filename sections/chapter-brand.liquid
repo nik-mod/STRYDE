@@ -1,19 +1,33 @@
 <section id="chapter-brand" class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}" aria-labelledby="BrandHeading-{{ section.id }}">
   <div class="brand-stage" data-brand-stage>
-    <p class="brand-watermark" aria-hidden="true" data-brand-watermark>{{ settings.brand_name | default: shop.name | escape }}</p>
-    <div class="brand-rule" aria-hidden="true"><span data-brand-rule></span></div>
+    <figure class="brand-visual frame">
+      {% if section.settings.image != blank %}
+        {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '700, 1200, 1800', sizes: '(max-width: 700px) 100vw, 55vw', alt: section.settings.image.alt }}
+        {% if section.settings.image_is_concept %}<figcaption class="asset-tag">{{ 'assets.concept_tag' | t }}</figcaption>{% endif %}
+      {% elsif section.settings.use_tn_model %}
+        <img src="{{ 'tn-detail-1400.webp' | asset_url }}" srcset="{{ 'tn-detail-700.webp' | asset_url }} 700w, {{ 'tn-detail-1400.webp' | asset_url }} 1400w" width="1400" height="1050" sizes="(max-width: 700px) 100vw, 55vw" loading="lazy" data-brand-model alt="Blue upper and white wave cage, an editorial crop of the TN model render">
+        <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
+      {% else %}
+        {% render 'presentation-image', slot: 'material_2' %}
+      {% endif %}
+    </figure>
+    <div class="brand-editorial">
     <h2 class="brand-lines" id="BrandHeading-{{ section.id }}">
       <span class="brand-line brand-line-quiet"><span>{{ section.settings.line_1 | escape }}</span></span>
       <span class="brand-line brand-line-loud"><span>{{ section.settings.line_2 | escape }}</span></span>
       <span class="brand-line brand-line-quiet"><span>{{ section.settings.line_3 | escape }}</span></span>
     </h2>
     <p class="brand-manifesto">{{ section.settings.manifesto | escape }}</p>
+    </div>
   </div>
 </section>
 {% schema %}
 {
   "name":"Brand story",
   "settings":[
+    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial image","default":false},
+    {"type":"image_picker","id":"image","label":"Campaign image","info":"Use an approved campaign or detail image. Empty slots show a disclosed model or concept study."},
+    {"type":"checkbox","id":"image_is_concept","label":"Campaign image is concept art","default":false},
     {"type":"text","id":"line_1","label":"Line one","default":"Form"},
     {"type":"text","id":"line_2","label":"Line two","default":"follows"},
     {"type":"text","id":"line_3","label":"Line three","default":"forward."},

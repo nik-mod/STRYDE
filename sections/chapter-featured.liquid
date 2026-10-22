@@ -6,8 +6,10 @@
 <section id="chapter-featured" class="chapter chapter-surface chapter-featured" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
   <div class="feat-grid">
     <div class="frame feat-frame">
-      {% if section.settings.use_tn_model and presentation_image == blank %}
-        <img src="{{ 'tn-angle-1400.webp' | asset_url }}" srcset="{{ 'tn-angle-700.webp' | asset_url }} 700w, {{ 'tn-angle-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — angle view rendered from the 3D model">
+      {% if product != blank and presentation_image == blank %}
+        <p class="editorial-image-pending">{{ 'hero.asset_pending' | t }}</p>
+      {% elsif section.settings.use_tn_model and presentation_image == blank %}
+        <img src="{{ 'tn-angle-1400.webp' | asset_url }}" srcset="{{ 'tn-angle-700.webp' | asset_url }} 700w, {{ 'tn-angle-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" data-featured-model alt="Blue and white TN — angle view rendered from the 3D model">
         <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
       {% else %}
       {% assign supplied_concept = false %}

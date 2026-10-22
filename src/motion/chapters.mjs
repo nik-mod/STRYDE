@@ -99,19 +99,17 @@ function deconstruction(root, gsap) {
 /* ---------------------------------------------------- 03 — materials */
 
 function materials(root, gsap, { mobile }) {
-  arrive(root, gsap);
   const panels = [...root.querySelectorAll('.mat-panel')];
   const journey = !mobile && panels.length > 1;
   if (journey) {
-    // Pinned macro journey on desktop: the whole section becomes a viewport
-    // stage; phases crossfade with depth as the scroll advances.
-    const stage = root.querySelector('[data-mat-panels]');
+    // Frame owns the wipe; image owns the crop/pan. Leave the first image and
+    // its copy visible at rest so the chapter has no empty entrance frame.
     root.classList.add('is-journey-host');
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: root,
         start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * 1.65)}`,
+        end: () => `+=${Math.round(window.innerHeight * 1.25)}`,
         pin: true,
         scrub: true,
         invalidateOnRefresh: true,
@@ -120,55 +118,50 @@ function materials(root, gsap, { mobile }) {
     const phaseLength = 1 / panels.length;
     panels.forEach((panel, index) => {
       const image = panel.querySelector('.mat-frame > img');
+      const frame = panel.querySelector('.mat-frame');
       const crop = image ? readCrop(image) : null;
       // Discard pixel offsets parsed from the CSS fallback before applying the
       // same crop with GSAP. Otherwise the translation accumulates twice.
       if (crop) gsap.set(image, { x: 0, y: 0, scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
       const enter = index * phaseLength;
-      const leave = enter + phaseLength;
       if (index > 0) {
-        timeline.fromTo(panel,
-          { autoAlpha: 0, scale: 1.09, yPercent: 4 },
-          { autoAlpha: 1, scale: 1, yPercent: 0, duration: phaseLength * .5, ease: 'power1.inOut' },
-          enter - phaseLength * .22);
+        gsap.set(panel, { autoAlpha: 0 });
+        timeline.set(panel, { autoAlpha: 1 }, enter - phaseLength * .2);
+        if (frame) timeline.fromTo(frame,
+          { clipPath: 'inset(0% 0% 0% 100%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: phaseLength * .5, ease: 'power2.inOut' },
+          enter - phaseLength * .2);
+        // The old subject stays complete behind the incoming wipe, then
+        // releases after the new frame covers it. Reverse follows the same path.
+        timeline.to(panels[index - 1], {
+          autoAlpha: 0, duration: phaseLength * .18, ease: 'none',
+        }, enter + phaseLength * .3);
       }
       if (crop) {
-        timeline.fromTo(image, { scale: crop.zoom * 1.12 }, {
-          scale: crop.zoom,
-          duration: phaseLength * .8,
-          ease: 'power1.out',
+        const direction = index % 2 ? -1 : 1;
+        // Merchant close-ups start at their authored static crop. During pan,
+        // a small overscan keeps their edge inside the frame at either extreme.
+        const motionZoom = Math.max(crop.zoom, 1.06);
+        timeline.fromTo(image, {
+          scale: motionZoom * 1.07, xPercent: crop.tx - direction * 2,
+          yPercent: crop.ty + 1.5,
+        }, {
+          scale: motionZoom,
+          xPercent: crop.tx + direction * 2,
+          yPercent: crop.ty - 1.5,
+          duration: phaseLength,
+          ease: 'none',
         }, Math.max(0, enter - phaseLength * .18));
       }
       const copy = panel.querySelector('.mat-copy');
       if (copy) {
         if (index > 0) {
           timeline.from(copy.children, {
-            y: 44,
-            autoAlpha: 0,
-            stagger: .06,
-            duration: phaseLength * .4,
+            y: 14,
+            duration: phaseLength * .32,
             ease: 'power3.out',
-          }, enter + phaseLength * .08);
-        } else {
-          // The first phase's copy is part of the resting composition.
-          gsap.from(copy.children, {
-            y: 44,
-            autoAlpha: 0,
-            stagger: .06,
-            duration: .9,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: root, start: 'top 72%', toggleActions: 'play none none reverse' },
-          });
+          }, enter - phaseLength * .2);
         }
-      }
-      if (index < panels.length - 1) {
-        timeline.to(panel, {
-          autoAlpha: 0,
-          scale: .965,
-          yPercent: -4,
-          duration: phaseLength * .3,
-          ease: 'power1.in',
-        }, leave - phaseLength * .3);
       }
     });
     return () => root.classList.remove('is-journey-host');
@@ -178,12 +171,14 @@ function materials(root, gsap, { mobile }) {
     const image = panel.querySelector('.mat-frame > img');
     const crop = image ? readCrop(image) : null;
     if (image && crop) {
+      const motionZoom = Math.max(crop.zoom, 1.06);
       gsap.set(image, { x: 0, y: 0, scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
-      gsap.fromTo(image, { scale: crop.zoom * 1.14, yPercent: crop.ty - 3 }, {
-        scale: crop.zoom,
-        yPercent: crop.ty,
+      gsap.fromTo(image, { scale: motionZoom * 1.06, xPercent: crop.tx - 2, yPercent: crop.ty + 2 }, {
+        scale: motionZoom,
+        xPercent: crop.tx + 2,
+        yPercent: crop.ty - 2,
         ease: 'none',
-        scrollTrigger: { trigger: panel, start: 'top bottom', end: 'top 20%', scrub: true },
+        scrollTrigger: { trigger: panel, start: 'top 92%', end: 'bottom 25%', scrub: true },
       });
     }
     const copy = panel.querySelector('.mat-copy');
@@ -205,6 +200,12 @@ function materials(root, gsap, { mobile }) {
 
 function technology(root, gsap) {
   wipeIn(root, gsap);
+  const image = root.querySelector('.tech-visual img');
+  const imageScale = image?.hasAttribute('data-tech-model') ? 1.5 : 1;
+  if (image) gsap.fromTo(image, { scale: imageScale * 1.06, xPercent: -2 }, {
+    scale: imageScale, xPercent: 2, ease: 'none',
+    scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
+  });
   const words = [...root.querySelectorAll('.tech-heading .heading-word-inner')];
   if (words.length) {
     gsap.from(words, {
@@ -212,7 +213,7 @@ function technology(root, gsap) {
       stagger: .09,
       duration: 1,
       ease: 'power4.out',
-      scrollTrigger: { trigger: root, start: 'top 55%', toggleActions: 'play none none reverse' },
+      scrollTrigger: { trigger: root, start: 'top 85%', toggleActions: 'play none none reverse' },
     });
   }
   const word = root.querySelector('[data-tech-word]');
@@ -289,7 +290,7 @@ function collection(root, gsap, { mobile, fine }) {
     scrollTrigger: {
       trigger: root,
       start: 'top top',
-      end: () => `+=${Math.round(window.innerHeight * (0.8 + scenes.length * .85))}`,
+      end: () => `+=${Math.round(window.innerHeight * (.3 + scenes.length * .58))}`,
       pin: true,
       scrub: true,
       invalidateOnRefresh: true,
@@ -318,10 +319,10 @@ function collection(root, gsap, { mobile, fine }) {
         .to(root, { backgroundColor: field, duration: span * .34, ease: 'power1.inOut' }, at);
     }
     timeline
-      .fromTo(art, { x: 0, xPercent: index === 0 ? 10 : 18, scale: .9, autoAlpha: 0 }, { x: 0, xPercent: 0, scale: 1, autoAlpha: 1, duration: span * .5, ease: 'power2.out' }, index === 0 ? 0 : at + span * .12)
+      .fromTo(art, { x: 0, xPercent: index === 0 ? 0 : 18, scale: index === 0 ? 1 : .9, autoAlpha: index === 0 ? 1 : 0 }, { x: 0, xPercent: 0, scale: 1, autoAlpha: 1, duration: span * .5, ease: 'power2.out' }, index === 0 ? 0 : at + span * .12)
       // Keep the decorative index quiet: autoAlpha: 1 overrides CSS opacity.
-      .fromTo(num, { xPercent: index % 2 ? -18 : 22, autoAlpha: 0 }, { xPercent: 0, autoAlpha: .12, duration: span * .46, ease: 'power2.out' }, index === 0 ? .015 : at + span * .1)
-      .fromTo(copy, { y: 46, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: span * .4, ease: 'power3.out', stagger: .02 }, index === 0 ? .05 : at + span * .24);
+      .fromTo(num, { xPercent: index === 0 ? 0 : index % 2 ? -18 : 22, autoAlpha: index === 0 ? .12 : 0 }, { xPercent: 0, autoAlpha: .12, duration: span * .46, ease: 'power2.out' }, index === 0 ? .015 : at + span * .1)
+      .fromTo(copy, { y: index === 0 ? 0 : 46, autoAlpha: index === 0 ? 1 : 0 }, { y: 0, autoAlpha: 1, duration: span * .4, ease: 'power3.out', stagger: .02 }, index === 0 ? .05 : at + span * .24);
     // Continuous in-phase drift: the numeral and the product keep moving.
     timeline
       .fromTo(num, { yPercent: index % 2 ? 8 : -6 }, { yPercent: index % 2 ? -6 : 8, duration: span, ease: 'none' }, at)
@@ -350,19 +351,14 @@ function featured(root, gsap) {
   arrive(root, gsap);
   const image = root.querySelector('.feat-frame > img');
   if (image) {
-    gsap.fromTo(image, { yPercent: -9, scale: 1.08 }, {
-      yPercent: 9,
-      scale: 1.08,
+    const model = image.hasAttribute('data-featured-model');
+    const scale = model ? 1.38 : 1.08;
+    const drift = model ? 4 : 9;
+    gsap.fromTo(image, { yPercent: -drift, scale }, {
+      yPercent: drift,
+      scale,
       ease: 'none',
       scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
-    });
-  }
-  const frame = root.querySelector('.feat-frame');
-  if (frame) {
-    gsap.from(frame, {
-      rotate: -6,
-      ease: 'none',
-      scrollTrigger: { trigger: root, start: 'top bottom', end: 'top 30%', scrub: true },
     });
   }
   const copy = root.querySelector('.feat-copy');
@@ -381,34 +377,35 @@ function featured(root, gsap) {
 /* -------------------------------------------------------- 07 — brand */
 
 function brand(root, gsap, { mobile }) {
-  wipeIn(root, gsap);
   const stage = root.querySelector('[data-brand-stage]');
   if (!stage) return;
-  const quiet = [...root.querySelectorAll('.brand-line-quiet > span')];
+  const image = root.querySelector('.brand-visual > img');
+  const visual = root.querySelector('.brand-visual');
+  const editorial = root.querySelector('.brand-editorial');
+  const lines = root.querySelectorAll('.brand-line > span');
+  // The complete editorial is readable on entrance. A shallow image reveal
+  // and restrained crop shift supply the depth, rather than hiding whole lines.
+  if (visual) gsap.fromTo(visual, { clipPath: 'inset(0% 8% 0% 0%)' }, {
+    clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
+    scrollTrigger: { trigger: root, start: 'top 85%', end: 'top 20%', scrub: true },
+  });
   const timeline = gsap.timeline({
     scrollTrigger: {
       trigger: stage,
-      start: 'top top',
-      end: mobile ? '+=55%' : '+=100%',
-      pin: true,
+      start: mobile ? 'top 80%' : 'top top',
+      end: mobile ? 'bottom 25%' : () => `+=${Math.round(window.innerHeight * .4)}`,
+      pin: !mobile,
       scrub: true,
       invalidateOnRefresh: true,
     },
   });
-  timeline
-    .fromTo('[data-brand-rule]', { scaleX: 0 }, { scaleX: 1, duration: .16, ease: 'power2.inOut' }, 0)
-    .fromTo('[data-brand-watermark]', { scale: .9, autoAlpha: .35 }, { scale: 1.08, autoAlpha: 1, duration: .5, ease: 'power1.out' }, 0)
-    .from(quiet.slice(1), { yPercent: 118, duration: .22, ease: 'power4.out' }, .12)
-    .to('.brand-line-quiet > span', { '--brand-wght': 620, duration: .4, ease: 'none' }, .2)
-    .from('.brand-line-loud > span', { yPercent: 118, duration: .2, ease: 'power4.out' }, .2)
-    .from('.brand-manifesto', { y: 44, autoAlpha: 0, duration: .22, ease: 'power3.out' }, .4)
-    .to({}, { duration: .16 });
-  // Watermark keeps drifting behind the pinned composition.
-  gsap.fromTo('[data-brand-watermark]', { yPercent: -3 }, {
-    yPercent: 3,
-    ease: 'none',
-    scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
-  });
+  if (image) timeline.fromTo(image, { scale: 1.09, xPercent: -2, yPercent: 2 }, {
+    scale: 1.03, xPercent: 1, yPercent: -2, duration: 1, ease: 'none',
+  }, 0);
+  if (editorial) timeline.fromTo(editorial, { y: 12 }, { y: -12, duration: 1, ease: 'none' }, 0);
+  if (lines.length) timeline.to(lines, { '--brand-wght': 680, duration: 1, ease: 'none' }, 0);
+  const rule = root.querySelector('[data-brand-rule]');
+  if (rule) timeline.fromTo(rule, { scaleX: .45 }, { scaleX: 1, duration: 1, ease: 'none' }, 0);
 }
 
 /* ------------------------------------------------------- 08 — finale */
@@ -427,9 +424,9 @@ function finale(root, gsap, { mobile }) {
   const timeline = gsap.timeline({
     scrollTrigger: {
       trigger: stage,
-      start: 'top top',
-      end: mobile ? '+=70%' : '+=120%',
-      pin: true,
+      start: mobile ? 'top 85%' : 'top top',
+      end: mobile ? 'bottom 30%' : () => `+=${Math.round(window.innerHeight * .5)}`,
+      pin: !mobile,
       scrub: true,
       invalidateOnRefresh: true,
       onToggle: self => { if (floating) self.isActive ? floating.play() : floating.pause(); },
@@ -438,20 +435,20 @@ function finale(root, gsap, { mobile }) {
   timeline
     .fromTo('[data-finale-spot]', { autoAlpha: 0, scale: .5 }, { autoAlpha: 1, scale: 1.15, duration: .3, ease: 'power1.out' }, 0)
     .fromTo('[data-finale-shoe]', { y: '10vh', scale: .86, rotation: -4, autoAlpha: 1 }, { y: 0, scale: 1, rotation: 0, autoAlpha: 1, duration: .38, ease: 'power2.out' }, 0)
-    .fromTo('[data-finale-word]', { x: 0, y: 0, autoAlpha: 0, scale: .72 }, { x: 0, y: 0, autoAlpha: 1, scale: 1.04, duration: .34, ease: 'power1.out' }, .2)
-    .from('[data-finale-floor]', { scaleX: 0, duration: .16, ease: 'power2.inOut' }, .3)
-    .from('.finale-kicker', { autoAlpha: 0, duration: .1 }, .34)
-    .from('.finale-heading .heading-line > span', { yPercent: 118, duration: .18, ease: 'power4.out', stagger: .06 }, .4)
-    .to('.finale-heading .heading-line > span', { '--brand-wght': 880, duration: .26, ease: 'none' }, .46)
-    .from('.finale-sub', { y: 30, autoAlpha: 0, duration: .12, ease: 'power3.out' }, .6)
-    .from('.finale-price', { autoAlpha: 0, duration: .08 }, .68)
-    .fromTo('.finale-actions .hero-cart, .finale-actions .finale-ghost', { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: .05, duration: .12, ease: 'power3.out' }, .72)
-    .to({}, { duration: .14 });
+    .fromTo('[data-finale-word]', { x: 0, y: 0, autoAlpha: 0, scale: .92 }, { x: 0, y: 0, autoAlpha: 1, scale: 1.02, duration: .4, ease: 'power1.out' }, 0)
+    .from('[data-finale-floor]', { scaleX: 0, duration: .16, ease: 'power2.inOut' }, .05)
+    .from('.finale-kicker', { autoAlpha: 0, duration: .1 }, 0)
+    .from('.finale-heading .heading-line > span', { yPercent: 35, duration: .16, ease: 'power4.out', stagger: .03 }, 0)
+    .to('.finale-heading .heading-line > span', { '--brand-wght': 880, duration: .4, ease: 'none' }, .1)
+    .from('.finale-sub', { y: 16, autoAlpha: 0, duration: .12, ease: 'power3.out' }, .05)
+    .fromTo('.finale-actions .hero-cart, .finale-actions .finale-ghost', { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: .025, duration: .12, ease: 'power3.out' }, .1);
+  const price = root.querySelector('.finale-price');
+  if (price) timeline.from(price, { autoAlpha: 0, duration: .08 }, .08);
   // The outlined word keeps a slow counter-drift behind the product.
   if (word) {
     timeline.fromTo(word, { yPercent: -44 }, {
       yPercent: -56,
-      duration: 1,
+      duration: .5,
       ease: 'none',
     }, 0);
   }

@@ -9,8 +9,10 @@
     <p class="finale-word" aria-hidden="true" data-finale-word>{{ settings.brand_name | default: shop.name | escape }}</p>
     <div class="finale-floor" aria-hidden="true" data-finale-floor></div>
     <div class="finale-inner" data-finale-inner>
-      <div class="finale-shoe" data-finale-shoe{% if section.settings.use_tn_model and presentation_image == blank %} data-finale-model{% endif %}>
-        {% if section.settings.use_tn_model and presentation_image == blank %}
+      <div class="finale-shoe" data-finale-shoe{% if section.settings.use_tn_model and presentation_image == blank and product == blank %} data-finale-model{% endif %}>
+        {% if product != blank and presentation_image == blank %}
+          <p class="editorial-image-pending">{{ 'hero.asset_pending' | t }}</p>
+        {% elsif section.settings.use_tn_model and presentation_image == blank %}
           <div class="finale-profile-window" data-finale-float>
             <img src="{{ 'tn-profile-1400.webp' | asset_url }}" srcset="{{ 'tn-profile-700.webp' | asset_url }} 700w, {{ 'tn-profile-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 120vw, 100vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — profile view rendered from the 3D model">
           </div>

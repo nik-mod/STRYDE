@@ -23,7 +23,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   const cueLine = root.querySelector('[data-hero-cue-line]');
   if (!stage) return;
 
-  const travel = mobile ? 1.1 : 2.1;
+  const travel = mobile ? .8 : 1.35;
   let intro = null;
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
@@ -36,8 +36,14 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
       scrub: true,
       invalidateOnRefresh: true,
       onUpdate: self => {
-        // Any real scroll takes over from the entrance — jump it to its end state.
-        if (intro?.isActive()) intro.progress(1);
+        // A fast jump can initialize scrub tweens while delayed entrance
+        // children still own hidden states. Settle that entrance once, then
+        // render this exact scroll position again from canonical start values.
+        if (intro && self.progress > 0) {
+          intro.progress(1).kill();
+          intro = null;
+          timeline.invalidate().progress(self.progress, true);
+        }
         bus.publish(chapterState(0, self.progress, self.direction));
       },
     },
@@ -45,26 +51,27 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
 
   // Phase 01 → 02 — depth: the type world recedes, the product begins to move.
   timeline
-    .to(line1, { xPercent: -3.5, scale: 1.05, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .to(line2, { xPercent: 3.5, scale: 1.05, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .to(float, { yPercent: -4, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .to(ring, { rotation: 16, scale: 1.04, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .to(copy, { opacity: .55, y: -20, ease: 'power1.inOut', duration: DEPTH_END }, 0)
+    .fromTo(line1, { xPercent: 0, scale: 1 }, { xPercent: -3.5, scale: 1.05, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
+    .fromTo(line2, { xPercent: 0, scale: 1 }, { xPercent: 3.5, scale: 1.05, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
+    .fromTo(float, { yPercent: 0 }, { yPercent: -4, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
+    .fromTo(ring, { rotation: 0, scale: 1 }, { rotation: 16, scale: 1.04, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
+    .fromTo(copy, { opacity: 1, y: 0 }, { opacity: .8, y: -8, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
     .to(cue, { opacity: 0, duration: .08 }, .05);
 
   // Phase 02 → 03 — transform: the shoe grows, the first line masks out.
   timeline
-    .to(line1, { yPercent: -114, ease: 'power2.in', duration: .2 }, DEPTH_END + .02)
-    .to(art, { scale: hasModel ? 1 : 1.22, xPercent: hasModel ? 0 : -2, rotation: hasModel ? 0 : 3, ease: 'power1.inOut', duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
+    .fromTo(line1, { yPercent: 0 }, { yPercent: -114, immediateRender: false, ease: 'power2.in', duration: .2 }, DEPTH_END + .02)
+    .fromTo(art, { scale: 1, xPercent: 0, rotation: 0 }, { scale: hasModel ? 1 : 1.22, xPercent: hasModel ? 0 : -2, rotation: hasModel ? 0 : 3, immediateRender: false, ease: 'power1.inOut', duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
     .to(float, { yPercent: -9, duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
     .to(ring, { scale: 1.14, opacity: .75, duration: TRANSFORM_END - DEPTH_END }, DEPTH_END);
 
-  // Phase 03 → 04 — macro: the product dominates, the second line masks out.
+  // Phase 03 → 04 — macro: retain the second line and editorial context while
+  // the product dominates. The handoff should still read as a composition.
   timeline
     .to(art, { scale: hasModel ? 1 : 1.62, yPercent: hasModel ? 0 : 6, rotation: hasModel ? 0 : -3, ease: 'power1.inOut', duration: MACRO_END - TRANSFORM_END }, TRANSFORM_END)
-    .to(line2, { yPercent: 114, ease: 'power2.in', duration: .18 }, TRANSFORM_END + .02)
+    .to(line2, { xPercent: 0, scale: 1, ease: 'power2.out', duration: .18 }, TRANSFORM_END + .02)
     .to(ring, { opacity: 0, scale: 1.22, duration: .16 }, TRANSFORM_END + .04)
-    .to(copy, { opacity: 0, duration: .12 }, TRANSFORM_END);
+    .to(copy, { opacity: .8, duration: .12 }, TRANSFORM_END);
 
   // Phase 04 → 05 — handoff: settle into the deterministic pose shared with
   // chapter 02; the stage color resolves into the next chapter's surface.
@@ -72,8 +79,8 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
     .to(art, { scale: hasModel ? 1 : 1.3, xPercent: 0, yPercent: 0, rotation: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
     .to(float, { yPercent: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
     .to(stage, { backgroundColor: surface, ease: 'power1.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
-    .to(foot, { opacity: 0, y: -34, ease: 'power2.in', duration: .14 }, MACRO_END)
-    .to({}, { duration: 1 - HANDOFF_END }, HANDOFF_END);
+    .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, ease: 'power2.out', duration: HANDOFF_END - MACRO_END }, MACRO_END)
+    .to(art, { yPercent: hasModel ? 0 : -2, duration: 1 - HANDOFF_END }, HANDOFF_END);
 
   // Entrance choreography (not scroll-bound). Only created when the visitor is
   // near the top: a paused .from() timeline applies its hidden start states on
@@ -81,12 +88,12 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   if ((window.scrollY || 0) < stage.offsetHeight * .4) {
     intro = gsap.timeline({ paused: true });
     intro
-      .from(line1, { yPercent: 114, duration: 1.1, ease: 'power4.out' }, 0)
-      .from(line2, { yPercent: 114, duration: 1.1, ease: 'power4.out' }, .12)
-      .from(art, { opacity: 0, scale: .92, y: 26, duration: 1.3, ease: 'power3.out' }, .18)
-      .from(ring, { opacity: 0, duration: 1, ease: 'power2.out' }, .4)
-      .from(copy, { opacity: 0, y: 18, duration: .9, ease: 'power3.out' }, .5)
-      .from(foot, { opacity: 0, y: 18, duration: .9, ease: 'power3.out' }, .62);
+      .fromTo(line1, { yPercent: 114 }, { yPercent: 0, duration: 1.1, ease: 'power4.out' }, 0)
+      .fromTo(line2, { yPercent: 114 }, { yPercent: 0, duration: 1.1, ease: 'power4.out' }, .12)
+      .fromTo(art, { opacity: 0, scale: .92, y: 26 }, { opacity: 1, scale: 1, y: 0, duration: 1.3, ease: 'power3.out' }, .18)
+      .fromTo(ring, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.out' }, .4)
+      .fromTo(copy, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .9, ease: 'power3.out' }, .5)
+      .fromTo(foot, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .9, ease: 'power3.out' }, .62);
     intro.play();
   }
 

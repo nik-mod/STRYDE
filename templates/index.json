@@ -46,6 +46,7 @@
     "technology": {
       "type": "chapter-technology",
       "settings": {
+        "use_tn_model": true,
         "heading": "FORM IN MOTION",
         "outline_word": "Perspective",
         "row_1_title": "The profile",
@@ -80,6 +81,7 @@
     "brand": {
       "type": "chapter-brand",
       "settings": {
+        "use_tn_model": true,
         "line_1": "Look closer.",
         "line_2": "Move further.",
         "line_3": "Stay curious.",
