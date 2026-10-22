@@ -14,7 +14,7 @@
     <h2 class="chapter-heading" id="CollHeading-{{ section.id }}">
       <span class="heading-line"><span>{{ section.settings.heading | upcase | escape }}</span></span>
     </h2>
-    {% if has_products %}<p class="coll-count">{{ collection.products_count }} {{ 'collection.products' | t }}</p>{% endif %}
+    {% if has_products %}<p class="coll-count">{{ 'collection.product_count' | t: count: collection.products_count }}</p>{% endif %}
   </div>
   <div class="coll-stage" data-coll-stage>
     {% if has_products %}
@@ -46,7 +46,7 @@
           assign concept_key = image_key | append: '_is_concept'
           assign image_slot = 'collection_' | append: index
         %}
-        {% case index %}{% when 1 %}{% assign tn_view = 'tn-angle-1400.webp' %}{% assign tn_title = 'The first impression.' %}{% when 2 %}{% assign tn_view = 'tn-heel-1400.webp' %}{% assign tn_title = 'A change of direction.' %}{% when 3 %}{% assign tn_view = 'tn-top-1400.webp' %}{% assign tn_title = 'From another point of view.' %}{% endcase %}
+        {% case index %}{% when 1 %}{% assign tn_view = 'tn-angle-1400.webp' %}{% assign tn_title = 'Three-quarter view' %}{% when 2 %}{% assign tn_view = 'tn-heel-1400.webp' %}{% assign tn_title = 'Heel view' %}{% when 3 %}{% assign tn_view = 'tn-top-1400.webp' %}{% assign tn_title = 'From above' %}{% endcase %}
         <article class="coll-scene" data-coll-scene style="--scene-field: {% cycle field_1, field_2, field_3 %}">
           <span class="coll-scene-num" aria-hidden="true">0{{ index }}</span>
           <div class="coll-scene-art">
@@ -78,7 +78,7 @@
   "name":"Collection reveal",
   "settings":[
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
-    {"type":"text","id":"kicker","label":"Kicker","default":"05 — The collection"},
+    {"type":"text","id":"kicker","label":"Kicker","default":"05 \u2014 The collection"},
     {"type":"text","id":"heading","label":"Heading","default":"The lineup"},
     {"type":"collection","id":"collection","label":"Collection","info":"The first three products play as a cinematic sequence. Without a collection, labeled concept studies stand in."},
     {"type":"color","id":"field_1","label":"Product 01 field","default":"#41b4f0"},

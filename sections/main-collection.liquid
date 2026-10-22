@@ -7,12 +7,12 @@
 <section class="page-shell collection-page{% if development_catalog %} collection-page-concepts{% endif %}" data-listing-section data-section-id="{{ section.id }}">
   {% if development_catalog %}
     <header class="listing-heading" data-listing-heading>
-      <div><p class="listing-eyebrow">STRYDE / FOOTWEAR STUDIES</p><h1>CONCEPT INDEX</h1></div>
+      <div><p class="listing-eyebrow">STRYDE / FOOTWEAR STUDIES</p><h1>Concept index</h1></div>
       <div class="listing-introduction"><p>Ten colour studies. Three original artwork views.</p><p class="listing-preview-note">Development preview · Not available for purchase</p></div>
     </header>
     {% render 'development-catalog', catalog: section.preview_catalog %}
   {% else %}
-  <div class="page-heading listing-heading" data-listing-heading><span class="micro">{{ 'general.collection' | t }}</span><h1>{{ collection.title | upcase | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
+  <div class="page-heading listing-heading" data-listing-heading><span class="micro">{{ 'general.collection' | t }}</span><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
   {% paginate collection.products by 12 %}
     <form method="get" action="{{ collection.url }}" class="collection-controls">
       <div class="filter-groups">
@@ -28,10 +28,12 @@
       <div class="sort-controls"><label class="micro" for="SortBy">{{ 'collection.sort' | t }}</label><select name="sort_by" id="SortBy">{% assign sort_by = collection.sort_by | default: collection.default_sort_by %}{% for option in collection.sort_options %}<option value="{{ option.value }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>{% endfor %}</select><button class="button button-small" type="submit">{{ 'collection.apply' | t }}</button></div>
     </form>
     <div class="active-filters">{% for filter in collection.filters %}{% for value in filter.active_values %}<a href="{{ value.url_to_remove }}">{{ filter.label | escape }}: {{ value.label | escape }} <span aria-hidden="true">×</span><span class="sr-only">{{ 'collection.remove_filter' | t }}</span></a>{% endfor %}{% if filter.type == 'price_range' %}{% if filter.min_value.value != null or filter.max_value.value != null %}<a href="{{ filter.url_to_remove }}">{{ filter.label | escape }} <span aria-hidden="true">×</span><span class="sr-only">{{ 'collection.remove_filter' | t }}</span></a>{% endif %}{% endif %}{% endfor %}</div>
-    <div class="collection-count micro">{{ collection.products_count }} {{ 'collection.products' | t }}</div>
+    <div class="collection-count micro">{{ 'collection.product_count' | t: count: collection.products_count }}</div>
     <div class="product-grid">{% for product in collection.products %}{% render 'product-card', card_product: product %}{% else %}<div class="empty-state"><h2>{{ 'collection.empty' | t }}</h2><p>{{ 'collection.empty_description' | t }}</p><a class="text-link" href="{{ collection.url }}">{{ 'collection.clear' | t }} {% render 'icon', name: 'arrow' %}</a></div>{% endfor %}</div>
     {% render 'pagination', paginate: paginate %}
   {% endpaginate %}
   {% endif %}
 </section>
-{% schema %}{"name":"Collection","settings":[]}{% endschema %}
+{% schema %}
+{"name":"Collection","settings":[]}
+{% endschema %}

@@ -5,7 +5,6 @@ import { mountCollectionHover } from './collection-hover.mjs';
 // return extra cleanup. GSAP owns all initial hidden states, so no-JS and
 // reduced-motion visitors always see the complete static layout.
 
-const clamp01 = value => Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0));
 
 function readCrop(element) {
   const style = element.style;
@@ -28,41 +27,13 @@ function wipeIn(section, gsap) {
   });
 }
 
-// Shared-field chapters arrive instead: content rises into place once.
-function arrive(section, gsap) {
-  const flow = section.querySelectorAll(':scope > *');
-  gsap.from(flow, {
-    y: 56,
-    autoAlpha: 0,
-    stagger: .07,
-    duration: .9,
-    ease: 'power3.out',
-    scrollTrigger: { trigger: section, start: 'top 78%', toggleActions: 'play none none reverse' },
-  });
-}
-
-function revealLineMasks(sections, gsap, { scrub = false } = {}) {
-  sections.forEach((span, index) => {
-    gsap.from(span, {
-      yPercent: 115,
-      duration: 1,
-      ease: 'power4.out',
-      delay: scrub ? 0 : index * .09,
-      scrollTrigger: scrub
-        ? { trigger: span, start: 'top 92%', end: 'top 55%', scrub: true }
-        : { trigger: span, start: 'top 92%', toggleActions: 'play none none reverse' },
-    });
-  });
-}
-
 /* ------------------------------------------------- 02 — deconstruction */
 
 function deconstruction(root, gsap) {
-  arrive(root, gsap);
   const crops = [...root.querySelectorAll('.decon-crop')];
   if (crops.length > 1) {
     const sequence = gsap.timeline({
-      scrollTrigger: { trigger: root, start: 'top 45%', end: 'bottom 75%', scrub: true },
+      scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
     });
     for (let index = 1; index < crops.length; index++) {
       const at = index / crops.length - .16;
@@ -85,15 +56,6 @@ function deconstruction(root, gsap) {
       scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
     });
   }
-  root.querySelectorAll('.decon-item').forEach(item => {
-    gsap.from(item, {
-      x: -28,
-      autoAlpha: 0,
-      duration: .8,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: item, start: 'top 90%', toggleActions: 'play none none reverse' },
-    });
-  });
 }
 
 /* ---------------------------------------------------- 03 — materials */
@@ -127,15 +89,17 @@ function materials(root, gsap, { mobile }) {
       if (index > 0) {
         gsap.set(panel, { autoAlpha: 0 });
         timeline.set(panel, { autoAlpha: 1 }, enter - phaseLength * .2);
-        if (frame) timeline.fromTo(frame,
-          { clipPath: 'inset(0% 0% 0% 100%)' },
-          { clipPath: 'inset(0% 0% 0% 0%)', duration: phaseLength * .5, ease: 'power2.inOut' },
+        const outgoingCopy = panels[index - 1].querySelector('.mat-copy');
+        if (outgoingCopy) timeline.to(outgoingCopy, { autoAlpha: 0, duration: phaseLength * .04, ease: 'none' }, enter - phaseLength * .2);
+        timeline.fromTo(panel,
+          { clipPath: 'inset(0% 100% 0% 0%)' },
+          { clipPath: 'inset(0% 0% 0% 0%)', duration: phaseLength * .34, ease: 'none' },
           enter - phaseLength * .2);
         // The old subject stays complete behind the incoming wipe, then
         // releases after the new frame covers it. Reverse follows the same path.
         timeline.to(panels[index - 1], {
           autoAlpha: 0, duration: phaseLength * .18, ease: 'none',
-        }, enter + phaseLength * .3);
+        }, enter + phaseLength * .15);
       }
       if (crop) {
         const direction = index % 2 ? -1 : 1;
@@ -152,16 +116,6 @@ function materials(root, gsap, { mobile }) {
           duration: phaseLength,
           ease: 'none',
         }, Math.max(0, enter - phaseLength * .18));
-      }
-      const copy = panel.querySelector('.mat-copy');
-      if (copy) {
-        if (index > 0) {
-          timeline.from(copy.children, {
-            y: 14,
-            duration: phaseLength * .32,
-            ease: 'power3.out',
-          }, enter - phaseLength * .2);
-        }
       }
     });
     return () => root.classList.remove('is-journey-host');
@@ -181,17 +135,6 @@ function materials(root, gsap, { mobile }) {
         scrollTrigger: { trigger: panel, start: 'top 92%', end: 'bottom 25%', scrub: true },
       });
     }
-    const copy = panel.querySelector('.mat-copy');
-    if (copy) {
-      gsap.from(copy.children, {
-        y: 42,
-        autoAlpha: 0,
-        stagger: .1,
-        duration: .9,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: panel, start: 'top 75%', toggleActions: 'play none none reverse' },
-      });
-    }
   });
   return undefined;
 }
@@ -199,23 +142,12 @@ function materials(root, gsap, { mobile }) {
 /* --------------------------------------------------- 04 — technology */
 
 function technology(root, gsap) {
-  wipeIn(root, gsap);
   const image = root.querySelector('.tech-visual img');
   const imageScale = image?.hasAttribute('data-tech-model') ? 1.5 : 1;
   if (image) gsap.fromTo(image, { scale: imageScale * 1.06, xPercent: -2 }, {
     scale: imageScale, xPercent: 2, ease: 'none',
     scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
   });
-  const words = [...root.querySelectorAll('.tech-heading .heading-word-inner')];
-  if (words.length) {
-    gsap.from(words, {
-      yPercent: 118,
-      stagger: .09,
-      duration: 1,
-      ease: 'power4.out',
-      scrollTrigger: { trigger: root, start: 'top 85%', toggleActions: 'play none none reverse' },
-    });
-  }
   const word = root.querySelector('[data-tech-word]');
   if (word) {
     gsap.fromTo(word, { xPercent: 4, '--tech-wght': 640 }, {
@@ -234,16 +166,6 @@ function technology(root, gsap) {
       scrollTrigger: { trigger: rows, start: 'top 82%', end: 'bottom 55%', scrub: true },
     });
   }
-  root.querySelectorAll('.tech-row').forEach((row, index) => {
-    gsap.from(row, {
-      x: -34,
-      autoAlpha: 0,
-      duration: .85,
-      delay: index * .05,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: row, start: 'top 86%', toggleActions: 'play none none reverse' },
-    });
-  });
 }
 
 /* -------------------------------------------------- 05 — collection */
@@ -290,7 +212,7 @@ function collection(root, gsap, { mobile, fine }) {
     scrollTrigger: {
       trigger: root,
       start: 'top top',
-      end: () => `+=${Math.round(window.innerHeight * (.3 + scenes.length * .58))}`,
+      end: () => `+=${Math.round(window.innerHeight * (.15 + scenes.length * .48))}`,
       pin: true,
       scrub: true,
       invalidateOnRefresh: true,
@@ -319,7 +241,7 @@ function collection(root, gsap, { mobile, fine }) {
         .to(root, { backgroundColor: field, duration: span * .34, ease: 'power1.inOut' }, at);
     }
     timeline
-      .fromTo(art, { x: 0, xPercent: index === 0 ? 0 : 18, scale: index === 0 ? 1 : .9, autoAlpha: index === 0 ? 1 : 0 }, { x: 0, xPercent: 0, scale: 1, autoAlpha: 1, duration: span * .5, ease: 'power2.out' }, index === 0 ? 0 : at + span * .12)
+      .fromTo(art, { x: 0, xPercent: index === 0 ? 0 : index === 1 ? -12 : 8, scale: index === 0 ? 1 : .96, autoAlpha: index === 0 ? 1 : 0 }, { x: 0, xPercent: 0, scale: 1, autoAlpha: 1, duration: span * .5, ease: 'power2.out' }, index === 0 ? 0 : at + span * .12)
       // Keep the decorative index quiet: autoAlpha: 1 overrides CSS opacity.
       .fromTo(num, { xPercent: index === 0 ? 0 : index % 2 ? -18 : 22, autoAlpha: index === 0 ? .12 : 0 }, { xPercent: 0, autoAlpha: .12, duration: span * .46, ease: 'power2.out' }, index === 0 ? .015 : at + span * .1)
       .fromTo(copy, { y: index === 0 ? 0 : 46, autoAlpha: index === 0 ? 1 : 0 }, { y: 0, autoAlpha: 1, duration: span * .4, ease: 'power3.out', stagger: .02 }, index === 0 ? .05 : at + span * .24);
@@ -348,28 +270,16 @@ function collection(root, gsap, { mobile, fine }) {
 /* ----------------------------------------------------- 06 — featured */
 
 function featured(root, gsap) {
-  arrive(root, gsap);
   const image = root.querySelector('.feat-frame > img');
   if (image) {
     const model = image.hasAttribute('data-featured-model');
-    const scale = model ? 1.38 : 1.08;
-    const drift = model ? 4 : 9;
+    const scale = model ? 1.62 : 1.02;
+    const drift = model ? 2 : 3;
     gsap.fromTo(image, { yPercent: -drift, scale }, {
       yPercent: drift,
       scale,
       ease: 'none',
       scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
-    });
-  }
-  const copy = root.querySelector('.feat-copy');
-  if (copy) {
-    gsap.from(copy.children, {
-      y: 42,
-      autoAlpha: 0,
-      stagger: .09,
-      duration: .9,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: copy, start: 'top 76%', toggleActions: 'play none none reverse' },
     });
   }
 }
@@ -399,10 +309,11 @@ function brand(root, gsap, { mobile }) {
       invalidateOnRefresh: true,
     },
   });
-  if (image) timeline.fromTo(image, { scale: 1.09, xPercent: -2, yPercent: 2 }, {
-    scale: 1.03, xPercent: 1, yPercent: -2, duration: 1, ease: 'none',
+  const crop = image?.hasAttribute('data-brand-model') ? 1.16 : 1.02;
+  if (image) timeline.fromTo(image, { scale: crop, xPercent: 0, yPercent: 0 }, {
+    scale: crop * 1.05, xPercent: -1, yPercent: -1, duration: 1, ease: 'none',
   }, 0);
-  if (editorial) timeline.fromTo(editorial, { y: 12 }, { y: -12, duration: 1, ease: 'none' }, 0);
+
   if (lines.length) timeline.to(lines, { '--brand-wght': 680, duration: 1, ease: 'none' }, 0);
   const rule = root.querySelector('[data-brand-rule]');
   if (rule) timeline.fromTo(rule, { scaleX: .45 }, { scaleX: 1, duration: 1, ease: 'none' }, 0);
@@ -411,48 +322,25 @@ function brand(root, gsap, { mobile }) {
 /* ------------------------------------------------------- 08 — finale */
 
 function finale(root, gsap, { mobile }) {
-  wipeIn(root, gsap);
   const stage = root.querySelector('[data-finale-stage]');
   if (!stage) return;
-  const float = root.querySelector('[data-finale-float]');
-  const floating = float ? gsap.fromTo(float, { y: 0, rotation: -.8 }, {
-    y: -8, rotation: .8, duration: 3.6, repeat: -1, yoyo: true, ease: 'sine.inOut',
-    paused: true,
-  }) : null;
-  const word = root.querySelector('[data-finale-word]');
-  if (word) gsap.set(word, { x: 0, y: 0, xPercent: -50, yPercent: -50 });
-  const timeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: stage,
-      start: mobile ? 'top 85%' : 'top top',
-      end: mobile ? 'bottom 30%' : () => `+=${Math.round(window.innerHeight * .5)}`,
-      pin: !mobile,
-      scrub: true,
-      invalidateOnRefresh: true,
-      onToggle: self => { if (floating) self.isActive ? floating.play() : floating.pause(); },
-    },
-  });
-  timeline
-    .fromTo('[data-finale-spot]', { autoAlpha: 0, scale: .5 }, { autoAlpha: 1, scale: 1.15, duration: .3, ease: 'power1.out' }, 0)
-    .fromTo('[data-finale-shoe]', { y: '10vh', scale: .86, rotation: -4, autoAlpha: 1 }, { y: 0, scale: 1, rotation: 0, autoAlpha: 1, duration: .38, ease: 'power2.out' }, 0)
-    .fromTo('[data-finale-word]', { x: 0, y: 0, autoAlpha: 0, scale: .92 }, { x: 0, y: 0, autoAlpha: 1, scale: 1.02, duration: .4, ease: 'power1.out' }, 0)
-    .from('[data-finale-floor]', { scaleX: 0, duration: .16, ease: 'power2.inOut' }, .05)
-    .from('.finale-kicker', { autoAlpha: 0, duration: .1 }, 0)
-    .from('.finale-heading .heading-line > span', { yPercent: 35, duration: .16, ease: 'power4.out', stagger: .03 }, 0)
-    .to('.finale-heading .heading-line > span', { '--brand-wght': 880, duration: .4, ease: 'none' }, .1)
-    .from('.finale-sub', { y: 16, autoAlpha: 0, duration: .12, ease: 'power3.out' }, .05)
-    .fromTo('.finale-actions .hero-cart, .finale-actions .finale-ghost', { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: .025, duration: .12, ease: 'power3.out' }, .1);
-  const price = root.querySelector('.finale-price');
-  if (price) timeline.from(price, { autoAlpha: 0, duration: .08 }, .08);
-  // The outlined word keeps a slow counter-drift behind the product.
-  if (word) {
-    timeline.fromTo(word, { yPercent: -44 }, {
-      yPercent: -56,
-      duration: .5,
-      ease: 'none',
-    }, 0);
-  }
-  if (timeline.scrollTrigger.isActive) floating?.play();
+  const shoe = root.querySelector('[data-finale-shoe]');
+  const heading = root.querySelector('.finale-heading');
+  const context = root.querySelectorAll('.finale-kicker, .finale-sub, .finale-price');
+  const controls = root.querySelector('.finale-actions');
+  const timeline = gsap.timeline({ scrollTrigger: {
+    trigger: stage, start: mobile ? 'top 85%' : 'top top',
+    end: mobile ? 'clamp(bottom bottom)' : () => `+=${Math.round(window.innerHeight * .8)}`,
+    pin: !mobile, scrub: true, invalidateOnRefresh: true,
+  }});
+  timeline.fromTo(shoe, { scale: .74, yPercent: 12, autoAlpha: 1 },
+    { scale: 1, yPercent: 0, autoAlpha: 1, duration: .68, ease: 'none' }, 0);
+  timeline.fromTo(heading, { autoAlpha: .55, y: 18 },
+    { autoAlpha: 1, y: 0, duration: .3, ease: 'none' }, .35);
+  if (context.length) timeline.fromTo(context, { autoAlpha: 0, y: 10 },
+    { autoAlpha: 1, y: 0, duration: .2, ease: 'none' }, .58);
+  if (controls) timeline.fromTo(controls, { autoAlpha: 0, y: 16 },
+    { autoAlpha: 1, y: 0, duration: .2, ease: 'none' }, .8);
 }
 
 const CONTROLLERS = { deconstruction, materials, technology, collection, featured, brand, finale };

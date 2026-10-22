@@ -7,7 +7,7 @@ const TRANSFORM_END = .46;
 const MACRO_END = .72;
 const HANDOFF_END = .9;
 
-export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = false, surface = '#effaff' }) {
+export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = false, surface = '#effaff', paper = '#b7ddef' }) {
   const stage = root.querySelector('[data-hero-stage]');
   const line1 = root.querySelector('[data-hero-line-1]');
   const line2 = root.querySelector('[data-hero-line-2]');
@@ -23,7 +23,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   const cueLine = root.querySelector('[data-hero-cue-line]');
   if (!stage) return;
 
-  const travel = mobile ? .8 : 1.35;
+  const travel = mobile ? .65 : 1.05;
   let intro = null;
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
@@ -42,45 +42,25 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
         if (intro && self.progress > 0) {
           intro.progress(1).kill();
           intro = null;
-          timeline.invalidate().progress(self.progress, true);
+          timeline.invalidate().progress(0, true).progress(self.progress, true);
         }
         bus.publish(chapterState(0, self.progress, self.direction));
       },
     },
   });
 
-  // Phase 01 → 02 — depth: the type world recedes, the product begins to move.
+  // The whole headline remains a stable reading zone. Product poses are
+  // scrubbed by the existing bus; HTML never masks away individual words.
   timeline
-    .fromTo(line1, { xPercent: 0, scale: 1 }, { xPercent: -3.5, scale: 1.05, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .fromTo(line2, { xPercent: 0, scale: 1 }, { xPercent: 3.5, scale: 1.05, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .fromTo(float, { yPercent: 0 }, { yPercent: -4, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .fromTo(ring, { rotation: 0, scale: 1 }, { rotation: 16, scale: 1.04, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .fromTo(copy, { opacity: 1, y: 0 }, { opacity: .8, y: -8, immediateRender: false, ease: 'power1.inOut', duration: DEPTH_END }, 0)
-    .to(cue, { opacity: 0, duration: .08 }, .05);
-
-  // Phase 02 → 03 — transform: the shoe grows, the first line masks out.
-  timeline
-    .fromTo(line1, { yPercent: 0 }, { yPercent: -114, immediateRender: false, ease: 'power2.in', duration: .2 }, DEPTH_END + .02)
-    .fromTo(art, { scale: 1, xPercent: 0, rotation: 0 }, { scale: hasModel ? 1 : 1.22, xPercent: hasModel ? 0 : -2, rotation: hasModel ? 0 : 3, immediateRender: false, ease: 'power1.inOut', duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
-    .to(float, { yPercent: -9, duration: TRANSFORM_END - DEPTH_END }, DEPTH_END)
-    .to(ring, { scale: 1.14, opacity: .75, duration: TRANSFORM_END - DEPTH_END }, DEPTH_END);
-
-  // Phase 03 → 04 — macro: retain the second line and editorial context while
-  // the product dominates. The handoff should still read as a composition.
-  timeline
-    .to(art, { scale: hasModel ? 1 : 1.62, yPercent: hasModel ? 0 : 6, rotation: hasModel ? 0 : -3, ease: 'power1.inOut', duration: MACRO_END - TRANSFORM_END }, TRANSFORM_END)
-    .to(line2, { xPercent: 0, scale: 1, ease: 'power2.out', duration: .18 }, TRANSFORM_END + .02)
-    .to(ring, { opacity: 0, scale: 1.22, duration: .16 }, TRANSFORM_END + .04)
-    .to(copy, { opacity: .8, duration: .12 }, TRANSFORM_END);
-
-  // Phase 04 → 05 — handoff: settle into the deterministic pose shared with
-  // chapter 02; the stage color resolves into the next chapter's surface.
-  timeline
-    .to(art, { scale: hasModel ? 1 : 1.3, xPercent: 0, yPercent: 0, rotation: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
-    .to(float, { yPercent: 0, ease: 'power2.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
-    .to(stage, { backgroundColor: surface, ease: 'power1.inOut', duration: HANDOFF_END - MACRO_END }, MACRO_END)
-    .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, ease: 'power2.out', duration: HANDOFF_END - MACRO_END }, MACRO_END)
-    .to(art, { yPercent: hasModel ? 0 : -2, duration: 1 - HANDOFF_END }, HANDOFF_END);
+    .fromTo(line1, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 0, scale: 1, yPercent: 0, immediateRender: false, duration: 1 }, 0)
+    .fromTo(line2, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 0, scale: 1, yPercent: 0, immediateRender: false, duration: 1 }, 0)
+    .fromTo(copy, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, duration: 1 }, 0)
+    .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, duration: .82 }, 0)
+    .to(foot, { opacity: 0, y: -16, duration: .18 }, .82)
+    .fromTo(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0 }, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0, immediateRender: false, duration: 1 }, 0)
+    .to(cue, { opacity: 0, duration: .12 }, .05)
+    .to(ring, { opacity: 0, duration: .2 }, .1)
+    .fromTo(stage, { backgroundColor: paper }, { backgroundColor: surface, immediateRender: true, duration: 1, ease: progress => Math.max(0, (progress - .7) / .3) }, 0);
 
   // Entrance choreography (not scroll-bound). Only created when the visitor is
   // near the top: a paused .from() timeline applies its hidden start states on
@@ -114,7 +94,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   if (fine) {
     const layers = [];
     if (depth) layers.push({ el: depth, x: gsap.quickTo(depth, 'x', { duration: .9, ease: 'power3.out' }), y: gsap.quickTo(depth, 'y', { duration: .9, ease: 'power3.out' }), scale: 16, yScale: 12 });
-    if (type) layers.push({ el: type, x: gsap.quickTo(type, 'x', { duration: 1.1, ease: 'power3.out' }), y: gsap.quickTo(type, 'y', { duration: 1.1, ease: 'power3.out' }), scale: -7, yScale: -5 });
+
     const onMove = event => {
       if (document.hidden || timeline.scrollTrigger?.progress >= 1) return;
       const rx = event.clientX / window.innerWidth - .5;

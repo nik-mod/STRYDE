@@ -7,7 +7,12 @@ import { conceptCatalog } from './fixtures/concept-catalog.mjs';
 const root = process.cwd();
 const engine = new Liquid({ root: [resolve('snippets')], extname: '.liquid', strictFilters: false });
 let locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
-engine.registerFilter('t', key => key.split('.').reduce((value, part) => value?.[part], locale) || key);
+engine.registerFilter('t', (key, ...args) => {
+  const options = Object.fromEntries(args.filter(arg => Array.isArray(arg) && arg.length === 2));
+  let message = key.split('.').reduce((value, part) => value?.[part], locale) || key;
+  if (typeof message === 'object') message = message[Number(options.count) === 1 ? 'one' : 'other'];
+  return String(message).replace(/\{\{\s*(\w+)\s*\}\}/g, (match, name) => options[name] ?? match);
+});
 engine.registerFilter('asset_url', name => `/assets/${name}`);
 engine.registerFilter('stylesheet_tag', url => `<link rel="stylesheet" href="${url}">`);
 engine.registerFilter('preload_tag', (url, options = {}) => `<link rel="preload" href="${url}"${options.as ? ` as="${options.as}"` : ''}${options.type ? ` type="${options.type}"` : ''}${options.as === 'font' ? ' crossorigin' : ''}>`);

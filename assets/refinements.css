@@ -28,10 +28,10 @@ html{scroll-padding-top:100px}
 .hero-cue{bottom:18%;left:9%;display:flex;gap:12px;font-size:8px;letter-spacing:.15em}
 .hero-cue-line{height:24px}
 .hero-image{filter:drop-shadow(0 25px 24px #12394b22)!important}
-.journey-nav{position:fixed;z-index:90;right:12px;top:50%;transform:translateY(-50%);display:grid;gap:2px;padding:9px 5px;border:1px solid #102b3b17;border-radius:30px;background:#f2f5f4e8;color:#102b3b;backdrop-filter:blur(10px)}
-.journey-nav a{position:relative;display:grid;place-items:center;width:32px;height:32px;font-size:9px;font-variant-numeric:tabular-nums;border-radius:50%;opacity:.5;transition:background .2s,opacity .2s}
-.journey-nav a[aria-current],.journey-nav a:hover{background:#102b3b;color:white;opacity:1;text-decoration:none}
-.journey-nav a span{position:absolute;right:44px;white-space:nowrap;padding:5px 10px;background:#102b3b;color:white;border-radius:5px;opacity:0;pointer-events:none;transition:opacity .2s}
+.journey-nav{position:fixed;z-index:90;right:12px;top:50%;transform:translateY(-50%);display:grid;gap:0;padding:4px 0;border:1px solid var(--rule);border-radius:2px;background:var(--surface);color:var(--ink-deep)}
+.journey-nav a{position:relative;display:grid;place-items:center;width:38px;height:40px;font-size:10px;font-weight:450;font-variant-numeric:tabular-nums;border-left:1px solid transparent;opacity:.7;transition:background .2s,opacity .2s}
+.journey-nav a[aria-current],.journey-nav a:hover{background:color-mix(in srgb,currentColor 7%,transparent);border-left-color:currentColor;font-weight:750;opacity:1;text-decoration:none}.journey-nav a:focus-visible{outline:1px solid currentColor;outline-offset:-3px;opacity:1}
+.journey-nav a span{position:absolute;right:44px;white-space:nowrap;padding:5px 10px;background:#102b3b;color:white;border-radius:2px;opacity:0;pointer-events:none;transition:opacity .2s}
 .journey-nav a:hover span,.journey-nav a:focus-visible span{opacity:1}
 .chapter{scroll-margin-top:80px}.chapter-kicker{font-size:10px;letter-spacing:.16em;opacity:.8}
 .chapter-heading{letter-spacing:-.055em}.chapter-intro{font-size:15px;line-height:1.8;opacity:.78}
@@ -373,6 +373,21 @@ html{scroll-padding-top:100px}
 .finale-sub { font-size: 15px; opacity: .85; margin-top: 20px; }
 .finale-actions { margin-top: 24px; }
 .finale-word { opacity: .09!important; }
+
+/* Catalog typography serves selection; campaign type stays in the chapters. */
+.product-page .price-line { align-items: baseline; gap: 16px; font-size: 19px; font-variant-numeric: tabular-nums; }
+.product-page .product-form { gap: 12px; margin-block: 30px; }
+.product-page .product-form > label { margin-top: 10px; font-weight: 600; letter-spacing: .06em; }
+.product-page .button, .search-form .button, .cart-summary .button { border-radius: 2px; }
+.collection-page .listing-heading { margin-bottom: 28px; }
+.collection-page .listing-heading > .micro { margin-bottom: 12px; }
+.collection-page .collection-controls { padding-block: 12px; }
+.collection-page .collection-count { padding-block: 18px; }
+.collection-page .collection-description { margin-top: 18px; }
+.collection-page .active-filters:empty { display: none; }
+.search-page .page-heading { margin-bottom: 26px; }
+.search-page .search-form { margin-bottom: 28px; }
+.search-count { margin-bottom: 24px; }
 
 @media (min-width: 701px) and (max-width: 900px) {
   .site-header { grid-template-columns: 1fr auto; }

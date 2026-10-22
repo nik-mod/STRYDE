@@ -13,7 +13,7 @@
 <section class="hero{% if featured_product != blank %} hero-has-product{% endif %}" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} {% if bundled_tn %} data-model-yaw="90" data-model-size="3.1"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
   <div class="hero-stage" data-hero-stage>
     <div class="hero-atmo" aria-hidden="true"></div>
-    <div class="hero-edition"><span>{{ 'hero.edition' | t }}</span><span>01 / TN</span></div>
+    <div class="hero-edition"><span>{{ 'hero.edition' | t }}</span><span>{% if bundled_tn %}01 / TN{% else %}01{% endif %}</span></div>
     <div class="hero-model-shadow" aria-hidden="true"></div>
     <h1 class="sr-only" id="HeroTitle-{{ section.id }}">{{ section.settings.headline_first | escape }} {{ section.settings.headline_second | escape }}</h1>
 
@@ -94,12 +94,12 @@
     {"type":"header","content":"Headline"},
     {"type":"text","id":"headline_first","label":"First line","default":"Built for"},
     {"type":"text","id":"headline_second","label":"Second line","default":"Velocity"},
-    {"type":"textarea","id":"description","label":"Description","default":"Translucent support, liquid metallic structure and weightless cushioning — one silhouette sculpted for forward motion."},
+    {"type":"textarea","id":"description","label":"Description","default":"A study in blue and white. Follow the curves, panel edges and sculpted profile."},
     {"type":"header","content":"Commerce"},
     {"type":"product","id":"featured_product","label":"Featured product"},
     {"type":"collection","id":"collection","label":"Collection link"},
     {"type":"text","id":"concept_name","label":"Fallback product name","default":"STRYDE ONE","info":"Shown when no featured product is selected."},
-    {"type":"text","id":"cta","label":"Fallback call to action","default":"Explore the collection"},
+    {"type":"text","id":"cta","label":"Fallback call to action","default":"View the collection"},
     {"type":"header","content":"Media"},
     {"type":"checkbox","id":"use_tn_model","label":"Use bundled blue and white TN model","default":false},
     {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the temporary concept artwork."},

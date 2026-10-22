@@ -29,7 +29,7 @@ function heroHarness() {
       return timeline;
     },
   };
-  const dispose = mountHero(root, { gsap: clock, bus: { publish() {} }, mobile: false, hasModel: true });
+  const dispose = mountHero(root, { gsap: clock, bus: { publish() {} }, mobile: false, hasModel: true, paper: '#b9d5e6' });
   // Stop wall-clock advancement; explicit seeks below still run genuine GSAP
   // lazy initialization, overwrite resolution and interpolation.
   gsap.ticker.sleep();
@@ -81,6 +81,30 @@ test('first hero scroll takes over an unfinished entrance and reverses to the es
   } finally {
     interrupted?.dispose();
     reference?.dispose();
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+    gsap.ticker.sleep();
+  }
+});
+
+test('hero field and commerce restore after a full seek and an interrupted entrance', () => {
+  const previousWindow = globalThis.window;
+  globalThis.window = Object.assign(new EventTarget(), { scrollY: 0 });
+  let harness;
+  try {
+    harness = heroHarness();
+    harness.intro.time(.05, true);
+    harness.seek(1);
+    assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [239, 250, 255]);
+    assert.equal(harness.targets.foot.opacity, 0, 'commerce yields before the shared product bridge');
+    harness.seek(0);
+    assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [185, 213, 230]);
+    assert.equal(harness.targets.foot.opacity, 1);
+    assert.equal(harness.targets.foot.y, 0);
+    harness.seek(.5);
+    assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [185, 213, 230]);
+  } finally {
+    harness?.dispose();
     if (previousWindow === undefined) delete globalThis.window;
     else globalThis.window = previousWindow;
     gsap.ticker.sleep();

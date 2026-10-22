@@ -6,7 +6,7 @@
       <span class="heading-word"><span class="heading-word-inner">{{ word | upcase | escape }}</span></span>{% unless forloop.last %} {% endunless %}
     {% endfor %}
   </h2>
-  <p class="tech-word" aria-hidden="true" data-tech-word>{{ section.settings.outline_word | upcase | escape }}</p>
+  {% if section.settings.outline_word != blank %}<p class="tech-word" aria-hidden="true" data-tech-word>{{ section.settings.outline_word | upcase | escape }}</p>{% endif %}
   <figure class="tech-visual">
     {% assign technology_image = section.settings.image | default: section.settings.product.featured_image %}
     {% if technology_image != blank %}
@@ -48,14 +48,14 @@
     {"type":"product","id":"product","label":"Primary product","info":"Its image replaces the model study unless an image override is selected."},
     {"type":"image_picker","id":"image","label":"Editorial image"},
     {"type":"checkbox","id":"image_is_concept","label":"Editorial image is concept art","default":false},
-    {"type":"text","id":"kicker","label":"Kicker","default":"04 — Technology"},
-    {"type":"text","id":"heading","label":"Heading","default":"Built to move"},
-    {"type":"text","id":"outline_word","label":"Outlined background word","default":"Motion"},
-    {"type":"text","id":"row_1_title","label":"Row 01 title","default":"Cushioning"},
+    {"type":"text","id":"kicker","label":"Kicker","default":"04 \u2014 Technology"},
+    {"type":"text","id":"heading","label":"Heading","default":"Lines & layers"},
+    {"type":"text","id":"outline_word","label":"Outlined background word"},
+    {"type":"text","id":"row_1_title","label":"Row 01 title","default":"The profile"},
     {"type":"textarea","id":"row_1_body","label":"Row 01 body","default":"Follow the shape of the midsole and the way its curved surfaces catch the light."},
-    {"type":"text","id":"row_2_title","label":"Row 02 title","default":"Support"},
+    {"type":"text","id":"row_2_title","label":"Row 02 title","default":"The layers"},
     {"type":"textarea","id":"row_2_body","label":"Row 02 body","default":"Layered lines frame the upper, giving the side profile its distinctive rhythm."},
-    {"type":"text","id":"row_3_title","label":"Row 03 title","default":"Traction"},
+    {"type":"text","id":"row_3_title","label":"Row 03 title","default":"The outsole"},
     {"type":"textarea","id":"row_3_body","label":"Row 03 body","default":"Turn the silhouette over to explore the tread, the arch and the contrast beneath."}
   ],
   "presets":[{"name":"Technology"}]

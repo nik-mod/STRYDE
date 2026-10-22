@@ -8,7 +8,7 @@
         "description": "A familiar silhouette. A different perspective. Discover every curve of the blue-and-white TN.",
         "headline_first": "BEYOND",
         "headline_second": "ORDINARY.",
-        "cta": "Explore the collection"
+        "cta": "View the collection"
       }
     },
     "deconstruction": {
@@ -47,22 +47,22 @@
       "type": "chapter-technology",
       "settings": {
         "use_tn_model": true,
-        "heading": "FORM IN MOTION",
-        "outline_word": "Perspective",
+        "heading": "Lines & layers",
+        "outline_word": "",
         "row_1_title": "The profile",
         "row_1_body": "A long, low silhouette with white waves moving across a blue upper.",
         "row_2_title": "The contrast",
         "row_2_body": "Bright white framing, translucent details and a dark outsole bring the layers into focus.",
-        "row_3_title": "The perspective",
-        "row_3_body": "Rotate, look closer, and follow how each surface catches the light."
+        "row_3_title": "The outsole",
+        "row_3_body": "Dark tread beneath a white midsole. Blue accents continue around the arch."
       }
     },
     "collection": {
       "type": "chapter-collection",
       "settings": {
         "use_tn_model": true,
-        "kicker": "05 \u2014 The perspective edit",
-        "heading": "ONE. EVERY ANGLE.",
+        "kicker": "05 \u2014 View series",
+        "heading": "Three views.",
         "tile_title": "TN study",
         "field_1": "#d6eaf1",
         "field_2": "#b9d5e6",
@@ -74,28 +74,29 @@
       "settings": {
         "use_tn_model": true,
         "kicker": "06 \u2014 In focus",
-        "fallback_title": "BLUE BY NATURE.",
-        "story": "Blue mesh. White waves. A silhouette that speaks for itself. Explore the full collection to find your next pair."
+        "fallback_title": "Blue / white.",
+        "story": "A blue upper framed by white waves. The dark outsole gives the light silhouette a distinct edge.",
+        "fallback_cta": "View the collection"
       }
     },
     "brand": {
       "type": "chapter-brand",
       "settings": {
         "use_tn_model": true,
-        "line_1": "Look closer.",
-        "line_2": "Move further.",
-        "line_3": "Stay curious.",
-        "manifesto": "For the details you notice on a second look. The lines that stay with you. The pair that makes an everyday route feel different. This is the STRYDE perspective."
+        "line_1": "Start",
+        "line_2": "with the line.",
+        "line_3": "",
+        "manifesto": "White curves divide the blue panels. The same line carries from the forefoot to the heel, a small detail that holds the whole silhouette together."
       }
     },
     "finale": {
       "type": "chapter-finale",
       "settings": {
         "use_tn_model": true,
-        "heading_line_1": "YOUR NEXT",
-        "heading_line_2": "MOVE.",
-        "sub": "Find your perspective. Explore the collection.",
-        "cta": "Discover the collection"
+        "heading_line_1": "THE",
+        "heading_line_2": "COLLECTION.",
+        "sub": "Browse the available products.",
+        "cta": "View the collection"
       }
     }
   },

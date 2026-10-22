@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { Liquid } from 'liquidjs';
+import { mountListing } from '../src/motion/listing.mjs';
 
 const campaignImage = { url: '/merchant-campaign.jpg', alt: 'Approved campaign photograph' };
 const productImage = { url: '/merchant-product.jpg', alt: 'Selected product photograph' };
@@ -51,24 +52,24 @@ test('Technology prioritizes editorial override, then actual product imagery, be
 
 test('Technology without a selected product discloses model and concept fallback images', async () => {
   for (const product of [undefined, null, '']) {
-    const model = await renderChapter('technology', { use_tn_model: true, image: '', product });
+    const model = await renderChapter('technology', { use_tn_model: true, image: '', product, row_1_title: 'Merchant detail' });
     assert.match(model, /src="\/assets\/tn-profile-1400.webp"/);
     assert.match(model, /hero.model_preview/);
     assert.doesNotMatch(model, /src=""|assets.concept_tag/);
-    const concept = await renderChapter('technology', { use_tn_model: false, image: null, product });
+    const concept = await renderChapter('technology', { use_tn_model: false, image: null, product, row_1_title: 'Merchant detail' });
     assert.match(concept, /data-concept-image="featured"/);
     assert.match(concept, /assets.concept_tag/);
     assert.doesNotMatch(concept, /src=""|data-tech-model|hero.model_preview/);
-    assert.match(concept, /Cushioning/);
+    assert.match(concept, /Merchant detail/);
   }
 });
 
 test('Technology selected merchandise with no photograph never substitutes a model or concept image', async () => {
   const product = { title: 'Actual merchant shoe', url: '/products/merchant-shoe', featured_image: null };
   for (const use_tn_model of [true, false]) {
-    const html = await renderChapter('technology', { product, use_tn_model, image: '' });
+    const html = await renderChapter('technology', { product, use_tn_model, image: '', row_1_title: 'Merchant detail' });
     assert.doesNotMatch(html, /<img\b|data-tech-model|data-concept-image|hero.model_preview|assets.concept_tag/);
-    assert.match(html, /Cushioning/);
+    assert.match(html, /Merchant detail/);
   }
   const override = await renderChapter('technology', { product, use_tn_model: true, image: campaignImage });
   assert.match(override, /src="\/merchant-campaign.jpg"/);
@@ -167,3 +168,51 @@ for (const name of ['hero', 'featured', 'finale']) {
     }
   });
 }
+
+test('blank Brand lines create no empty display rows while configured story and image survive', async () => {
+  for (const blank of ['', null, '   ']) {
+    for (const omitted of [1, 2, 3]) {
+      const settings = { image: campaignImage, line_1: 'First & form', line_2: 'Second line', line_3: 'Third line', manifesto: 'Merchant story' };
+      settings[`line_${omitted}`] = blank;
+      const html = await renderChapter('brand', settings);
+      assert.equal((html.match(/class="brand-line /g) || []).length, 2);
+      assert.doesNotMatch(html, /class="brand-line [^"]*"><span>\s*<\/span>/);
+      assert.match(html, /merchant-campaign.jpg/);
+      assert.match(html, /Merchant story/);
+      if (omitted !== 1) assert.match(html, /First &amp; form/);
+    }
+  }
+});
+
+test('Hero TN edition belongs only to its bundled model, never merchant imagery or merchandise', async () => {
+  const bundled = await renderChapter('hero', { use_tn_model: true });
+  assert.match(bundled, /01 \/ TN/);
+  for (const override of [
+    { image: campaignImage },
+    { model_url: '/merchant.glb' },
+    { featured_product: { title: 'Merchant shoe', selected_or_first_available_variant: { id: 771, price: 24900, available: true } } },
+  ]) {
+    const html = await renderChapter('hero', { use_tn_model: true, ...override });
+    const edition = html.match(/<div class="hero-edition">[\s\S]*?<\/div>/)?.[0];
+    assert(edition);
+    assert.doesNotMatch(edition, /TN/);
+    assert.match(edition, /<span>01<\/span>/);
+  }
+});
+
+test('catalog mounting leaves browsing entries still and supplies safe repeatable lifecycle cleanup', () => {
+  const entries = Array.from({ length: 10 }, () => ({ opacity: 1, y: 0 }));
+  const heading = {};
+  const root = { querySelector: () => heading, querySelectorAll: () => entries };
+  const motions = [];
+  const clock = {
+    context(callback) { callback(); return { revert() {} }; },
+    matchMedia() { return { add(query, callback) { callback(); }, revert() {} }; },
+    fromTo(target) { motions.push(target); }, from(target) { motions.push(target); }, to(target) { motions.push(target); },
+  };
+  const dispose = mountListing(root, { gsap: clock });
+  assert.equal(typeof dispose, 'function', 'the runtime always calls section cleanup on unload or reduced-motion changes');
+  dispose(); dispose();
+  assert(motions.every(target => target === heading), 'browsing entries must not receive replayed entrance motion');
+  assert(entries.every(entry => entry.opacity === 1 && entry.y === 0));
+});

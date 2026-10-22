@@ -18,20 +18,20 @@
     "next_page": "Next page",
     "not_found": "Page not found",
     "off_track": "Off the track",
-    "explore_collection": "Explore the collection",
+    "explore_collection": "View the collection",
     "not_found_description": "The page you\u2019re looking for has moved or is no longer available.",
     "account": "Your account",
     "the_details": "The details",
     "our_perspective": "Our perspective",
     "explore_details": "Explore the details",
     "materials": "In detail",
-    "form": "Form in motion",
+    "form": "Lines & layers",
     "perspectives": "Perspectives",
     "in_focus": "In focus"
   },
   "assets": {
     "concept_alt": "STRYDE concept sneaker in silver and ice blue, floating three-quarter view",
-    "concept_tag": "Concept artwork · Temporary",
+    "concept_tag": "Concept artwork \u00b7 Temporary",
     "concept_side_alt": "Temporary sneaker concept study, silver and cyan lateral side view",
     "concept_rear_alt": "Temporary sneaker concept study, silver and cyan rear three-quarter view",
     "concept_detail_alt": "Temporary concept detail study of silver ribs, ice-blue weave and a cyan chamber"
@@ -47,7 +47,7 @@
     "concept_tile_price": "Price on selection",
     "model_preview": "3D model preview",
     "edition": "THE PERSPECTIVE SERIES / 001",
-    "perspective_study": "One silhouette. Three perspectives."
+    "perspective_study": "One silhouette, three views."
   },
   "products": {
     "image_unavailable": "Product image unavailable",
@@ -70,7 +70,11 @@
     "products": "products",
     "empty": "No products found.",
     "empty_description": "Adjust the filters to see more products.",
-    "clear": "Clear filters"
+    "clear": "Clear filters",
+    "product_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    }
   },
   "cart": {
     "title": "Your bag",
@@ -89,6 +93,10 @@
     "placeholder": "Search products",
     "results_for": "results for",
     "empty": "No results.",
-    "empty_description": "Try another product name or search term."
+    "empty_description": "Try another product name or search term.",
+    "results_count": {
+      "one": "{{ count }} result for \u201c{{ terms }}\u201d",
+      "other": "{{ count }} results for \u201c{{ terms }}\u201d"
+    }
   }
 }

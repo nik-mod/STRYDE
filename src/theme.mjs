@@ -10,6 +10,7 @@ import { mountHeader } from './motion/header.mjs';
 import { mountEnvironments } from './motion/environments.mjs';
 import { mountMagnetic } from './motion/magnetic.mjs';
 import { mountListing } from './motion/listing.mjs';
+import { mountTriggerInspection } from './motion/inspection.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
 // All high-frequency work shares GSAP's clock. No second requestAnimationFrame loop.
@@ -66,7 +67,7 @@ function mountHeroSection(root) {
     media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
       if (!conditions.motion) return;
       const scope = createScope();
-      scope.add(mountHero(root, { gsap, bus, mobile: conditions.mobile, hasModel: Boolean(root.dataset.modelUrl), fine: conditions.fine, surface: getComputedStyleValue(root, '--surface', '#effaff') }));
+      scope.add(mountHero(root, { gsap, bus, mobile: conditions.mobile, hasModel: Boolean(root.dataset.modelUrl), fine: conditions.fine, surface: getComputedStyleValue(root, '--surface', '#effaff'), paper: getComputedStyleValue(root, '--paper', '#b7ddef') }));
       if (conditions.fine) {
         root.querySelectorAll('[data-magnetic]').forEach(element => scope.add(mountMagnetic(element, { gsap, signal: scope.signal })));
       }
@@ -131,6 +132,7 @@ function mount(scope = document) {
 }
 function unmount(scope) { for (const [root, dispose] of instances) if (scope === root || scope.contains(root)) { dispose(); instances.delete(root); } }
 syncScroll(); mount();
+let disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location });
 document.addEventListener('shopify:section:load', event => { mount(event.target); syncScroll(); });
 document.addEventListener('shopify:section:unload', event => { unmount(event.target); syncScroll(); ScrollTrigger.refresh(); });
 reduceQuery.addEventListener('change', () => { syncScroll(); unmount(document); mount(); });
@@ -141,11 +143,12 @@ window.addEventListener('pagehide', () => {
   exitScroll = scrollCheckpoint();
   try { sessionStorage.setItem(checkpointKey, JSON.stringify(exitScroll)); } catch { /* Optional restoration only. */ }
   pageActive = false;
+  disposeInspection();
   unmount(document); environmentDispose?.(); environmentDispose = null; lenis?.destroy(); lenis = null; scheduler.setLenis(null); modalObserver.disconnect();
 });
 window.addEventListener('pageshow', event => {
   pageActive = true;
-  if (event.persisted) { syncScroll(); mount(); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
+  if (event.persisted) { syncScroll(); mount(); disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location }); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
   restoreScroll(event.persisted ? exitScroll : reloadScroll);
   reloadScroll = null;
 });

@@ -4,6 +4,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { heroPose } from './motion/contracts.mjs';
 import { refinePreviewMaterial } from './scene-materials.mjs';
 import { fittedCameraZ } from './scene-framing.mjs';
+import { createSceneBridge, projectionWindow } from './scene-bridge.mjs';
 
 export function disposeObject(object) {
   const textures = new Set(); const materials = new Set(); const geometries = new Set();
@@ -34,9 +35,11 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const status = root.querySelector('[data-model-status]');
   const fallback = host.querySelector('.hero-image, .concept-visual, .model-fallback');
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
-  let renderer; let disposed = false; let model; let visible = false; let contextLost = false;
+  let renderer; let disposed = false; let model; let visible = false; let contextLost = false; let bridge;
   let dirty = true; let lastProgress = null;
+  let currentPose = heroPose(bus.state?.local || 0);
   const framingPoints = [], worldPoints = [];
+  const projectedPoint = new THREE.Vector3();
   let unsubscribe = () => {}; let removeFrame = () => {}; let observer; let resizeObserver;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, .01, 100);
@@ -48,7 +51,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const lights = [key, rim];
   const cleanup = () => {
     if (disposed) return; disposed = true;
-    unsubscribe(); removeFrame(); observer?.disconnect(); resizeObserver?.disconnect();
+    unsubscribe(); removeFrame(); observer?.disconnect(); resizeObserver?.disconnect(); bridge?.dispose();
     renderer?.domElement.removeEventListener('webglcontextlost', onLost);
     renderer?.domElement.removeEventListener('webglcontextrestored', onRestored);
     if (model) disposeObject(model);
@@ -56,7 +59,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     if (fallback) fallback.hidden = false;
     setStatus('');
   };
-  const onLost = event => { event.preventDefault(); contextLost = true; if (fallback) fallback.hidden = false; setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product imagery remains available.'); };
+  const onLost = event => { event.preventDefault(); contextLost = true; bridge?.restore(); if (fallback) fallback.hidden = false; setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product imagery remains available.'); };
   const onRestored = () => { contextLost = false; dirty = true; if (fallback && model) fallback.hidden = true; setStatus(''); };
   signal.addEventListener('abort', cleanup, { once: true });
   try {
@@ -69,6 +72,8 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     renderer.domElement.addEventListener('webglcontextlost', onLost);
     renderer.domElement.addEventListener('webglcontextrestored', onRestored);
     host.append(renderer.domElement);
+    bridge = createSceneBridge({ root, host, canvas: renderer.domElement });
+    let viewportWidth = 0, viewportHeight = 0;
     const resize = () => {
       if (disposed) return;
       const width = host.clientWidth, height = host.clientHeight;
@@ -76,6 +81,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       // Bound GPU fill cost on large/retina screens without changing CSS size.
       const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1600000 / (width * height)));
       renderer.setPixelRatio(ratio); renderer.setSize(width, height, false);
+      viewportWidth = width; viewportHeight = height;
       camera.aspect = width / height; camera.updateProjectionMatrix(); dirty = true;
     };
     resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host); resize();
@@ -127,7 +133,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     unsubscribe = bus.subscribe(state => {
       if (state.local === lastProgress) return;
       lastProgress = state.local;
-      const pose = heroPose(state.local);
+      const pose = currentPose = heroPose(state.local);
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ);
       camera.position.set(0, pose.cameraY, pose.cameraZ);
       if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
@@ -136,11 +142,57 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       dirty = true;
     });
     removeFrame = scheduler.add(() => {
-      if (!dirty || !visible || document.hidden || contextLost || disposed) return;
+      if (document.hidden || contextLost || disposed) return;
+      const handoff = bridge?.update();
+      if (handoff?.changed) dirty = true;
+      if (!dirty || (!visible && !handoff?.active)) return;
+      if (camera.view?.enabled) camera.clearViewOffset();
+      if (handoff?.active) {
+        const width = Math.max(1, Math.round(handoff.width)), height = Math.max(1, Math.round(handoff.height));
+        if (width !== viewportWidth || height !== viewportHeight) {
+          const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1600000 / (width * height)));
+          renderer.setPixelRatio(ratio); renderer.setSize(width, height, false);
+          viewportWidth = width; viewportHeight = height;
+          camera.aspect = width / height; camera.updateProjectionMatrix();
+        }
+        // Match the existing profile render's camera orientation. This changes
+        // only the bridge, preserving the Hero's deterministic pose contract.
+        const mix = handoff.mix;
+        rig.rotation.set(
+          THREE.MathUtils.lerp(currentPose.rotationX, .077431086955443, mix),
+          THREE.MathUtils.lerp(currentPose.rotationY, 0, mix),
+          THREE.MathUtils.lerp(currentPose.rotationZ, 0, mix),
+        );
+        camera.position.y = THREE.MathUtils.lerp(currentPose.cameraY, 0, mix);
+        const fov = THREE.MathUtils.lerp(currentPose.fov, 33, mix);
+        if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+      } else if (handoff?.changed) {
+        resize();
+        rig.rotation.set(currentPose.rotationX, currentPose.rotationY, currentPose.rotationZ);
+        camera.position.y = currentPose.cameraY;
+        camera.fov = currentPose.fov; camera.updateProjectionMatrix();
+      }
       if (framingPoints.length) {
         rig.updateMatrixWorld(true);
         for (let i = 0; i < framingPoints.length; i++) worldPoints[i].copy(framingPoints[i]).applyMatrix4(rig.matrixWorld);
         camera.position.z = fittedCameraZ(worldPoints, { fov: camera.fov, aspect: camera.aspect, y: camera.position.y });
+        if (handoff?.active && handoff.footprint && handoff.projectionMix > 0) {
+          camera.updateMatrixWorld();
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          for (const point of worldPoints) {
+            projectedPoint.copy(point).project(camera);
+            const x = (projectedPoint.x + 1) * viewportWidth / 2;
+            const y = (1 - projectedPoint.y) * viewportHeight / 2;
+            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+          }
+          const footprint = handoff.footprint;
+          const view = projectionWindow({ left: minX, top: minY, width: maxX - minX, height: maxY - minY }, {
+            left: footprint.left - handoff.left, top: footprint.top - handoff.top,
+            width: footprint.width, height: footprint.height,
+          }, viewportWidth, viewportHeight, handoff.projectionMix);
+          if (view) camera.setViewOffset(viewportWidth, viewportHeight, view.x, view.y, view.width, view.height);
+        }
       }
       renderer.render(scene, camera);
       dirty = false;
