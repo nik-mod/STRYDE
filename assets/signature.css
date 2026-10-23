@@ -1,10 +1,11 @@
 /* Bounded product presentation. Photography is never tinted or sold as inventory. */
-.hero .hero-type { top: 23%; width: 36%; font-size: clamp(74px, 7.3vw, 114px); line-height: .94; }
-.hero .hero-type .hero-line-1 .hero-line-inner { font-style: normal; font-variation-settings: 'wght' 870, 'wdth' 78; }
-.hero .hero-type .hero-line-2 .hero-line-inner { font-style: italic; font-variation-settings: 'wght' 700, 'wdth' 82; }
-.hero .hero-line-2 { margin-top: .08em; }
-.js .hero .hero-art { left: 40%; right: 2%; top: 16%; bottom: 17%; }
-.hero .hero-copy { top: 51%; width: 30%; }
+.hero .hero-type { top: 16%; width: 58%; font-size: clamp(88px, 10.4vw, 192px); line-height: .88; letter-spacing: -.058em; }
+.hero .hero-line { transform: none; }
+.hero .hero-type .hero-line-1 .hero-line-inner { font-style: normal; color: var(--ink); opacity: 1; font-variation-settings: 'wght' 880, 'wdth' 80; }
+.hero .hero-type .hero-line-2 .hero-line-inner { font-style: italic; color: var(--hero-type); opacity: 1; font-variation-settings: 'wght' 620, 'wdth' 84; }
+.hero .hero-line-2 { margin-top: .05em; }
+.js .hero .hero-art { left: 33%; right: 0; top: 9%; bottom: 14%; }
+.hero .hero-copy { top: auto; bottom: 22%; width: min(320px, 26vw); font-size: 14px; }
 .hero .hero-edition { top: calc(var(--header-height) + var(--preview-height) + 18px); }
 .chapter-collection .coll-scene-num { display: none; }
 .chapter-collection .coll-scene-price { max-width: 34ch; font-size: 14px; line-height: 1.55; }
@@ -96,3 +97,61 @@
  .hero .hero-type,.hero .hero-copy { position:relative;inset:auto;width:100%; }
  .js .hero .hero-art { position:relative;inset:auto;height:50vw;min-height:260px; }
 }
+
+/* ----------------------------------------------------------------
+   Campaign art direction pass — directed product experience.
+   Hero: tonal field, monumental type interlocked with the product,
+   grounded contact shadow. Chapters: deeper field progression. */
+
+/* Hero: directional light — deep sky overhead, light pooling at the
+   product. Restrained: two gradients, no glows or ornaments. */
+.hero-stage {
+  background: linear-gradient(197deg, #5d9cc6 0%, #7fb6da 20%, #a5d0ea 44%, #cde8f6 70%, #eef8fd 100%);
+}
+.hero-atmo {
+  background:
+    radial-gradient(48% 40% at 67% 44%, rgba(255, 255, 255, .5), transparent 72%),
+    radial-gradient(56% 26% at 18% 102%, rgba(16, 43, 59, .14), transparent 75%);
+}
+.hero .hero-model-shadow {
+  display: block;
+  left: 38%;
+  top: 77%;
+  width: 46%;
+  height: 7%;
+  background: radial-gradient(ellipse, rgba(10, 34, 52, .3), transparent 66%);
+  filter: blur(16px);
+}
+.hero-cue { left: 50%; transform: translateX(-50%); bottom: 4.8%; }
+
+/* Featured: the full shoe stays in frame — no accidental macro crop. */
+[data-tn-editorial] .feat-frame { transform: none; }
+
+/* Materials sits on the paper field now — lift its frames off it. */
+[data-tn-editorial] .mat-frame { background: #eef4f7; }
+.mat-frame { background: #eef4f7; }
+
+/* Collection sequence: licensed photography presented as consistent
+   studio cards — never tinted, never sold as inventory. */
+.chapter-collection.is-sequenced .coll-scene-figure { width: 56%; height: 88%; }
+.chapter-collection.is-sequenced .coll-scene:nth-of-type(odd) .coll-scene-figure { margin-left: 5%; }
+.chapter-collection.is-sequenced .coll-scene:nth-of-type(even) .coll-scene-figure { margin-right: 5%; }
+.chapter-collection .coll-scene-visual img.photo-card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: var(--surface);
+  filter: none;
+  transform: none;
+}
+.chapter-collection .coll-scene-copy .photo-reference-credit { margin-top: 12px; }
+.chapter-collection .coll-scene-copy .photo-reference-credit p { font-size: 11px; line-height: 1.5; }
+.chapter-collection .coll-scene-copy .photo-reference-credit a { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width:700px) {
+  .hero .hero-type { width: 92%; font-size: 15vw; }
+  .hero .hero-model-shadow { left: 14%; width: 72%; top: 66%; }
+  .hero-cue { display: none; }
+}
+

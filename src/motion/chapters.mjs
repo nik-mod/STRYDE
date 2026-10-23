@@ -279,8 +279,10 @@ function featured(root, gsap) {
   const image = root.querySelector('.feat-frame > img');
   if (image) {
     const model = image.hasAttribute('data-featured-model');
-    const scale = model ? 1.25 : 1.02;
-    const drift = model ? 2 : 3;
+    // Keep the complete silhouette inside the frame: a light drift only.
+    // Larger scales crop the shoe mid-scroll and read as broken imagery.
+    const scale = model ? 1.08 : 1;
+    const drift = model ? 1.2 : 1.6;
     gsap.fromTo(image, { yPercent: -drift, scale }, {
       yPercent: drift,
       scale,
@@ -351,5 +353,11 @@ const CONTROLLERS = { deconstruction, materials, technology, collection, feature
 export function mountChapter(root, { gsap, mobile, fine }) {
   const controller = CONTROLLERS[root.dataset.chapter];
   if (!controller) return undefined;
-  return controller(root, gsap, { mobile, fine }) || undefined;
+  const dispose = controller(root, gsap, { mobile, fine }) || undefined;
+  // Chapter handoff: the incoming composition rises over the previous one.
+  // Desktop only — the flowing mobile layout keeps its own arrival motion.
+  if (!mobile && (root.dataset.chapter === 'deconstruction' || root.dataset.chapter === 'featured')) {
+    wipeIn(root, gsap);
+  }
+  return dispose;
 }

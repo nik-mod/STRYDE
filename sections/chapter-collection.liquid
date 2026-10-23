@@ -39,6 +39,27 @@
           </div>
         </article>
       {% endfor %}
+    {% elsif section.preview_photography %}
+      {% comment %} Local preview only: licensed owner photography stands in for the
+         empty-merchandise state. Real Shopify products always take precedence, and an
+         uploaded theme never receives this property. Credited and non-purchasable. {% endcomment %}
+      {% for photo in section.preview_photography limit: 3 %}
+        <article class="coll-scene" data-coll-scene style="--scene-field: {% cycle field_1, field_2, field_3 %}">
+          <span class="coll-scene-num" aria-hidden="true">0{{ forloop.index }}</span>
+          <div class="coll-scene-art">
+            <div class="coll-scene-figure">
+              <span class="coll-scene-visual" data-coll-visual>
+                <img class="photo-card" src="{{ photo.asset | asset_url }}" width="{{ photo.width }}" height="{{ photo.height }}" loading="{% if forloop.index == 1 %}eager{% else %}lazy{% endif %}" decoding="async" alt="{{ photo.name | escape }} — independent photographic reference">
+              </span>
+            </div>
+          </div>
+          <div class="coll-scene-copy">
+            <h3 class="coll-scene-name"><span class="scene-line"><span>{{ photo.name | escape }}</span></span></h3>
+            <p class="coll-scene-price">Photographic reference · Not store inventory</p>
+            {% render 'photography-credit', photo: photo %}
+          </div>
+        </article>
+      {% endfor %}
     {% else %}
       {% for index in (1..3) %}
         {% liquid
