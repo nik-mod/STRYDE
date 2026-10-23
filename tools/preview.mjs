@@ -2,7 +2,7 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Liquid } from 'liquidjs';
-import { conceptCatalog } from './fixtures/concept-catalog.mjs';
+import { photographyCatalog } from './fixtures/photography-catalog.mjs';
 
 const root = process.cwd();
 const engine = new Liquid({ root: [resolve('snippets')], extname: '.liquid', strictFilters: false });
@@ -78,10 +78,11 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
     if (type === 'chapter-collection' && populated) sectionSettings.collection = context.collection;
     // This additional render property does not exist on Shopify's SectionDrop.
     // It is never a theme setting and never goes into collection.products.
-    // A populated native collection always wins; ?concepts=0 previews its empty UI.
-    const preview_catalog = type === 'main-collection' && pathname === '/collections/all' &&
-      context.collection.products_count === 0 && query.get('concepts') !== '0' ? conceptCatalog : undefined;
-    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_catalog } });
+    // A populated native collection always wins. References are never merchandise.
+    const preview_reference_mode = type === 'main-collection' && pathname === '/collections/all' &&
+      context.collection.products_count === 0 && query.get('concepts') !== '0' && query.get('photography') !== '0';
+    const preview_photography = (preview_reference_mode || (type === 'chapter-collection' && !populated)) ? photographyCatalog : undefined;
+    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography } });
   }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));
   let content = '';

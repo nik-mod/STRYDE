@@ -52,12 +52,15 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   // The whole headline remains a stable reading zone. Product poses are
   // scrubbed by the existing bus; HTML never masks away individual words.
   timeline
-    .fromTo(line1, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 0, scale: 1, yPercent: 0, immediateRender: false, duration: 1 }, 0)
-    .fromTo(line2, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 0, scale: 1, yPercent: 0, immediateRender: false, duration: 1 }, 0)
+    .fromTo(line1, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 2, scale: 1, yPercent: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
+    .to(line1, { xPercent: 0, duration: .44, ease: 'none' }, .46)
+    .fromTo(line2, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: -1.5, scale: 1, yPercent: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
+    .to(line2, { xPercent: 0, duration: .44, ease: 'none' }, .46)
     .fromTo(copy, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, duration: 1 }, 0)
     .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, duration: .82 }, 0)
     .to(foot, { opacity: 0, y: -16, duration: .18 }, .82)
-    .fromTo(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0 }, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0, immediateRender: false, duration: 1 }, 0)
+    .fromTo(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0 }, { scale: hasModel ? 1.03 : 1, xPercent: 0, yPercent: 0, rotation: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
+    .to(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0, duration: .44, ease: 'none' }, .46)
     .to(cue, { opacity: 0, duration: .12 }, .05)
     .to(ring, { opacity: 0, duration: .2 }, .1)
     .fromTo(stage, { backgroundColor: paper }, { backgroundColor: surface, immediateRender: true, duration: 1, ease: progress => Math.max(0, (progress - .7) / .3) }, 0);

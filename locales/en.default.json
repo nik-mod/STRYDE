@@ -74,7 +74,14 @@
     "product_count": {
       "one": "{{ count }} product",
       "other": "{{ count }} products"
-    }
+    },
+    "tn_study": "TN / model study",
+    "chrome_study": "Chrome / concept",
+    "chrome_rear": "Chrome / rear view",
+    "model_note": "Blue and white TN. A 3D model study.",
+    "concept_note": "Chrome-and-cyan concept. Concept artwork \u00b7 Temporary.",
+    "chrome_rear_note": "Rear view of the same chrome concept. Concept artwork \u00b7 Temporary.",
+    "image_note": "Editorial image study."
   },
   "cart": {
     "title": "Your bag",

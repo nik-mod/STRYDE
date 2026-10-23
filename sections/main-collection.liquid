@@ -1,16 +1,16 @@
 {% liquid
-  assign development_catalog = false
-  if collection.products_count == 0 and section.preview_catalog != blank
-    assign development_catalog = true
+  assign photography_references = false
+  if collection.products_count == 0 and section.preview_reference_mode
+    assign photography_references = true
   endif
 %}
-<section class="page-shell collection-page{% if development_catalog %} collection-page-concepts{% endif %}" data-listing-section data-section-id="{{ section.id }}">
-  {% if development_catalog %}
+<section class="page-shell collection-page{% if photography_references %} collection-page-photography{% endif %}" data-listing-section data-section-id="{{ section.id }}">
+  {% if photography_references %}
     <header class="listing-heading" data-listing-heading>
-      <div><p class="listing-eyebrow">STRYDE / FOOTWEAR STUDIES</p><h1>Concept index</h1></div>
-      <div class="listing-introduction"><p>Ten colour studies. Three original artwork views.</p><p class="listing-preview-note">Development preview · Not available for purchase</p></div>
+      <div><p class="listing-eyebrow">STRYDE / FOOTWEAR PHOTOGRAPHY</p><h1>Different by design.</h1></div>
+      <div class="listing-introduction"><p>Independent photographs of distinctive sneaker models.</p><p class="listing-preview-note">Development references · Not store inventory or available for purchase</p></div>
     </header>
-    {% render 'development-catalog', catalog: section.preview_catalog %}
+    {% render 'photography-catalog', catalog: section.preview_photography %}
   {% else %}
   <div class="page-heading listing-heading" data-listing-heading><span class="micro">{{ 'general.collection' | t }}</span><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
   {% paginate collection.products by 12 %}

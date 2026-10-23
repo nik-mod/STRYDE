@@ -97,9 +97,10 @@ function mountHeroSection(root) {
 function mountChapterSection(root) {
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
-    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
+    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
       if (!conditions.motion) return;
-      return mountChapter(root, { gsap, mobile: root.dataset.chapter === 'collection' ? conditions.collectionFlow : conditions.mobile, fine: conditions.fine });
+      const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : conditions.mobile || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
+      return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });
     });
   }, root);
   return () => { media.revert(); context.revert(); };

@@ -38,7 +38,11 @@ test('real collection scenes preserve native data without concept labels or subs
   assert.match(html, /products.sold_out/);
   assert.match(html, /hero.asset_pending/);
   assert.doesNotMatch(html, /assets.concept_tag|stryde-concept-v2|data-model-editorial-image/);
-  assert.equal(((await collection({use_tn_model:true})).html.match(/data-model-editorial-image/g)||[]).length,3);
+  const studies = (await collection({use_tn_model:true})).html;
+  assert.equal((studies.match(/data-model-editorial-image/g)||[]).length,1);
+  assert.equal((studies.match(/data-concept-image=/g)||[]).length,2);
+  assert.match(studies, /collection.chrome_rear_note/);
+  assert.doesNotMatch(studies, /money|Price on selection|coll-scene-link/);
   assert.match((await collection()).html, /assets.concept_tag/);
 });
 

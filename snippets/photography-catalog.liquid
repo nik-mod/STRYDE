@@ -1,0 +1,13 @@
+<div class="photography-grid">
+  {% for photo in catalog %}
+    <article class="photography-reference" data-photography-reference="{{ photo.id | escape }}">
+      <figure>
+        <img src="{{ photo.asset | asset_url }}" width="{{ photo.width }}" height="{{ photo.height }}" loading="lazy" alt="{{ photo.name | escape }} — independent photographic reference">
+        <figcaption><h2>{{ photo.name | escape }}</h2><p>Photographic reference · Not store inventory</p></figcaption>
+      </figure>
+      {% render 'photography-credit', photo: photo %}
+    </article>
+  {% else %}
+    <div class="empty-state"><h2>Photography coming soon.</h2><p>Licensed reference photographs are not yet available. Store products will appear here when a collection is connected.</p></div>
+  {% endfor %}
+</div>

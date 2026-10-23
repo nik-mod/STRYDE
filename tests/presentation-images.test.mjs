@@ -28,7 +28,7 @@ test('campaign slots resolve to shipped assets and always disclose bundled conce
   const html = await renderPreview('/',new URLSearchParams('artwork=concept'));
   const collection = html.match(/<section\b[^>]*\bchapter-collection\b[\s\S]*?<\/section>/)[0];
   assert.equal(new Set([...collection.matchAll(/src="([^"]+)"/g)].map(m=>m[1])).size,3);
-  assert.equal((collection.match(/Concept artwork · Temporary/g)||[]).length,3);
+  assert.equal((collection.match(/class="asset-tag"[^>]*>Concept artwork · Temporary/g)||[]).length,3);
   assert.doesNotMatch(collection,/coll-tint/);
 });
 
@@ -54,7 +54,7 @@ test('standalone scene pickers never override configured product imagery or nati
   const render=settings=>engine.parseAndRender(markup,{section:{id:'qa',settings},routes:{all_products_collection_url:'/collections/all'}});
   const standalone=await render(settings);
   assert.match(standalone,/merchant-detail.jpg/);
-  assert.equal((standalone.match(/assets.concept_tag/g)||[]).length,3);
+  assert.equal((standalone.match(/class="asset-tag"[^>]*>assets.concept_tag/g)||[]).length,3);
   engine.registerFilter('money_with_currency',cents=>`$${cents/100}`);
   const product={title:'Actual shoe',url:'/products/actual',price:24000,available:true,featured_image:{url:'/actual.jpg'}};
   const native=await render({...settings,collection:{products_count:1,products:[product]}});

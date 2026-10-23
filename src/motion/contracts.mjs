@@ -20,9 +20,9 @@ const span = (p, from, to) => smooth((p - from) / (to - from));
 // No incremental transforms: the same input always returns the same pose in either direction.
 export function heroPose(progress) {
   const p = clamp(progress);
-  const rotationY = mix(-.38, .7, span(p, 0, .46)) + mix(0, .48, span(p, .46, .72)) - mix(0, 1.08, span(p, .72, .9));
-  const rotationZ = .56 + mix(0, .06, span(p, 0, .46)) - mix(0, .7, span(p, .72, .9));
-  const rotationX = .26 + mix(0, .08, span(p, .46, .72)) - mix(0, .34, span(p, .72, .9));
+  const rotationY = mix(-.38, .16, span(p, 0, .46)) + mix(0, .1, span(p, .46, .72)) - mix(0, .16, span(p, .72, .9));
+  const rotationZ = .56 - mix(0, .2, span(p, 0, .46)) - mix(0, .44, span(p, .72, .9));
+  const rotationX = .26 + mix(0, .02, span(p, .46, .72)) - mix(0, .28, span(p, .72, .9));
   const cameraZ = 4.8 - mix(0, .65, span(p, 0, .46)) - mix(0, .55, span(p, .46, .72)) + mix(0, .7, span(p, .72, .9));
   const cameraY = .1 + mix(0, .06, span(p, .46, .72)) - mix(0, .08, span(p, .72, .9));
   const fov = 32 + mix(0, 3.2, span(p, .46, .72)) - mix(0, 3.2, span(p, .72, .9));

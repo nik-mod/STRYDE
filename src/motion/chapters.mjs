@@ -81,7 +81,9 @@ function materials(root, gsap, { mobile }) {
     panels.forEach((panel, index) => {
       const image = panel.querySelector('.mat-frame > img');
       const frame = panel.querySelector('.mat-frame');
+      const copy = panel.querySelector('.mat-copy');
       const crop = image ? readCrop(image) : null;
+      if (copy) gsap.set(copy, { opacity: index === 0 ? 1 : 0 });
       // Discard pixel offsets parsed from the CSS fallback before applying the
       // same crop with GSAP. Otherwise the translation accumulates twice.
       if (crop) gsap.set(image, { x: 0, y: 0, scale: crop.zoom, xPercent: crop.tx, yPercent: crop.ty });
@@ -90,8 +92,12 @@ function materials(root, gsap, { mobile }) {
         gsap.set(panel, { autoAlpha: 0 });
         timeline.set(panel, { autoAlpha: 1 }, enter - phaseLength * .2);
         const outgoingCopy = panels[index - 1].querySelector('.mat-copy');
-        if (outgoingCopy) timeline.to(outgoingCopy, { autoAlpha: 0, duration: phaseLength * .04, ease: 'none' }, enter - phaseLength * .2);
-        timeline.fromTo(panel,
+        // Keep one complete caption owner while the frame wipes. Switch both
+        // columns atomically once most of the new landmark is established.
+        const captionAt = enter + phaseLength * .055;
+        if (copy) timeline.set(copy, { opacity: 1 }, captionAt);
+        if (outgoingCopy) timeline.set(outgoingCopy, { opacity: 0 }, captionAt);
+        timeline.fromTo(frame,
           { clipPath: 'inset(0% 100% 0% 0%)' },
           { clipPath: 'inset(0% 0% 0% 0%)', duration: phaseLength * .34, ease: 'none' },
           enter - phaseLength * .2);
@@ -273,7 +279,7 @@ function featured(root, gsap) {
   const image = root.querySelector('.feat-frame > img');
   if (image) {
     const model = image.hasAttribute('data-featured-model');
-    const scale = model ? 1.62 : 1.02;
+    const scale = model ? 1.25 : 1.02;
     const drift = model ? 2 : 3;
     gsap.fromTo(image, { yPercent: -drift, scale }, {
       yPercent: drift,
@@ -293,27 +299,22 @@ function brand(root, gsap, { mobile }) {
   const visual = root.querySelector('.brand-visual');
   const editorial = root.querySelector('.brand-editorial');
   const lines = root.querySelectorAll('.brand-line > span');
-  // The complete editorial is readable on entrance. A shallow image reveal
-  // and restrained crop shift supply the depth, rather than hiding whole lines.
-  if (visual) gsap.fromTo(visual, { clipPath: 'inset(0% 8% 0% 0%)' }, {
-    clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
-    scrollTrigger: { trigger: root, start: 'top 85%', end: 'top 20%', scrub: true },
-  });
   const timeline = gsap.timeline({
     scrollTrigger: {
       trigger: stage,
-      start: mobile ? 'top 80%' : 'top top',
-      end: mobile ? 'bottom 25%' : () => `+=${Math.round(window.innerHeight * .4)}`,
-      pin: !mobile,
+      start: 'top 80%',
+      end: 'bottom 25%',
+      pin: false,
       scrub: true,
       invalidateOnRefresh: true,
     },
   });
-  const crop = image?.hasAttribute('data-brand-model') ? 1.16 : 1.02;
-  if (image) timeline.fromTo(image, { scale: crop, xPercent: 0, yPercent: 0 }, {
-    scale: crop * 1.05, xPercent: -1, yPercent: -1, duration: 1, ease: 'none',
+  const crop = 1.02;
+  if (image) timeline.fromTo(image, { scale: crop, xPercent: -1, yPercent: 0 }, {
+    scale: crop, xPercent: 1, yPercent: 0, duration: 1, ease: 'none',
   }, 0);
 
+  if (editorial) timeline.fromTo(editorial, { xPercent: mobile ? 0 : -3 }, { xPercent: -1, duration: 1, ease: 'none' }, 0);
   if (lines.length) timeline.to(lines, { '--brand-wght': 680, duration: 1, ease: 'none' }, 0);
   const rule = root.querySelector('[data-brand-rule]');
   if (rule) timeline.fromTo(rule, { scaleX: .45 }, { scaleX: 1, duration: 1, ease: 'none' }, 0);
@@ -333,10 +334,12 @@ function finale(root, gsap, { mobile }) {
     end: mobile ? 'clamp(bottom bottom)' : () => `+=${Math.round(window.innerHeight * .8)}`,
     pin: !mobile, scrub: true, invalidateOnRefresh: true,
   }});
-  timeline.fromTo(shoe, { scale: .74, yPercent: 12, autoAlpha: 1 },
-    { scale: 1, yPercent: 0, autoAlpha: 1, duration: .68, ease: 'none' }, 0);
-  timeline.fromTo(heading, { autoAlpha: .55, y: 18 },
-    { autoAlpha: 1, y: 0, duration: .3, ease: 'none' }, .35);
+  timeline.fromTo(shoe, { scale: .94, xPercent: -4, yPercent: 0, autoAlpha: 1 },
+    { scale: 1, xPercent: 0, yPercent: 0, autoAlpha: 1, duration: .72, ease: 'none' }, 0);
+  const titleParts = root.querySelectorAll('.finale-heading .heading-line');
+  titleParts.forEach((part, index) => timeline.fromTo(part,
+    { x: (index === 0 ? -1 : 1) * 14, y: index === 0 ? -16 : 16, autoAlpha: .45 },
+    { x: 0, y: 0, autoAlpha: 1, duration: .4, ease: 'none' }, .3));
   if (context.length) timeline.fromTo(context, { autoAlpha: 0, y: 10 },
     { autoAlpha: 1, y: 0, duration: .2, ease: 'none' }, .58);
   if (controls) timeline.fromTo(controls, { autoAlpha: 0, y: 16 },
