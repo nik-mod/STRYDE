@@ -17,12 +17,12 @@
 .chapter-collection .photo-reference-credit a { text-decoration: underline; text-underline-offset: 3px; }
 .chapter-brand { padding: 70px var(--gutter); background: var(--ink-deep); color: var(--surface); }
 .brand-stage { display: grid; grid-template-columns: 1.15fr 1fr; gap: 5%; align-items: center; min-height: 0; padding: 0; overflow: visible; }
-.brand-visual { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 1.2; margin: 0; background: #a9d5e7; }
-.brand-visual > img { object-fit: contain; object-position: center; }
+.brand-visual { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 4 / 3; margin: 0; background: #a9d5e7; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, .35); }
+.brand-visual > img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .brand-visual > img[data-brand-model] { transform: scale(1.02); }
 .brand-visual .asset-tag { left: 12px; bottom: 12px; color: var(--ink-deep); background: var(--paper); }
 .brand-editorial { position: relative; width: 100%; margin: 0; padding: 0; color: inherit; }
-.brand-line-quiet { font-size: clamp(56px, 6.7vw, 102px); line-height: 1; }
+.brand-line-quiet { font-size: clamp(64px, 7.4vw, 116px); line-height: 1; }
 .brand-line-loud { font-size: clamp(40px, 4.6vw, 70px); max-width: 12ch; line-height: 1.05; margin: .12em 0 0; }
 .brand-line > span { font-variation-settings: 'wght' var(--brand-wght, 550), 'wdth' 87; }
 .brand-line-loud > span { font-variation-settings: 'wght' 700, 'wdth' 87; }
@@ -127,6 +127,11 @@
 /* Featured: the full shoe stays in frame — no accidental macro crop. */
 [data-tn-editorial] .feat-frame { transform: none; }
 
+/* Finale: one consistent, gentle profile crop — the complete silhouette
+   stays inside the window (recovery.css left it overflow:visible). */
+.finale-profile-window { aspect-ratio: 1240 / 730; overflow: hidden; }
+.finale-profile-window img { width: 124%; left: -12%; top: -36%; }
+
 /* Materials sits on the paper field now — lift its frames off it. */
 [data-tn-editorial] .mat-frame { background: #eef4f7; }
 .mat-frame { background: #eef4f7; }
@@ -153,5 +158,8 @@
   .hero .hero-type { width: 92%; font-size: 15vw; }
   .hero .hero-model-shadow { left: 14%; width: 72%; top: 66%; }
   .hero-cue { display: none; }
+  .chapter-collection .coll-scene { padding-block: 26px; }
+  .chapter-collection .coll-scene-copy .coll-scene-name { margin-top: 4px; }
+  .finale-ghost { border-color: rgba(239, 250, 255, .78); }
 }
 

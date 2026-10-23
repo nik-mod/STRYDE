@@ -81,7 +81,10 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
     // A populated native collection always wins. References are never merchandise.
     const preview_reference_mode = type === 'main-collection' && pathname === '/collections/all' &&
       context.collection.products_count === 0 && query.get('concepts') !== '0' && query.get('photography') !== '0';
-    const preview_photography = (preview_reference_mode || (type === 'chapter-collection' && !populated)) ? photographyCatalog : undefined;
+    // The homepage collection chapter shows licensed photography by default;
+    // ?artwork=concept (QA) and ?photography=0 restore the disclosed concept studies.
+    const preview_photography = (preview_reference_mode || (type === 'chapter-collection' && !populated)) &&
+      query.get('artwork') !== 'concept' && query.get('photography') !== '0' ? photographyCatalog : undefined;
     return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography } });
   }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));

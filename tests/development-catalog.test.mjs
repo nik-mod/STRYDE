@@ -3,20 +3,26 @@ import assert from 'node:assert/strict';
 import { readFile,stat } from 'node:fs/promises';
 import { Liquid } from 'liquidjs';
 import { conceptCatalog } from '../tools/fixtures/concept-catalog.mjs';
+import { photographyCatalog } from '../tools/fixtures/photography-catalog.mjs';
 import { renderPreview } from '../tools/preview.mjs';
 
 function listing(html) {return html.match(/<section\b[^>]*\bcollection-page\b[\s\S]*?<\/section>/)?.[0] || '';}
 
-test('local all-products page supplies exactly ten named, disclosed, non-commerce concept entries',async()=>{
+test('local all-products page supplies six licensed photographic references, credited and non-commerce',async()=>{
   const html=listing(await renderPreview('/collections/all'));
   assert(html,'Collection section missing');
-  assert.equal((html.match(/data-concept-entry/g)||[]).length,10);
-  assert.equal(new Set(conceptCatalog.map(p=>p.name)).size,10);
-  for(const entry of conceptCatalog){assert(html.includes(entry.name));assert(html.includes(entry.colorway));assert(html.includes(entry.asset));assert((await stat(`assets/${entry.asset}`)).size>1000);}
-  assert.equal((html.match(/Concept artwork · Temporary/g)||[]).length,10);
+  assert.equal((html.match(/data-photography-reference/g)||[]).length,6);
+  assert.equal(new Set(photographyCatalog.map(p=>p.name)).size,6);
+  for(const photo of photographyCatalog){
+    assert(html.includes(photo.name));
+    assert(html.includes(photo.asset));
+    assert(html.includes(photo.creator));
+    assert(html.includes(photo.source));
+    assert((await stat(`assets/${photo.asset}`)).size>1000);
+  }
+  assert.equal((html.match(/Photographic reference · Not store inventory/g)||[]).length,6);
   assert.doesNotMatch(html,/<form|href="\/products\/|\$|name="add"|name="checkout"|name="sort_by"|No products found/);
-  assert.match(html,/not available for purchase/i);
-  assert.equal(new Set(conceptCatalog.map(p=>[p.asset,p.hue,p.saturation,p.lightness,p.rotation].join('/'))).size,10);
+  assert.match(html,/Not store inventory or available for purchase/);
 });
 
 test('concept fallback is limited to the local all-products empty view and yields to native fixtures',async()=>{
