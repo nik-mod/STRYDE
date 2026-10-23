@@ -19,7 +19,7 @@
     "not_found": "Page not found",
     "off_track": "Off the track",
     "explore_collection": "View the collection",
-    "not_found_description": "The page you\u2019re looking for has moved or is no longer available.",
+    "not_found_description": "The page you’re looking for has moved or is no longer available.",
     "account": "Your account",
     "the_details": "The details",
     "our_perspective": "Our perspective",
@@ -31,7 +31,7 @@
   },
   "assets": {
     "concept_alt": "STRYDE concept sneaker in silver and ice blue, floating three-quarter view",
-    "concept_tag": "Concept artwork \u00b7 Temporary",
+    "concept_tag": "Concept artwork · Temporary",
     "concept_side_alt": "Temporary sneaker concept study, silver and cyan lateral side view",
     "concept_rear_alt": "Temporary sneaker concept study, silver and cyan rear three-quarter view",
     "concept_detail_alt": "Temporary concept detail study of silver ribs, ice-blue weave and a cyan chamber"
@@ -39,7 +39,7 @@
   "hero": {
     "asset_pending": "Product imagery not provided",
     "scroll": "Scroll",
-    "model_loading": "Loading product view\u2026",
+    "model_loading": "Loading product view…",
     "model_error": "3D view unavailable. Product imagery remains available.",
     "model_interrupted": "3D view interrupted. Product imagery remains available.",
     "add_to_cart": "Add to cart",
@@ -59,7 +59,11 @@
     "available": "Available",
     "add_to_bag": "Add to bag",
     "materials": "Materials",
-    "view_selection": "View selection"
+    "view_selection": "View selection",
+    "trust_sizing": "Sizing",
+    "trust_delivery": "Delivery",
+    "trust_returns": "Returns",
+    "trust_support": "Support"
   },
   "collection": {
     "min_price": "Minimum",
@@ -79,8 +83,8 @@
     "chrome_study": "Chrome / concept",
     "chrome_rear": "Chrome / rear view",
     "model_note": "Blue and white TN. A 3D model study.",
-    "concept_note": "Chrome-and-cyan concept. Concept artwork \u00b7 Temporary.",
-    "chrome_rear_note": "Rear view of the same chrome concept. Concept artwork \u00b7 Temporary.",
+    "concept_note": "Chrome-and-cyan concept. Concept artwork · Temporary.",
+    "chrome_rear_note": "Rear view of the same chrome concept. Concept artwork · Temporary.",
     "image_note": "Editorial image study."
   },
   "cart": {
@@ -102,8 +106,11 @@
     "empty": "No results.",
     "empty_description": "Try another product name or search term.",
     "results_count": {
-      "one": "{{ count }} result for \u201c{{ terms }}\u201d",
-      "other": "{{ count }} results for \u201c{{ terms }}\u201d"
+      "one": "{{ count }} result for “{{ terms }}”",
+      "other": "{{ count }} results for “{{ terms }}”"
     }
+  },
+  "materials": {
+    "specs_label": "Material and construction notes"
   }
 }

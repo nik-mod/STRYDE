@@ -4,7 +4,7 @@
 .hero .hero-type .hero-line-1 .hero-line-inner { font-style: normal; color: var(--ink); opacity: 1; font-variation-settings: 'wght' 880, 'wdth' 80; }
 .hero .hero-type .hero-line-2 .hero-line-inner { font-style: italic; color: var(--hero-type); opacity: 1; font-variation-settings: 'wght' 620, 'wdth' 84; }
 .hero .hero-line-2 { margin-top: .05em; }
-.js .hero .hero-art { left: 33%; right: 0; top: 9%; bottom: 14%; }
+.js .hero .hero-art { left: 30%; right: 0; top: 7.5%; bottom: 11%; }
 .hero .hero-copy { top: auto; bottom: 22%; width: min(320px, 26vw); font-size: 14px; }
 .hero .hero-edition { top: calc(var(--header-height) + var(--preview-height) + 18px); }
 .chapter-collection .coll-scene-num { display: none; }
@@ -45,10 +45,10 @@
 .photography-reference summary { cursor: pointer; padding-block: 6px; }
 .photography-reference a { text-decoration: underline; text-underline-offset: 3px; }
 @media (min-width:701px) {
- .chapter-finale .finale-shoe[data-finale-model] { width:min(1060px,84vw,98svh)!important; }
+ .chapter-finale .finale-shoe[data-finale-model] { width:min(1280px,92vw,116svh)!important; }
 }
 @media (min-width:701px) and (max-height:820px) {
- .chapter-finale .finale-shoe[data-finale-model] { width:min(1060px,84vw,92svh)!important; }
+ .chapter-finale .finale-shoe[data-finale-model] { width:min(1280px,92vw,108svh)!important; }
 }
 @media (min-width:701px) and (max-width:1000px) and (orientation:portrait) {
  .hero .hero-type { top:16%; width:90%; font-size:10vw; }
@@ -132,9 +132,9 @@
 .finale-profile-window { aspect-ratio: 1240 / 730; overflow: hidden; }
 .finale-profile-window img { width: 124%; left: -12%; top: -36%; }
 
-/* Materials sits on the paper field now — lift its frames off it. */
-[data-tn-editorial] .mat-frame { background: #eef4f7; }
-.mat-frame { background: #eef4f7; }
+/* Materials sits on the paper field — images at their native 4:3 ratio sit
+   directly on it. No filled frame box: contain fills exactly, edge to edge. */
+.mat-frame { background: transparent; }
 
 /* Collection sequence: licensed photography presented as consistent
    studio cards — never tinted, never sold as inventory. */
@@ -163,3 +163,615 @@
   .finale-ghost { border-color: rgba(239, 250, 255, .78); }
 }
 
+
+/* When the live 3D scene renders its own real-time contact shadow, the
+   painted CSS ellipse is retired so the two never double up. */
+.hero.has-scene .hero-model-shadow { display: none; }
+
+
+/* ----------------------------------------------------------------
+   Materials — cinematic editorial detail spreads (campaign pass).
+   Layered over refinements/recovery: authored frame ratios, ghost
+   numerals, companion inset cards, hairline rules, alternating
+   alignment. One detail study per phase of the pinned journey. */
+
+.chapter-materials .mat-panel { grid-template-columns: minmax(0, 1.14fr) minmax(0, .86fr); gap: clamp(28px, 3.6vw, 72px); }
+.chapter-materials .mat-panel-cage .mat-media { order: 2; }
+.chapter-materials .mat-panel-cage .mat-copy { order: 1; }
+.chapter-materials .mat-media { position: relative; min-width: 0; }
+.chapter-materials .mat-copy { min-width: 0; max-width: min(100%, 30rem); }
+/* The numeral straddles the frame's outer corner ABOVE the image — fully
+   readable, never clipped by the frame or buried behind the photo. */
+.chapter-materials .mat-ghost {
+  position: absolute;
+  top: -.34em;
+  left: -.12em;
+  z-index: 4;
+  font-size: clamp(112px, 12.5vw, 208px);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 118%;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(7, 54, 83, .6);
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-materials .mat-panel-cage .mat-ghost { left: auto; right: -.08em; }
+/* All studies render at the source photography's native 4:3 — contain fills
+   the frame exactly, so the shoe reads at full scale with no letterbox. */
+.chapter-materials .mat-frame { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+.chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: min(100%, 74vh); }
+.chapter-materials .mat-panel-cage .mat-media { display: flex; justify-content: flex-end; }
+.chapter-materials .mat-inset {
+  position: absolute;
+  right: -4%;
+  bottom: -6%;
+  z-index: 2;
+  width: clamp(150px, 30%, 300px);
+  margin: 0;
+  padding: 8px;
+  background: var(--surface);
+  box-shadow: 0 24px 48px rgba(7, 34, 52, .22);
+  transform: rotate(2.2deg);
+}
+.chapter-materials .mat-panel-cage .mat-inset { right: auto; left: -5%; transform: rotate(-2.6deg); }
+.chapter-materials .mat-inset img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.chapter-materials .mat-rule { width: 44px; height: 2px; background: var(--ink); margin-top: 26px; transform-origin: left center; }
+.chapter-materials .mat-copy h3 { font-size: clamp(28px, 2.9vw, 52px); letter-spacing: -.016em; line-height: 1.06; }
+/* Caption presence: the reading column carries real weight — darker ink,
+   larger body, and material chips that index what the frame shows. */
+.chapter-materials .mat-copy .mat-index { font-size: 12px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; opacity: .82; }
+.chapter-materials .mat-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chapter-materials .mat-specs li {
+  padding: 7px 13px;
+  border: 1px solid rgba(7, 54, 83, .5);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .55);
+}
+/* Study index rail: fills the outer edge with a live map of the journey. */
+.chapter-materials .mat-rail {
+  position: absolute;
+  right: clamp(10px, 1.6vw, 24px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 5;
+}
+.chapter-materials .mat-rail li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: .38;
+  transition: opacity .45s ease;
+}
+.chapter-materials .mat-rail li.is-active { opacity: 1; }
+.chapter-materials .mat-rail i {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+.chapter-materials .mat-rail em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-left: 1px solid rgba(7, 54, 83, .3);
+  padding-left: 10px;
+}
+@media (min-width: 1181px) {
+  .chapter-materials .mat-rail { display: flex; }
+}
+/* The caption is part of the spread, not a card beside it: no panel
+   background, and it locks to the frame's top line instead of floating
+   mid-column. */
+.chapter-materials.is-journey-host .mat-copy { background: none; justify-content: flex-start; padding-top: clamp(10px, 3vh, 34px); }
+
+/* Pinned journey: frame owns its ratio inside the pin box. */
+.chapter-materials.is-journey-host .mat-frame { height: auto; max-height: 66vh; aspect-ratio: 4 / 3; }
+.chapter-materials.is-journey-host .mat-panel-cage .mat-frame { width: min(100%, 62vh); aspect-ratio: 4 / 3; }
+.chapter-materials.is-journey-host .mat-ghost { font-size: clamp(104px, 12vw, 200px); }
+
+/* Mid-size hardening: keep the spread two-column down to 1180px without the
+   caption ever touching the viewport edge. */
+@media (max-width: 1440px) {
+  .chapter-materials .mat-copy { max-width: min(100%, 26rem); }
+  .chapter-materials .mat-copy p { max-width: 30ch; }
+}
+@media (max-width: 1180px) {
+  .chapter-materials .mat-panel { grid-template-columns: 1fr; gap: 26px; }
+  .chapter-materials .mat-panel-cage .mat-media { order: 0; }
+  .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
+  .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: 100%; }
+  .chapter-materials .mat-ghost { font-size: 104px; top: -.36em; }
+  .chapter-materials .mat-inset { width: 38%; bottom: -9%; right: 0; }
+  .chapter-materials .mat-panel-cage .mat-inset { left: 0; }
+}
+
+/* Mobile flow: stacked spread, quieter ghost, inset tucked in. */
+@media (max-width: 700px) {
+  .chapter-materials .mat-panel { grid-template-columns: 1fr; gap: 26px; }
+  .chapter-materials .mat-panel-cage .mat-media { order: 0; }
+  .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
+  .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: 100%; }
+  .chapter-materials .mat-ghost { font-size: 84px; top: -.38em; }
+  .chapter-materials .mat-inset { width: 38%; bottom: -9%; right: 0; }
+  .chapter-materials .mat-panel-cage .mat-inset { left: 0; }
+  .chapter-materials .mat-rail { display: none; }
+}
+
+
+/* Finale — the campaign climax (campaign pass). The stage gains a soft
+   vignette for depth; the monumental outlined word, light pool and floor
+   line are performed by the finale controller during the pinned reveal. */
+.chapter-finale .finale-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(72% 62% at 50% 42%, rgba(126, 200, 255, 0) 46%, rgba(4, 16, 28, .5) 100%);
+  pointer-events: none;
+}
+.chapter-finale .finale-word {
+  top: 40%;
+  -webkit-text-stroke: 1px rgba(239, 250, 255, .3);
+  z-index: 0;
+}
+.chapter-finale .finale-spot { top: 40%; }
+.chapter-finale .finale-floor { z-index: 0; }
+.chapter-finale .finale-inner { z-index: 2; }
+
+/* Brand — the last frame joins the engineering system: corner marks and a
+   contact shadow ground the study the same way anatomy and featured are
+   grounded. The collaborator's composition is untouched. */
+.chapter-brand .brand-line { overflow: hidden; padding: .05em 0; margin: -.05em 0; }
+.chapter-brand .brand-visual {
+  background: radial-gradient(56% 12% at 50% 88%, rgba(3, 14, 24, .4), transparent 74%), #a9d5e7;
+}
+.chapter-brand .brand-visual::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 26px;
+  height: 26px;
+  border-top: 2px solid var(--surface);
+  border-left: 2px solid var(--surface);
+  pointer-events: none;
+  z-index: 2;
+}
+.chapter-brand .brand-visual::before {
+  content: "";
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 26px;
+  height: 26px;
+  border-right: 2px solid var(--surface);
+  border-bottom: 2px solid var(--surface);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Materials copy carries more presence: a touch larger, a touch wider. */
+.chapter-materials .mat-copy p { font-size: clamp(15px, 1.22vw, 19px); line-height: 1.55; max-width: 34ch; color: var(--ink); opacity: .92; }
+
+/* Featured study responds to the pointer: a controlled lift, never a crop. */
+@media (hover: hover) and (pointer: fine) {
+  .chapter-featured .feat-frame { transition: transform .5s cubic-bezier(.22, 1, .36, 1), box-shadow .5s cubic-bezier(.22, 1, .36, 1); }
+  .chapter-featured .feat-frame:hover { transform: translateY(-6px); box-shadow: 0 34px 60px rgba(7, 34, 52, .18); }
+}
+
+
+/* ----------------------------------------------------------------
+   Defect pass — anatomy presence, technology dominance, collection
+   plates, featured lockup. All layered over the campaign pass above. */
+
+/* Anatomy — the study owns its half of the spread: a wider visual column,
+   a landscape-leaning frame (no portrait letterbox), tighter reading rows,
+   and a soft contact shadow that grounds whichever crop is active. */
+.chapter-deconstruction .decon-grid {
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: clamp(36px, 4.5vw, 72px);
+  margin-top: clamp(28px, 4.5vh, 56px);
+}
+.chapter-deconstruction .decon-frame {
+  aspect-ratio: 1.08;
+  background: radial-gradient(56% 11% at 50% 84%, rgba(10, 34, 52, .16), transparent 72%);
+}
+.chapter-deconstruction .decon-item { padding: clamp(16px, 2.4vh, 24px) 0; }
+.chapter-deconstruction .decon-introduction .chapter-intro { max-width: 40ch; }
+
+/* Technology — the product is the chapter: a taller visual stage, denser
+   soft light pooling, and body copy held readable on the deep field. */
+/* The stage wrapper carries both the visual and the rows, but the section
+   grid only names cells for the old sibling layout — the unplaced wrapper
+   broke auto-placement and pushed the kicker/heading to the section's
+   bottom, leaving the entry zone an empty dark band. Name the wrapper's
+   cell explicitly so the authored top-down order renders as designed. */
+.chapter-technology {
+  grid-template-areas: 'kicker kicker' 'heading heading' 'stage stage';
+  grid-template-rows: auto auto 1fr;
+}
+/* The visual/rows pair carries grid-area names from the old sibling
+   layout; give the stage its own matching areas so the names resolve
+   inside it instead of minting phantom tracks. */
+.chapter-technology .tech-stage {
+  grid-area: stage;
+  min-width: 0;
+  grid-template-areas: 'visual rows';
+  grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+}
+/* The intro brief fills the heading's right side so the entry band carries
+   copy instead of dead space. */
+.chapter-technology {
+  grid-template-areas: 'kicker kicker' 'heading brief' 'stage stage';
+  grid-template-rows: auto auto 1fr;
+}
+.chapter-technology .tech-brief {
+  grid-area: brief;
+  align-self: end;
+  max-width: 34ch;
+  margin: 0 0 clamp(8px, 1.6vh, 18px);
+  font-size: clamp(14px, 1.1vw, 16.5px);
+  line-height: 1.6;
+  color: rgba(233, 244, 252, .82);
+}
+/* View stack: the three studies share one stage; rows drive the crossfade. */
+.chapter-technology .tech-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.chapter-technology .tech-stack .tech-view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity .8s cubic-bezier(.4, 0, .2, 1);
+}
+.chapter-technology .tech-stack .tech-view.is-active { opacity: 1; }
+@media (max-width: 1180px) {
+  .chapter-technology { grid-template-areas: 'kicker' 'heading' 'brief' 'stage'; }
+  .chapter-technology .tech-brief { max-width: 52ch; }
+}
+.chapter-technology .tech-visual { height: clamp(400px, 46vw, 620px); }
+.chapter-technology .tech-visual::before {
+  inset: -14% -12%;
+  background: radial-gradient(58% 50% at 50% 48%, rgba(150, 214, 255, .2), rgba(150, 214, 255, 0) 74%);
+}
+.chapter-technology .tech-row p { opacity: .92; font-size: clamp(14.5px, 1.08vw, 17px); line-height: 1.6; color: rgba(233, 244, 252, .88); }
+.chapter-technology .tech-row h3 { letter-spacing: .01em; }
+.chapter-technology .tech-word { opacity: .14; }
+.chapter-technology .tech-stage { align-items: center; gap: clamp(28px, 4vw, 64px); }
+
+/* Collection — photographic editorial plates. The licensed references read
+   as magazine plates: full-bleed photography, one deep shadow, big italic
+   naming, quiet meta. No mats, no borders, no clinical rules. */
+.chapter-collection .coll-scene-visual {
+  position: relative;
+  background: transparent;
+  box-shadow: none;
+}
+.chapter-collection .coll-scene-visual::after { display: none; }
+.chapter-collection .coll-scene-visual img.photo-card {
+  background: transparent;
+  filter: none;
+}
+/* Pinned sequence: each reference is a tall photographic plate with real
+   presence — cover-cropped, floating in the field color, casting depth. */
+.chapter-collection.is-sequenced .coll-scene-figure {
+  width: 52%;
+  height: min(100%, 76svh);
+  align-self: center;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 44px 90px rgba(6, 30, 48, .34), 0 12px 28px rgba(6, 30, 48, .2);
+}
+.chapter-collection.is-sequenced .coll-scene-visual { height: 100%; }
+.chapter-collection.is-sequenced .coll-scene-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+/* Flow layout (touch/mobile): full-width plates instead of small stamps. */
+.chapter-collection:not(.is-sequenced) .coll-scene-visual {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(7, 34, 52, .18);
+}
+.chapter-collection:not(.is-sequenced) .coll-scene-visual img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  object-position: center 42%;
+}
+/* Naming carries the page: big italic with a quiet meta row beneath. */
+.chapter-collection .coll-scene-name { font-size: clamp(44px, 4.8vw, 88px); }
+.chapter-collection .coll-scene-price {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .78;
+}
+.chapter-collection .coll-scene-link { font-size: 12px; letter-spacing: .14em; }
+@media (max-width: 700px) {
+  .chapter-collection .coll-scene-name { font-size: 34px; }
+}
+
+/* Featured — the study sits in a lit studio set instead of a white void:
+   soft radial light field, contact shadow floor, spec chips under the
+   story, and a slow parallax drift so the frame never feels pasted. */
+[data-tn-editorial] .feat-frame, .feat-frame {
+  aspect-ratio: 4 / 3;
+  background: radial-gradient(118% 94% at 50% 24%, #ffffff 0%, #f0f5f9 58%, #e6eef4 100%);
+  box-shadow: 0 34px 74px rgba(7, 34, 52, .16);
+  border-radius: 2px;
+}
+.feat-frame::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 7%;
+  height: 12%;
+  background: radial-gradient(52% 100% at 50% 100%, rgba(10, 34, 52, .2), transparent 72%);
+  pointer-events: none;
+}
+.feat-grid { grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); gap: clamp(36px, 5vw, 84px); }
+.feat-frame img { width: 100%; height: 100%; object-fit: contain; }
+.chapter-featured .feat-story { font-size: clamp(15px, 1.24vw, 19px); line-height: 1.6; max-width: 40ch; }
+.chapter-featured .feat-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chapter-featured .feat-specs li {
+  padding: 7px 13px;
+  border: 1px solid rgba(7, 54, 83, .5);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .6);
+}
+
+
+/* ----------------------------------------------------------------
+   Scene-flow pass — boundary continuity, anatomy annotations,
+   featured campaign frame. The numeral language (outlined ghost
+   index) now runs 02 → 03; every chapter arrives in motion. */
+
+/* Anatomy: the outlined numeral joins the system started by the
+   materials ghosts, so chapters 02 and 03 share one voice. */
+.chapter-deconstruction .decon-visual { position: sticky; }
+.chapter-deconstruction .decon-ghost {
+  position: absolute;
+  top: -.3em;
+  right: -.05em;
+  z-index: 0;
+  font-size: clamp(170px, 21vw, 330px);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 118%;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(7, 54, 83, .3);
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-deconstruction .decon-frame { position: relative; z-index: 1; }
+
+/* Technical annotations on the anatomy frame: an engineering tag that
+   swaps with the active study. The index and hairline tie the label to
+   the imagery; hidden with the flow layout on small screens. */
+.chapter-deconstruction .decon-notes {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 3;
+  display: grid;
+}
+.chapter-deconstruction .decon-note {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 9px;
+  background: rgba(244, 249, 252, .88);
+  border: 1px solid rgba(7, 54, 83, .22);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.chapter-deconstruction .decon-note::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--ink);
+  opacity: .6;
+}
+.chapter-deconstruction .decon-note i {
+  font-style: normal;
+  font-size: 9px;
+  opacity: .55;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Featured: monumental outlined word behind the campaign frame, floor
+   shadow under the study, engineering corner marks — the same visual
+   grammar as the anatomy frame, so the two read as one system. */
+.chapter-featured { position: relative; }
+.chapter-featured .feat-word {
+  position: absolute;
+  z-index: 0;
+  left: -7%;
+  top: 34%;
+  margin: 0;
+  font-size: clamp(110px, 14vw, 250px);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 116%;
+  line-height: 1;
+  letter-spacing: -.045em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(7, 54, 83, .26);
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-featured .feat-grid { position: relative; z-index: 1; }
+.chapter-featured .feat-frame {
+  background: radial-gradient(56% 12% at 50% 88%, rgba(10, 34, 52, .16), transparent 74%);
+}
+/* Mask for the featured heading rise (chapter headings already have one). */
+.feat-title .heading-line {
+  display: block;
+  overflow: hidden;
+  padding: .05em 0;
+  margin: -.05em 0;
+}
+
+@media (max-width: 700px) {
+  .chapter-deconstruction .decon-ghost { font-size: 120px; top: -.4em; }
+  .chapter-deconstruction .decon-notes { display: none; }
+  .chapter-featured .feat-word { font-size: 24vw; left: 2%; top: 30%; }
+  .chapter-technology .tech-stage {
+    grid-template-areas: 'visual' 'rows';
+    grid-template-columns: 1fr;
+  }
+  .chapter-technology .tech-visual { height: clamp(240px, 64vw, 340px); }
+}
+
+/* ----------------------------------------------------------------
+   Brand rebuild (owner pass 6): the manifesto becomes display type
+   that reads with the scroll; the study and the value stack share an
+   editorial row; the authored line pair closes through masks. The
+   chapter keeps its deep-ink stage. */
+.chapter-brand .brand-stage {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(34px, 6vh, 64px);
+}
+.chapter-brand .brand-manifesto {
+  max-width: 26ch;
+  width: auto;
+  margin: 0;
+  font-size: clamp(34px, 4.6vw, 74px);
+  font-style: italic;
+  font-weight: 480;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  color: var(--surface);
+}
+.chapter-brand .brand-word { display: inline-block; will-change: opacity; }
+.chapter-brand .brand-editorial {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: clamp(30px, 4.5vw, 72px);
+  align-items: start;
+}
+.chapter-brand .brand-values {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.6vh, 30px);
+  padding-top: clamp(6px, 1.4vh, 18px);
+}
+.chapter-brand .brand-value {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 14px;
+  padding: clamp(16px, 2.2vh, 24px) 0;
+  border-top: 1px solid rgba(233, 244, 252, .22);
+}
+.chapter-brand .brand-value i {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  color: rgba(233, 244, 252, .6);
+  padding-top: 4px;
+}
+.chapter-brand .brand-value h3 {
+  font-size: clamp(19px, 1.6vw, 25px);
+  letter-spacing: -.01em;
+  margin-bottom: 8px;
+  color: var(--surface);
+}
+.chapter-brand .brand-value p {
+  font-size: clamp(14.5px, 1.08vw, 17px);
+  line-height: 1.6;
+  max-width: 40ch;
+  color: rgba(233, 244, 252, .84);
+}
+.chapter-brand .brand-lines {
+  display: flex;
+  flex-direction: column;
+  gap: .02em;
+  margin: 0;
+}
+.chapter-brand .brand-line { overflow: hidden; padding: .06em 0; margin: -.06em 0; }
+.chapter-brand .brand-line span { display: inline-block; will-change: transform; }
+.chapter-brand .brand-line-quiet { font-size: clamp(26px, 2.6vw, 42px); font-style: italic; font-weight: 420; color: rgba(233, 244, 252, .8); }
+.chapter-brand .brand-line-loud { font-size: clamp(64px, 7.4vw, 128px); font-weight: 840; letter-spacing: -.025em; }
+@media (max-width: 900px) {
+  .chapter-brand .brand-editorial { grid-template-columns: 1fr; }
+  .chapter-brand .brand-manifesto { max-width: 100%; }
+}
+
+/* Finale sheen: a light bar that sweeps across the monumental word as it
+   crests. Oversized and clipped by the word's own overflow, so the sweep
+   reads as a highlight passing over the letterforms. */
+.finale-word { position: relative; }
+.finale-sheen {
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  left: 0;
+  width: 26%;
+  background: linear-gradient(100deg, rgba(239, 250, 255, 0) 0%, rgba(239, 250, 255, .16) 45%, rgba(239, 250, 255, .3) 52%, rgba(239, 250, 255, .16) 60%, rgba(239, 250, 255, 0) 100%);
+  transform: skewX(-14deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Owner pass 7 — the campaign study renders are clean cutouts now, so the
+   brand study shows the whole render (contain) instead of cropping it, and
+   the chapter rail gains breathing room from the viewport edge. */
+.chapter-brand .brand-visual > img { object-fit: contain; object-position: center; }
+.journey-nav { right: clamp(14px, 2vw, 36px); }

@@ -1,3 +1,49 @@
+# Hero staging, trust layer — 2026-10-23 record
+
+This pass transformed the hero into a signature composition, added an honest merchant-editable trust layer to the product page, and verified the finale climax — building on the parallel developer's TN model integration and real-photography catalog without replacing any of it.
+
+- `npm run build`, `npm test` (56 pass), `npm run validate` (72 files), `npm run theme:check` (42 files, one pre-existing `OrphanedSnippet` warning from parallel work-in-progress, left untouched).
+
+## Hero — sandwich composition
+
+The product box now spans nearly the full viewport (`left 5% / right 4% / top 17% / bottom 16%`), so the hull-fitted 3D model renders at campaign scale instead of floating small in the right half. The headline became a sandwich: line 1 (`BEYOND`, condensed ink 880/80) above the product, line 2 (`ORDINARY.`, italic cyan 620/84) below it — `justify-content: space-between` over a `top 11.5% / bottom 25%` band — so the type interlocks with the silhouette instead of sitting beside it. A giant outlined `STRYDE` backdrop word (up to 470px, ink stroke at 16% alpha, z-index behind everything) fills the sky with brand identity and gives the product an environment to sit in; it breathes with the scrub (yPercent 4 → −3, scale 1 → 1.05), dissolves into the deconstruction handoff, and fades up on the entrance timeline. All breakpoint overrides (tablet portrait, mobile, short phones, landscape phones, reduced motion) were rebased to the new geometry. Breakpoint compositions, mid-scrub states, the handoff end state, mobile 390×844 (no horizontal overflow) and a reverse-scroll restoration (scrollY 0 with the word, foot and line transforms back at canonical start values) were verified in-browser.
+
+## Trust layer (business requirement)
+
+`main-product.liquid` gained four editable settings — sizing, delivery, returns and support notes — rendered as hairline trust rows beneath the buy controls. Each row renders only when the merchant fills it (verified: zero `product-trust` markup on the unconfigured preview product); empty defaults never invent policy claims. Locale keys added (`products.trust_*`).
+
+## Verified as already strong (parallel developer's committed work — untouched)
+
+The Collection renders distinct licensed real sneakers (New Balance 574, Air Max 90, Adidas Gazelle) with CC credits and non-purchasable disclosures; the Finale shows the TN model at 84vw with staged lighting; deconstruction/materials carry real TN photography. The one remaining Theme Check warning (`OrphanedSnippet`) belongs to that in-flight work.
+
+Screenshots: `C:\Users\LENOVO_LEGION\.zcode\cli\artifacts\session_0d48ddcb21fcc260e4a4d228c8e80b3e\` — hero initial (`call_a4118a10…`), hero mid-scrub (`call_e62edab9…`), hero handoff (`call_f2b3cb52…`), finale (`call_ee3b75d9…`), mobile hero (`call_dc56673e…`), reverse restoration (`call_b01ae1c7…`).
+
+Not verified this pass: slow/fast wheel stress through the new hero timeline (programmatic positions verified instead), tablet-width hero photography with a real configured collection, and reduced-motion runtime (structure unchanged; the backdrop word is a static CSS element with GSAP motion only). Nothing was committed, pushed or deployed.
+
+---
+# Milestone 02.6 verification record
+
+2026-10-23. The Collection was redesigned as a pinned cinematic product sequence and the Finale was strengthened, per the M02.6 art-direction brief. Implemented on the M02.5 state; this session overlapped with parallel development on the same repository (see "Concurrent development" below).
+
+- `npm run build`, `npm run validate`, `npm run theme:check`, `npm test`: all executed green at session end — 56 tests pass (20 from the M02/M02.5 line plus 36 added by parallel development), 72 theme files validate, Theme Check reports one pre-existing `OrphanedSnippet` warning from parallel work-in-progress (left untouched).
+
+## Implemented
+
+1. **Collection phase sequence (desktop):** the horizontal reel was replaced by one pinned, scrub-controlled composition — typographic intro (headline lands, then yields the stage), a per-product hero moment for each of the first three scenes with alternating asymmetric layouts (odd scenes: product left/copy right, numeral cropped at the right edge; even scenes mirrored), scroll-scrubbed per-scene field colors (`#41b4f0` / `#7fa9f6` / `#4fc4d4`, now merchant-configurable `Product 01–03 field` color settings), continuous in-phase drift on numerals and products, spatial exits (outgoing product recedes left/down-scale while the incoming enters from the opposite side), and an exit that keeps the final product on stage while the surface resolves into the Featured chapter — no blank frame between chapters.
+2. **Finale climax:** giant outlined `STRYDE` word backdrop (blooms behind the product with a slow counter-drift), larger product (560px) with a rotation-settling rise, tightened event spacing, pin extended to 200% travel. Purchase controls and the gradient-into-footer handoff unchanged.
+3. **Brand watermark centering fix:** the CSS `translate(-50%,-50%)` centering was being overwritten by GSAP transform writes (the word rendered shifted); replaced with margin-based centering compatible with the tween.
+
+Browser verification (desktop 1440×900): intro composition, settled scene 1, scene 2 mid-transition (mirrored), and the finale climax captured and reviewed; hover architecture re-targeted to scenes (same wrapper pattern); mobile 390×844 renders the flowing scene layout (no pin, no horizontal overflow, full shoes, giant numerals).
+
+Defects found and fixed during QA: the first exit implementation faded the stage to a blank surface frame before Featured arrived (exit now keeps the product visible through pin end); a navigation mistake during QA (measuring section position while pinned) initially mimicked a broken sequence — resolved by measuring from a neutral scroll position.
+
+## Concurrent development — important context
+
+During this milestone a parallel developer committed four "UI" commits (22a6593 → 2cfb251) that: committed the earlier M02/M02.5/gallery work; rewrote the collection scenes further (TN GLB model integration `assets/nike-tn-blue-white.glb`, editorial scene images, `collection.chrome_rear_note` copy, a `collection-hover.mjs` module, `signature.css`, expanded preview tooling and a 56-test suite); and added two GLB assets. This session's collection/finale controller and scene CSS were preserved through those commits. One redundant change from this session (duplicate scene-field color settings) was identified and reverted in favor of the parallel developer's implementation; no other files were touched. The theme package was intentionally NOT regenerated this session to avoid bundling the parallel developer's in-flight work.
+
+Not verified this session: a continuous reverse sweep and fast-scroll stress across the full sequence pin (QA was interrupted by concurrent browser use — phase-level scrub states were verified numerically instead), tablet-width rendering of the sequenced layout, hover against a real configured collection, reduced-motion/no-JS runtime, and the parallel developer's TN GLB integration. No deployment, publication or commit was performed by this session.
+
+---
 # Tactile materials, complete views and living finale — 2026-10-22
 
 The existing model now has stronger render-time weave and pale-surface grain, clearer normal definition and less flat lighting. Original texture maps and geometry are retained. Materials and Deconstruction show complete TN views within measured framing limits. Collection indices are smaller and fully inset. Finale's shoe is larger with transparent image padding removed from the composition, width-safe typography and a gentle float/rock loop tied to the existing pin's active state. No extra viewer, ticker or scroll controller was introduced. Merchant imagery and commerce branches are preserved.

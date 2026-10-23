@@ -29,15 +29,21 @@
       {% endfor %}
     </div>
     <div class="decon-visual">
+      <span class="decon-ghost" aria-hidden="true">02</span>
       <div class="frame decon-frame">
         <div class="decon-crop is-active" style="--zoom: {% if section.settings.use_tn_model %}1.32{% else %}1.25{% endif %}; --tx: 0%; --ty: 0%;">
-          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-profile-1400.webp' | asset_url }}" srcset="{{ 'tn-profile-700.webp' | asset_url }} 700w, {{ 'tn-profile-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — profile view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
+          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — profile view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
         </div>
         <div class="decon-crop" style="--zoom: {% if section.settings.use_tn_model %}1.25{% else %}1.35{% endif %}; --tx: 0%; --ty: 0%;">
-          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-heel-1400.webp' | asset_url }}" srcset="{{ 'tn-heel-700.webp' | asset_url }} 700w, {{ 'tn-heel-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — heel view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
+          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-heel-2800.webp' | asset_url }}" srcset="{{ 'tn-heel-1000.webp' | asset_url }} 1000w, {{ 'tn-heel-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — heel view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
         </div>
         <div class="decon-crop" style="--zoom: {% if section.settings.use_tn_model %}1{% else %}1.2{% endif %}; --tx: 0%; --ty: 0%;">
-          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-sole-1400.webp' | asset_url }}" srcset="{{ 'tn-sole-700.webp' | asset_url }} 700w, {{ 'tn-sole-1400.webp' | asset_url }} 1400w" sizes="(max-width: 700px) 92vw, 55vw" width="1400" height="1050" loading="lazy" alt="Blue and white TN — sole view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
+          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-sole-2800.webp' | asset_url }}" srcset="{{ 'tn-sole-1000.webp' | asset_url }} 1000w, {{ 'tn-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — sole view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
+        </div>
+        <div class="decon-notes" aria-hidden="true">
+          <span class="decon-note" data-decon-note><i>01</i>Upper and side structure</span>
+          <span class="decon-note" data-decon-note><i>02</i>Heel geometry and cage</span>
+          <span class="decon-note" data-decon-note><i>03</i>Outsole and cushioning</span>
         </div>
         <span class="decon-tick" aria-hidden="true"></span>
         <span class="asset-tag">{% if section.settings.use_tn_model %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</span>

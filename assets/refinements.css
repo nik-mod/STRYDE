@@ -63,7 +63,7 @@ html{scroll-padding-top:100px}
 .feat-story{line-height:1.8;font-size:14px;max-width:37ch}.feat-actions{margin-top:32px}
 .brand-lines{font-size:clamp(64px,9vw,150px);letter-spacing:-.06em}.brand-line-loud{font-style:italic}.brand-watermark{opacity:.12!important}.brand-manifesto{font-size:14px;line-height:1.85;max-width:44ch}
 .chapter-finale{padding-top:60px;background:#102b3b;padding-bottom:80px}
-.finale-stage{min-height:90svh}.finale-word{opacity:.18!important;-webkit-text-stroke:1px #effaff6b}.finale-spot{background:radial-gradient(closest-side,#b7ddef33,transparent)}
+.finale-stage{min-height:90svh}.finale-spot{background:radial-gradient(closest-side,#b7ddef33,transparent)}
 [data-tn-editorial] .finale-shoe{width:min(520px,48vw);max-height:none;margin-bottom:4px;filter:drop-shadow(0 20px 30px #0004)}
 .finale-heading{font-size:clamp(58px,7.5vw,120px);font-style:normal;letter-spacing:-.065em;line-height:.9}
 .finale-sub{font-size:13px;opacity:.72}.finale-actions .hero-cart{background:#e4f2f8;color:#102b3b}.finale-ghost{min-height:54px;font-size:12px;padding-inline:26px}
@@ -372,7 +372,6 @@ html{scroll-padding-top:100px}
 .chapter-finale .finale-heading .heading-line > span { font-variation-settings: 'wght' var(--brand-wght, 600), 'wdth' 96; }
 .finale-sub { font-size: 15px; opacity: .85; margin-top: 20px; }
 .finale-actions { margin-top: 24px; }
-.finale-word { opacity: .09!important; }
 
 /* Catalog typography serves selection; campaign type stays in the chapters. */
 .product-page .price-line { align-items: baseline; gap: 16px; font-size: 19px; font-variant-numeric: tabular-nums; }

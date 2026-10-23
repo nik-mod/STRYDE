@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { heroPose } from './motion/contracts.mjs';
 import { refinePreviewMaterial } from './scene-materials.mjs';
 import { fittedCameraZ } from './scene-framing.mjs';
 import { createSceneBridge, projectionWindow } from './scene-bridge.mjs';
+
+const smoothstep = value => { const c = Math.min(1, Math.max(0, value)); return c * c * (3 - 2 * c); };
 
 export function disposeObject(object) {
   const textures = new Set(); const materials = new Set(); const geometries = new Set();
@@ -35,7 +38,8 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const status = root.querySelector('[data-model-status]');
   const fallback = host.querySelector('.hero-image, .concept-visual, .model-fallback');
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
-  let renderer; let disposed = false; let model; let visible = false; let contextLost = false; let bridge;
+  let renderer; let disposed = false; let model; let visible = false; let contextLost = false; let bridge; let aoPool; let catcher; let envRT;
+  let shadowRig; let shadowBaseX = 0; let footprintSize = 1;
   let dirty = true; let lastProgress = null;
   let currentPose = heroPose(bus.state?.local || 0);
   const framingPoints = [], worldPoints = [];
@@ -45,13 +49,22 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const camera = new THREE.PerspectiveCamera(32, 1, .01, 100);
   camera.position.set(0, .1, 4.8);
   const rig = new THREE.Group(); scene.add(rig);
-  const ambient = new THREE.HemisphereLight(0xffffff, 0x6f9fc0, 1.05); scene.add(ambient);
+  const ambient = new THREE.HemisphereLight(0xffffff, 0x5290b8, .9); scene.add(ambient);
   const key = new THREE.DirectionalLight(0xffffff, 3.4); key.position.set(3, 4, 5); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xffffff, 2); rim.position.set(-3, 2, -2); scene.add(rim);
+  const rim = new THREE.DirectionalLight(0xbfe8ff, 2); rim.position.set(-3, 2, -2); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0x8fd2f4, .55); fill.position.set(-2.6, .7, 3.4); scene.add(fill);
   const lights = [key, rim];
+  const removeSet = () => {
+    if (aoPool) { shadowRig?.remove(aoPool); aoPool.geometry.dispose(); aoPool.material.map?.dispose(); aoPool.material.dispose(); aoPool = null; }
+    if (shadowRig) { scene.remove(shadowRig); shadowRig = null; }
+    if (catcher) { scene.remove(catcher); catcher.geometry.dispose(); catcher.material.dispose(); catcher = null; }
+    if (envRT) { scene.environment = null; envRT.dispose(); envRT = null; }
+  };
   const cleanup = () => {
     if (disposed) return; disposed = true;
     unsubscribe(); removeFrame(); observer?.disconnect(); resizeObserver?.disconnect(); bridge?.dispose();
+    root.classList.remove('has-scene');
+    removeSet();
     renderer?.domElement.removeEventListener('webglcontextlost', onLost);
     renderer?.domElement.removeEventListener('webglcontextrestored', onRestored);
     if (model) disposeObject(model);
@@ -79,7 +92,8 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       const width = host.clientWidth, height = host.clientHeight;
       if (!width || !height) return;
       // Bound GPU fill cost on large/retina screens without changing CSS size.
-      const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1600000 / (width * height)));
+      // Never below native 1x — sub-native renders visibly blur the product.
+      const ratio = Math.max(1, Math.min(devicePixelRatio || 1, 2, Math.sqrt(4200000 / (width * height))));
       renderer.setPixelRatio(ratio); renderer.setSize(width, height, false);
       viewportWidth = width; viewportHeight = height;
       camera.aspect = width / height; camera.updateProjectionMatrix(); dirty = true;
@@ -110,6 +124,23 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       }
     });
     model.rotation.y += THREE.MathUtils.degToRad(Number(root.dataset.modelYaw) || 0);
+    // Studio grounding: a dense soft shadow map under the product. The tight
+    // ortho bounds keep texels concentrated on the silhouette so the penumbra
+    // reads as studio softness rather than a blur halo.
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.camera.near = .5;
+    key.shadow.camera.far = 16;
+    key.shadow.camera.left = -3.2;
+    key.shadow.camera.right = 3.2;
+    key.shadow.camera.top = 3.2;
+    key.shadow.camera.bottom = -3.2;
+    key.shadow.radius = 5;
+    key.shadow.bias = -.0003;
+    key.shadow.normalBias = .02;
+    model.traverse(node => { if (node.isMesh) node.castShadow = true; });
     const bounds = new THREE.Box3().setFromObject(model); const size = bounds.getSize(new THREE.Vector3()); const center = bounds.getCenter(new THREE.Vector3());
     if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty model');
     model.position.sub(center);
@@ -126,6 +157,57 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     const mobileFit = innerWidth <= 700 ? .82 : 1;
     const scale = ((Number(root.dataset.modelSize) || 2.2) * mobileFit) / Math.max(size.x, size.y, size.z);
     rig.scale.setScalar(scale); rig.add(model);
+    // Grounding without pedestal geometry: a real-time directional contact
+    // shadow layered with a painted occlusion pool that darkens toward the
+    // sole. Both are radial and alpha-faded — no hard edges, no ornament.
+    // Nothing sits under the product but light and its shadow.
+    {
+      const worldBounds = new THREE.Box3().setFromObject(rig);
+      const footprint = Math.max(worldBounds.max.x - worldBounds.min.x, worldBounds.max.z - worldBounds.min.z);
+      footprintSize = footprint;
+      const contactY = worldBounds.min.y - Math.max(.04, footprint * .02);
+      catcher = new THREE.Mesh(
+        new THREE.CircleGeometry(footprint * .9, 72),
+        new THREE.ShadowMaterial({ opacity: .24, color: 0x062030 }),
+      );
+      catcher.rotation.x = -Math.PI / 2;
+      catcher.position.y = contactY;
+      catcher.receiveShadow = true;
+      catcher.renderOrder = 1;
+      const occlusion = document.createElement('canvas');
+      occlusion.width = occlusion.height = 256;
+      const context = occlusion.getContext('2d');
+      const gradient = context.createRadialGradient(128, 128, 30, 128, 128, 128);
+      gradient.addColorStop(0, 'rgba(6, 32, 48, .24)');
+      gradient.addColorStop(.55, 'rgba(6, 32, 48, .1)');
+      gradient.addColorStop(1, 'rgba(6, 32, 48, 0)');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 256, 256);
+      // The occlusion pool is an ellipse along the shoe's ground axis, carried
+      // by a rig that tracks the pose yaw and tilt each frame — the shadow
+      // stays under the whole silhouette (toe included) and softens as the
+      // shoe lifts, instead of pooling as a detached dark disc.
+      shadowBaseX = (worldBounds.min.x + worldBounds.max.x) / 2;
+      shadowRig = new THREE.Group();
+      shadowRig.position.set(shadowBaseX, contactY + .0015, (worldBounds.min.z + worldBounds.max.z) / 2);
+      aoPool = new THREE.Mesh(
+        new THREE.PlaneGeometry(1, 1),
+        new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(occlusion), transparent: true, depthWrite: false }),
+      );
+      aoPool.rotation.x = -Math.PI / 2;
+      aoPool.scale.set(footprint * 1.06, footprint * .74, 1);
+      aoPool.renderOrder = 2;
+      shadowRig.add(aoPool);
+      scene.add(catcher, shadowRig);
+      // Studio reflections: a soft neutral environment gives the materials real
+      // response instead of the previous dead lambert look.
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      envRT = pmrem.fromScene(new RoomEnvironment(), .04);
+      scene.environment = envRT.texture;
+      scene.environmentIntensity = .32;
+      pmrem.dispose();
+      root.classList.add('has-scene');
+    }
     // The rig follows the same authored five-phase pose the image fallback
     // scrubs against: rotation, lens, camera height and lighting derive from
     // heroPose(progress). Distance fits the silhouette instead of stacking a
@@ -139,6 +221,22 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
       key.intensity = pose.keyIntensity;
       rim.intensity = pose.rimIntensity;
+      // The grounding performs with the pose: through the handoff phase the
+      // shadow and occlusion release together so the profile projection
+      // carries the shoe alone.
+      const fade = smoothstep((state.local - .74) / .13);
+      if (catcher) catcher.material.opacity = .24 * (1 - fade);
+      if (aoPool) aoPool.material.opacity = 1 - fade;
+      if (shadowRig) {
+        // Shadow performs with the pose: yaw-aligned ellipse, slight shift
+        // toward the contact side under roll, and a lift-shrink so the pool
+        // reads lighter as the sole leaves the ground.
+        shadowRig.rotation.y = pose.rotationY;
+        const tilt = Math.min(1, Math.abs(pose.rotationZ) / .56);
+        shadowRig.scale.setScalar(1 - .26 * tilt);
+        shadowRig.position.x = shadowBaseX + Math.sin(pose.rotationZ) * footprintSize * .08;
+        if (aoPool) aoPool.material.opacity = (1 - fade) * (1 - .28 * tilt);
+      }
       dirty = true;
     });
     removeFrame = scheduler.add(() => {
@@ -150,7 +248,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       if (handoff?.active) {
         const width = Math.max(1, Math.round(handoff.width)), height = Math.max(1, Math.round(handoff.height));
         if (width !== viewportWidth || height !== viewportHeight) {
-          const ratio = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1600000 / (width * height)));
+          const ratio = Math.max(1, Math.min(devicePixelRatio || 1, 2, Math.sqrt(4200000 / (width * height))));
           renderer.setPixelRatio(ratio); renderer.setSize(width, height, false);
           viewportWidth = width; viewportHeight = height;
           camera.aspect = width / height; camera.updateProjectionMatrix();
@@ -175,7 +273,10 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       if (framingPoints.length) {
         rig.updateMatrixWorld(true);
         for (let i = 0; i < framingPoints.length; i++) worldPoints[i].copy(framingPoints[i]).applyMatrix4(rig.matrixWorld);
-        camera.position.z = fittedCameraZ(worldPoints, { fov: camera.fov, aspect: camera.aspect, y: camera.position.y });
+        // Frame the silhouette: with no set geometry there is nothing else
+        // that must stay in frame, so the product owns the fit entirely.
+        const fit = { fov: camera.fov, aspect: camera.aspect, y: camera.position.y };
+        camera.position.z = fittedCameraZ(worldPoints, fit);
         if (handoff?.active && handoff.footprint && handoff.projectionMix > 0) {
           camera.updateMatrixWorld();
           let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;

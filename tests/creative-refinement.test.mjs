@@ -53,7 +53,7 @@ test('Technology prioritizes editorial override, then actual product imagery, be
 test('Technology without a selected product discloses model and concept fallback images', async () => {
   for (const product of [undefined, null, '']) {
     const model = await renderChapter('technology', { use_tn_model: true, image: '', product, row_1_title: 'Merchant detail' });
-    assert.match(model, /src="\/assets\/tn-profile-1400.webp"/);
+    assert.match(model, /src="\/assets\/tn-profile-2800.webp"/);
     assert.match(model, /hero.model_preview/);
     assert.doesNotMatch(model, /src=""|assets.concept_tag/);
     const concept = await renderChapter('technology', { use_tn_model: false, image: null, product, row_1_title: 'Merchant detail' });
@@ -94,10 +94,13 @@ test('Brand empty campaign settings retain editable story and a disclosed visual
       assert.match(html, /Closer &amp; clearer/);
       assert.match(html, /&lt;em&gt;Move&lt;\/em&gt;/);
       assert.match(html, /Stay curious\./);
-      assert.match(html, /A story &lt;script&gt;unsafe\(\)&lt;\/script&gt; &amp; a detail\./);
+      // The manifesto renders word by word; each fragment must still escape.
+      assert.match(html, /<span class="brand-word">A<\/span> <span class="brand-word">story<\/span>/);
+      assert.match(html, /<span class="brand-word">&lt;script&gt;unsafe\(\)&lt;\/script&gt;<\/span>/);
+      assert.match(html, /<span class="brand-word">&amp;<\/span> <span class="brand-word">a<\/span> <span class="brand-word">detail\.<\/span>/);
       assert.doesNotMatch(html, /<script>|<em>|src=""/);
       assert.match(html, use_tn_model ? /hero.model_preview/ : /assets.concept_tag/);
-      assert.match(html, use_tn_model ? /tn-detail-1400.webp/ : /data-concept-image="material_2"/);
+      assert.match(html, use_tn_model ? /tn-detail-2800.webp/ : /data-concept-image="material_2"/);
     }
   }
 });
@@ -127,7 +130,7 @@ test('Materials empty detail slots disclose each model or concept image independ
   const model = await renderChapter('materials', { use_tn_model: true, panel_1_image: '', panel_2_image: null });
   assert.equal((model.match(/data-macro-image/g) || []).length, 3);
   assert.equal((model.match(/hero.model_preview/g) || []).length, 3);
-  for (const view of ['detail', 'profile', 'sole']) assert.match(model, new RegExp(`src="/assets/tn-${view}-1400.webp"`));
+  for (const view of ['detail', 'profile', 'sole']) assert.match(model, new RegExp(`src="/assets/tn-${view}-2800.webp"`));
   assert.doesNotMatch(model, /src=""|assets.concept_tag/);
   const concept = await renderChapter('materials', { use_tn_model: false });
   assert.equal((concept.match(/assets.concept_tag/g) || []).length, 3);
@@ -178,7 +181,7 @@ test('blank Brand lines create no empty display rows while configured story and 
       assert.equal((html.match(/class="brand-line /g) || []).length, 2);
       assert.doesNotMatch(html, /class="brand-line [^"]*"><span>\s*<\/span>/);
       assert.match(html, /merchant-campaign.jpg/);
-      assert.match(html, /Merchant story/);
+      assert.match(html, /<span class="brand-word">Merchant<\/span> <span class="brand-word">story<\/span>/);
       if (omitted !== 1) assert.match(html, /First &amp; form/);
     }
   }

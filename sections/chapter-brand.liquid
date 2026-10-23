@@ -1,24 +1,51 @@
 <section id="chapter-brand" class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}" aria-labelledby="BrandHeading-{{ section.id }}">
+  <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
   <div class="brand-stage" data-brand-stage>
-    <figure class="brand-visual frame">
-      {% if section.settings.image != blank %}
-        {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '700, 1200, 1800', sizes: '(max-width: 700px) 100vw, 55vw', alt: section.settings.image.alt }}
-        {% if section.settings.image_is_concept %}<figcaption class="asset-tag">{{ 'assets.concept_tag' | t }}</figcaption>{% endif %}
-      {% elsif section.settings.use_tn_model %}
-        <img src="{{ 'tn-detail-1400.webp' | asset_url }}" srcset="{{ 'tn-detail-700.webp' | asset_url }} 700w, {{ 'tn-detail-1400.webp' | asset_url }} 1400w" width="1400" height="1050" sizes="(max-width: 700px) 100vw, 55vw" loading="lazy" data-brand-model alt="Blue upper and white wave cage, an editorial crop of the TN model render">
-        <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
-      {% else %}
-        {% render 'presentation-image', slot: 'material_2' %}
-      {% endif %}
-    </figure>
+    {%- comment -%} The manifesto becomes the chapter's display type: each word
+      arrives with the scroll, so the statement performs instead of sitting. {%- endcomment -%}
+    <h2 class="brand-manifesto" id="BrandHeading-{{ section.id }}" data-brand-manifesto>
+      {%- assign manifesto_words = section.settings.manifesto | split: ' ' -%}
+      {% for word in manifesto_words %}<span class="brand-word">{{ word | escape }}</span> {% endfor %}
+    </h2>
     <div class="brand-editorial">
-    <h2 class="brand-lines" id="BrandHeading-{{ section.id }}">
+      <figure class="brand-visual frame" data-brand-visual>
+        {% if section.settings.image != blank %}
+          {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '700, 1200, 1800', sizes: '(max-width: 700px) 100vw, 46vw', alt: section.settings.image.alt }}
+          {% if section.settings.image_is_concept %}<figcaption class="asset-tag">{{ 'assets.concept_tag' | t }}</figcaption>{% endif %}
+        {% elsif section.settings.use_tn_model %}
+          <img src="{{ 'tn-detail-2800.webp' | asset_url }}" srcset="{{ 'tn-detail-1000.webp' | asset_url }} 1000w, {{ 'tn-detail-2800.webp' | asset_url }} 2800w" width="2800" height="2100" sizes="(max-width: 700px) 100vw, 46vw" loading="lazy" data-brand-model alt="Blue upper and white wave cage, an editorial crop of the TN model render">
+          <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
+        {% else %}
+          {% render 'presentation-image', slot: 'material_2' %}
+        {% endif %}
+      </figure>
+      <div class="brand-values" data-brand-values>
+        {% for index in (1..3) %}
+          {% liquid
+            assign title_key = 'value_' | append: index | append: '_title'
+            assign body_key = 'value_' | append: index | append: '_body'
+            assign title = section.settings[title_key]
+            assign body = section.settings[body_key]
+          %}
+          {% if title != blank %}
+          <div class="brand-value">
+            <i aria-hidden="true">0{{ index }}</i>
+            <div>
+              <h3>{{ title | escape }}</h3>
+              <p>{{ body | escape }}</p>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {%- comment -%} The closing statement keeps the authored line pair, performed
+      through overflow masks. {%- endcomment -%}
+    <p class="brand-lines" aria-hidden="true">
       {% if section.settings.line_1 != blank %}<span class="brand-line brand-line-quiet"><span>{{ section.settings.line_1 | escape }}</span></span>{% endif %}
       {% if section.settings.line_2 != blank %}<span class="brand-line brand-line-loud"><span>{{ section.settings.line_2 | escape }}</span></span>{% endif %}
       {% if section.settings.line_3 != blank %}<span class="brand-line brand-line-quiet"><span>{{ section.settings.line_3 | escape }}</span></span>{% endif %}
-    </h2>
-    <p class="brand-manifesto">{{ section.settings.manifesto | escape }}</p>
-    </div>
+    </p>
   </div>
 </section>
 {% schema %}
@@ -28,10 +55,17 @@
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial image","default":false},
     {"type":"image_picker","id":"image","label":"Campaign image","info":"Use an approved campaign or detail image. Empty slots show a disclosed model or concept study."},
     {"type":"checkbox","id":"image_is_concept","label":"Campaign image is concept art","default":false},
-    {"type":"text","id":"line_1","label":"Line one","default":"Start"},
-    {"type":"text","id":"line_2","label":"Line two","default":"with the line."},
-    {"type":"text","id":"line_3","label":"Line three"},
-    {"type":"textarea","id":"manifesto","label":"Manifesto","default":"White curves divide the blue panels. The same line carries from the forefoot to the heel \u2014 a small detail that holds the whole silhouette together."}
+    {"type":"text","id":"kicker","label":"Kicker","default":"07 — The brand"},
+    {"type":"textarea","id":"manifesto","label":"Manifesto (displayed word by word)","default":"We study silhouettes before we sell them. Every line you scrolled was drawn from the profile up — form first, decoration later, nothing invented."},
+    {"type":"text","id":"value_1_title","label":"Value 01 title","default":"Perspective first"},
+    {"type":"textarea","id":"value_1_body","label":"Value 01 body","default":"Each silhouette is read from the profile up. Form leads; finish follows."},
+    {"type":"text","id":"value_2_title","label":"Value 02 title","default":"Study, not stock"},
+    {"type":"textarea","id":"value_2_body","label":"Value 02 body","default":"References are credited photographs and renders, clearly labeled — never inventory."},
+    {"type":"text","id":"value_3_title","label":"Value 03 title","default":"Honest by construction"},
+    {"type":"textarea","id":"value_3_body","label":"Value 03 body","default":"Claims stay editable and checkable. The store only sells what can be verified."},
+    {"type":"text","id":"line_1","label":"Closing line one","default":"Start"},
+    {"type":"text","id":"line_2","label":"Closing line two","default":"with the line."},
+    {"type":"text","id":"line_3","label":"Closing line three"}
   ],
   "presets":[{"name":"Brand story"}]
 }

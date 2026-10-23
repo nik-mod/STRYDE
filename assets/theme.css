@@ -802,16 +802,62 @@ a.hero-name:hover {
   will-change: transform;
   margin: clamp(30px, 5vh, 60px) 0 clamp(40px, 7vh, 90px);
 }
+.tech-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+  gap: clamp(28px, 4.5vw, 80px);
+  align-items: center;
+  margin-top: clamp(34px, 6vh, 72px);
+}
+.tech-visual {
+  position: relative;
+  margin: 0;
+}
+/* Studio light pooling behind the product on the dark field — the stage
+   spotlight that makes the silhouette read as presented, not floating. */
+.tech-visual::before {
+  content: "";
+  position: absolute;
+  inset: -10% -9%;
+  background: radial-gradient(54% 46% at 50% 46%, rgba(150, 214, 255, .17), rgba(150, 214, 255, 0) 72%);
+  pointer-events: none;
+}
+.tech-visual img,
+.tech-visual > .presentation-image {
+  position: relative;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 46px 36px rgba(0, 0, 0, .55));
+}
+.tech-visual .asset-tag {
+  position: absolute;
+  left: 2px;
+  bottom: -4px;
+  color: var(--surface);
+  opacity: .55;
+}
+.tech-image-pending {
+  padding: 40px 0;
+  font-size: 13px;
+  opacity: .7;
+}
 .tech-rows {
   display: grid;
+  align-content: center;
 }
 .tech-row {
   display: grid;
-  grid-template-columns: 90px 1fr minmax(0, 1.1fr);
-  gap: clamp(18px, 3vw, 48px);
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 6px 18px;
   align-items: baseline;
-  padding: clamp(24px, 4vh, 40px) 0;
+  padding: clamp(18px, 3vh, 32px) 0;
   border-top: 1px solid var(--rule-light);
+}
+.tech-row h3 {
+  grid-column: 2;
+}
+.tech-row p {
+  grid-column: 2;
 }
 .tech-row:last-child {
   border-bottom: 1px solid var(--rule-light);
@@ -1796,6 +1842,10 @@ a.hero-name:hover {
   }
   .decon-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .tech-stage {
+    grid-template-columns: 1fr;
+    gap: 30px;
   }
   .tech-row {
     grid-template-columns: 64px 1fr;
@@ -2818,4 +2868,33 @@ body .journey-nav {
     transform: none;
     transition: none;
   }
+}
+
+/* Product trust rows — editable merchant notes, hidden when unset. */
+.product-trust {
+  margin-top: 34px;
+  border-top: 1px solid var(--rule);
+}
+.product-trust-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.product-trust-row h3 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .6;
+}
+.product-trust-row p {
+  margin: 0;
+  opacity: .85;
+}
+@media (max-width: 700px) {
+  .product-trust-row { grid-template-columns: 1fr; gap: 4px; }
 }

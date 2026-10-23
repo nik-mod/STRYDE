@@ -8,11 +8,11 @@ import { renderPreview } from '../tools/preview.mjs';
 
 function listing(html) {return html.match(/<section\b[^>]*\bcollection-page\b[\s\S]*?<\/section>/)?.[0] || '';}
 
-test('local all-products page supplies six licensed photographic references, credited and non-commerce',async()=>{
+test('local all-products page supplies every licensed photographic reference, credited and non-commerce',async()=>{
   const html=listing(await renderPreview('/collections/all'));
   assert(html,'Collection section missing');
-  assert.equal((html.match(/data-photography-reference/g)||[]).length,6);
-  assert.equal(new Set(photographyCatalog.map(p=>p.name)).size,6);
+  assert.equal((html.match(/data-photography-reference/g)||[]).length,8);
+  assert.equal(new Set(photographyCatalog.map(p=>p.name)).size,8);
   for(const photo of photographyCatalog){
     assert(html.includes(photo.name));
     assert(html.includes(photo.asset));
@@ -20,7 +20,7 @@ test('local all-products page supplies six licensed photographic references, cre
     assert(html.includes(photo.source));
     assert((await stat(`assets/${photo.asset}`)).size>1000);
   }
-  assert.equal((html.match(/Photographic reference · Not store inventory/g)||[]).length,6);
+  assert.equal((html.match(/Photographic reference · Not store inventory/g)||[]).length,8);
   assert.doesNotMatch(html,/<form|href="\/products\/|\$|name="add"|name="checkout"|name="sort_by"|No products found/);
   assert.match(html,/Not store inventory or available for purchase/);
 });
