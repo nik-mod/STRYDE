@@ -296,3 +296,45 @@ Final Chromium review covered 1440×1000, 1366×768, 768×1024, 390×844 and 375
 Reverse-scroll restoration, five repeated section reloads, runtime reduced-motion changes, sold-out/no-JS variant behavior and the synthetic GLB context-loss/recovery/disposal checks passed again. Screenshots are named `stryde-editorial-*.png` in the chat's visualization directory. These checks do not certify authentic merchandise rendering or connected-store checkout.
 
 The first independent editorial review passed and identified two focused refinements: repeated collection navigation and caption/sole clearance at tablet and short-phone sizes. The center anchor and duplicate lower strip were removed; the primary hero and header shopping links remain. A 28px reserved caption band now separates the complete concept image from its plain disclosure across breakpoints. The image and caption remain in the same fallback wrapper. Build, eleven foundation tests and Theme Check were rerun successfully after those changes.
+
+## Pass 8 — transparent renders, handoff and end-state life
+
+Owner screenshots showed the re-rendered TN studies as opaque white rectangles
+("cropped pictures"), a washed shoe with a ghost double during the hero→anatomy
+handoff, and an empty dead finale stage. Root causes found and fixed:
+
+- The 2800/1000 study renders were produced with an opaque white clear color.
+  `tools/render-tn.mjs` now renders with `alpha: true` and a transparent clear;
+  all twelve views were re-rendered and re-harvested (probe: shoe alpha occupies
+  20–251 × 56–161 of a 280×210 sample, i.e. real transparent margins).
+- `profileFootprint` in `src/scene-bridge.mjs` was re-measured for the new
+  2800×2100 profile render (left 200, top 560, size 2320×1060 in render space).
+- The bridge dissolve no longer crossfades two semi-transparent shoes: the
+  static study snaps fully opaque at alignment completion (progress .8) and the
+  live canvas then fades away on top of it. The deconstruction crop/annotation
+  swaps are staggered (out completes before in starts), removing the double-shoe
+  ghost mid-chapter.
+- Materials panels now show full-shoe views (angle / profile / sole) at native
+  fit with macro studies moved to the insets, and the study rail was moved clear
+  of the fixed chapter numeral rail after it clipped at the viewport edge.
+- Featured: the dark floor-smudge override was removed (studio radial retained,
+  one soft contact ellipse), and an editable detail ledger (Label: Value rows)
+  fills the right column.
+- Hero: a time-based idle float/sway on the resting 3D model (amplitude dies as
+  scrolling starts and during the handoff) plus a chapter-index ticker along the
+  bottom edge (CSS marquee, reduced-motion guarded, fades on scroll, hidden on
+  mobile).
+- Finale: the monumental word is present as texture at pin arrival (no dead dark
+  frame), the resting float gained a sway, the word drifts slowly at rest, and a
+  pre-existing layout bug was fixed where the finale grid sized its implicit
+  track to the action row's max-content and shoved the whole composition
+  off-center (clipped on mobile).
+
+Recovery note: OneDrive sync reverted ten files (all chapter sections,
+signature.css, chapters.mjs, hero.mjs, refinement tests) to pre-phase-6 state
+mid-session; they were restored from the last commit after marker audits
+confirmed HEAD held the newer work. Verification screenshots (`p8-desktop-*`,
+`p8-mobile-*`) were captured with stepped wheel scrolling so Lenis and pinned
+scenes behave as for a real reader. `npm run build`, 56/56 tests, structural
+validation (88 files) and Theme Check (one pre-existing orphaned-snippet
+warning) pass. Not tested: connected-store checkout, real merchandise.

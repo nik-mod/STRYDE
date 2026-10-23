@@ -6,14 +6,15 @@ export function handoffProgress(scroll, start, end) {
   return clamp((scroll - start) / (end - start));
 }
 
-// Measured alpha bounds of the bundled 1400×1050 profile render. The DOM image
+// Measured alpha bounds of the bundled 2800×2100 transparent profile render
+// (probe space 280×210 → ×10: left 200, top 560, size 2320×1060). The DOM image
 // rectangle already includes its live crop/translation; contain adds padding.
 export function profileFootprint(rect) {
-  const scale = Math.min(rect.width / 1400, rect.height / 1050);
+  const scale = Math.min(rect.width / 2800, rect.height / 2100);
   return {
-    left: rect.left + (rect.width - 1400 * scale) / 2 + 226 * scale,
-    top: rect.top + (rect.height - 1050 * scale) / 2 + 330 * scale,
-    width: 920 * scale, height: 415 * scale,
+    left: rect.left + (rect.width - 2800 * scale) / 2 + 200 * scale,
+    top: rect.top + (rect.height - 2100 * scale) / 2 + 560 * scale,
+    width: 2320 * scale, height: 1060 * scale,
   };
 }
 
@@ -105,6 +106,10 @@ export function createSceneBridge({ root, host, canvas, environment = window }) 
       const viewportHeight = carryHeight + (targetRect.height - carryHeight) * landing;
       const image = target.querySelector?.('.decon-crop.is-active > img');
       const footprint = image ? profileFootprint(image.getBoundingClientRect()) : null;
+      // Alignment (landing) completes at progress .8. Only then does the static
+      // image snap fully opaque UNDER the still-opaque overlay; the canvas then
+      // fades away on top of it. Nothing is ever semi-transparent over the page,
+      // and the aligned stack makes the swap read as one continuous shoe.
       const dissolve = smooth((progress - .8) / .2);
       Object.assign(overlay.style, {
         left: `${left}px`, top: `${top}px`, width: `${viewportWidth}px`, height: `${viewportHeight}px`, opacity: String(1 - dissolve),
@@ -112,7 +117,7 @@ export function createSceneBridge({ root, host, canvas, environment = window }) 
       if (!overlay.isConnected) document.body.append(overlay);
       if (canvas.parentNode !== overlay) overlay.append(canvas);
       Object.assign(canvas.style, { display: 'block', width: '100%', height: '100%' });
-      target.style.opacity = String(dissolve);
+      target.style.opacity = dissolve > 0 ? '1' : '0';
       state = { active: true, changed: true, progress, mix: smooth(progress / .65), width: viewportWidth, height: viewportHeight,
         left, top, footprint, projectionMix: landing };
       return state;

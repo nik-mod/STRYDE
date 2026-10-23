@@ -21,6 +21,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   const foot = root.querySelector('[data-hero-foot]');
   const cue = root.querySelector('[data-hero-cue]');
   const cueLine = root.querySelector('[data-hero-cue-line]');
+  const ticker = root.querySelector('[data-hero-ticker]');
   if (!stage) return;
 
   const travel = mobile ? .65 : 1.05;
@@ -62,6 +63,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
     .fromTo(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0 }, { scale: hasModel ? 1.03 : 1, xPercent: 0, yPercent: 0, rotation: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
     .to(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0, duration: .44, ease: 'none' }, .46)
     .to(cue, { opacity: 0, duration: .12 }, .05)
+    .to(ticker, { opacity: 0, duration: .14 }, .06)
     .to(ring, { opacity: 0, duration: .2 }, .1)
     .fromTo(stage, { backgroundColor: paper }, { backgroundColor: surface, immediateRender: true, duration: 1, ease: progress => Math.max(0, (progress - .7) / .3) }, 0);
 

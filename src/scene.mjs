@@ -39,7 +39,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const fallback = host.querySelector('.hero-image, .concept-visual, .model-fallback');
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
   let renderer; let disposed = false; let model; let visible = false; let contextLost = false; let bridge; let aoPool; let catcher; let envRT;
-  let shadowRig; let shadowBaseX = 0; let footprintSize = 1;
+  let shadowRig; let shadowBaseX = 0; let footprintSize = 1; let floatRig = null;
   let dirty = true; let lastProgress = null;
   let currentPose = heroPose(bus.state?.local || 0);
   const framingPoints = [], worldPoints = [];
@@ -156,7 +156,13 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     for (let i = 0; i < framingPoints.length; i++) worldPoints.push(new THREE.Vector3());
     const mobileFit = innerWidth <= 700 ? .82 : 1;
     const scale = ((Number(root.dataset.modelSize) || 2.2) * mobileFit) / Math.max(size.x, size.y, size.z);
-    rig.scale.setScalar(scale); rig.add(model);
+    rig.scale.setScalar(scale);
+    // Idle life lives on its own inner group: the authored pose (and the
+    // chapter handoff) keep driving the rig unchanged, while this group adds
+    // a time-based float that fades out the moment scrolling takes over.
+    floatRig = new THREE.Group();
+    floatRig.add(model);
+    rig.add(floatRig);
     // Grounding without pedestal geometry: a real-time directional contact
     // shadow layered with a painted occlusion pool that darkens toward the
     // sole. Both are radial and alpha-faded — no hard edges, no ornament.
@@ -243,6 +249,19 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       if (document.hidden || contextLost || disposed) return;
       const handoff = bridge?.update();
       if (handoff?.changed) dirty = true;
+      // Idle float: a slow breath on the resting hero. Amplitude dies out as
+      // soon as scrolling begins and during the chapter handoff, so the pose
+      // contract and the profile alignment stay pixel-exact when they matter.
+      if (floatRig && visible) {
+        const local = bus.state?.local || 0;
+        const rest = (1 - smoothstep(local / .16)) * (1 - (handoff?.mix || 0)) * (1 - (handoff?.projectionMix || 0));
+        if (rest > 0) {
+          const t = performance.now() / 1000;
+          floatRig.position.y = Math.sin(t * 1.05) * .028 * rest;
+          floatRig.rotation.z = Math.sin(t * .62 + 1.2) * .022 * rest;
+          dirty = true;
+        }
+      }
       if (!dirty || (!visible && !handoff?.active)) return;
       if (camera.view?.enabled) camera.clearViewOffset();
       if (handoff?.active) {

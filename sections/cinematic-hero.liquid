@@ -85,6 +85,25 @@
       <span>{{ 'hero.scroll' | t }}</span>
       <span class="hero-cue-line" data-hero-cue-line></span>
     </div>
+
+    <div class="hero-ticker" aria-hidden="true" data-hero-ticker>
+      <div class="hero-ticker-track">
+        {% for pass in (1..2) %}
+          {% for index in (2..8) %}
+            {% case index %}
+              {% when 2 %}{% assign label = 'Anatomy' %}
+              {% when 3 %}{% assign label = 'Materials' %}
+              {% when 4 %}{% assign label = 'Technology' %}
+              {% when 5 %}{% assign label = 'Collection' %}
+              {% when 6 %}{% assign label = 'Featured' %}
+              {% when 7 %}{% assign label = 'Brand' %}
+              {% when 8 %}{% assign label = 'Finale' %}
+            {% endcase %}
+            <span class="hero-ticker-item">{{ index | prepend: '0' | slice: -2, 2 }} — {{ label }}</span>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </section>
 {% schema %}

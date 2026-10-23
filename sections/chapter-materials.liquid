@@ -9,7 +9,7 @@
         <span class="mat-ghost" aria-hidden="true">01</span>
         <div class="frame mat-frame">
           {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
-            <img src="{{ 'tn-detail-2800.webp' | asset_url }}" srcset="{{ 'tn-detail-1000.webp' | asset_url }} 1000w, {{ 'tn-detail-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1.1; --tx: 0%; --ty: 0%;" alt="Close view of the blue gradient upper and white wave cage, rendered from the TN model">
+            <img src="{{ 'tn-angle-2800.webp' | asset_url }}" srcset="{{ 'tn-angle-1000.webp' | asset_url }} 1000w, {{ 'tn-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Three-quarter view of the blue gradient upper and white wave cage, rendered from the TN model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_1', image: section.settings.panel_1_image, image_is_concept: section.settings.panel_1_image_is_concept, crop_style: '--zoom: 2.9; --tx: 12%; --ty: -18%;' %}
@@ -17,7 +17,7 @@
         </div>
         {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
         <figure class="mat-inset" aria-hidden="true" data-mat-inset>
-          <img src="{{ 'tn-heel-2800.webp' | asset_url }}" srcset="{{ 'tn-heel-1000.webp' | asset_url }} 1000w, {{ 'tn-heel-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
+          <img src="{{ 'tn-detail-2800.webp' | asset_url }}" srcset="{{ 'tn-detail-1000.webp' | asset_url }} 1000w, {{ 'tn-detail-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
         </figure>
         {% endif %}
       </div>
@@ -39,7 +39,7 @@
         <span class="mat-ghost" aria-hidden="true">02</span>
         <div class="frame mat-frame">
           {% if section.settings.use_tn_model and section.settings.panel_2_image == blank %}
-            <img src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1.12; --tx: 0%; --ty: 0%;" alt="Close profile of the white cage and sculpted midsole, rendered from the TN model">
+            <img src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Side profile of the white wave cage and sculpted midsole, rendered from the TN model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_2', image: section.settings.panel_2_image, image_is_concept: section.settings.panel_2_image_is_concept, crop_style: '--zoom: 1; --tx: 0%; --ty: 0%;' %}
@@ -69,7 +69,7 @@
         <span class="mat-ghost" aria-hidden="true">03</span>
         <div class="frame mat-frame">
           {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
-            <img src="{{ 'tn-sole-2800.webp' | asset_url }}" srcset="{{ 'tn-sole-1000.webp' | asset_url }} 1000w, {{ 'tn-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1.08; --tx: 0%; --ty: 0%;" alt="Close view of the dark tread and blue arch, rendered from the TN model">
+            <img src="{{ 'tn-sole-2800.webp' | asset_url }}" srcset="{{ 'tn-sole-1000.webp' | asset_url }} 1000w, {{ 'tn-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Underside view of the dark tread and blue arch, rendered from the TN model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_3', image: section.settings.panel_3_image, image_is_concept: section.settings.panel_3_image_is_concept, crop_style: '--zoom: 2.5; --tx: -70%; --ty: -10%;' %}
@@ -77,7 +77,7 @@
         </div>
         {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
         <figure class="mat-inset" aria-hidden="true" data-mat-inset>
-          <img src="{{ 'tn-angle-2800.webp' | asset_url }}" srcset="{{ 'tn-angle-1000.webp' | asset_url }} 1000w, {{ 'tn-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
+          <img src="{{ 'tn-heel-2800.webp' | asset_url }}" srcset="{{ 'tn-heel-1000.webp' | asset_url }} 1000w, {{ 'tn-heel-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
         </figure>
         {% endif %}
       </div>

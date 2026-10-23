@@ -28,14 +28,13 @@ const VIEWS = window.__tnViews ?? [
 
 async function renderTN() {
   const canvas = document.createElement('canvas');
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true, preserveDrawingBuffer: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = .9;
-  renderer.setClearColor(0xffffff, 1);
+  renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff);
   const camera = new THREE.PerspectiveCamera(32, 4 / 3, .01, 100);
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x5290b8, .9));
@@ -96,6 +95,19 @@ async function renderTN() {
       out[`${view.name}-${sizeSpec.suffix}`] = renderer.domElement.toDataURL('image/webp', sizeSpec.quality);
     }
   }
+  const probe = new Image();
+  probe.src = out['profile-2800'];
+  await probe.decode();
+  const pc = document.createElement('canvas');
+  pc.width = 280; pc.height = 210;
+  const px = pc.getContext('2d').getImageData(0, 0, 280, 210);
+  pc.getContext('2d').drawImage(probe, 0, 0, 280, 210);
+  const data = pc.getContext('2d').getImageData(0, 0, 280, 210).data;
+  let minX = 280, minY = 210, maxX = 0, maxY = 0;
+  for (let y = 0; y < 210; y++) for (let x = 0; x < 280; x++) {
+    if (data[(y * 280 + x) * 4 + 3] > 12) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+  }
+  window.__tnProfileBounds = { minX, minY, maxX, maxY, w: 280, h: 210 };
   window.__tnRenders = out;
   window.__tnDone = true;
 }

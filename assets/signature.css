@@ -28,7 +28,12 @@
 .brand-line-loud > span { font-variation-settings: 'wght' 700, 'wdth' 87; }
 .brand-manifesto { max-width: 32ch; width: 100%; margin: 26px 0 0; font-size: 18px; line-height: 1.55; }
 .chapter-finale { padding-inline: 0; }
-.finale-stage { overflow: hidden; }
+/* The stage grid otherwise sizes its implicit track to the widest child's
+   max-content (the action row), which overflows the viewport to the right
+   and shoves the whole composition off-center. Cap the track; the overflow
+   stays hidden on the stage as before. */
+.finale-stage { overflow: hidden; grid-template-columns: minmax(0, 1fr); justify-items: center; }
+.finale-inner { width: 100%; max-width: 100%; box-sizing: border-box; }
 .finale-shoe { transform-origin: center; }
 .chapter-finale .finale-heading { position: relative; z-index: 2; gap: .22em; font-size: clamp(42px, 4.8vw, 72px); }
 .chapter-finale .finale-heading .heading-line { overflow: visible; }
@@ -124,6 +129,43 @@
 }
 .hero-cue { left: 50%; transform: translateX(-50%); bottom: 4.8%; }
 
+/* Chapter index ticker: a quiet marquee along the bottom edge — fills the
+   lower band, names the journey ahead, keeps the resting hero alive. Two
+   identical sequences and a -50% loop make the seam invisible. */
+.hero-ticker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  overflow: hidden;
+  padding: 11px 0 13px;
+  border-top: 1px solid rgba(10, 34, 52, .14);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.hero-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: heroTicker 38s linear infinite;
+}
+.hero-ticker-item {
+  margin-right: 42px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(10, 34, 52, .55);
+  white-space: nowrap;
+}
+@keyframes heroTicker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-ticker-track { animation: none; }
+}
+
 /* Featured: the full shoe stays in frame — no accidental macro crop. */
 [data-tn-editorial] .feat-frame { transform: none; }
 
@@ -158,6 +200,7 @@
   .hero .hero-type { width: 92%; font-size: 15vw; }
   .hero .hero-model-shadow { left: 14%; width: 72%; top: 66%; }
   .hero-cue { display: none; }
+  .hero-ticker { display: none; }
   .chapter-collection .coll-scene { padding-block: 26px; }
   .chapter-collection .coll-scene-copy .coll-scene-name { margin-top: 4px; }
   .finale-ghost { border-color: rgba(239, 250, 255, .78); }
@@ -242,10 +285,11 @@
   color: var(--ink);
   background: rgba(255, 255, 255, .55);
 }
-/* Study index rail: fills the outer edge with a live map of the journey. */
+/* Study index rail: fills the outer edge with a live map of the journey.
+   Offset clears the fixed chapter numeral rail so the labels never clip. */
 .chapter-materials .mat-rail {
   position: absolute;
-  right: clamp(10px, 1.6vw, 24px);
+  right: clamp(76px, 6.4vw, 104px);
   top: 50%;
   transform: translateY(-50%);
   display: none;
@@ -567,6 +611,39 @@
   color: var(--ink);
   background: rgba(255, 255, 255, .6);
 }
+/* Detail ledger: numbered hairline rows that give the right column real
+   editorial weight instead of ending at the chips. */
+.chapter-featured .feat-notes {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(7, 54, 83, .18);
+}
+.chapter-featured .feat-notes li {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 2px;
+  border-bottom: 1px solid rgba(7, 54, 83, .18);
+  font-size: 13.5px;
+  letter-spacing: .01em;
+  color: var(--ink);
+}
+.chapter-featured .feat-notes i {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  opacity: .55;
+  font-variant-numeric: tabular-nums;
+}
+.chapter-featured .feat-notes b {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chapter-featured .feat-notes span {
+  opacity: .78;
+}
 
 
 /* ----------------------------------------------------------------
@@ -657,8 +734,15 @@
   user-select: none;
 }
 .chapter-featured .feat-grid { position: relative; z-index: 1; }
-.chapter-featured .feat-frame {
-  background: radial-gradient(56% 12% at 50% 88%, rgba(10, 34, 52, .16), transparent 74%);
+/* One soft grounding shadow only: the lit-studio radial from the base rule
+   stays, the ::after contact ellipse does the grounding — no dark floor
+   smudge painted over the light field. */
+.chapter-featured .feat-frame::after {
+  left: 22%;
+  right: 22%;
+  bottom: 5.5%;
+  height: 8%;
+  background: radial-gradient(50% 100% at 50% 100%, rgba(10, 34, 52, .13), transparent 70%);
 }
 /* Mask for the featured heading rise (chapter headings already have one). */
 .feat-title .heading-line {

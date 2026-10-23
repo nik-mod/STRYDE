@@ -47,8 +47,10 @@ function deconstruction(root, gsap) {
     });
     for (let index = 1; index < crops.length; index++) {
       const at = index / crops.length - .16;
-      sequence.to(crops[index - 1], { opacity: 0, duration: .1, ease: 'power1.inOut' }, at)
-        .to(crops[index], { opacity: 1, duration: .1, ease: 'power1.inOut' }, at);
+      // Sequential swap: the outgoing study finishes fading before the
+      // incoming one appears — overlapping fades read as a double shoe.
+      sequence.to(crops[index - 1], { opacity: 0, duration: .09, ease: 'power1.inOut' }, at)
+        .to(crops[index], { opacity: 1, duration: .09, ease: 'power1.inOut' }, at + .09);
     }
     // Technical annotations sit on the frame and swap with the same
     // timeline positions as the crops, so the label always names the
@@ -58,8 +60,8 @@ function deconstruction(root, gsap) {
       notes.forEach((note, index) => gsap.set(note, { autoAlpha: index === 0 ? 1 : 0 }));
       for (let index = 1; index < crops.length; index++) {
         const at = index / crops.length - .16;
-        sequence.to(notes[index - 1], { autoAlpha: 0, yPercent: -22, duration: .09, ease: 'power1.inOut' }, at)
-          .fromTo(notes[index], { autoAlpha: 0, yPercent: 22 }, { autoAlpha: 1, yPercent: 0, duration: .09, ease: 'power1.inOut' }, at);
+        sequence.to(notes[index - 1], { autoAlpha: 0, yPercent: -22, duration: .08, ease: 'power1.inOut' }, at)
+          .fromTo(notes[index], { autoAlpha: 0, yPercent: 22 }, { autoAlpha: 1, yPercent: 0, duration: .08, ease: 'power1.inOut' }, at + .09);
       }
     }
     // The reading list tracks the crop sequence: the group matching the
@@ -530,7 +532,9 @@ function finale(root, gsap, { mobile }) {
   if (spot) timeline.fromTo(spot, { autoAlpha: 0, scale: .66 },
     { autoAlpha: 1, scale: 1.14, duration: .44, ease: 'none' }, 0);
   if (word) {
-    timeline.fromTo(word, { autoAlpha: 0, scale: .82 },
+    // The word is already present as texture when the stage arrives — the
+    // dark field never reads as empty before the reveal takes over.
+    timeline.fromTo(word, { autoAlpha: .3, scale: .82 },
       { autoAlpha: 1, scale: 1, duration: .3, ease: 'none' }, .04);
     timeline.to(word, { scale: 1.16, autoAlpha: .16, duration: .56, ease: 'none' }, .34);
   }
@@ -545,12 +549,18 @@ function finale(root, gsap, { mobile }) {
   timeline.fromTo(shoe, { scale: .74, yPercent: 15, rotationZ: -5, autoAlpha: 1 },
     { scale: 1.05, yPercent: 0, rotationZ: 0, autoAlpha: 1, duration: .5, ease: 'none' }, .02);
   timeline.to(shoe, { scale: 1, duration: .22, ease: 'none' }, .56);
-  // After the landing the shoe keeps breathing — a slow float that holds
-  // the stage alive while the reader decides. Independent of the scrub, so
-  // it also runs at the resting end-state.
+  // After the landing the shoe keeps breathing — a slow float with a hint of
+  // sway that holds the stage alive while the reader decides. Independent of
+  // the scrub, so it also runs at the resting end-state. One tween, two
+  // properties — separate same-element tweens can silently no-op.
   const floatTarget = shoe?.querySelector('[data-finale-float]') || shoe?.querySelector('img') || shoe;
   if (floatTarget) gsap.to(floatTarget, {
-    yPercent: -1.6, duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: .8,
+    yPercent: -2.1, rotation: 1.15, duration: 2.9, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: .8,
+  });
+  // The monumental word never fully settles either: a long lateral drift
+  // keeps the dark stage moving after the reveal completes.
+  if (word) gsap.to(word, {
+    xPercent: 1.4, duration: 5.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1,
   });
   const titleParts = root.querySelectorAll('.finale-heading .heading-line');
   titleParts.forEach((part, index) => timeline.fromTo(part,

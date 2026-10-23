@@ -33,6 +33,18 @@
         {% for spec in feat_specs %}{% if spec != blank %}<li>{{ spec | strip | escape }}</li>{% endif %}{% endfor %}
       </ul>
       {% endif %}
+      {% assign feat_details = section.settings.details | split: '|' %}
+      {% if feat_details.size > 0 %}
+      <ul class="feat-notes" aria-label="{{ 'featured.details_label' | t | escape }}">
+        {% for detail in feat_details %}
+          {% assign label = detail | split: ':' | first | strip %}
+          {% assign value = detail | split: ':' | last | strip %}
+          {% if label != blank and value != blank %}
+          <li><i>{{ forloop.index | prepend: '0' | slice: -2, 2 }}</i><b>{{ label | escape }}</b><span>{{ value | escape }}</span></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
       <div class="feat-actions">
         {% if product != blank %}
           {% form 'product', product, class: 'feat-form' %}
@@ -69,6 +81,7 @@
     {"type":"text","id":"fallback_title","label":"Fallback title","default":"Blue / white."},
     {"type":"textarea","id":"story","label":"Story","default":"A blue upper framed by white waves. The dark outsole gives the light silhouette a distinct edge."},
     {"type":"text","id":"specs","label":"Spec chips","default":"Gradient upper, Wave cage, Woven collar"},
+    {"type":"text","id":"details","label":"Detail ledger (pipe-separated, Label: Value)","default":"Colourway: Blue / White | Upper: Gradient knit with wave cage | Sole: Dark tread, sculpted midsole"},
     {"type":"text","id":"fallback_cta","label":"Fallback call to action","default":"View the collection"},
     {"type":"image_picker","id":"image","label":"Presentation image","info":"Replaces the product or concept image. Leave empty to use the assigned product photo, then labeled concept art."},
     {"type":"checkbox","id":"image_is_concept","label":"Presentation image is concept art","default":false}

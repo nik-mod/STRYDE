@@ -80,11 +80,13 @@ test('handoff progress clamps abrupt jumps and rejects invalid geometry', () => 
 });
 
 test('profile landing measures the image alpha subject rather than its padded frame', () => {
+  // Bounds re-measured from the 2800×2100 transparent render: probe space
+  // 280×210 reports left 20, top 56, size 232×106 → ×10.
   assert.deepEqual(profileFootprint({ left: 100, top: 50, width: 1400, height: 1400 }), {
-    left: 326, top: 555, width: 920, height: 415,
+    left: 200, top: 505, width: 1160, height: 530,
   });
   const scaled = profileFootprint({ left: 0, top: 0, width: 700, height: 525 });
-  assert.deepEqual(scaled, { left: 113, top: 165, width: 460, height: 207.5 });
+  assert.deepEqual(scaled, { left: 50, top: 140, width: 580, height: 265 });
 });
 
 test('the real Three camera lands a projected subject in the requested alpha footprint', () => {
