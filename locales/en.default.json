@@ -27,7 +27,8 @@
     "materials": "In detail",
     "form": "Lines & layers",
     "perspectives": "Perspectives",
-    "in_focus": "In focus"
+    "in_focus": "In focus",
+    "close_menu": "Close navigation"
   },
   "assets": {
     "concept_alt": "STRYDE concept sneaker in silver and ice blue, floating three-quarter view",
@@ -108,12 +109,26 @@
     "results_count": {
       "one": "{{ count }} result for “{{ terms }}”",
       "other": "{{ count }} results for “{{ terms }}”"
-    }
+    },
+    "suggestions": "Start with a silhouette"
   },
   "materials": {
     "specs_label": "Material and construction notes"
   },
   "featured": {
     "details_label": "Product details"
+  },
+  "references": {
+    "study_one": "study",
+    "study_other": "studies",
+    "filter_brand": "Filter photographs by brand",
+    "all": "All studies",
+    "search": "Find a silhouette",
+    "no_matches_kicker": "A different direction",
+    "no_matches": "No matching silhouettes.",
+    "try_another": "Try another name or reset your filters."
+  },
+  "footer": {
+    "statement": "Find your next perspective."
   }
 }

@@ -40,7 +40,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
   const setStatus = message => { status.hidden = !message; status.textContent = message; };
   let renderer; let disposed = false; let model; let visible = false; let contextLost = false; let bridge; let aoPool; let catcher; let envRT;
   let shadowRig; let shadowBaseX = 0; let footprintSize = 1; let floatRig = null;
-  let dirty = true; let lastProgress = null;
+  let dirty = true; let lastProgress = null; let revealStart = 0; let arrivalFinished = false;
   let currentPose = heroPose(bus.state?.local || 0);
   const framingPoints = [], worldPoints = [];
   const projectedPoint = new THREE.Vector3();
@@ -128,7 +128,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     // ortho bounds keep texels concentrated on the silhouette so the penumbra
     // reads as studio softness rather than a blur halo.
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
     key.shadow.camera.near = .5;
@@ -245,6 +245,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       }
       dirty = true;
     });
+    revealStart = performance.now();
     removeFrame = scheduler.add(() => {
       if (document.hidden || contextLost || disposed) return;
       const handoff = bridge?.update();
@@ -252,15 +253,18 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       // Idle float: a slow breath on the resting hero. Amplitude dies out as
       // soon as scrolling begins and during the chapter handoff, so the pose
       // contract and the profile alignment stay pixel-exact when they matter.
-      if (floatRig && visible) {
+      if (floatRig && (visible || handoff?.active)) {
         const local = bus.state?.local || 0;
-        const rest = (1 - smoothstep(local / .16)) * (1 - (handoff?.mix || 0)) * (1 - (handoff?.projectionMix || 0));
-        if (rest > 0) {
-          const t = performance.now() / 1000;
-          floatRig.position.y = Math.sin(t * 1.05) * .028 * rest;
-          floatRig.rotation.z = Math.sin(t * .62 + 1.2) * .022 * rest;
-          dirty = true;
-        }
+        if (local > 0 || handoff?.active) arrivalFinished = true;
+        const elapsed = Math.max(0, (performance.now() - revealStart) / 1500);
+        const arrival = arrivalFinished ? 0 : Math.pow(1 - Math.min(1, elapsed), 3);
+        const rest = (1 - smoothstep(local / .16)) * (1 - (handoff?.mix || 0));
+        const t = performance.now() / 1000;
+        // Reset even at zero amplitude: otherwise the last idle frame persists
+        // inside the profile handoff and introduces an alignment discontinuity.
+        floatRig.position.y = Math.sin(t * 1.05) * .022 * rest + .22 * arrival;
+        floatRig.rotation.set(.12 * arrival, -.5 * arrival, Math.sin(t * .62 + 1.2) * .016 * rest - .18 * arrival);
+        if (rest > 0 || arrival > 0) dirty = true;
       }
       if (!dirty || (!visible && !handoff?.active)) return;
       if (camera.view?.enabled) camera.clearViewOffset();
@@ -291,10 +295,14 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       }
       if (framingPoints.length) {
         rig.updateMatrixWorld(true);
-        for (let i = 0; i < framingPoints.length; i++) worldPoints[i].copy(framingPoints[i]).applyMatrix4(rig.matrixWorld);
+        for (let i = 0; i < framingPoints.length; i++) worldPoints[i].copy(framingPoints[i]).applyMatrix4(floatRig.matrixWorld);
         // Frame the silhouette: with no set geometry there is nothing else
         // that must stay in frame, so the product owns the fit entirely.
-        const fit = { fov: camera.fov, aspect: camera.aspect, y: camera.position.y };
+        // Optical dolly expressed as silhouette occupancy: the safe fit still
+        // protects the toe/heel while the detail beat visibly moves closer.
+        const occupancy = Math.min(.96, .84 * 4.8 / currentPose.cameraZ);
+        const fill = THREE.MathUtils.lerp(occupancy, .94, handoff?.mix || 0);
+        const fit = { fov: camera.fov, aspect: camera.aspect, y: camera.position.y, fill };
         camera.position.z = fittedCameraZ(worldPoints, fit);
         if (handoff?.active && handoff.footprint && handoff.projectionMix > 0) {
           camera.updateMatrixWorld();

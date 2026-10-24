@@ -10,6 +10,7 @@ import { mountHeader } from './motion/header.mjs';
 import { mountEnvironments } from './motion/environments.mjs';
 import { mountMagnetic } from './motion/magnetic.mjs';
 import { mountListing } from './motion/listing.mjs';
+import { mountNavigation } from './motion/navigation.mjs';
 import { mountTriggerInspection } from './motion/inspection.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -103,7 +104,7 @@ function mountChapterSection(root) {
   const context = gsap.context(() => {
     media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
       if (!conditions.motion) return;
-      const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : conditions.mobile || (root.dataset.chapter === 'materials' && conditions.materialsFlow) || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
+      const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : root.dataset.chapter === 'materials' ? conditions.materialsFlow : conditions.mobile || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
       return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });
     });
   }, root);
@@ -128,12 +129,6 @@ function mount(scope = document) {
     if (instances.has(root)) continue;
     instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : root.matches('[data-listing-section]') ? mountListing(root, { gsap }) : mountProduct(root));
   }
-  scope.querySelectorAll('[data-mobile-menu]').forEach(menu => {
-    if (menu.dataset.bound) return; menu.dataset.bound = 'true';
-    menu.addEventListener('toggle', syncScroll);
-    menu.addEventListener('keydown', event => { if (event.key === 'Escape') { menu.open = false; menu.querySelector('summary').focus(); } });
-    menu.addEventListener('click', event => { if (event.target.closest('a')) menu.open = false; });
-  });
   ScrollTrigger.refresh();
   const progress = document.querySelector('[data-story-progress]');
   if (progress && !progressTween) progressTween = gsap.fromTo(progress, { scaleX: 0 }, {
@@ -142,6 +137,7 @@ function mount(scope = document) {
 }
 function unmount(scope) { for (const [root, dispose] of instances) if (scope === root || scope.contains(root)) { dispose(); instances.delete(root); } }
 syncScroll(); mount();
+let disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll });
 let disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location });
 document.addEventListener('shopify:section:load', event => { mount(event.target); syncScroll(); });
 document.addEventListener('shopify:section:unload', event => { unmount(event.target); syncScroll(); ScrollTrigger.refresh(); });
@@ -155,11 +151,12 @@ window.addEventListener('pagehide', () => {
   pageActive = false;
   disposeInspection();
   progressTween?.scrollTrigger?.kill(); progressTween?.revert(); progressTween = null;
+  disposeNavigation();
   unmount(document); environmentDispose?.(); environmentDispose = null; lenis?.destroy(); lenis = null; scheduler.setLenis(null); modalObserver.disconnect();
 });
 window.addEventListener('pageshow', event => {
   pageActive = true;
-  if (event.persisted) { syncScroll(); mount(); disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location }); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
+  if (event.persisted) { syncScroll(); mount(); disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll }); disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location }); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
   restoreScroll(event.persisted ? exitScroll : reloadScroll);
   reloadScroll = null;
 });

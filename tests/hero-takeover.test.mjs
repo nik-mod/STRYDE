@@ -3,13 +3,24 @@ import assert from 'node:assert/strict';
 import { gsap } from 'gsap';
 import { mountHero } from '../src/motion/hero.mjs';
 
-function heroHarness() {
+function heroHarness({ glyphs = false } = {}) {
   const selectors = [
     'stage', 'line-1', 'line-2', 'art', 'float', 'depth', 'type', 'ring', 'copy', 'foot', 'cue',
   ];
   const targets = Object.fromEntries(selectors.map(name => [name, {
     opacity: 1, x: 0, y: 0, xPercent: 0, yPercent: 0, scale: 1, rotation: 0,
   }]));
+  if (glyphs) {
+    for (const [name, text] of [['line-1', 'BEYOND'], ['line-2', 'ORDINARY.']]) {
+      const line = targets[name];
+      line.textContent = text;
+      line.ownerDocument = { createElement: () => ({
+        dataset: {}, opacity: 1, yPercent: 0, rotationX: 0, rotationZ: 0,
+        transformOrigin: '', '--glyph-fill': 1,
+      }) };
+      line.replaceChildren = (...children) => { line.children = children; };
+    }
+  }
   targets.stage.offsetHeight = 900;
   targets.stage.backgroundColor = '#b9d5e6';
   const root = { querySelector: selector => targets[selector.match(/^\[data-hero-(.*)\]$/)?.[1]] || null };
@@ -103,6 +114,40 @@ test('hero field and commerce restore after a full seek and an interrupted entra
     assert.equal(harness.targets.foot.y, 0);
     harness.seek(.5);
     assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [185, 213, 230]);
+  } finally {
+    harness?.dispose();
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+    gsap.ticker.sleep();
+  }
+});
+
+
+test('scrolling during the character reveal settles every glyph and teardown restores the original display text', () => {
+  const previousWindow = globalThis.window;
+  globalThis.window = Object.assign(new EventTarget(), { scrollY: 0 });
+  let harness;
+  try {
+    harness = heroHarness({ glyphs: true });
+    harness.intro.time(.3, true);
+    const first = harness.targets['line-1'].children;
+    const second = harness.targets['line-2'].children;
+    assert.equal(first.length, 6);
+    assert.equal(second.length, 9);
+    assert(first.some(glyph => glyph.opacity < 1));
+    harness.seek(.6);
+    harness.seek(0);
+    for (const glyph of [...first, ...second]) {
+      assert.equal(glyph.opacity, 1);
+      assert.equal(glyph.yPercent, 0);
+      assert.equal(glyph.rotationX, 0);
+      assert.equal(glyph.rotationZ, 0);
+    }
+    for (const glyph of second) assert.equal(glyph['--glyph-fill'], 1);
+    harness.dispose();
+    assert.equal(harness.targets['line-1'].textContent, 'BEYOND');
+    assert.equal(harness.targets['line-2'].textContent, 'ORDINARY.');
+    harness = null;
   } finally {
     harness?.dispose();
     if (previousWindow === undefined) delete globalThis.window;

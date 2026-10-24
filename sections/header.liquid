@@ -9,7 +9,7 @@
     {% if shop.customer_accounts_enabled %}<a class="account-link icon-link" href="{{ routes.account_url }}" aria-label="{{ 'general.account' | t }}">{% render 'icon', name: 'account' %}</a>{% endif %}
     <a class="icon-link" href="{{ routes.search_url }}" aria-label="{{ 'general.search' | t }}">{% render 'icon', name: 'search' %}</a>
     <a class="bag-link" href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }} ({{ cart.item_count }})">{% render 'icon', name: 'bag' %}<span class="bag-count">{{ cart.item_count }}</span></a>
-    <details class="mobile-menu" data-mobile-menu>
+    <details class="mobile-menu" data-mobile-menu data-open-label="{{ 'general.menu' | t | escape }}" data-close-label="{{ 'general.close_menu' | t | escape }}">
       <summary aria-label="{{ 'general.menu' | t }}"><span></span><span></span></summary>
       <nav class="mobile-menu-panel" aria-label="{{ 'general.mobile_navigation' | t }}">
         {% if section.settings.menu != blank %}{% for link in section.settings.menu.links %}<a href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}{% else %}<a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a>{% if request.page_type == 'index' %}<a href="#chapter-deconstruction">{{ 'general.the_details' | t }}</a><a href="#chapter-brand">{{ 'general.our_perspective' | t }}</a>{% endif %}{% endif %}

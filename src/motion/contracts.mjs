@@ -20,17 +20,21 @@ const span = (p, from, to) => smooth((p - from) / (to - from));
 // No incremental transforms: the same input always returns the same pose in either direction.
 export function heroPose(progress) {
   const p = clamp(progress);
-  // A wider, more theatrical arc: the establish sweep travels further before
-  // the macro close-up breathes in, and the handoff levels the shoe dead-flat
-  // for the chapter-02 projection. Spans stay smooth and boundary-continuous.
-  const rotationY = mix(-.4, .18, span(p, 0, .46)) + mix(0, .06, span(p, .46, .72)) - mix(0, .22, span(p, .72, .9));
-  const rotationZ = .56 - mix(0, .24, span(p, 0, .46)) - mix(0, .06, span(p, .46, .72)) - mix(0, .24, span(p, .72, .9));
-  const rotationX = .26 + mix(0, .02, span(p, .46, .72)) - mix(0, .28, span(p, .72, .9));
-  const cameraZ = 4.8 - mix(0, .7, span(p, 0, .46)) - mix(0, .6, span(p, .46, .72)) + mix(0, .8, span(p, .72, .9));
-  const cameraY = .1 + mix(0, .07, span(p, .46, .72)) - mix(0, .09, span(p, .72, .9));
-  const fov = 32 + mix(0, 4, span(p, .46, .72)) - mix(0, 3.6, span(p, .72, .9));
-  const keyIntensity = 3.4 + mix(0, 1.2, span(p, .46, .72)) - mix(0, 1.2, span(p, .72, .9));
-  const rimIntensity = 2 + mix(0, .8, span(p, .46, .72)) - mix(0, .8, span(p, .72, .9));
+  // Absolute poses keep fast scrolling and reverse seeks on the same path.
+  // First turn away slightly, then reveal the side before levelling for Anatomy.
+  const track = values => values[0]
+    + (values[1] - values[0]) * span(p, 0, .18)
+    + (values[2] - values[1]) * span(p, .18, .46)
+    + (values[3] - values[2]) * span(p, .46, .72)
+    + (values[4] - values[3]) * span(p, .72, .9);
+  const rotationY = track([-.4, -.72, .28, .1, .02]);
+  const rotationZ = track([.56, .4, .12, -.07, .02]);
+  const rotationX = track([.26, .42, .1, .22, 0]);
+  const cameraZ = track([4.8, 4.45, 4.1, 3.5, 4.5]);
+  const cameraY = track([.1, .12, .08, .17, .08]);
+  const fov = track([32, 32, 33, 36, 32.4]);
+  const keyIntensity = track([3.4, 3.6, 3.8, 4.6, 3.4]);
+  const rimIntensity = track([2, 2.3, 2.5, 2.8, 2]);
   return { rotationX, rotationY, rotationZ, cameraZ, cameraY, fov, keyIntensity, rimIntensity };
 }
 
