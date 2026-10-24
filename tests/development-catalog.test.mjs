@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile,stat } from 'node:fs/promises';
+import { access, readFile, stat } from 'node:fs/promises';
 import { Liquid } from 'liquidjs';
 import { conceptCatalog } from '../tools/fixtures/concept-catalog.mjs';
 import { photographyCatalog } from '../tools/fixtures/photography-catalog.mjs';
@@ -8,29 +8,42 @@ import { renderPreview } from '../tools/preview.mjs';
 
 function listing(html) {return html.match(/<section\b[^>]*\bcollection-page\b[\s\S]*?<\/section>/)?.[0] || '';}
 
-test('local all-products page supplies every licensed photographic reference, credited and non-commerce',async()=>{
+test('local all-products page supplies every imported photo group and keeps commerce disabled',async()=>{
   const html=listing(await renderPreview('/collections/all'));
   assert(html,'Collection section missing');
-  assert.equal((html.match(/data-photography-reference/g)||[]).length,8);
-  assert.equal(new Set(photographyCatalog.map(p=>p.name)).size,8);
-  for(const photo of photographyCatalog){
-    assert(html.includes(photo.name));
-    assert(html.includes(photo.asset));
-    assert(html.includes(photo.creator));
-    assert(html.includes(photo.source));
-    assert((await stat(`assets/${photo.asset}`)).size>1000);
+  const catalog=JSON.parse(await readFile('tools/fixtures/photo-shop.json','utf8'));
+  assert.equal(catalog.length,889);
+  assert.equal(catalog.reduce((count,item)=>count+item.count,0),1296);
+  assert.equal((html.match(/class="photo-shop-card" data-photo-card/g)||[]).length,889);
+  const sameShoe=catalog.find(item=>item.photos.some(photo=>photo.source==='20241125_135432.jpg'));
+  assert.equal(sameShoe.count,4);
+  assert.deepEqual(sameShoe.photos.map(photo=>photo.source),[
+    '20241125_135432.jpg','20241125_135434.jpg','20241125_135435.jpg','20241125_135437.jpg',
+  ]);
+  assert(!catalog.some(item=>['20241125_135434.jpg','20241125_135435.jpg','20241125_135437.jpg'].some(source=>item.photos.some(photo=>photo.source===source))&&item!==sameShoe));
+  assert.match(html,/data-photo-search/);
+  assert.match(html,/data-photo-status/);
+  for(const item of catalog){
+    assert(item.description);
+    assert(item.identityStatus);
+    assert(html.includes(item.title));
+    for(const photo of item.photos){
+      await access(`.${photo.src}`);
+      assert((await stat(`.${photo.src}`)).size>1000);
+    }
   }
-  assert.equal((html.match(/Photographic reference · Not store inventory/g)||[]).length,8);
-  assert.doesNotMatch(html,/<form|href="\/products\/|\$|name="add"|name="checkout"|name="sort_by"|No products found/);
-  assert.match(html,/Not store inventory or available for purchase/);
+  assert.match(html,/Needs shoe ID/);
+  assert.doesNotMatch(html,/<form|name="add"|name="checkout"|name="sort_by"/);
+  assert.match(html,/Local catalog/);
 });
 
-test('concept fallback is limited to the local all-products empty view and yields to native fixtures',async()=>{
+test('the imported catalog remains on the local all-products route and yields to native fixtures',async()=>{
   for(const [path,query]of[['/collections/all','concepts=0'],['/collections/other',''],['/collections/all','fixtures=1&image=1']]){
     const html=listing(await renderPreview(path,new URLSearchParams(query)));
     assert.doesNotMatch(html,/data-concept-entry|Arc Study|Tide Study/);
     if(query.includes('fixtures')){assert.match(html,/href="\/products\/preview-product"/);assert.match(html,/\$180\.00 USD/);assert.match(html,/preview-fixture.svg/);assert.match(html,/name="sort_by"/);}
-    else assert.match(html,/No products found/);
+    else if(path==='/collections/other')assert.match(html,/No products found/);
+    else assert.match(html,/889 PHOTO GROUPS/);
   }
   assert.doesNotMatch(await renderPreview('/'),/data-concept-entry/);
 });

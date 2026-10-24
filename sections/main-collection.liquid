@@ -5,7 +5,13 @@
   endif
 %}
 <section class="page-shell collection-page{% if photography_references %} collection-page-photography{% endif %}" data-listing-section data-section-id="{{ section.id }}">
-  {% if photography_references %}
+  {% if section.preview_photo_shop.size > 0 %}
+    <header class="listing-heading photo-shop-heading" data-listing-heading>
+      <div><p class="listing-eyebrow">STRYDE / YOUR SHOE ARCHIVE</p><h1>Find your pair.</h1></div>
+      <div class="listing-introduction"><p>Takeout photo sequences stay together; unmatched photos await visual grouping and shoe identification.</p><p class="listing-preview-note">Review brand and model before adding products to the live store</p></div>
+    </header>
+    {% render 'photo-shop-catalog', catalog: section.preview_photo_shop %}
+  {% elsif photography_references %}
     <header class="listing-heading" data-listing-heading>
       <div><p class="listing-eyebrow">STRYDE / FOOTWEAR PHOTOGRAPHY</p><h1>Different by design.</h1></div>
       <div class="listing-introduction"><p>Independent photographs of distinctive sneaker models.</p><p class="listing-preview-note">Development references · Not store inventory or available for purchase</p></div>

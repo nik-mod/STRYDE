@@ -1,3 +1,6 @@
+{% if section.settings.preview_photo_product %}
+  {% render 'photo-product-preview', item: section.settings.preview_photo_product %}
+{% else %}
 {% liquid
   assign selected_variant = product.selected_or_first_available_variant
   assign form_id = 'ProductForm-' | append: section.id
@@ -47,6 +50,7 @@
   </div>
   <script type="application/ld+json">{{ product | structured_data }}</script>
 </section>
+{% endif %}
 {% schema %}
 {"name":"Product","settings":[{"type":"header","content":"Trust notes"},{"type":"paragraph","content":"Optional reassurance rows under the buy controls. Each appears only when filled; leave blank until real policies exist."},{"type":"text","id":"size_note","label":"Sizing note"},{"type":"text","id":"delivery_note","label":"Delivery note"},{"type":"text","id":"returns_note","label":"Returns note"},{"type":"text","id":"support_note","label":"Support note"}]}
 {% endschema %}
