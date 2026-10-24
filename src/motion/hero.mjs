@@ -24,7 +24,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   const ticker = root.querySelector('[data-hero-ticker]');
   if (!stage) return;
 
-  const travel = mobile ? .65 : 1.05;
+  const travel = mobile ? .8 : 1.5;
   let intro = null;
   const timeline = gsap.timeline({
     defaults: { ease: 'none' },
@@ -46,6 +46,8 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
           timeline.invalidate().progress(0, true).progress(self.progress, true);
         }
         bus.publish(chapterState(0, self.progress, self.direction));
+        const viewLabel = root.querySelector('[data-hero-view-label]');
+        if (viewLabel) viewLabel.textContent = self.progress < .3 ? 'Three-quarter' : self.progress < .65 ? 'The turn' : self.progress < .85 ? 'Profile study' : 'Every angle';
       },
     },
   });
@@ -53,14 +55,14 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   // The whole headline remains a stable reading zone. Product poses are
   // scrubbed by the existing bus; HTML never masks away individual words.
   timeline
-    .fromTo(line1, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 2, scale: 1, yPercent: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
-    .to(line1, { xPercent: 0, duration: .44, ease: 'none' }, .46)
-    .fromTo(line2, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: -1.5, scale: 1, yPercent: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
-    .to(line2, { xPercent: 0, duration: .44, ease: 'none' }, .46)
+    .fromTo(line1, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: -1, scale: 1, yPercent: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
+    .to(line1, { xPercent: -2, duration: .44, ease: 'none' }, .46)
+    .fromTo(line2, { xPercent: 0, scale: 1, yPercent: 0 }, { xPercent: 1, scale: 1, yPercent: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
+    .to(line2, { xPercent: 2, duration: .44, ease: 'none' }, .46)
     .fromTo(copy, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, duration: 1 }, 0)
     .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, immediateRender: false, duration: .82 }, 0)
     .to(foot, { opacity: 0, y: -16, duration: .18 }, .82)
-    .fromTo(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0 }, { scale: hasModel ? 1.03 : 1, xPercent: 0, yPercent: 0, rotation: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
+    .fromTo(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0 }, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0, immediateRender: false, duration: .46, ease: 'none' }, 0)
     .to(art, { scale: 1, xPercent: 0, yPercent: 0, rotation: 0, duration: .44, ease: 'none' }, .46)
     .to(cue, { opacity: 0, duration: .12 }, .05)
     .to(ticker, { opacity: 0, duration: .14 }, .06)
@@ -96,7 +98,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, fine = fa
   // on top of the scroll-controlled base pose. Never writes the same transform
   // properties the scrub timeline owns.
   const listeners = new AbortController();
-  if (fine) {
+  if (fine && !hasModel) {
     const layers = [];
     if (depth) layers.push({ el: depth, x: gsap.quickTo(depth, 'x', { duration: .9, ease: 'power3.out' }), y: gsap.quickTo(depth, 'y', { duration: .9, ease: 'power3.out' }), scale: 16, yScale: 12 });
 

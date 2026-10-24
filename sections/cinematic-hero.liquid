@@ -52,7 +52,22 @@
 
     <div class="hero-copy" data-hero-copy>
       <p>{{ section.settings.description | escape }}</p>
+      {% if bundled_tn %}
+      <div class="hero-views" role="group" aria-label="Inspect the 3D sneaker">
+        <button type="button" data-scene-view="profile" aria-pressed="false"><img src="{{ 'tn-profile-1000.webp' | asset_url }}" width="1000" height="750" alt="" loading="lazy"><span>Profile</span></button>
+        <button type="button" data-scene-view="upper" aria-pressed="false"><img src="{{ 'tn-top-1000.webp' | asset_url }}" width="1000" height="750" alt="" loading="lazy"><span>Upper</span></button>
+        <button type="button" data-scene-view="outsole" aria-pressed="false"><img src="{{ 'tn-sole-1000.webp' | asset_url }}" width="1000" height="750" alt="" loading="lazy"><span>Outsole</span></button>
+      </div>
+      {% endif %}
     </div>
+
+    {% if bundled_tn %}
+    <dl class="hero-metadata" aria-label="Model study">
+      <div><dt>Silhouette</dt><dd>Air Max Plus / TN</dd></div>
+      <div><dt>Palette</dt><dd>Blue. White. Black.</dd></div>
+      <div><dt>Perspective</dt><dd data-hero-view-label>Three-quarter</dd></div>
+    </dl>
+    {% endif %}
 
     <div class="hero-foot" data-hero-foot>
       <div class="hero-product-info">

@@ -22,7 +22,7 @@ const VIEWS = window.__tnViews ?? [
   { name: 'heel', yaw: 270, pitch: 4, zoom: 1.04, lift: 0 },
   { name: 'angle', yaw: 55, pitch: 8, zoom: 1.02, lift: 0 },
   { name: 'top', yaw: 90, pitch: 82, zoom: 1.06, lift: 0 },
-  { name: 'sole', yaw: 90, pitch: -82, zoom: 1.1, lift: 0 },
+  { name: 'sole', yaw: 90, pitch: -82, zoom: .96, lift: 0 },
   { name: 'detail', yaw: 76, pitch: -16, zoom: 1.9, lift: .12 },
 ];
 
@@ -69,12 +69,15 @@ async function renderTN() {
   model.position.sub(center);
 
   const group = new THREE.Group();
-  group.rotation.order = 'YXZ';
+  // Apply yaw first, then tilt around the world horizontal axis. Tilting
+  // before yaw rolls a side profile upright instead of showing the outsole.
+  group.rotation.order = 'XYZ';
   group.add(model);
   scene.add(group);
 
   const out = {};
   for (const view of VIEWS) {
+    group.position.set(0, 0, 0);
     group.rotation.set(THREE.MathUtils.degToRad(view.pitch), THREE.MathUtils.degToRad(view.yaw), 0);
     group.updateMatrixWorld(true);
     const worldBounds = new THREE.Box3().setFromObject(group);

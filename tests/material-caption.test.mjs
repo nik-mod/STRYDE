@@ -12,7 +12,16 @@ test('Materials keeps exactly one full caption through both wipes and reverse se
     const copy = { opacity: 1, autoAlpha: 1 };
     return { autoAlpha: 1, image, frame, copy, querySelector: selector => ({ '.mat-frame > img': image, '.mat-frame': frame, '.mat-copy': copy })[selector] };
   });
-  const root = { dataset: { chapter: 'materials' }, classList: { add() {}, remove() {} }, querySelectorAll: () => panels };
+  const railItems = Array.from({ length: 3 }, () => {
+    const item = { active: false };
+    item.classList = { toggle(_name, active) { item.active = active; } };
+    return item;
+  });
+  const root = {
+    dataset: { chapter: 'materials' }, classList: { add() {}, remove() {} },
+    querySelectorAll: selector => selector === '.mat-panel' ? panels : [],
+    querySelector: selector => selector === '[data-mat-rail]' ? { children: railItems } : null,
+  };
   let timeline;
   const clock = { ...gsap, timeline({ scrollTrigger, ...options }) { timeline = gsap.timeline({ ...options, paused: true }); return timeline; } };
   let dispose;
@@ -21,9 +30,10 @@ test('Materials keeps exactly one full caption through both wipes and reverse se
     gsap.ticker.sleep();
     const positions = [0, .25, .29, .31, .33, .35, .38, .5, .61, .63, .66, .68, .7, .72, 1];
     const ownerAt = progress => {
-      timeline.progress(progress, true);
+      timeline.progress(progress, false);
       const visible = panels.filter(panel => panel.copy.opacity > .99 && panel.copy.autoAlpha > .99 && panel.autoAlpha > .99);
       assert.equal(visible.length, 1, `exactly one readable caption at ${progress}`);
+      assert.equal(railItems.findIndex(item => item.active), panels.indexOf(visible[0]), `study index matches the caption at ${progress}`);
       return panels.indexOf(visible[0]);
     };
     const forward = positions.map(ownerAt);

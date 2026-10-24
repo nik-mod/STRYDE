@@ -4,7 +4,7 @@
     <span class="heading-line"><span>{{ section.settings.heading | escape }}</span></span>
   </h2>
   <div class="mat-panels" data-mat-panels>
-    <div class="mat-panel mat-panel-upper">
+    <div class="mat-panel mat-panel-upper" id="MatPanel-{{ section.id }}-1">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">01</span>
         <div class="frame mat-frame">
@@ -34,7 +34,7 @@
         <div class="mat-rule" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="mat-panel mat-panel-cage">
+    <div class="mat-panel mat-panel-cage" id="MatPanel-{{ section.id }}-2">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">02</span>
         <div class="frame mat-frame">
@@ -64,7 +64,7 @@
         <div class="mat-rule" aria-hidden="true"></div>
       </div>
     </div>
-    <div class="mat-panel mat-panel-sole">
+    <div class="mat-panel mat-panel-sole" id="MatPanel-{{ section.id }}-3">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">03</span>
         <div class="frame mat-frame">
@@ -95,11 +95,13 @@
       </div>
     </div>
   </div>
-  <ol class="mat-rail" data-mat-rail aria-hidden="true">
-    <li class="is-active"><i>01</i><em>Color</em></li>
-    <li><i>02</i><em>Structure</em></li>
-    <li><i>03</i><em>Foundation</em></li>
-  </ol>
+  <nav class="study-switcher" aria-label="Material studies">
+    <ol class="mat-rail" data-mat-rail>
+      <li class="is-active"><a href="#MatPanel-{{ section.id }}-1" data-study-index="0" aria-controls="MatPanel-{{ section.id }}-1" aria-current="step"><span>01</span><strong>Color</strong><em>Upper &amp; panel contrast</em></a></li>
+      <li><a href="#MatPanel-{{ section.id }}-2" data-study-index="1" aria-controls="MatPanel-{{ section.id }}-2"><span>02</span><strong>Structure</strong><em>Lines &amp; layered surfaces</em></a></li>
+      <li><a href="#MatPanel-{{ section.id }}-3" data-study-index="2" aria-controls="MatPanel-{{ section.id }}-3"><span>03</span><strong>Foundation</strong><em>Midsole &amp; outsole</em></a></li>
+    </ol>
+  </nav>
 </section>
 {% schema %}
 {

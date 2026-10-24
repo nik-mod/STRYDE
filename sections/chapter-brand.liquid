@@ -8,12 +8,13 @@
       {% for word in manifesto_words %}<span class="brand-word">{{ word | escape }}</span> {% endfor %}
     </h2>
     <div class="brand-editorial">
-      <figure class="brand-visual frame" data-brand-visual>
+      <figure class="brand-visual frame{% if section.settings.image == blank and section.settings.use_tn_model %} brand-visual-pair{% endif %}" data-brand-visual>
         {% if section.settings.image != blank %}
           {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '700, 1200, 1800', sizes: '(max-width: 700px) 100vw, 46vw', alt: section.settings.image.alt }}
           {% if section.settings.image_is_concept %}<figcaption class="asset-tag">{{ 'assets.concept_tag' | t }}</figcaption>{% endif %}
         {% elsif section.settings.use_tn_model %}
           <img src="{{ 'tn-detail-2800.webp' | asset_url }}" srcset="{{ 'tn-detail-1000.webp' | asset_url }} 1000w, {{ 'tn-detail-2800.webp' | asset_url }} 2800w" width="2800" height="2100" sizes="(max-width: 700px) 100vw, 46vw" loading="lazy" data-brand-model alt="Blue upper and white wave cage, an editorial crop of the TN model render">
+          <span class="brand-detail-plate"><img src="{{ 'tn-heel-1000.webp' | asset_url }}" width="1000" height="750" loading="lazy" alt="Heel detail of the same blue and white TN model"></span>
           <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
         {% else %}
           {% render 'presentation-image', slot: 'material_2' %}
@@ -46,6 +47,11 @@
       {% if section.settings.line_2 != blank %}<span class="brand-line brand-line-loud"><span>{{ section.settings.line_2 | escape }}</span></span>{% endif %}
       {% if section.settings.line_3 != blank %}<span class="brand-line brand-line-quiet"><span>{{ section.settings.line_3 | escape }}</span></span>{% endif %}
     </p>
+    <nav class="brand-index" aria-label="Revisit the study">
+      <a href="#chapter-deconstruction"><span>02 / Anatomy</span><strong>{{ 'general.the_details' | t }}</strong><small>Shape &amp; silhouette</small></a>
+      <a href="#chapter-materials"><span>03 / Materials</span><strong>{{ 'general.materials' | t }}</strong><small>Color &amp; structure</small></a>
+      <a href="#chapter-technology"><span>04 / Technology</span><strong>{{ 'general.form' | t }}</strong><small>Profile &amp; foundation</small></a>
+    </nav>
   </div>
 </section>
 {% schema %}

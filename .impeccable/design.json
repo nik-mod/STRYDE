@@ -1,0 +1,429 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T17:54:21.0038947Z",
+  "title": "Design System: STRYDE",
+  "extensions": {
+    "colorMeta": {
+      "film-blue": {
+        "role": "primary",
+        "displayName": "Film Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0438 228.78)",
+          "oklch(26.43% 0.0438 228.78)",
+          "oklch(37.86% 0.0438 228.78)",
+          "oklch(49.29% 0.0438 228.78)",
+          "oklch(60.71% 0.0438 228.78)",
+          "oklch(72.14% 0.0438 228.78)",
+          "oklch(83.57% 0.0438 228.78)",
+          "oklch(95% 0.0438 228.78)"
+        ]
+      },
+      "film-cobalt": {
+        "role": "primary",
+        "displayName": "Film Cobalt",
+        "tonalRamp": [
+          "oklch(15% 0.1597 260.00)",
+          "oklch(26.43% 0.1597 260.00)",
+          "oklch(37.86% 0.1597 260.00)",
+          "oklch(49.29% 0.1597 260.00)",
+          "oklch(60.71% 0.1597 260.00)",
+          "oklch(72.14% 0.1597 260.00)",
+          "oklch(83.57% 0.1597 260.00)",
+          "oklch(95% 0.1597 260.00)"
+        ]
+      },
+      "film-ice": {
+        "role": "neutral",
+        "displayName": "Film Ice",
+        "tonalRamp": [
+          "oklch(15% 0.0079 216.62)",
+          "oklch(26.43% 0.0079 216.62)",
+          "oklch(37.86% 0.0079 216.62)",
+          "oklch(49.29% 0.0079 216.62)",
+          "oklch(60.71% 0.0079 216.62)",
+          "oklch(72.14% 0.0079 216.62)",
+          "oklch(83.57% 0.0079 216.62)",
+          "oklch(95% 0.0079 216.62)"
+        ]
+      },
+      "materials-blue": {
+        "role": "primary",
+        "displayName": "Materials Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0370 220.56)",
+          "oklch(26.43% 0.0370 220.56)",
+          "oklch(37.86% 0.0370 220.56)",
+          "oklch(49.29% 0.0370 220.56)",
+          "oklch(60.71% 0.0370 220.56)",
+          "oklch(72.14% 0.0370 220.56)",
+          "oklch(83.57% 0.0370 220.56)",
+          "oklch(95% 0.0370 220.56)"
+        ]
+      },
+      "ocean": {
+        "role": "primary",
+        "displayName": "Ocean",
+        "tonalRamp": [
+          "oklch(15% 0.0597 242.08)",
+          "oklch(26.43% 0.0597 242.08)",
+          "oklch(37.86% 0.0597 242.08)",
+          "oklch(49.29% 0.0597 242.08)",
+          "oklch(60.71% 0.0597 242.08)",
+          "oklch(72.14% 0.0597 242.08)",
+          "oklch(83.57% 0.0597 242.08)",
+          "oklch(95% 0.0597 242.08)"
+        ]
+      },
+      "ocean-deep": {
+        "role": "primary",
+        "displayName": "Ocean Deep",
+        "tonalRamp": [
+          "oklch(15% 0.0461 244.25)",
+          "oklch(26.43% 0.0461 244.25)",
+          "oklch(37.86% 0.0461 244.25)",
+          "oklch(49.29% 0.0461 244.25)",
+          "oklch(60.71% 0.0461 244.25)",
+          "oklch(72.14% 0.0461 244.25)",
+          "oklch(83.57% 0.0461 244.25)",
+          "oklch(95% 0.0461 244.25)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0442 237.37)",
+          "oklch(26.43% 0.0442 237.37)",
+          "oklch(37.86% 0.0442 237.37)",
+          "oklch(49.29% 0.0442 237.37)",
+          "oklch(60.71% 0.0442 237.37)",
+          "oklch(72.14% 0.0442 237.37)",
+          "oklch(83.57% 0.0442 237.37)",
+          "oklch(95% 0.0442 237.37)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0470 228.22)",
+          "oklch(26.43% 0.0470 228.22)",
+          "oklch(37.86% 0.0470 228.22)",
+          "oklch(49.29% 0.0470 228.22)",
+          "oklch(60.71% 0.0470 228.22)",
+          "oklch(72.14% 0.0470 228.22)",
+          "oklch(83.57% 0.0470 228.22)",
+          "oklch(95% 0.0470 228.22)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0034 174.48)",
+          "oklch(26.43% 0.0034 174.48)",
+          "oklch(37.86% 0.0034 174.48)",
+          "oklch(49.29% 0.0034 174.48)",
+          "oklch(60.71% 0.0034 174.48)",
+          "oklch(72.14% 0.0034 174.48)",
+          "oklch(83.57% 0.0034 174.48)",
+          "oklch(95% 0.0034 174.48)"
+        ]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0260 217.94)",
+          "oklch(26.43% 0.0260 217.94)",
+          "oklch(37.86% 0.0260 217.94)",
+          "oklch(49.29% 0.0260 217.94)",
+          "oklch(60.71% 0.0260 217.94)",
+          "oklch(72.14% 0.0260 217.94)",
+          "oklch(83.57% 0.0260 217.94)",
+          "oklch(95% 0.0260 217.94)"
+        ]
+      },
+      "action-text": {
+        "role": "neutral",
+        "displayName": "Action Text",
+        "tonalRamp": [
+          "oklch(15% 0.0045 214.33)",
+          "oklch(26.43% 0.0045 214.33)",
+          "oklch(37.86% 0.0045 214.33)",
+          "oklch(49.29% 0.0045 214.33)",
+          "oklch(60.71% 0.0045 214.33)",
+          "oklch(72.14% 0.0045 214.33)",
+          "oklch(83.57% 0.0045 214.33)",
+          "oklch(95% 0.0045 214.33)"
+        ]
+      },
+      "action-hover": {
+        "role": "secondary",
+        "displayName": "Action Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0772 229.54)",
+          "oklch(26.43% 0.0772 229.54)",
+          "oklch(37.86% 0.0772 229.54)",
+          "oklch(49.29% 0.0772 229.54)",
+          "oklch(60.71% 0.0772 229.54)",
+          "oklch(72.14% 0.0772 229.54)",
+          "oklch(83.57% 0.0772 229.54)",
+          "oklch(95% 0.0772 229.54)"
+        ]
+      },
+      "finale-action": {
+        "role": "neutral",
+        "displayName": "Finale Action",
+        "tonalRamp": [
+          "oklch(15% 0.0169 225.19)",
+          "oklch(26.43% 0.0169 225.19)",
+          "oklch(37.86% 0.0169 225.19)",
+          "oklch(49.29% 0.0169 225.19)",
+          "oklch(60.71% 0.0169 225.19)",
+          "oklch(72.14% 0.0169 225.19)",
+          "oklch(83.57% 0.0169 225.19)",
+          "oklch(95% 0.0169 225.19)"
+        ]
+      },
+      "film-rule": {
+        "role": "neutral",
+        "displayName": "Film Rule",
+        "purpose": "Ink mixed to 24% opacity. Ramp previews the underlying Ink; preserve alpha in implementation.",
+        "tonalRamp": [
+          "oklch(15% 0.0442 237.37)",
+          "oklch(26.43% 0.0442 237.37)",
+          "oklch(37.86% 0.0442 237.37)",
+          "oklch(49.29% 0.0442 237.37)",
+          "oklch(60.71% 0.0442 237.37)",
+          "oklch(72.14% 0.0442 237.37)",
+          "oklch(83.57% 0.0442 237.37)",
+          "oklch(95% 0.0442 237.37)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Hero first line",
+        "purpose": "Condensed Archivo display, weight 900 and width 76."
+      },
+      "display-secondary": {
+        "displayName": "Hero second line",
+        "purpose": "Italic Archivo, weight 720 and width 82; cobalt emphasis."
+      },
+      "headline": {
+        "displayName": "Chapter heading",
+        "purpose": "Balanced chapter headline; font-stretch 85%."
+      },
+      "title": {
+        "displayName": "Study title",
+        "purpose": "Material study title; max-width 11ch on desktop."
+      },
+      "body": {
+        "displayName": "Editorial body",
+        "purpose": "Responsive readable prose, generally 33–39ch."
+      },
+      "label": {
+        "displayName": "Chapter label",
+        "purpose": "Tracked uppercase indexing and kickers."
+      }
+    },
+    "shadows": [
+      {
+        "name": "material-inset",
+        "value": "0 18px 36px rgba(7, 34, 52, .15)",
+        "purpose": "Small alternate-view plates beside the active material study."
+      },
+      {
+        "name": "reference-plate",
+        "value": "0 24px 60px rgba(6, 30, 48, .24)",
+        "purpose": "Credited photography in the reference reel."
+      },
+      {
+        "name": "action-hover",
+        "value": "0 6px 20px #102b3b15",
+        "purpose": "Retained primary-action hover shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.19, 1, .22, 1)",
+        "purpose": "Shared outgoing easing."
+      },
+      {
+        "name": "action-lift",
+        "value": "transform .3s cubic-bezier(.19, 1, .22, 1), background .25s",
+        "purpose": "Primary action lifts by 2px on hover and returns on active."
+      },
+      {
+        "name": "study-state",
+        "value": "background .2s, color .2s",
+        "purpose": "Current and hover material-study states."
+      },
+      {
+        "name": "journey-pose",
+        "value": "p * p * (3 - 2 * p)",
+        "purpose": "Clamped interpolation of absolute product poses; window-bound chapter fades in src/journey-poses.mjs."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-layout",
+        "value": "max-width: 1180px"
+      },
+      {
+        "name": "portrait-tablet",
+        "value": "max-width: 900px and orientation: portrait"
+      },
+      {
+        "name": "mobile",
+        "value": "max-width: 700px"
+      },
+      {
+        "name": "short-desktop",
+        "value": "min-width: 1181px and max-height: 820px"
+      },
+      {
+        "name": "short-phone",
+        "value": "max-width: 700px and max-height: 740px"
+      }
+    ],
+    "source": {
+      "mode": "scan",
+      "palette": "config/settings_data.json current; layout/theme.liquid; assets/experience.css",
+      "cascade": [
+        "assets/theme.css",
+        "assets/refinements.css",
+        "assets/recovery.css",
+        "assets/signature.css",
+        "assets/experience.css (homepage only)"
+      ],
+      "scene": [
+        "src/journey-scene.mjs",
+        "src/journey-poses.mjs"
+      ],
+      "screenshots": [
+        ".impeccable/review/desktop-hero.png",
+        ".impeccable/review/mobile-hero.png",
+        ".impeccable/review/tablet-hero.png",
+        ".impeccable/review/desktop-materials.png",
+        ".impeccable/review/desktop-finale.png"
+      ],
+      "tonalRamps": "Derived OKLCH swatch previews only; frontmatter tokens are normative."
+    },
+    "accessibility": {
+      "focus": "2px solid currentColor; outline-offset: 5px",
+      "reducedMotion": "No journey renderer; static imagery and content in normal flow.",
+      "noJavaScript": "Static imagery, complete HTML story and native links.",
+      "canvas": "aria-hidden; pointer-events: none"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary collection action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Opening collection or native product action.",
+      "html": "<button class=\"ds-primary\" type=\"button\">View the collection</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:17px 28px;border:0;border-radius:2px;background:var(--ink-deep,#102b3b);color:#f3f7f8;font-family:Archivo,Arial,sans-serif;font-size:clamp(14px,1vw,20px);font-weight:600;letter-spacing:.02em;transition:transform .3s cubic-bezier(.19,1,.22,1),background .25s}.ds-primary:hover{background:#256580;color:white;transform:translateY(-2px);box-shadow:0 6px 20px #102b3b15}.ds-primary:active{transform:translateY(0)}.ds-primary:focus-visible{outline:2px solid currentColor;outline-offset:5px}.ds-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}"
+    },
+    {
+      "name": "Finale collection action",
+      "kind": "button",
+      "refersTo": "button-finale",
+      "description": "Light primary action on the ocean finale.",
+      "html": "<button class=\"ds-finale\" type=\"button\">View the collection</button>",
+      "css": ".ds-finale{min-height:54px;padding:17px 28px;border:0;border-radius:2px;background:#e4f2f8;color:#102b3b;font-family:Archivo,Arial,sans-serif;font-size:clamp(14px,1vw,20px);font-weight:600;transition:transform .3s cubic-bezier(.19,1,.22,1),background .25s}.ds-finale:hover{background:var(--accent,#dcf3fa);transform:translateY(-2px)}.ds-finale:active{transform:translateY(0)}.ds-finale:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+    },
+    {
+      "name": "Finale ghost action",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Outlined secondary search action on ocean.",
+      "html": "<div class=\"ds-ocean\"><a class=\"ds-ghost\" href=\"#search\">Search</a></div>",
+      "css": ".ds-ocean{padding:20px;background:#092e46;color:var(--surface,#f2f5f4)}.ds-ghost{display:inline-flex;align-items:center;min-height:54px;padding:17px 28px;border:1px solid rgba(239,250,255,.78);border-radius:2px;background:transparent;color:inherit;font-family:Archivo,Arial,sans-serif;font-size:clamp(14px,1vw,20px);font-weight:500;text-decoration:none;transition:background .25s,color .25s}.ds-ghost:hover{background:var(--surface,#f2f5f4);color:var(--ink,#102b3b)}.ds-ghost:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+    },
+    {
+      "name": "Commerce field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Retained square transparent native search field.",
+      "html": "<label class=\"ds-field-label\">Search<input class=\"ds-field\" type=\"search\" placeholder=\"Search products\"></label>",
+      "css": ".ds-field-label{display:grid;gap:8px;color:var(--ink,#102b3b);font:16px/1.5 Archivo,Arial,sans-serif}.ds-field{min-height:46px;padding:10px 14px;border:1px solid rgba(7,54,83,.44);border-radius:0;background:transparent;color:inherit;font:inherit}.ds-field:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+    },
+    {
+      "name": "Specification chip",
+      "kind": "chip",
+      "refersTo": "specification-chip",
+      "description": "Uppercase study annotation, not an option selector.",
+      "html": "<span class=\"ds-chip\">Curved ribs</span>",
+      "css": ".ds-chip{display:inline-block;padding:9px 12px;border:1px solid rgba(7,54,83,.5);border-radius:2px;background:transparent;color:var(--ink,#102b3b);font-family:Archivo,Arial,sans-serif;font-size:clamp(11px,.8vw,17px);font-weight:600;letter-spacing:.07em;text-transform:uppercase}"
+    },
+    {
+      "name": "Material study anchors",
+      "kind": "nav",
+      "refersTo": "study-navigation",
+      "description": "Real anchors identify and reach the three material perspectives.",
+      "html": "<nav class=\"ds-studies\" aria-label=\"Material studies\"><a href=\"#color\"><span>01</span><strong>Color</strong><em>Upper &amp; panel contrast</em></a><a href=\"#structure\" aria-current=\"step\"><span>02</span><strong>Structure</strong><em>Lines &amp; layered surfaces</em></a><a href=\"#foundation\"><span>03</span><strong>Foundation</strong><em>Midsole &amp; outsole</em></a></nav>",
+      "css": ".ds-studies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid color-mix(in srgb,var(--ink,#102b3b) 24%,transparent);font-family:Archivo,Arial,sans-serif;color:var(--ink,#102b3b)}.ds-studies a{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:16px 18px;border-right:1px solid color-mix(in srgb,var(--ink,#102b3b) 24%,transparent);color:inherit;text-decoration:none;transition:background .2s,color .2s}.ds-studies a:last-child{border-right:0}.ds-studies span{grid-row:1/3;align-self:center;opacity:.6;font-size:11px}.ds-studies strong{font-size:clamp(16px,1.15vw,25px);font-weight:650}.ds-studies em{font-size:11px;font-style:normal}.ds-studies a:hover,.ds-studies a[aria-current]{color:var(--film-cobalt,#265fbd);background:rgba(255,255,255,.23)}.ds-studies a:focus-visible{outline:2px solid currentColor;outline-offset:5px}@media(max-width:700px){.ds-studies a{display:flex;flex-direction:column;padding:12px 9px;gap:4px}.ds-studies span{align-self:flex-start}.ds-studies strong{font-size:15px}.ds-studies em{display:none}}"
+    },
+    {
+      "name": "Product card",
+      "kind": "card",
+      "refersTo": "product-card",
+      "description": "Shared commerce card with a square pale media field and ruled information.",
+      "html": "<a class=\"ds-card\" href=\"#product\"><div class=\"ds-card-media\" aria-label=\"Product media slot\"></div><div class=\"ds-card-info\"><h2>Product title</h2><p>Product price</p><span>Availability</span></div></a>",
+      "css": ".ds-card{display:block;color:var(--ink,#102b3b);font-family:Archivo,Arial,sans-serif;text-decoration:none}.ds-card-media{aspect-ratio:1.08;background:var(--surface,#f2f5f4);overflow:hidden}.ds-card-info{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;margin-top:18px;padding-top:15px;border-top:1px solid var(--rule,rgba(16,43,59,.17))}.ds-card h2,.ds-card p{margin:0}.ds-card h2{font-size:18px;font-weight:600;letter-spacing:-.025em}.ds-card p{font-size:13px}.ds-card span{grid-column:1/-1;font-size:11px}.ds-card:hover h2{text-decoration:underline;text-underline-offset:5px}.ds-card:focus-visible{outline:2px solid currentColor;outline-offset:5px}"
+    },
+    {
+      "name": "Annotation ledger",
+      "kind": "custom",
+      "description": "Numbered ruled content row used beside the product study.",
+      "html": "<div class=\"ds-ledger\"><span class=\"ds-number\">01</span><div><h3>The silhouette</h3><p>Follow the curves, panel edges and sculpted profile.</p></div></div>",
+      "css": ".ds-ledger{display:grid;grid-template-columns:32px minmax(0,1fr);gap:18px;padding-block:clamp(16px,1.7vw,36px);border-top:1px solid color-mix(in srgb,var(--ink,#102b3b) 24%,transparent);color:var(--ink,#102b3b);font-family:Archivo,Arial,sans-serif}.ds-number{font-size:clamp(11px,.8vw,17px)}.ds-ledger h3{margin:0;font-size:clamp(22px,2vw,46px);line-height:1.1;letter-spacing:-.025em}.ds-ledger p{margin-bottom:0;font-size:clamp(15px,1.1vw,24px);line-height:1.55;max-width:39ch}"
+    }
+  ],
+  "narrative": {
+    "dos": [
+      "Do retain the blue-and-white subject and the pale-blue, ice and ocean environments.",
+      "Do preserve local Archivo width and weight variation, readable prose and compact-screen overrides.",
+      "Do connect every material-study anchor and caption to the corresponding visible perspective.",
+      "Do preserve native Shopify product, variant, availability, search, collection and cart behavior.",
+      "Do keep reference credits, model-study disclosures and shipping-asset provenance intact.",
+      "Do keep content and navigation usable with reduced motion, failed WebGL and no JavaScript."
+    ],
+    "overview": "STRYDE combines a blue-and-white sneaker study with monumental editorial typography. Pale sky and ice fields give the subject room; ocean chapters concentrate attention. A locally bundled variable Archivo family shifts width and weight between expressive headlines and precise captions.\n\nDepth comes from the sneaker, its light and its changing perspective. Useful HTML copy, annotation ledgers, material-study anchors and a chapter index keep the experience legible. The motion follows a continuous subject through product chapters; credited photography remains a separate reference plate.",
+    "rules": [
+      {
+        "body": "Supporting colors frame the blue-and-white sneaker; preserve the clear distinction between pale study fields and ocean chapters.",
+        "section": "colors",
+        "name": "The Subject Color Rule"
+      },
+      {
+        "body": "Scale prose as well as display type on wide screens; retain the explicit compact-screen overrides instead of shrinking a desktop composition uniformly.",
+        "section": "typography",
+        "name": "The Readable Scale Rule"
+      },
+      {
+        "body": "The fixed canvas owns only the currently active disclosed model study. Keep credited reference photography separate and retain the image fallback until the scene successfully owns its host.",
+        "section": "elevation",
+        "name": "The One Subject Rule"
+      }
+    ],
+    "donts": [
+      "Don't replace the continuous product subject with repeated flat-picture reveals in animated product chapters.",
+      "Don't let the 3D overlay capture pointer events or obscure essential reading and action zones.",
+      "Don't use reference studies as purchasable inventory or evidence of performance claims.",
+      "Don't apply homepage-only type sizes or stage geometry to native commerce routes.",
+      "Don't add long empty pinned intervals or a blank closing tail."
+    ],
+    "keyCharacteristics": [
+      "Blue-and-white product identity, with ice, ocean and concentrated cobalt.",
+      "Monumental variable typography paired with readable editorial copy.",
+      "One continuous 3D subject, anchored by HTML navigation and disclosures.",
+      "Hairline ledgers, square media and restrained action corners."
+    ],
+    "northStar": "The Continuous Product Film"
+  }
+}

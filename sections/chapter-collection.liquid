@@ -99,6 +99,10 @@
       {% endfor %}
     {% endif %}
   </div>
+  <div class="chapter-summary coll-summary">
+    <p>{% if has_products %}{{ collection.title | escape }}{% else %}Three silhouettes. Three perspectives.{% endif %}</p>
+    <a href="{{ collection.url | default: routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a>
+  </div>
 </section>
 {% schema %}
 {

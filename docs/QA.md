@@ -338,3 +338,62 @@ confirmed HEAD held the newer work. Verification screenshots (`p8-desktop-*`,
 scenes behave as for a real reader. `npm run build`, 56/56 tests, structural
 validation (88 files) and Theme Check (one pre-existing orphaned-snippet
 warning) pass. Not tested: connected-store checkout, real merchandise.
+
+## Full-page refinement — 2026-10-24
+
+Reviewed all eight chapters in Chromium at 1440×900 and 390×844, with
+additional tablet (768×1024), laptop (1366×768), and short-phone (375×667)
+checks. Corrected hero/anatomy clipping, collapsed mobile material frames,
+tablet grid placement, pinned material spacing, and the material index's
+reverse-scroll synchronization. Re-rendered the top/outsole studies from the
+bundled GLB with the correct rotation order. The finale's decorative word is
+out of document flow, the arrival animates the inner content independently of
+the pin, and its product, heading, and earlier-arriving controls fit the screen.
+Short-phone and static hero edition labels no longer overlap the headline.
+
+Verified chapter anchors, the mobile menu and Escape, collection navigation,
+and collection/search/cart/product routes. Reduced-motion and JavaScript-disabled
+phone views retain all three material images without a canvas. No page errors,
+broken images, or horizontal overflow were observed in these checks. Build,
+56 tests (including forward/reverse caption and index agreement), structural
+validation, and diff whitespace checks pass. Theme Check has no errors and
+retains the existing orphaned development-catalog snippet warning. The manual
+design detector reported no findings. Commerce remains a local preview;
+connected-store checkout and production deployment were not exercised.
+
+## Recording-driven 3D rebuild — 2026-10-24
+
+Reviewed the owner's 36.2-second recording from beginning to end using 24
+evenly spaced captured frames. The main failures were the disappearing anatomy
+subject near 6s, competing material images near 9s, small type at recording
+resolution, sparse brand transitions near 30s, and static later product views.
+
+The bundled TN now uses one persistent renderer and one model load through the
+hero, anatomy, materials, technology, featured, and finale chapters. Absolute
+world-axis poses reveal the real top and outsole. The overlay interpolates
+between chapter windows, uses the existing GSAP scheduler, limits pixel cost,
+and restores static images on failure, context loss, reduced motion, or teardown.
+Merchant asset precedence and the separate photographic collection remain native.
+Material panels now switch with one complete caption and image owner; study
+anchors synchronize with forward/reverse scroll and retain native flow targets.
+
+The homepage-only experience stylesheet introduces monumental Archivo display,
+larger responsive reading type, a cobalt accent, fuller annotation/credit
+ledgers, a compact brand close, and immediately readable finale controls.
+
+Verified all eight chapters at 1440×900, 2556×1438 (recording size), 1366×768,
+768×1024, 390×844, and 375×667. No horizontal overflow or browser page errors
+were observed. Study selection in both directions, reload mid-story, one-canvas
+ownership, actual WebGL loss/recovery, runtime reduced motion, no-JS layouts,
+mobile menu/Escape, and collection/search/cart/product routes passed. Build,
+60 tests, and structural validation pass. Theme Check retains only the existing
+orphaned development-catalog warning. The design detector reported no findings.
+
+An independent visual review requested one fix: the tablet hero ledger overlapped
+the model. The redundant tablet ledger was removed; the reviewer scored the
+recapture resolved with no visible regression and accepted the result pending
+documentation. Screenshot evidence is in `.impeccable/review/`. Existing raster
+origins are recorded from repository model, concept, and photographic source
+records; unknown reference origins remain explicitly unknown. No new shipping
+image was generated in this rebuild. Store-connected checkout and physical-device
+production frame rate are outside these local checks. No deployment was run.

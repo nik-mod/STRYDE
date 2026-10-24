@@ -4,7 +4,7 @@
 .hero .hero-type .hero-line-1 .hero-line-inner { font-style: normal; color: var(--ink); opacity: 1; font-variation-settings: 'wght' 880, 'wdth' 80; }
 .hero .hero-type .hero-line-2 .hero-line-inner { font-style: italic; color: var(--hero-type); opacity: 1; font-variation-settings: 'wght' 620, 'wdth' 84; }
 .hero .hero-line-2 { margin-top: .05em; }
-.js .hero .hero-art { left: 30%; right: 0; top: 7.5%; bottom: 11%; }
+.js .hero .hero-art { left: 36%; right: 6%; top: 14%; bottom: 19%; }
 .hero .hero-copy { top: auto; bottom: 22%; width: min(320px, 26vw); font-size: 14px; }
 .hero .hero-edition { top: calc(var(--header-height) + var(--preview-height) + 18px); }
 .chapter-collection .coll-scene-num { display: none; }
@@ -50,10 +50,10 @@
 .photography-reference summary { cursor: pointer; padding-block: 6px; }
 .photography-reference a { text-decoration: underline; text-underline-offset: 3px; }
 @media (min-width:701px) {
- .chapter-finale .finale-shoe[data-finale-model] { width:min(1280px,92vw,116svh)!important; }
+ .chapter-finale .finale-shoe[data-finale-model] { width:min(1000px,86vw,90svh)!important; }
 }
 @media (min-width:701px) and (max-height:820px) {
- .chapter-finale .finale-shoe[data-finale-model] { width:min(1280px,92vw,108svh)!important; }
+ .chapter-finale .finale-shoe[data-finale-model] { width:min(1000px,86vw,80svh)!important; }
 }
 @media (min-width:701px) and (max-width:1000px) and (orientation:portrait) {
  .hero .hero-type { top:16%; width:90%; font-size:10vw; }
@@ -66,6 +66,7 @@
  .photography-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 @media (max-width:700px) {
+ .hero .hero-edition { top: calc(var(--header-height) + 20px); }
  .hero .hero-type { top:16%;width:88%;font-size:13vw; }
  .hero .hero-copy { top:auto;bottom:21%;width:83%; }
  .js .hero .hero-art { left:3%;right:3%;top:31%;bottom:37%; }
@@ -99,9 +100,11 @@
  .hero .hero-name { font-size:18px; }
 }
 @media (prefers-reduced-motion:reduce) {
+ .hero .hero-edition { inset: auto; }
  .hero .hero-type,.hero .hero-copy { position:relative;inset:auto;width:100%; }
  .js .hero .hero-art { position:relative;inset:auto;height:50vw;min-height:260px; }
 }
+.no-js .hero .hero-edition { inset: auto; }
 
 /* ----------------------------------------------------------------
    Campaign art direction pass — directed product experience.
@@ -171,8 +174,8 @@
 
 /* Finale: one consistent, gentle profile crop — the complete silhouette
    stays inside the window (recovery.css left it overflow:visible). */
-.finale-profile-window { aspect-ratio: 1240 / 730; overflow: hidden; }
-.finale-profile-window img { width: 124%; left: -12%; top: -36%; }
+.finale-profile-window { aspect-ratio: 2; overflow: hidden; }
+.finale-profile-window img { width: 111.1111%; left: -3.9683%; top: -36.5079%; }
 
 /* Materials sits on the paper field — images at their native 4:3 ratio sit
    directly on it. No filled frame box: contain fills exactly, edge to edge. */
@@ -222,7 +225,7 @@
 .chapter-materials .mat-panel-cage .mat-media { order: 2; }
 .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
 .chapter-materials .mat-media { position: relative; min-width: 0; }
-.chapter-materials .mat-copy { min-width: 0; max-width: min(100%, 30rem); }
+.chapter-materials .mat-copy { min-width: 0; max-width: min(100%, 30rem); background: transparent; }
 /* The numeral straddles the frame's outer corner ABOVE the image — fully
    readable, never clipped by the frame or buried behind the photo. */
 .chapter-materials .mat-ghost {
@@ -244,7 +247,7 @@
 .chapter-materials .mat-panel-cage .mat-ghost { left: auto; right: -.08em; }
 /* All studies render at the source photography's native 4:3 — contain fills
    the frame exactly, so the shoe reads at full scale with no letterbox. */
-.chapter-materials .mat-frame { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+.chapter-materials .mat-frame { width: 100%; height: auto; aspect-ratio: 4 / 3; background: transparent; }
 .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: min(100%, 74vh); }
 .chapter-materials .mat-panel-cage .mat-media { display: flex; justify-content: flex-end; }
 .chapter-materials .mat-inset {
@@ -285,15 +288,15 @@
   color: var(--ink);
   background: rgba(255, 255, 255, .55);
 }
-/* Study index rail: fills the outer edge with a live map of the journey.
-   Offset clears the fixed chapter numeral rail so the labels never clip. */
+/* The study index sits below the spread, clear of captions and chapter links. */
 .chapter-materials .mat-rail {
   position: absolute;
-  right: clamp(76px, 6.4vw, 104px);
-  top: 50%;
-  transform: translateY(-50%);
+  right: auto;
+  left: var(--gutter);
+  bottom: 24px;
+  top: auto;
   display: none;
-  flex-direction: column;
+  flex-direction: row;
   gap: 18px;
   margin: 0;
   padding: 0;
@@ -334,6 +337,9 @@
 .chapter-materials.is-journey-host .mat-copy { background: none; justify-content: flex-start; padding-top: clamp(10px, 3vh, 34px); }
 
 /* Pinned journey: frame owns its ratio inside the pin box. */
+.chapter-materials.is-journey-host .mat-panels { margin-top: clamp(52px, 7vh, 72px); }
+.chapter-materials.is-journey-host .mat-media { width: min(100%, calc((100svh - 370px) * 4 / 3)); }
+.chapter-materials:not(.is-journey-host) .mat-rail { display: none; }
 .chapter-materials.is-journey-host .mat-frame { height: auto; max-height: 66vh; aspect-ratio: 4 / 3; }
 .chapter-materials.is-journey-host .mat-panel-cage .mat-frame { width: min(100%, 62vh); aspect-ratio: 4 / 3; }
 .chapter-materials.is-journey-host .mat-ghost { font-size: clamp(104px, 12vw, 200px); }
@@ -345,7 +351,10 @@
   .chapter-materials .mat-copy p { max-width: 30ch; }
 }
 @media (max-width: 1180px) {
-  .chapter-materials .mat-panel { grid-template-columns: 1fr; gap: 26px; }
+  .chapter-materials .mat-panel { display: grid; grid-template-columns: 1fr; gap: 36px; min-height: 0; padding-block: 30px 54px; background: transparent; }
+  .chapter-materials .mat-media { width: 100%; }
+  .chapter-materials .mat-frame { height: auto; aspect-ratio: 4 / 3 !important; }
+  .chapter-materials .mat-copy { max-width: 100%; padding: 0; }
   .chapter-materials .mat-panel-cage .mat-media { order: 0; }
   .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
   .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: 100%; }
@@ -356,7 +365,7 @@
 
 /* Mobile flow: stacked spread, quieter ghost, inset tucked in. */
 @media (max-width: 700px) {
-  .chapter-materials .mat-panel { grid-template-columns: 1fr; gap: 26px; }
+  .chapter-materials .mat-panel { grid-template-columns: 1fr; gap: 36px; }
   .chapter-materials .mat-panel-cage .mat-media { order: 0; }
   .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
   .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: 100%; }
@@ -384,7 +393,7 @@
   z-index: 0;
 }
 .chapter-finale .finale-spot { top: 40%; }
-.chapter-finale .finale-floor { z-index: 0; }
+.chapter-finale .finale-floor { z-index: 0; bottom: 24px; }
 .chapter-finale .finale-inner { z-index: 2; }
 
 /* Brand — the last frame joins the engineering system: corner marks and a
@@ -500,10 +509,10 @@
 }
 .chapter-technology .tech-stack .tech-view.is-active { opacity: 1; }
 @media (max-width: 1180px) {
-  .chapter-technology { grid-template-areas: 'kicker' 'heading' 'brief' 'stage'; }
+  .chapter-technology { grid-template-areas: 'kicker' 'heading' 'brief' 'stage'; grid-template-columns: minmax(0, 1fr); }
   .chapter-technology .tech-brief { max-width: 52ch; }
 }
-.chapter-technology .tech-visual { height: clamp(400px, 46vw, 620px); }
+.chapter-technology .tech-visual { height: clamp(320px, 36vw, 500px); }
 .chapter-technology .tech-visual::before {
   inset: -14% -12%;
   background: radial-gradient(58% 50% at 50% 48%, rgba(150, 214, 255, .2), rgba(150, 214, 255, 0) 74%);
@@ -757,6 +766,7 @@
   .chapter-deconstruction .decon-notes { display: none; }
   .chapter-featured .feat-word { font-size: 24vw; left: 2%; top: 30%; }
   .chapter-technology .tech-stage {
+    display: grid;
     grid-template-areas: 'visual' 'rows';
     grid-template-columns: 1fr;
   }
@@ -841,7 +851,7 @@
 /* Finale sheen: a light bar that sweeps across the monumental word as it
    crests. Oversized and clipped by the word's own overflow, so the sweep
    reads as a highlight passing over the letterforms. */
-.finale-word { position: relative; }
+.finale-word { position: absolute; }
 .finale-sheen {
   position: absolute;
   top: -12%;

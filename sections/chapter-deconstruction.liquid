@@ -18,7 +18,7 @@
           {% when 5 %}{% assign title = section.settings.part_5_title %}{% assign body = section.settings.part_5_body %}
         {% endcase %}
         {% if title != blank %}
-          <div class="decon-item">
+          <div class="decon-item" id="Anatomy-{{ section.id }}-{{ index }}">
             <span class="decon-num" aria-hidden="true">0{{ index }}</span>
             <div>
               <h3>{{ title | escape }}</h3>
@@ -31,7 +31,7 @@
     <div class="decon-visual">
       <span class="decon-ghost" aria-hidden="true">02</span>
       <div class="frame decon-frame">
-        <div class="decon-crop is-active" style="--zoom: {% if section.settings.use_tn_model %}1.32{% else %}1.25{% endif %}; --tx: 0%; --ty: 0%;">
+        <div class="decon-crop is-active" style="--zoom: {% if section.settings.use_tn_model %}1.06{% else %}1.25{% endif %}; --tx: 0%; --ty: 0%;">
           {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — profile view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
         </div>
         <div class="decon-crop" style="--zoom: {% if section.settings.use_tn_model %}1.25{% else %}1.35{% endif %}; --tx: 0%; --ty: 0%;">
@@ -48,6 +48,13 @@
         <span class="decon-tick" aria-hidden="true"></span>
         <span class="asset-tag">{% if section.settings.use_tn_model %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</span>
       </div>
+      {% if section.settings.use_tn_model %}
+      <dl class="chapter-ledger decon-ledger">
+        <div><dt>Silhouette</dt><dd>Air Max Plus / TN</dd></div>
+        <div><dt>Color study</dt><dd>Blue / White</dd></div>
+        <div><dt>View sequence</dt><dd>Profile / Heel / Outsole</dd></div>
+      </dl>
+      {% endif %}
     </div>
   </div>
 </section>

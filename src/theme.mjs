@@ -72,20 +72,24 @@ function mountHeroSection(root) {
         root.querySelectorAll('[data-magnetic]').forEach(element => scope.add(mountMagnetic(element, { gsap, signal: scope.signal })));
       }
       if (root.dataset.modelUrl) {
+        const journey = root.dataset.modelYaw === '90' && document.querySelector('[data-chapter="materials"][data-tn-editorial]');
         const observer = new IntersectionObserver(entries => {
           if (!entries.some(entry => entry.isIntersecting)) return;
           observer.disconnect();
           scope.run(async signal => {
-            const { mountScene } = await import('./scene.mjs');
+            const { mountScene } = journey ? { mountScene: (await import('./journey-scene.mjs')).mountJourneyScene } : await import('./scene.mjs');
             if (signal.aborted || reduceQuery.matches) return;
-            return mountScene({ root, url: new URL(root.dataset.modelUrl, location.href).href, bus, scheduler, signal });
+            return mountScene({ root, url: new URL(root.dataset.modelUrl, location.href).href, bus, scheduler, signal, gsap, ScrollTrigger });
           }).catch(error => {
             const status = root.querySelector('[data-model-status]');
             status.hidden = false; status.textContent = root.dataset.errorLabel;
             console.warn('[STRYDE] Scene bundle unavailable:', error.message);
           });
         }, { rootMargin: '200px' });
-        observer.observe(root);
+        // Restored scroll positions can start after the hero. Any visible
+        // product chapter must be able to initialize the shared renderer.
+        const observed = journey ? document.querySelectorAll('[data-hero], [data-chapter][data-tn-editorial], [data-chapter="technology"]') : [root];
+        observed.forEach(element => observer.observe(element));
         return () => { observer.disconnect(); scope.dispose(); };
       }
       return () => scope.dispose();
@@ -97,9 +101,9 @@ function mountHeroSection(root) {
 function mountChapterSection(root) {
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
-    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
+    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
       if (!conditions.motion) return;
-      const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : conditions.mobile || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
+      const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : conditions.mobile || (root.dataset.chapter === 'materials' && conditions.materialsFlow) || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
       return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });
     });
   }, root);
@@ -107,6 +111,7 @@ function mountChapterSection(root) {
 }
 
 let environmentDispose = null;
+let progressTween = null;
 function ensureEnvironments(scope) {
   if (environmentDispose) return;
   if (scope !== document && !scope.querySelector?.('[data-env]')) return;
@@ -130,6 +135,10 @@ function mount(scope = document) {
     menu.addEventListener('click', event => { if (event.target.closest('a')) menu.open = false; });
   });
   ScrollTrigger.refresh();
+  const progress = document.querySelector('[data-story-progress]');
+  if (progress && !progressTween) progressTween = gsap.fromTo(progress, { scaleX: 0 }, {
+    scaleX: 1, ease: 'none', scrollTrigger: { id: 'story-progress', trigger: '#MainContent', start: 'top top', end: 'bottom bottom', scrub: true },
+  });
 }
 function unmount(scope) { for (const [root, dispose] of instances) if (scope === root || scope.contains(root)) { dispose(); instances.delete(root); } }
 syncScroll(); mount();
@@ -145,6 +154,7 @@ window.addEventListener('pagehide', () => {
   try { sessionStorage.setItem(checkpointKey, JSON.stringify(exitScroll)); } catch { /* Optional restoration only. */ }
   pageActive = false;
   disposeInspection();
+  progressTween?.scrollTrigger?.kill(); progressTween?.revert(); progressTween = null;
   unmount(document); environmentDispose?.(); environmentDispose = null; lenis?.destroy(); lenis = null; scheduler.setLenis(null); modalObserver.disconnect();
 });
 window.addEventListener('pageshow', event => {
