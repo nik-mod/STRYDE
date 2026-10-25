@@ -1,0 +1,42 @@
+<section class="page-shell account-page" data-account-overview>
+  <header class="page-heading"><span class="micro">{{ 'customer.account_intro' | t }}</span><h1>{{ 'customer.account_title' | t | upcase }}</h1></header>
+  <div class="account-layout">
+    <div class="account-main">
+      <h2>{{ 'customer.orders_title' | t }}</h2>
+      {% paginate customer.orders by 10 %}
+        {% if customer.orders.size > 0 %}
+          <div class="account-orders">
+            {% for order in customer.orders %}
+              <a class="account-order" href="{{ order.customer_url | default: order.url }}">
+                <span class="account-order-name">{{ order.name }}</span>
+                <span class="account-order-date micro">{{ order.created_at | date: '%d.%m.%Y' }}</span>
+                <span class="micro">{{ order.financial_status_label }}</span>
+                <span class="micro">{{ order.fulfillment_status_label | default: order.fulfillment_status }}</span>
+                <span class="account-order-total">{{ order.total_price | money_with_currency }}</span>
+              </a>
+            {% endfor %}
+          </div>
+          {% render 'pagination', paginate: paginate %}
+        {% else %}
+          <div class="empty-state"><h3>{{ 'customer.orders_empty' | t }}</h3><p>{{ 'customer.orders_empty_description' | t }}</p><a class="button button-dark" href="{{ routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a></div>
+        {% endif %}
+      {% endpaginate %}
+    </div>
+    <aside class="account-side">
+      <div class="account-block">
+        <h2>{{ 'customer.profile_title' | t }}</h2>
+        <p>{{ customer.name | escape }}</p>
+        <p class="micro">{{ customer.email }}</p>
+      </div>
+      <div class="account-block">
+        <h2>{{ 'customer.addresses_title' | t }}</h2>
+        {% if customer.default_address %}
+          {{ customer.default_address | format_address }}
+        {% else %}<p class="micro">{{ 'customer.addresses_empty' | t }}</p>{% endif %}
+        <a class="text-link" href="{{ routes.account_addresses_url }}">{{ 'customer.addresses_title' | t }} {% render 'icon', name: 'arrow' %}</a>
+      </div>
+      <a class="text-link" href="{{ routes.account_logout_url }}">{{ 'customer.sign_out' | t }} {% render 'icon', name: 'arrow' %}</a>
+    </aside>
+  </div>
+</section>
+{% schema %}{"name":"Account","settings":[]}{% endschema %}

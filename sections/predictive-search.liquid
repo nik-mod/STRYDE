@@ -1,0 +1,47 @@
+{% comment %}
+  Rendered by Shopify's predictive search endpoint (?section_id=predictive-search).
+  Never included in a template directly; mountPredictiveSearch() swaps the
+  returned HTML into the live suggestion panel on the search page.
+{% endcomment %}
+<div class="predictive-results" data-predictive-results>
+  {% if predictive_search.performed %}
+    {% assign total_results = predictive_search.resources.products.results.size | plus: predictive_search.resources.pages.results.size | plus: predictive_search.resources.queries.results.size %}
+    {% if total_results == 0 %}
+      <p class="micro predictive-empty">{{ 'search.predictive_empty' | t }}</p>
+    {% else %}
+      {% if predictive_search.resources.products.results.size > 0 %}
+        <div class="predictive-group">
+          <h2 class="micro">{{ 'search.predictive_products' | t }}</h2>
+          <ul>
+            {% for product in predictive_search.resources.products.results %}
+              <li><a href="{{ product.url }}">{{ product.title | escape }}{% if product.available == false %} — {{ 'products.sold_out' | t }}{% endif %}{% if product.compare_at_price > product.price %} — {{ 'products.on_sale' | t }}{% endif %}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      {% if predictive_search.resources.queries.results.size > 0 %}
+        <div class="predictive-group">
+          <h2 class="micro">{{ 'search.predictive_queries' | t }}</h2>
+          <ul>
+            {% for query in predictive_search.resources.queries.results %}
+              <li><a href="{{ query.url }}">{{ query.styled_text }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      {% if predictive_search.resources.pages.results.size > 0 %}
+        <div class="predictive-group">
+          <h2 class="micro">{{ 'search.predictive_pages' | t }}</h2>
+          <ul>
+            {% for page in predictive_search.resources.pages.results %}
+              <li><a href="{{ page.url }}">{{ page.title | escape }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% else %}
+    <p class="micro predictive-empty">{{ 'search.predictive_empty' | t }}</p>
+  {% endif %}
+</div>
+{% schema %}{"name":"Predictive search","settings":[]}{% endschema %}

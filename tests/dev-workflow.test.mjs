@@ -49,7 +49,7 @@ test('local dev serves the same Liquid without authentication and watches CSS an
     const page = await fetch(development.url);
     const html = await page.text();
     assert.equal(page.status, 200); assert.match(html, /data-hero/); assert.match(html, /data-stryde-dev/);
-    assert.match(html, /COMMERCE DISABLED/);
+    assert.match(html, /SIMULATED COMMERCE/);
     assert.equal((await fetch(`${development.url}/cart/add`, { method: 'POST' })).status, 405);
     const stream = await fetch(`${development.url}/__stryde_dev/events`, { signal: abort.signal });
     assert.match(stream.headers.get('content-type'), /text\/event-stream/); reader = stream.body.getReader();

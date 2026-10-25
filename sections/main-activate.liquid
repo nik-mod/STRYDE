@@ -1,0 +1,15 @@
+<section class="page-shell auth-page" data-account-activate>
+  <div class="auth-panel">
+    <header class="page-heading"><span class="micro">{{ shop.name | escape }}</span><h1>{{ 'customer.activate_title' | t }}</h1></header>
+    {% form 'activate_customer_password' %}
+      {{ form.errors | default_errors }}
+      <label for="ActivatePassword">{{ 'customer.sign_in_password' | t }}</label>
+      <input type="password" id="ActivatePassword" name="customer[password]" autocomplete="new-password" minlength="5" required>
+      <label for="ActivatePasswordConfirm">{{ 'customer.sign_in_password' | t }}</label>
+      <input type="password" id="ActivatePasswordConfirm" name="customer[password_confirmation]" autocomplete="new-password" minlength="5" required>
+      <button class="button button-dark button-full" type="submit">{{ 'customer.activate_submit' | t }}</button>
+      <button class="text-link" type="submit" name="decline">{{ 'customer.activate_decline' | t }}</button>
+    {% endform %}
+  </div>
+</section>
+{% schema %}{"name":"Activate account","settings":[]}{% endschema %}

@@ -1,0 +1,87 @@
+{% comment %}
+  Address book. Uses Shopify's classic customer_address form; the country
+  select is populated by Shopify (country_option_tags) and follows the
+  customer's locale. Deletion asks for confirmation before submitting.
+{% endcomment %}
+<section class="page-shell account-page addresses-page" data-account-addresses>
+  <nav class="studio-breadcrumbs" aria-label="{{ 'general.breadcrumbs' | t }}"><a href="{{ routes.account_url }}">{% render 'icon', name: 'arrow' %} {{ 'customer.account_title' | t }}</a><span>{{ 'customer.addresses_title' | t }}</span></nav>
+  <header class="page-heading"><span class="micro">{{ 'customer.account_intro' | t }}</span><h1>{{ 'customer.addresses_title' | t | upcase }}</h1></header>
+  <div class="addresses-grid">
+    {% for address in customer.addresses %}
+      <article class="address-card{% if address == customer.default_address %} address-default{% endif %}">
+        <h2 class="micro">{% if address == customer.default_address %}{{ 'customer.addresses_default' | t }} · {% endif %}{{ forloop.index }}</h2>
+        {{ address | format_address }}
+        <div class="address-actions">
+          <button type="button" class="text-link" data-address-toggle aria-expanded="false" aria-controls="EditAddress-{{ address.id }}">{{ 'customer.address_edit' | t }}</button>
+          <form method="post" action="{{ address.url }}" data-address-delete onsubmit="return confirm('{{ 'customer.address_delete_confirm' | t }}')">
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" class="text-link">{{ 'customer.address_delete' | t }}</button>
+          </form>
+        </div>
+        {% form 'customer_address', address %}
+          <div class="address-form" id="EditAddress-{{ address.id }}" hidden>
+            <label for="AddressFirstName-{{ address.id }}">{{ 'customer.address_first_name' | t }}</label>
+            <input type="text" id="AddressFirstName-{{ address.id }}" name="address[first_name]" value="{{ address.first_name }}" autocomplete="given-name">
+            <label for="AddressLastName-{{ address.id }}">{{ 'customer.address_last_name' | t }}</label>
+            <input type="text" id="AddressLastName-{{ address.id }}" name="address[last_name]" value="{{ address.last_name }}" autocomplete="family-name">
+            <label for="AddressCompany-{{ address.id }}">{{ 'customer.address_company' | t }}</label>
+            <input type="text" id="AddressCompany-{{ address.id }}" name="address[company]" value="{{ address.company }}" autocomplete="organization">
+            <label for="AddressAddress1-{{ address.id }}">{{ 'customer.address_line1' | t }}</label>
+            <input type="text" id="AddressAddress1-{{ address.id }}" name="address[address1]" value="{{ address.address1 }}" autocomplete="address-line1">
+            <label for="AddressAddress2-{{ address.id }}">{{ 'customer.address_line2' | t }}</label>
+            <input type="text" id="AddressAddress2-{{ address.id }}" name="address[address2]" value="{{ address.address2 }}" autocomplete="address-line2">
+            <label for="AddressCity-{{ address.id }}">{{ 'customer.address_city' | t }}</label>
+            <input type="text" id="AddressCity-{{ address.id }}" name="address[city]" value="{{ address.city }}" autocomplete="address-level2">
+            <label for="AddressCountry-{{ address.id }}">{{ 'customer.address_country' | t }}</label>
+            <select id="AddressCountry-{{ address.id }}" name="address[country]" data-default="{{ address.country }}" autocomplete="country">{{ all_country_option_tags }}</select>
+            <label for="AddressZip-{{ address.id }}">{{ 'customer.address_zip' | t }}</label>
+            <input type="text" id="AddressZip-{{ address.id }}" name="address[zip]" value="{{ address.zip }}" autocapitalize="characters" autocomplete="postal-code">
+            <label for="AddressPhone-{{ address.id }}">{{ 'customer.address_phone' | t }}</label>
+            <input type="tel" id="AddressPhone-{{ address.id }}" name="address[phone]" value="{{ address.phone }}" autocomplete="tel">
+            <label class="address-default-label"><input type="checkbox" name="address[default]" {% if address == customer.default_address %}checked{% endif %}> {{ 'customer.address_set_default' | t }}</label>
+            <button class="button button-dark" type="submit">{{ 'customer.address_save' | t }}</button>
+            <button class="text-link" type="button" data-address-toggle aria-controls="EditAddress-{{ address.id }}">{{ 'customer.address_cancel' | t }}</button>
+          </div>
+        {% endform %}
+      </article>
+    {% endfor %}
+    <article class="address-card address-new">
+      <h2>{{ 'customer.address_add' | t }}</h2>
+      {% form 'customer_address', customer.new_address %}
+        <label for="AddressFirstNameNew">{{ 'customer.address_first_name' | t }}</label>
+        <input type="text" id="AddressFirstNameNew" name="address[first_name]" autocomplete="given-name">
+        <label for="AddressLastNameNew">{{ 'customer.address_last_name' | t }}</label>
+        <input type="text" id="AddressLastNameNew" name="address[last_name]" autocomplete="family-name">
+        <label for="AddressCompanyNew">{{ 'customer.address_company' | t }}</label>
+        <input type="text" id="AddressCompanyNew" name="address[company]" autocomplete="organization">
+        <label for="AddressAddress1New">{{ 'customer.address_line1' | t }}</label>
+        <input type="text" id="AddressAddress1New" name="address[address1]" autocomplete="address-line1">
+        <label for="AddressAddress2New">{{ 'customer.address_line2' | t }}</label>
+        <input type="text" id="AddressAddress2New" name="address[address2]" autocomplete="address-line2">
+        <label for="AddressCityNew">{{ 'customer.address_city' | t }}</label>
+        <input type="text" id="AddressCityNew" name="address[city]" autocomplete="address-level2">
+        <label for="AddressCountryNew">{{ 'customer.address_country' | t }}</label>
+        <select id="AddressCountryNew" name="address[country]" autocomplete="country">{{ all_country_option_tags }}</select>
+        <label for="AddressZipNew">{{ 'customer.address_zip' | t }}</label>
+        <input type="text" id="AddressZipNew" name="address[zip]" autocapitalize="characters" autocomplete="postal-code">
+        <label for="AddressPhoneNew">{{ 'customer.address_phone' | t }}</label>
+        <input type="tel" id="AddressPhoneNew" name="address[phone]" autocomplete="tel">
+        <label class="address-default-label"><input type="checkbox" name="address[default]"> {{ 'customer.address_set_default' | t }}</label>
+        <button class="button button-dark" type="submit">{{ 'customer.address_save' | t }}</button>
+      {% endform %}
+    </article>
+  </div>
+</section>
+<script>
+  (() => {
+    for (const toggle of document.querySelectorAll('[data-address-toggle]')) {
+      toggle.addEventListener('click', () => {
+        const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+        if (!panel) return;
+        panel.hidden = !panel.hidden;
+        toggle.setAttribute('aria-expanded', String(!panel.hidden));
+      });
+    }
+  })();
+</script>
+{% schema %}{"name":"Addresses","settings":[]}{% endschema %}

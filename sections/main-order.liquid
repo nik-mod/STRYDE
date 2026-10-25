@@ -1,0 +1,41 @@
+<section class="page-shell account-page order-page" data-account-order>
+  <nav class="studio-breadcrumbs" aria-label="{{ 'general.breadcrumbs' | t }}"><a href="{{ routes.account_url }}">{% render 'icon', name: 'arrow' %} {{ 'customer.account_title' | t }}</a><span>{{ order.name }}</span></nav>
+  <header class="page-heading">
+    <span class="micro">{{ order.created_at | date: '%d.%m.%Y' }}</span>
+    <h1>{{ order.name }}</h1>
+    <p class="micro">
+      {{ 'customer.order_payment_status' | t }}: {{ order.financial_status_label }} · {{ 'customer.order_fulfillment_status' | t }}: {{ order.fulfillment_status_label | default: order.fulfillment_status | default: '—' }}
+      {% if order.cancelled %} · {{ 'customer.order_cancelled' | t }}{% endif %}
+    </p>
+  </header>
+  <div class="order-layout">
+    <div class="order-items">
+      {% for line_item in order.line_items %}
+        <article class="order-item">
+          <div class="order-item-info">
+            <h2>{% if line_item.url != blank %}<a href="{{ line_item.url }}">{{ line_item.title | escape }}</a>{% else %}{{ line_item.title | escape }}{% endif %}</h2>
+            {% unless line_item.sku == blank %}<p class="micro">SKU {{ line_item.sku | escape }}</p>{% endunless %}
+            <p class="micro">{{ line_item.quantity }} × {{ line_item.final_price | money }}</p>
+            <p class="micro">{% if line_item.successfully_fulfilled %}{{ 'customer.order_item_fulfilled' | t }}{% else %}{{ 'customer.order_item_unfulfilled' | t }}{% endif %}</p>
+          </div>
+          <p class="order-item-total">{{ line_item.final_line_price | money_with_currency }}</p>
+        </article>
+      {% endfor %}
+    </div>
+    <aside class="order-summary">
+      <h2>{{ 'customer.order_details_title' | t }}</h2>
+      {% for discount_application in order.cart_level_discount_applications %}
+        <p>{{ discount_application.title | escape }} <span>−{{ discount_application.total_allocated_amount | money }}</span></p>
+      {% endfor %}
+      <p>{{ 'cart.subtotal' | t }} <span>{{ order.line_items_subtotal_price | money_with_currency }}</span></p>
+      {% for shipping_method in order.shipping_methods %}<p>{{ shipping_method.title | escape }} <span>{{ shipping_method.price | money }}</span></p>{% endfor %}
+      {% for tax_line in order.tax_lines %}<p>{{ tax_line.title | escape }} {{ tax_line.rate | times: 100 }}% <span>{{ tax_line.price | money }}</span></p>{% endfor %}
+      <p class="cart-total">{{ 'customer.order_total' | t }} <span>{{ order.total_price | money_with_currency }}</span></p>
+      {% if order.shipping_address %}
+        <h3>{{ 'customer.order_shipped_to' | t }}</h3>
+        <div class="order-address">{{ order.shipping_address | format_address }}</div>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% schema %}{"name":"Order","settings":[]}{% endschema %}

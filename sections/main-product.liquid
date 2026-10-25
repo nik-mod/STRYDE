@@ -15,22 +15,28 @@
     <div class="product-information studio-product-information">
       {% if product.vendor != blank %}<p class="micro">{{ product.vendor | escape }}</p>{% endif %}
       <h1 class="product-heading">{{ product.title | escape }}</h1>
-      <div class="price-line"><p data-product-price>{{ selected_variant.price | money_with_currency }}</p><s data-product-compare{% unless selected_variant.compare_at_price > selected_variant.price %} hidden{% endunless %}>{{ selected_variant.compare_at_price | money_with_currency }}</s></div>
-      {% form 'product', product, id: form_id, class: 'product-form' %}
+      <div class="price-line"><p data-product-price>{{ selected_variant.price | money_with_currency }}</p><s data-product-compare{% unless selected_variant.compare_at_price > selected_variant.price %} hidden{% endunless %}>{{ selected_variant.compare_at_price | money_with_currency }}</s><span class="sale-badge micro" data-product-sale-badge{% unless selected_variant.compare_at_price > selected_variant.price %} hidden{% endunless %}>{{ 'products.on_sale' | t }}</span></div>
+      {% form 'product', product, id: form_id, class: 'product-form', data-product-form: true %}
         {{ form.errors | default_errors }}
-        <label class="micro variant-select-label" for="Variant-{{ section.id }}">{{ 'products.choose_variant' | t }}</label>
-        {% if product.variants.size > 1 and product.variants.size <= 12 %}
-        <div class="studio-variant-options" data-variant-options role="group" aria-label="{{ 'products.choose_variant' | t }}">
-          {% for variant in product.variants %}<button type="button" data-variant-option="{{ variant.id }}" aria-pressed="{% if variant == selected_variant %}true{% else %}false{% endif %}"{% unless variant.available %} disabled{% endunless %}>{{ variant.title | escape }}</button>{% endfor %}
-        </div>
+        {% if product.options_with_values.size > 0 %}
+          {% render 'variant-picker', product: product %}
         {% endif %}
+        <label class="micro variant-select-label" for="Variant-{{ section.id }}">{{ 'products.choose_variant' | t }}</label>
         <select id="Variant-{{ section.id }}" name="id" data-variant-select>
           {% for variant in product.variants %}<option value="{{ variant.id }}"{% if variant == selected_variant %} selected{% endif %}{% unless variant.available %} disabled{% endunless %}>{{ variant.title | escape }} — {{ variant.price | money_with_currency }}{% unless variant.available %} — {{ 'products.sold_out' | t }}{% endunless %}</option>{% endfor %}
         </select>
-        <label class="micro" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
-        <input id="Quantity-{{ section.id }}" class="quantity-input" type="number" name="quantity" value="1" min="1" step="1" inputmode="numeric">
+        <div class="product-form-row">
+          <div class="product-quantity">
+            <label class="micro" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+            <input id="Quantity-{{ section.id }}" class="quantity-input" type="number" name="quantity" value="1" min="1" step="1" inputmode="numeric">
+          </div>
+          {% if section.settings.size_guide_page != blank and section.settings.size_guide_page.url != blank %}
+            <a class="text-link micro size-guide-link" href="{{ section.settings.size_guide_page.url }}">{{ 'products.size_guide' | t }} {% render 'icon', name: 'arrow' %}</a>
+          {% endif %}
+        </div>
         <p class="availability micro" data-product-availability role="status" aria-live="polite">{% if selected_variant.available %}{{ 'products.available' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</p>
         <button class="button button-dark button-full" type="submit" name="add" data-add-to-cart{% unless selected_variant.available %} disabled{% endunless %}>{% if selected_variant.available %}{{ 'products.add_to_bag' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}{% render 'icon', name: 'plus' %}</button>
+        <p class="micro form-error" data-form-error role="alert" hidden></p>
       {% endform %}
       <noscript><form action="{{ product.url }}" method="get" class="product-form"><label for="VariantNoScript-{{ section.id }}">{{ 'products.choose_variant' | t }}</label><select id="VariantNoScript-{{ section.id }}" name="variant">{% for variant in product.variants %}<option value="{{ variant.id }}"{% if variant == selected_variant %} selected{% endif %}>{{ variant.title | escape }}{% unless variant.available %} — {{ 'products.sold_out' | t }}{% endunless %}</option>{% endfor %}</select><button class="button" type="submit">{{ 'products.view_selection' | t }}</button></form></noscript>
       {% if product.description != blank %}<div class="rte product-description">{{ product.description }}</div>{% endif %}
@@ -49,12 +55,19 @@
         {% if section.settings.support_note != blank %}<div class="product-trust-row"><h3>{{ 'products.trust_support' | t }}</h3><p>{{ section.settings.support_note | escape }}</p></div>{% endif %}
       </div>
       {% endif %}
-      <script type="application/json" data-product-variants>{"variants":[{% for variant in product.variants %}{"id":{{ variant.id | json }},"available":{{ variant.available | json }},"price":{{ variant.price | money_with_currency | json }},"comparePrice":{{ variant.compare_at_price | money_with_currency | json }},"onSale":{% if variant.compare_at_price > variant.price %}true{% else %}false{% endif %},"image":{% if variant.featured_image %}{{ variant.featured_image | image_url: width: 1600 | json }}{% elsif product.featured_image %}{{ product.featured_image | image_url: width: 1600 | json }}{% else %}null{% endif %},"imageAlt":{{ variant.featured_image.alt | default: product.title | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}],"labels":{"available":{{ 'products.available' | t | json }},"soldOut":{{ 'products.sold_out' | t | json }},"add":{{ 'products.add_to_bag' | t | json }}}}</script>
+      <script type="application/json" data-product-variants>{"variants":[{% for variant in product.variants %}{"id":{{ variant.id | json }},"available":{{ variant.available | json }},"price":{{ variant.price | money_with_currency | json }},"comparePrice":{{ variant.compare_at_price | money_with_currency | json }},"onSale":{% if variant.compare_at_price > variant.price %}true{% else %}false{% endif %},"image":{% if variant.featured_image %}{{ variant.featured_image | image_url: width: 1600 | json }}{% elsif product.featured_image %}{{ product.featured_image | image_url: width: 1600 | json }}{% else %}null{% endif %},"imageAlt":{{ variant.featured_image.alt | default: product.title | json }},"options":{{ variant.options | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}],"options":[{% for option in product.options_with_values %}{"name":{{ option.name | json }},"position":{{ option.position | json }},"values":{{ option.values | json }}}{% unless forloop.last %},{% endunless %}{% endfor %}],"selected":{{ selected_variant.id | json }},"labels":{"available":{{ 'products.available' | t | json }},"soldOut":{{ 'products.sold_out' | t | json }},"add":{{ 'products.add_to_bag' | t | json }},"adding":{{ 'products.adding' | t | json }},"unavailableCombination":{{ 'products.unavailable_combination' | t | json }},"selectOption":{{ 'products.select_option_first' | t | json }}}}</script>
     </div>
+  </div>
+  <div class="sticky-purchase" data-sticky-purchase hidden>
+    <div class="sticky-purchase-info">
+      <p class="sticky-purchase-title">{{ product.title | escape }}</p>
+      <p class="sticky-purchase-price" data-sticky-price>{{ selected_variant.price | money_with_currency }}</p>
+    </div>
+    <button type="button" class="button button-dark" data-sticky-add{% unless selected_variant.available %} disabled{% endunless %}>{% if selected_variant.available %}{{ 'products.add_to_bag' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</button>
   </div>
   <script type="application/ld+json">{{ product | structured_data }}</script>
 </section>
 {% endif %}
 {% schema %}
-{"name":"Product","settings":[{"type":"header","content":"Trust notes"},{"type":"paragraph","content":"Optional reassurance rows under the buy controls. Each appears only when filled; leave blank until real policies exist."},{"type":"text","id":"size_note","label":"Sizing note"},{"type":"text","id":"delivery_note","label":"Delivery note"},{"type":"text","id":"returns_note","label":"Returns note"},{"type":"text","id":"support_note","label":"Support note"}]}
+{"name":"Product","settings":[{"type":"header","content":"Trust notes"},{"type":"paragraph","content":"Optional reassurance rows under the buy controls. Each appears only when filled; leave blank until real policies exist."},{"type":"text","id":"size_note","label":"Sizing note"},{"type":"text","id":"delivery_note","label":"Delivery note"},{"type":"text","id":"returns_note","label":"Returns note"},{"type":"text","id":"support_note","label":"Support note"},{"type":"page","id":"size_guide_page","label":"Size guide page","info":"Links the footwear size chart from the buy controls."}]}
 {% endschema %}

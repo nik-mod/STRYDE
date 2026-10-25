@@ -1,0 +1,24 @@
+{% comment %}
+  Contact page template (assign to a page as page.contact). Content above the
+  form comes from the page itself, so the merchant controls the copy; the form
+  posts through Shopify's native contact form — no external service.
+{% endcomment %}
+<article class="page-shell editorial-page contact-page">
+  <div class="page-heading"><span class="micro">{{ shop.name | escape }}</span><h1>{{ 'contact.title' | t | upcase }}</h1></div>
+  <p class="contact-intro">{{ 'contact.intro' | t }}</p>
+  {% if page.content != blank %}<div class="rte contact-content">{{ page.content }}</div>{% endif %}
+  <div class="contact-form-wrap">
+    {% form 'contact' %}
+      {% if form.posted_successfully? %}<p class="auth-notice" role="status">{{ 'contact.sent' | t }}</p>{% endif %}
+      {{ form.errors | default_errors }}
+      <label for="ContactName">{{ 'contact.name' | t }}</label>
+      <input type="text" id="ContactName" name="contact[name]" autocomplete="name" required>
+      <label for="ContactEmail">{{ 'contact.email' | t }}</label>
+      <input type="email" id="ContactEmail" name="contact[email]" autocomplete="email" required>
+      <label for="ContactMessage">{{ 'contact.message' | t }}</label>
+      <textarea id="ContactMessage" name="contact[body]" rows="6" required></textarea>
+      <button class="button button-dark" type="submit">{{ 'contact.submit' | t }} {% render 'icon', name: 'arrow' %}</button>
+    {% endform %}
+  </div>
+</article>
+{% schema %}{"name":"Contact","settings":[]}{% endschema %}

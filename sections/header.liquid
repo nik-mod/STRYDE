@@ -1,4 +1,9 @@
 <header class="site-header">
+  {% if section.settings.announcement != blank %}
+  <div class="announcement-bar">
+    {% if section.settings.announcement_link != blank %}<a href="{{ section.settings.announcement_link }}">{{ section.settings.announcement | escape }}</a>{% else %}<span>{{ section.settings.announcement | escape }}</span>{% endif %}
+  </div>
+  {% endif %}
   <a class="wordmark" href="{{ routes.root_url }}" aria-label="{{ settings.brand_name | default: shop.name | escape }} — {{ 'general.home' | t }}">
     {% if settings.logo != blank %}{{ settings.logo | image_url: width: 400 | image_tag: widths: '120, 200, 400', width: 160, loading: 'eager', alt: settings.brand_name }}{% else %}{{ settings.brand_name | default: shop.name | escape }}{% endif %}
   </a>
@@ -8,7 +13,7 @@
   <div class="header-actions">
     {% if shop.customer_accounts_enabled %}<a class="account-link icon-link" href="{{ routes.account_url }}" aria-label="{{ 'general.account' | t }}">{% render 'icon', name: 'account' %}</a>{% endif %}
     <a class="icon-link" href="{{ routes.search_url }}" aria-label="{{ 'general.search' | t }}">{% render 'icon', name: 'search' %}</a>
-    <a class="bag-link" href="{{ routes.cart_url }}" aria-label="{{ 'cart.title' | t }} ({{ cart.item_count }})">{% render 'icon', name: 'bag' %}<span class="bag-count">{{ cart.item_count }}</span></a>
+    <a class="bag-link" href="{{ routes.cart_url }}"{% unless request.page_type == 'cart' %} data-cart-open aria-haspopup="dialog"{% endunless %} aria-label="{{ 'cart.title' | t }} ({{ cart.item_count }})">{% render 'icon', name: 'bag' %}<span class="bag-count" data-cart-count>{{ cart.item_count }}</span></a>
     <details class="mobile-menu" data-mobile-menu data-open-label="{{ 'general.menu' | t | escape }}" data-close-label="{{ 'general.close_menu' | t | escape }}">
       <summary aria-label="{{ 'general.menu' | t }}"><span></span><span></span></summary>
       <nav class="mobile-menu-panel" aria-label="{{ 'general.mobile_navigation' | t }}">
@@ -20,5 +25,5 @@
   </div>
 </header>
 {% schema %}
-{"name":"Header","settings":[{"type":"link_list","id":"menu","label":"Navigation menu"}]}
+{"name":"Header","settings":[{"type":"link_list","id":"menu","label":"Navigation menu"},{"type":"header","content":"Announcement"},{"type":"text","id":"announcement","label":"Announcement text","info":"Shows above the navigation only when filled, for example a seasonal campaign or free-shipping threshold you configured in Shopify."},{"type":"url","id":"announcement_link","label":"Announcement link"}]}
 {% endschema %}
