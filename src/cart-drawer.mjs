@@ -33,8 +33,35 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
 
   function content() { return dialog.querySelector('[data-cart-drawer-content]'); }
 
+  // Re-rendering swaps every control; keep keyboard focus on the equivalent
+  // control (same line, same action) instead of dropping it to <body>.
+  function focusSignature() {
+    const active = dialog.contains(document.activeElement) ? document.activeElement : null;
+    if (!active?.dataset) return null;
+    const item = active.closest('[data-cart-item]');
+    if (active.dataset.cartQuantity !== undefined && item) {
+      const current = Number(item.querySelector('[data-cart-quantity-value]')?.textContent) || 0;
+      return { key: item.dataset.key, action: 'quantity', delta: Number(active.dataset.quantity) - current };
+    }
+    if (active.dataset.cartRemove !== undefined) return { key: active.dataset.key ?? item?.dataset.key, action: 'remove' };
+    return null;
+  }
+
+  function restoreFocus(signature) {
+    if (!signature?.key) return;
+    if (signature.action === 'remove') {
+      dialog.querySelector(`[data-cart-remove][data-key="${CSS.escape(signature.key)}"]`)?.focus();
+      return;
+    }
+    if (signature.action !== 'quantity') return;
+    const item = dialog.querySelector(`[data-cart-item][data-key="${CSS.escape(signature.key)}"]`);
+    const current = Number(item?.querySelector('[data-cart-quantity-value]')?.textContent) || 0;
+    item?.querySelector(`[data-cart-quantity][data-quantity="${current + signature.delta}"]`)?.focus();
+  }
+
   async function refresh() {
     const token = ++refreshToken;
+    const signature = focusSignature();
     dialog.dataset.busy = 'true';
     try {
       const sections = await fetchSections(routes.root || '/', ['cart-drawer'], fetchImpl);
@@ -43,6 +70,7 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
       next.innerHTML = sections['cart-drawer'];
       const incoming = next.querySelector('[data-cart-drawer-content]');
       if (incoming && content()) content().innerHTML = incoming.innerHTML;
+      restoreFocus(signature);
     } catch (error) {
       announce(error.message);
     } finally {
