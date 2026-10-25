@@ -1,4 +1,33 @@
-<section id="chapter-brand" class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}" aria-labelledby="BrandHeading-{{ section.id }}">
+{% liquid
+  assign brand_studio = false
+  if section.settings.use_tn_model and section.settings.image == blank
+    assign brand_studio = true
+  endif
+%}
+<section id="chapter-brand" class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}"{% if brand_studio %} data-brand-live data-tn-editorial{% endif %} aria-labelledby="BrandHeading-{{ section.id }}">
+  {% if brand_studio %}
+  <div class="brand-studio" data-brand-stage>
+    <header class="brand-studio-head">
+      <h2 id="BrandHeading-{{ section.id }}">{{ section.settings.studio_heading | default: 'In a different light.' | escape }}</h2>
+      <p class="brand-studio-caption" data-brand-caption>Follow the sidewall.</p>
+    </header>
+    <figure class="brand-studio-window" data-brand-window>
+      <img data-brand-model src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" width="2800" height="2100" sizes="(max-width: 700px) 92vw, 86vw" loading="lazy" alt="The complete blue and white Nike Air Max Plus sneaker in profile">
+      <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
+    </figure>
+    <footer class="brand-studio-foot">
+      <div class="brand-studio-stops" data-brand-stops role="group" aria-label="Choose the sneaker view" hidden>
+        <button type="button" data-brand-step="0" aria-pressed="true"><span>01</span> Profile</button>
+        <button type="button" data-brand-step="1" aria-pressed="false"><span>02</span> Upper</button>
+        <button type="button" data-brand-step="2" aria-pressed="false"><span>03</span> Foundation</button>
+      </div>
+      <div class="brand-studio-actions">
+        <a href="#chapter-deconstruction">{{ 'general.explore_details' | t }} {% render 'icon', name: 'arrow' %}</a>
+        <a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }} {% render 'icon', name: 'arrow' %}</a>
+      </div>
+    </footer>
+  </div>
+  {% else %}
   <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
   <div class="brand-stage" data-brand-stage>
     {%- comment -%} The manifesto becomes the chapter's display type: each word
@@ -8,14 +37,10 @@
       {% for word in manifesto_words %}<span class="brand-word">{{ word | escape }}</span> {% endfor %}
     </h2>
     <div class="brand-editorial">
-      <figure class="brand-visual frame{% if section.settings.image == blank and section.settings.use_tn_model %} brand-visual-pair{% endif %}" data-brand-visual>
+      <figure class="brand-visual frame" data-brand-visual>
         {% if section.settings.image != blank %}
           {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '700, 1200, 1800', sizes: '(max-width: 700px) 100vw, 46vw', alt: section.settings.image.alt }}
           {% if section.settings.image_is_concept %}<figcaption class="asset-tag">{{ 'assets.concept_tag' | t }}</figcaption>{% endif %}
-        {% elsif section.settings.use_tn_model %}
-          <img src="{{ 'tn-detail-2800.webp' | asset_url }}" srcset="{{ 'tn-detail-1000.webp' | asset_url }} 1000w, {{ 'tn-detail-2800.webp' | asset_url }} 2800w" width="2800" height="2100" sizes="(max-width: 700px) 100vw, 46vw" loading="lazy" data-brand-model alt="Blue upper and white wave cage, an editorial crop of the TN model render">
-          <span class="brand-detail-plate"><img src="{{ 'tn-heel-1000.webp' | asset_url }}" width="1000" height="750" loading="lazy" alt="Heel detail of the same blue and white TN model"></span>
-          <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
         {% else %}
           {% render 'presentation-image', slot: 'material_2' %}
         {% endif %}
@@ -42,35 +67,39 @@
     </div>
     {%- comment -%} The closing statement keeps the authored line pair, performed
       through overflow masks. {%- endcomment -%}
+    {% if section.settings.line_1 != blank or section.settings.line_2 != blank or section.settings.line_3 != blank %}
     <p class="brand-lines" aria-hidden="true">
       {% if section.settings.line_1 != blank %}<span class="brand-line brand-line-quiet"><span>{{ section.settings.line_1 | escape }}</span></span>{% endif %}
       {% if section.settings.line_2 != blank %}<span class="brand-line brand-line-loud"><span>{{ section.settings.line_2 | escape }}</span></span>{% endif %}
       {% if section.settings.line_3 != blank %}<span class="brand-line brand-line-quiet"><span>{{ section.settings.line_3 | escape }}</span></span>{% endif %}
     </p>
+    {% endif %}
     <nav class="brand-index" aria-label="Revisit the study">
       <a href="#chapter-deconstruction"><span>02 / Anatomy</span><strong>{{ 'general.the_details' | t }}</strong><small>Shape &amp; silhouette</small></a>
       <a href="#chapter-materials"><span>03 / Materials</span><strong>{{ 'general.materials' | t }}</strong><small>Color &amp; structure</small></a>
       <a href="#chapter-technology"><span>04 / Technology</span><strong>{{ 'general.form' | t }}</strong><small>Profile &amp; foundation</small></a>
     </nav>
   </div>
+  {% endif %}
 </section>
 {% schema %}
 {
   "name":"Brand story",
   "settings":[
-    {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial image","default":false},
+    {"type":"checkbox","id":"use_tn_model","label":"Use live TN lighting studio","default":false},
+    {"type":"text","id":"studio_heading","label":"3D studio heading","default":"In a different light."},
     {"type":"image_picker","id":"image","label":"Campaign image","info":"Use an approved campaign or detail image. Empty slots show a disclosed model or concept study."},
     {"type":"checkbox","id":"image_is_concept","label":"Campaign image is concept art","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"07 — The brand"},
-    {"type":"textarea","id":"manifesto","label":"Manifesto (displayed word by word)","default":"We study silhouettes before we sell them. Every line you scrolled was drawn from the profile up — form first, decoration later, nothing invented."},
-    {"type":"text","id":"value_1_title","label":"Value 01 title","default":"Perspective first"},
-    {"type":"textarea","id":"value_1_body","label":"Value 01 body","default":"Each silhouette is read from the profile up. Form leads; finish follows."},
-    {"type":"text","id":"value_2_title","label":"Value 02 title","default":"Study, not stock"},
-    {"type":"textarea","id":"value_2_body","label":"Value 02 body","default":"References are credited photographs and renders, clearly labeled — never inventory."},
-    {"type":"text","id":"value_3_title","label":"Value 03 title","default":"Honest by construction"},
-    {"type":"textarea","id":"value_3_body","label":"Value 03 body","default":"Claims stay editable and checkable. The store only sells what can be verified."},
-    {"type":"text","id":"line_1","label":"Closing line one","default":"Start"},
-    {"type":"text","id":"line_2","label":"Closing line two","default":"with the line."},
+    {"type":"textarea","id":"manifesto","label":"Manifesto (displayed word by word)","default":"Blue mesh. White curves. Dark tread."},
+    {"type":"text","id":"value_1_title","label":"Value 01 title","default":"The line, up close."},
+    {"type":"textarea","id":"value_1_body","label":"Value 01 body","default":"White ribs trace the blue upper from forefoot to heel, above a sculpted midsole and black tread."},
+    {"type":"text","id":"value_2_title","label":"Value 02 title"},
+    {"type":"textarea","id":"value_2_body","label":"Value 02 body"},
+    {"type":"text","id":"value_3_title","label":"Value 03 title"},
+    {"type":"textarea","id":"value_3_body","label":"Value 03 body"},
+    {"type":"text","id":"line_1","label":"Closing line one"},
+    {"type":"text","id":"line_2","label":"Closing line two"},
     {"type":"text","id":"line_3","label":"Closing line three"}
   ],
   "presets":[{"name":"Brand story"}]

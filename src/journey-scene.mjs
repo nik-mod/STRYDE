@@ -3,11 +3,10 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { refinePreviewMaterial } from './scene-materials.mjs';
-import { fittedCameraZ } from './scene-framing.mjs';
 import { journeyModelSpec, journeyModelKey } from './journey-models.mjs';
-import { shoeTurn, studyTransition, windowTransition, turnPose, travelWindow, transitionCamera } from './journey-transition.mjs';
+import { studyTransition, windowTransition, exchangeModelSpec, chapterCameraDistance, productWindowViewport } from './journey-transition.mjs';
 import { environmentFor } from './motion/environments.mjs';
-import { journeyPose, journeyProgress, interpolateJourneyPose, flowingMaterialSample, inspectionPose, journeyHandoff } from './journey-poses.mjs';
+import { journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandLighting } from './journey-poses.mjs';
 
 const chapterOrder = ['hero', 'deconstruction', 'materials', 'technology', 'collection', 'featured', 'brand', 'finale'];
 const clamp = value => Math.min(1, Math.max(0, value));
@@ -74,6 +73,7 @@ export async function mountJourneyScene(options) {
 
 async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTrigger }) {
   const document = root.ownerDocument, environment = document.defaultView;
+  const inspectMotion = new URLSearchParams(environment.location.search).has('inspect');
   if (signal.aborted || environment.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};
   const overlay = document.createElement('div');
   overlay.className = 'journey-canvas';
@@ -96,47 +96,23 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   const primary = { url, yaw: Number(root.dataset.modelYaw) || 90, variant: 'blue' };
   const assets = new Map(), loading = new Map(), failed = new Set();
   let selectedAssets = [];
-  const sweepResolution = { value: new THREE.Vector2(1, 1) };
+  const cameraFits = new Map();
   let activeModelKey = '', modelObserver;
   let disposed = false, lost = false, loaded = false, dirty = true, targetsDirty = true;
-  let targets = [], owned = [], width = 0, height = 0, lastSignature = '', previousY = environment.scrollY, lastScrollTime = 0;
+  let targets = [], owned = [], width = 0, height = 0, lastSignature = '';
   let detachFrame = () => {};
-  let inspection = null, inspectionStart = 0, inspectionFrom = null, renderedPose = journeyPose('hero', 0);
-  let releaseFrom = null, releaseStart = 0;
-  let previousFrameTime = 0;
-  const viewButtons = [...root.querySelectorAll('[data-scene-view]')];
-  const resetInspection = () => {
-    inspection = null;
-    viewButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
-  };
-  const inspect = event => {
-    const button = event.target.closest('[data-scene-view]');
-    if (!button || !root.contains(button) || !loaded || lost) return;
-    inspection = inspectionPose(button.dataset.sceneView);
-    if (!inspection) return;
-    inspectionFrom = { ...renderedPose };
-    releaseFrom = null;
-    inspectionStart = performance.now() / 1000;
-    viewButtons.forEach(view => view.setAttribute('aria-pressed', String(view === button)));
-    const label = root.querySelector('[data-hero-view-label]');
-    if (label) label.textContent = button.textContent.trim();
-    dirty = true;
-  };
-  root.addEventListener('click', inspect);
   const release = () => {
     owned.forEach(target => target.classList.remove('has-journey-scene'));
     owned = [];
     overlay.style.display = 'none';
   };
   const refresh = () => { targetsDirty = true; dirty = true; };
-  const onLost = event => { event.preventDefault(); lost = true; release(); root.classList.remove('has-scene'); resetInspection(); setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product imagery remains available.'); };
+  const onLost = event => { event.preventDefault(); lost = true; release(); root.classList.remove('has-scene'); setStatus(root.dataset.contextLostLabel || '3D view interrupted. Product imagery remains available.'); };
   const onRestored = () => { lost = false; dirty = true; lastSignature = ''; root.classList.add('has-scene'); setStatus(''); };
   const cleanup = () => {
     if (disposed) return;
     disposed = true;
     release(); detachFrame();
-    root.removeEventListener('click', inspect);
-    resetInspection();
     document.removeEventListener('shopify:section:load', refresh);
     document.removeEventListener('shopify:section:unload', refresh);
     environment.removeEventListener('resize', refresh);
@@ -144,7 +120,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     renderer?.domElement.removeEventListener('webglcontextlost', onLost);
     renderer?.domElement.removeEventListener('webglcontextrestored', onRestored);
     modelObserver?.disconnect();
-    assets.forEach(asset => disposeModel(asset.model)); assets.clear();
+    assets.forEach(asset => disposeModel(asset.model)); assets.clear(); cameraFits.clear();
     shadowPlane?.geometry.dispose(); key.shadow.dispose();
     shadow?.dispose(); shadowTexture?.dispose(); reflection?.dispose();
     renderer?.dispose(); renderer?.forceContextLoss(); overlay.remove();
@@ -170,6 +146,8 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     add('technology', technology, technology?.querySelector('[data-tech-model]') ? [technology.querySelector('.tech-visual')] : []);
     const featured = document.querySelector('[data-chapter="featured"]');
     add('featured', featured, featured?.querySelector('[data-featured-model]') ? [featured.querySelector('.feat-frame')] : []);
+    const brand = document.querySelector('[data-chapter="brand"][data-brand-live]');
+    add('brand', brand, brand ? [brand.querySelector('[data-brand-window]')] : []);
     const finale = document.querySelector('[data-chapter="finale"]');
     add('finale', finale, finale?.querySelector('[data-finale-model]') ? [finale.querySelector('.finale-profile-window')] : []);
     targets = result; targetsDirty = false;
@@ -182,8 +160,9 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       ? bus.state.local
       : pin ? journeyProgress(environment.scrollY, pin.start, pin.end)
         : clamp((environment.innerHeight * .75 - sectionRect.top) / Math.max(1, sectionRect.height));
-    if (['materials', 'featured'].includes(target.chapter) && pin?.animation) progress = pin.animation.progress();
-    let visual = target.visuals[0], flowBlend = null, flowRect = null;
+    if (['materials', 'featured', 'brand'].includes(target.chapter) && pin?.animation) progress = pin.animation.progress();
+    if (target.chapter === 'brand' && !pin && Number.isFinite(Number(target.section.dataset.brandProgress))) progress = clamp(Number(target.section.dataset.brandProgress));
+    let visual = target.visuals[0];
     if (target.visuals.length > 1 && !pin) {
       // Flowing panels all have opacity 1. Use their actual on-screen geometry,
       // then map the visible panel's local reading progress into its third.
@@ -194,19 +173,6 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       );
       visual = target.visuals[flow.index];
       progress = flow.progress;
-      for (let index = 1; index < target.visuals.length; index++) {
-        const from = target.visuals[index - 1], to = target.visuals[index];
-        const fromSpec = journeyModelSpec(from.closest('[data-journey-model]')?.dataset, primary);
-        const toSpec = journeyModelSpec(to.closest('[data-journey-model]')?.dataset, primary);
-        if (journeyModelKey(fromSpec) === journeyModelKey(toSpec)) continue;
-        const fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect();
-        const handoff = journeyHandoff(fromRect, toRect, environment.innerHeight);
-        if (handoff) {
-          flowBlend = { from: fromSpec, to: toSpec, progress: handoff.progress };
-          flowRect = travelWindow(fromRect, toRect, handoff.progress);
-          break;
-        }
-      }
     } else if (target.visuals.length > 1) {
       // A caption's visible owner is the same panel that owns the live model.
       // Scoring opacity also handles seeks during a merchant's fade transition.
@@ -226,16 +192,16 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       progress = clamp((environment.innerHeight * .6 - visual.getBoundingClientRect().top) / (environment.innerHeight * .48));
     }
     let modelSpec = journeyModelSpec(modelOwner?.dataset, primary);
-    let modelBlend = flowBlend || (target.chapter === 'materials' && pin ? studyTransition(
+    let modelBlend = target.chapter === 'materials' && pin ? studyTransition(
       target.visuals.map(frame => journeyModelSpec(frame.closest('[data-journey-model]')?.dataset, primary)), progress,
-    ) : null);
+    ) : null;
     if (modelOwner?.hasAttribute('data-journey-from-primary')) {
       const transition = windowTransition(primary, modelSpec, progress,
         Number(modelOwner.dataset.journeyChangeStart), Number(modelOwner.dataset.journeyChangeEnd));
       modelSpec = transition.spec; modelBlend = transition.blend;
     }
     const pose = journeyPose(target.chapter, progress);
-    return { ...target, progress, visual, modelSpec, modelBlend, rect: flowRect || visual.getBoundingClientRect(), sectionRect, pose: modelBlend ? turnPose(pose, modelBlend.progress) : pose };
+    return { ...target, progress, visual, modelSpec, modelBlend, rect: visual.getBoundingClientRect(), sectionRect, pose };
   }
 
   async function loadModel(spec) {
@@ -268,7 +234,6 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
           for (const x of [centered.min.x, centered.max.x]) for (const y of [centered.min.y, centered.max.y]) for (const z of [centered.min.z, centered.max.z]) surface.push(new THREE.Vector3(x, y, z));
         }
         const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-        const cut = { value: -1 }, role = { value: 0 };
         const treatedMaterials = new Set();
         object.traverse(node => {
           for (const material of (Array.isArray(node.material) ? node.material : [node.material])) {
@@ -281,27 +246,12 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
               if ('specularIntensity' in material) material.specularIntensity = .6;
               material.specularColor?.setRGB(.8, .8, .8);
             } else refinePreviewMaterial(material, THREE.ShaderChunk.normal_fragment_maps);
-            const compile = material.onBeforeCompile.bind(material);
-            const cacheKey = material.customProgramCacheKey.bind(material);
-            material.onBeforeCompile = (shader, webgl) => {
-              compile(shader, webgl);
-              Object.assign(shader.uniforms, { uShoeCut: cut, uShoeRole: role, uShoeResolution: sweepResolution });
-              shader.fragmentShader = 'uniform float uShoeCut; uniform float uShoeRole; uniform vec2 uShoeResolution;\n' + shader.fragmentShader;
-              shader.fragmentShader = shader.fragmentShader.replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
-                float shoeX = gl_FragCoord.x / uShoeResolution.x;
-                float shoeY = gl_FragCoord.y / uShoeResolution.y;
-                float shoeSurface = shoeX + .025 * sin(shoeY * 6.2831853);
-                if (uShoeRole != 0.0 && (shoeSurface - uShoeCut) * uShoeRole < 0.0) discard;
-              `);
-            };
-            material.customProgramCacheKey = () => cacheKey() + '|opaque-shoe-turn-v1';
           }
         });
         const scale = 2.6 / Math.max(size.x, size.y, size.z);
         const group = new THREE.Group(); group.scale.setScalar(scale); group.add(object);
         surface.forEach(point => point.multiplyScalar(scale));
-        const asset = { model: object, group, points: surface, worldPoints: surface.map(() => new THREE.Vector3()), cut, role,
-          scale, size: size.clone().multiplyScalar(scale), fitScale: new THREE.Vector3(1, 1, 1) };
+        const asset = { model: object, group, points: surface, worldPoints: surface.map(() => new THREE.Vector3()), scale };
         assets.set(id, asset); dirty = true;
         return asset;
       } catch (error) { disposeModel(object); throw error; }
@@ -314,31 +264,33 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     return task;
   }
 
-  function selectModel(spec, blend = null) {
-    const specs = blend ? [blend.from, blend.to] : [spec];
-    const ids = specs.map(journeyModelKey), id = ids.join('|');
-    const next = ids.map(key => assets.get(key));
-    if (next.some(asset => !asset)) { specs.forEach(candidate => { void loadModel(candidate); }); return false; }
+  function selectModel(spec, exchange = null) {
+    if (exchange) { void loadModel(exchange.from); void loadModel(exchange.to); }
+    const chosen = exchangeModelSpec(spec, exchange), id = journeyModelKey(chosen), asset = assets.get(id);
+    if (!asset) { void loadModel(chosen); return false; }
     if (activeModelKey !== id) {
-      selectedAssets.forEach(asset => { rig.remove(asset.group); asset.role.value = 0; });
-      selectedAssets = next;
-      next.forEach(asset => rig.add(asset.group));
+      selectedAssets.forEach(previous => rig.remove(previous.group));
+      selectedAssets = [asset]; rig.add(asset.group);
       activeModelKey = id; lastSignature = ''; dirty = true;
     }
-    const surface = blend ? shoeTurn(blend.progress).surface : 0;
-    const envelope = blend ? next[0].size.clone().lerp(next[1].size, surface) : null;
-    next.forEach((asset, index) => {
-      asset.role.value = blend ? (index === 0 ? 1 : -1) : 0;
-      asset.cut.value = - .05 + surface * 1.1;
-      // Match the full silhouette envelope at the heel, then restore the new
-      // shoe's exact proportions as the turn opens back into its side view.
-      asset.fitScale.set(1, 1, 1);
-      if (envelope) asset.fitScale.copy(envelope).divide(asset.size);
-      asset.group.scale.copy(asset.fitScale).multiplyScalar(asset.scale);
-    });
-    overlay.dataset.model = blend ? (surface <= 0 ? blend.from.variant : surface >= 1 ? blend.to.variant : `${blend.from.variant}-to-${blend.to.variant}`) : spec.variant;
-    overlay.dataset.transition = blend ? blend.progress.toFixed(4) : '';
+    overlay.dataset.model = chosen.variant;
+    overlay.dataset.transition = exchange ? exchange.progress.toFixed(4) : '';
     return true;
+  }
+
+  function cameraDistanceFor(view) {
+    const target = targets.find(candidate => candidate.chapter === view.chapter);
+    const specs = (target?.visuals || [view.visual]).map(visual => journeyModelSpec(visual.closest('[data-journey-model]')?.dataset, primary));
+    if (view.modelBlend) specs.push(view.modelBlend.from, view.modelBlend.to);
+    else specs.push(view.modelSpec);
+    const unique = [...new Map(specs.map(spec => [journeyModelKey(spec), spec])).entries()];
+    const missing = unique.filter(([id]) => !assets.has(id));
+    if (missing.length) { missing.forEach(([, spec]) => { void loadModel(spec); }); return null; }
+    const aspects = (target?.visuals || []).map(visual => visual.getBoundingClientRect()).filter(rect => rect.width > 1 && rect.height > 1).map(rect => rect.width / rect.height);
+    const aspect = Math.max(.01, Math.floor(Math.min(view.rect.width / view.rect.height, ...aspects) * 100) / 100);
+    const key = JSON.stringify([view.chapter, aspect, unique.map(([id]) => id).sort()]);
+    if (!cameraFits.has(key)) cameraFits.set(key, chapterCameraDistance(unique.map(([id]) => assets.get(id).points), view.chapter, { aspect, fov: camera.fov }));
+    return cameraFits.get(key);
   }
 
   function resolve() {
@@ -357,11 +309,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       if (chapterOrder.indexOf(to.chapter) !== chapterOrder.indexOf(from.chapter) + 1) continue;
       const handoff = journeyHandoff(from.rect, to.rect, environment.innerHeight);
       if (handoff) {
-        const modelBlend = journeyModelKey(from.modelSpec) !== journeyModelKey(to.modelSpec)
-          ? { from: from.modelSpec, to: to.modelSpec, progress: handoff.progress } : null;
-        const pose = interpolateJourneyPose(from.pose, to.pose, handoff.progress);
-        return { ...[from, to][handoff.index], modelBlend, pose: modelBlend ? turnPose(pose, modelBlend.progress) : pose,
-          rect: travelWindow(from.rect, to.rect, handoff.progress), visuals: [...from.visuals, ...to.visuals], opacity: 1 };
+        // Separate chapter windows have a heading and reading zone between
+        // them. Draw both visible windows with one context instead of flying
+        // a large canvas across that text. Model exchanges stay inside a study.
+        return { ...[from, to][handoff.index], views: [from, to], opacity: 1 };
       }
     }
     if (!current) return null;
@@ -374,6 +325,69 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     const enter = previousLive || current.chapter === 'hero' ? 1 : clamp((environment.innerHeight - current.sectionRect.top) / (environment.innerHeight * .4));
     const leave = nextLive || current.chapter === 'finale' ? 1 : clamp(current.sectionRect.bottom / (environment.innerHeight * .4));
     return { ...current, visuals: current.chapter === 'materials' ? current.visuals : [current.visual], opacity: Math.min(enter, leave) };
+  }
+
+  function lightFor(chapter, progress) {
+    const light = environmentFor(chapter);
+    if (chapter === 'brand') {
+      const studio = brandLighting(progress);
+      key.position.set(...studio.key); rim.position.set(...studio.rim);
+      key.intensity = studio.keyIntensity; rim.intensity = studio.rimIntensity;
+      ambient.intensity = .55; fill.intensity = .25; scene.environmentIntensity = .23;
+    } else {
+      key.position.set(3, 4, 5); rim.position.set(-3, 2, -2);
+      key.intensity = light.key; rim.intensity = light.rim;
+      ambient.intensity = 1.05; fill.intensity = .65; scene.environmentIntensity = .36;
+    }
+    return light;
+  }
+
+  function renderBoundary(views, chapter) {
+    const targetWidth = Math.ceil(environment.innerWidth / 64) * 64;
+    const targetHeight = Math.ceil(environment.innerHeight / 64) * 64;
+    if (width !== targetWidth || height !== targetHeight) {
+      width = targetWidth; height = targetHeight;
+      renderer.setPixelRatio(Math.max(1, Math.min(environment.devicePixelRatio || 1, 1.5, Math.sqrt(2000000 / (width * height)))));
+      renderer.setSize(width, height, false);
+    }
+    Object.assign(overlay.style, { display: 'block', left: '0px', top: '0px', width: `${environment.innerWidth}px`, height: `${environment.innerHeight}px`, opacity: '1' });
+    renderer.setScissorTest(false); renderer.autoClear = false; renderer.clear();
+    const visible = [];
+    const motion = [];
+    for (const view of views) {
+      if (!selectModel(view.modelSpec, view.modelBlend)) continue;
+      const { rect, pose } = view;
+      if (rect.width < 2 || rect.height < 2) continue;
+      const cameraZ = cameraDistanceFor(view);
+      if (cameraZ === null) continue;
+      const window = productWindowViewport(rect, view.sectionRect, { width: environment.innerWidth, height: environment.innerHeight }, { width, height });
+      if (!window) continue;
+      renderer.setViewport(...window.viewport);
+      renderer.setScissor(...window.scissor); renderer.setScissorTest(true); renderer.clearDepth();
+      camera.aspect = rect.width / rect.height; camera.updateProjectionMatrix();
+      rig.position.y = 0; rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ'); rig.updateMatrixWorld(true);
+      let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+      selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
+        const world = asset.worldPoints[index].copy(point).applyMatrix4(rig.matrixWorld);
+        bottom = Math.min(bottom, world.y); minX = Math.min(minX, world.x); maxX = Math.max(maxX, world.x);
+        minZ = Math.min(minZ, world.z); maxZ = Math.max(maxZ, world.z);
+      }));
+      shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
+      shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
+      camera.position.set(0, pose.cameraY, cameraZ);
+      const light = lightFor(view.chapter, view.progress);
+      renderer.toneMappingExposure = pose.exposure * light.exposure;
+      renderer.render(scene, camera);
+      if (inspectMotion) motion.push({ chapter: view.chapter, model: overlay.dataset.model, pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() });
+      visible.push(...(view.chapter === 'materials' ? view.visuals : [view.visual]));
+    }
+    renderer.autoClear = true; renderer.setScissorTest(false);
+    owned.filter(target => !visible.includes(target)).forEach(target => target.classList.remove('has-journey-scene'));
+    visible.forEach(target => target.classList.add('has-journey-scene')); owned = visible;
+    overlay.dataset.chapter = chapter;
+    if (inspectMotion) overlay.dataset.motion = JSON.stringify(motion);
+    if (!visible.length) release();
+    lastSignature = ''; dirty = true;
   }
 
   try {
@@ -398,7 +412,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
         const spec = journeyModelSpec(entry.target.dataset, primary);
         void loadModel(spec); modelObserver.unobserve(entry.target);
       }
-    }, { rootMargin: '700px' });
+    }, { rootMargin: `${Math.max(1200, environment.innerHeight * 1.5)}px` });
     document.querySelectorAll('[data-journey-model]').forEach(target => modelObserver.observe(target));
     const pmrem = new THREE.PMREMGenerator(renderer), room = new RoomEnvironment();
     reflection = pmrem.fromScene(room, .04); room.dispose(); pmrem.dispose();
@@ -422,38 +436,19 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     loaded = true; root.classList.add('has-scene'); setStatus('');
     collectTargets();
 
-    detachFrame = scheduler.add(time => {
-      const dt = Math.min(.05, Math.max(0, time - (previousFrameTime || time - 1 / 60)));
-      previousFrameTime = time;
+    detachFrame = scheduler.add(() => {
       if (disposed || lost || !loaded || document.hidden || !root.isConnected) { if (!root.isConnected) release(); return; }
       const current = resolve();
       if (!current) { release(); lastSignature = ''; return; }
+      if (current.views) { renderBoundary(current.views, current.chapter); return; }
       const desiredKey = journeyModelKey(current.modelSpec);
       if (failed.has(desiredKey)) { release(); lastSignature = ''; return; }
       if (!selectModel(current.modelSpec, current.modelBlend)) { release(); lastSignature = ''; return; }
-      const { rect } = current;
-      const scroll = environment.scrollY;
-      const now = performance.now() / 1000;
-      if (scroll !== previousY) {
-        previousY = scroll; lastScrollTime = time;
-        if (inspection) { releaseFrom = { ...renderedPose }; releaseStart = now; resetInspection(); }
-      }
-      if (current.chapter !== 'hero') { if (inspection) resetInspection(); releaseFrom = null; }
-      const inspectionProgress = clamp((now - inspectionStart) / .65);
-      const releaseProgress = clamp((now - releaseStart) / .35);
-      if (releaseProgress >= 1) releaseFrom = null;
-      const targetPose = inspection ? interpolateJourneyPose(inspectionFrom, inspection, inspectionProgress)
-        : releaseFrom ? interpolateJourneyPose(releaseFrom, current.pose, releaseProgress) : current.pose;
-      // Frame-rate independent settling absorbs wheel steps, trackpad bursts
-      // and chapter jumps without changing the authored final angles.
-      const settle = 1 - Math.exp(-12 * dt);
-      const pose = Object.fromEntries(Object.entries(targetPose).map(([key, value]) => [key,
-        Math.abs(value - renderedPose[key]) < .00001 ? value : renderedPose[key] + (value - renderedPose[key]) * settle,
-      ]));
-      renderedPose = pose;
-      const resting = !inspection && !releaseFrom && time - lastScrollTime > .2 && ((current.chapter === 'hero' && current.progress < .06) || (current.chapter === 'finale' && current.progress > .82));
-      const signature = [activeModelKey, current.modelBlend?.progress.toFixed(5) || '', ...Object.values(pose).map(value => value.toFixed(5)), current.chapter, current.progress.toFixed(5), rect.left.toFixed(2), rect.top.toFixed(2), rect.width.toFixed(2), rect.height.toFixed(2), current.opacity.toFixed(3), inspection ? inspectionProgress.toFixed(4) + ':' + viewButtons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.sceneView : releaseFrom ? `release-${releaseProgress.toFixed(4)}` : 'scroll'].join(':');
-      if (!dirty && !resting && signature === lastSignature) return;
+      const { rect, pose } = current;
+      const cameraZ = cameraDistanceFor(current);
+      if (cameraZ === null) { release(); lastSignature = ''; return; }
+      const signature = [activeModelKey, ...Object.values(pose).map(value => value.toFixed(5)), current.chapter, current.progress.toFixed(5), rect.left.toFixed(2), rect.top.toFixed(2), rect.width.toFixed(2), rect.height.toFixed(2), current.opacity.toFixed(3), cameraZ.toFixed(5)].join(':');
+      if (!dirty && signature === lastSignature) return;
       lastSignature = signature; dirty = false;
       // CSS geometry remains exact, but GPU storage changes only at 64px
       // boundaries while the canvas travels between differently sized stages.
@@ -462,34 +457,33 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
         width = targetWidth; height = targetHeight;
         const dpr = Math.min(environment.devicePixelRatio || 1, 1.5, Math.sqrt(2000000 / (width * height)));
         renderer.setPixelRatio(Math.max(1, dpr)); renderer.setSize(width, height, false);
-        sweepResolution.value.set(renderer.domElement.width, renderer.domElement.height);
       }
       const aspect = rect.width / rect.height;
       if (camera.aspect !== aspect) { camera.aspect = aspect; camera.updateProjectionMatrix(); }
       Object.assign(overlay.style, { display: 'block', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, opacity: String(current.opacity) });
-      const idle = resting ? Math.sin(time * .9) * .012 : 0;
-      rig.position.y = idle;
-      rig.rotation.set(pose.rotationX, pose.rotationY + (resting ? Math.sin(time * .43) * .016 : 0), pose.rotationZ, 'XYZ');
+      rig.position.y = 0;
+      rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
       rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
-        const world = asset.worldPoints[index].copy(point).multiply(asset.fitScale).applyMatrix4(rig.matrixWorld);
+        const world = asset.worldPoints[index].copy(point).applyMatrix4(rig.matrixWorld);
         bottom = Math.min(bottom, world.y); minX = Math.min(minX, world.x); maxX = Math.max(maxX, world.x);
         minZ = Math.min(minZ, world.z); maxZ = Math.max(maxZ, world.z);
       }));
       shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
       shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
-      const fit = { fov: camera.fov, aspect: camera.aspect, y: pose.cameraY, fill: environment.innerWidth <= 700 ? Math.min(.95, pose.fill) : pose.fill };
-      const distances = selectedAssets.map(asset => fittedCameraZ(asset.worldPoints, fit));
-      camera.position.set(0, pose.cameraY, current.modelBlend ? transitionCamera(distances[0], distances[1], current.modelBlend.progress) : distances[0]);
-      const light = environmentFor(current.chapter);
-      key.intensity = light.key; rim.intensity = light.rim;
+      camera.position.set(0, pose.cameraY, cameraZ);
+      const light = lightFor(current.chapter, current.progress);
       renderer.toneMappingExposure = pose.exposure * light.exposure;
+      renderer.setScissorTest(false); renderer.setViewport(0, 0, width, height);
       renderer.render(scene, camera);
       owned.filter(target => !current.visuals.includes(target)).forEach(target => target.classList.remove('has-journey-scene'));
       current.visuals.forEach(target => target.classList.add('has-journey-scene'));
       owned = current.visuals;
       overlay.dataset.chapter = current.chapter;
+      overlay.dataset.pose = [pose.rotationX, pose.rotationY, pose.rotationZ].map(value => value.toFixed(5)).join(',');
+      overlay.dataset.camera = cameraZ.toFixed(5);
+      if (inspectMotion) overlay.dataset.motion = JSON.stringify([{ chapter: current.chapter, model: overlay.dataset.model, pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() }]);
     });
   } catch (error) {
     if (!disposed && !signal.aborted) {

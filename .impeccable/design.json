@@ -209,7 +209,7 @@
       },
       "display-secondary": {
         "displayName": "Hero second line",
-        "purpose": "Italic Archivo, weight 720 and width 82; cobalt emphasis."
+        "purpose": "Italic Archivo, weight 720 and width 76; cobalt emphasis beside the product."
       },
       "headline": {
         "displayName": "Chapter heading",
@@ -393,7 +393,7 @@
       "Do keep reference credits, model-study disclosures and shipping-asset provenance intact.",
       "Do keep content and navigation usable with reduced motion, failed WebGL and no JavaScript."
     ],
-    "overview": "STRYDE combines a blue-and-white sneaker study with monumental editorial typography. Pale sky and ice fields give the subject room; ocean chapters concentrate attention. A locally bundled variable Archivo family shifts width and weight between expressive headlines and precise captions.\n\nDepth comes from the sneaker, its light and its changing perspective. Useful HTML copy, annotation ledgers, material-study anchors and a chapter index keep the experience legible. The motion follows a continuous subject through product chapters; credited photography remains a separate reference plate.",
+    "overview": "STRYDE combines a blue-and-white sneaker study with monumental editorial typography. Pale sky and ice fields give the subject room; ocean chapters concentrate attention. A locally bundled variable Archivo family shifts width and weight between expressive headlines and precise captions.\n\nDepth comes from the sneaker, its light and its changing perspective. Useful HTML copy, annotation ledgers, material-study anchors and a chapter index keep the experience legible. The motion follows a continuous subject through product chapters, including a real-light Brand studio; credited photography remains a separate reference plate.",
     "rules": [
       {
         "body": "Supporting colors frame the blue-and-white sneaker; preserve the clear distinction between pale study fields and ocean chapters.",
@@ -406,7 +406,7 @@
         "name": "The Readable Scale Rule"
       },
       {
-        "body": "The fixed canvas owns only the currently active disclosed model study. Keep credited reference photography separate and retain the image fallback until the scene successfully owns its host.",
+        "body": "The fixed canvas owns the active disclosed study, with separate clipped views for both visible chapter windows at a handoff. Keep credited reference photography separate and retain the image fallback until the scene successfully owns its host.",
         "section": "elevation",
         "name": "The One Subject Rule"
       }

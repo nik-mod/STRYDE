@@ -81,7 +81,7 @@ test('the third supplied shoe owns chapter 06 and ships with a bounded delivery 
   const html = await renderPreview('/');
   const featured = html.slice(html.indexOf('id="chapter-featured"'), html.indexOf('id="chapter-brand"'));
   assert.match(featured, /nike-tn-deep-blue\.glb/);
-  assert.match(featured, /data-journey-from-primary/);
+  assert.doesNotMatch(featured, /data-journey-from-primary/, 'the deep-blue feature must never begin with the unrelated blue/white identity');
   assert.match(featured, /tn-navy-angle-2800\.webp/);
   assert.match(featured, /Blue \/ Navy \/ White/);
   const bytes = await readFile(new URL('../assets/nike-tn-deep-blue.glb', import.meta.url));

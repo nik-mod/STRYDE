@@ -1,5 +1,23 @@
-export function shouldPlaySiteIntro({ reduced = false, restoredY = 0, hash = '', navigationType = '', designMode = false } = {}) {
-  return !reduced && !designMode && !hash && navigationType !== 'back_forward' && !(restoredY > 24);
+export const SITE_INTRO_RETURN_KEY = 'stryde:intro-internal-return:v1';
+
+export function isInternalHomeReturn({ currentURL, referrer = '', navigationType = '', marker = null, now = Date.now() } = {}) {
+  if (navigationType !== 'navigate') return false;
+  try {
+    const current = new URL(currentURL);
+    if (referrer && new URL(referrer).origin === current.origin) return true;
+    return Boolean(marker && marker.path === current.pathname && Number.isFinite(marker.time) && now >= marker.time && now - marker.time < 15000);
+  } catch { return false; }
+}
+
+export function markInternalHomeReturn(environment, href) {
+  try {
+    const target = new URL(href, environment.location.href);
+    environment.sessionStorage?.setItem(SITE_INTRO_RETURN_KEY, JSON.stringify({ path: target.pathname, time: Date.now() }));
+  } catch { /* Same-origin referrer detection remains available without storage. */ }
+}
+
+export function shouldPlaySiteIntro({ reduced = false, restoredY = 0, hash = '', navigationType = '', designMode = false, internalReturn = false } = {}) {
+  return !internalReturn && !reduced && !designMode && !hash && navigationType !== 'back_forward' && !(restoredY > 24);
 }
 
 export function mountSiteIntro({ gsap, document, environment, skip = false, onChange = () => {} }) {

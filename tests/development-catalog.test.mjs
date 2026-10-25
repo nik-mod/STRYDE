@@ -8,13 +8,15 @@ import { renderPreview } from '../tools/preview.mjs';
 
 function listing(html) {return html.match(/<section\b[^>]*\bcollection-page\b[\s\S]*?<\/section>/)?.[0] || '';}
 
-test('local all-products page supplies every imported photo group and keeps commerce disabled',async()=>{
+test('local all-products page paginates the imported photo groups and keeps commerce disabled',async()=>{
   const html=listing(await renderPreview('/collections/all'));
   assert(html,'Collection section missing');
   const catalog=JSON.parse(await readFile('tools/fixtures/photo-shop.json','utf8'));
   assert.equal(catalog.length,889);
   assert.equal(catalog.reduce((count,item)=>count+item.count,0),1296);
-  assert.equal((html.match(/class="photo-shop-card" data-photo-card/g)||[]).length,889);
+  assert.equal((html.match(/class="photo-shop-card" data-photo-card/g)||[]).length,12);
+  const payload=JSON.parse(html.match(/<script type="application\/json" data-catalog-data>([\s\S]*?)<\/script>/)[1]);
+  assert.equal(payload.length,889);
   const sameShoe=catalog.find(item=>item.photos.some(photo=>photo.source==='20241125_135432.jpg'));
   assert.equal(sameShoe.count,4);
   assert.deepEqual(sameShoe.photos.map(photo=>photo.source),[
@@ -22,19 +24,23 @@ test('local all-products page supplies every imported photo group and keeps comm
   ]);
   assert(!catalog.some(item=>['20241125_135434.jpg','20241125_135435.jpg','20241125_135437.jpg'].some(source=>item.photos.some(photo=>photo.source===source))&&item!==sameShoe));
   assert.match(html,/data-photo-search/);
-  assert.match(html,/data-photo-status/);
+  assert.match(html,/name="brand"/);
+  assert.match(html,/name="color"/);
+  assert.match(html,/data-catalog-pagination/);
   for(const item of catalog){
     assert(item.description);
     assert(item.identityStatus);
-    assert(html.includes(item.title));
+    assert(payload.some(entry=>entry.id===item.id));
     for(const photo of item.photos){
       await access(`.${photo.src}`);
       assert((await stat(`.${photo.src}`)).size>1000);
     }
   }
-  assert.match(html,/Needs shoe ID/);
-  assert.doesNotMatch(html,/<form|name="add"|name="checkout"|name="sort_by"/);
-  assert.match(html,/Local catalog/);
+  assert.doesNotMatch(html,/name="add"|name="checkout"|name="sort_by"|method="post"/);
+  assert.match(html,/Photo studies · Purchases unavailable/);
+  const second=listing(await renderPreview('/collections/all',new URLSearchParams('page=2')));
+  assert.equal((second.match(/class="photo-shop-card" data-photo-card/g)||[]).length,12);
+  assert.match(second,/13–24 of 889 designs/);
 });
 
 test('the imported catalog remains on the local all-products route and yields to native fixtures',async()=>{
@@ -43,7 +49,7 @@ test('the imported catalog remains on the local all-products route and yields to
     assert.doesNotMatch(html,/data-concept-entry|Arc Study|Tide Study/);
     if(query.includes('fixtures')){assert.match(html,/href="\/products\/preview-product"/);assert.match(html,/\$180\.00 USD/);assert.match(html,/preview-fixture.svg/);assert.match(html,/name="sort_by"/);}
     else if(path==='/collections/other')assert.match(html,/No products found/);
-    else assert.match(html,/889 PHOTO GROUPS/);
+    else assert.match(html,/1–12 of 889 designs/);
   }
   assert.doesNotMatch(await renderPreview('/'),/data-concept-entry/);
 });

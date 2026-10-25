@@ -1,12 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mountSiteIntro, shouldPlaySiteIntro } from '../src/motion/site-intro.mjs';
+import { mountSiteIntro, shouldPlaySiteIntro, isInternalHomeReturn, markInternalHomeReturn, SITE_INTRO_RETURN_KEY } from '../src/motion/site-intro.mjs';
 import { renderPreview } from '../tools/preview.mjs';
+import { isHomeDocumentNavigation } from '../src/motion/navigation.mjs';
 
 test('the intro is a separate homepage overlay and is absent from collection and product routes', async () => {
   const home = await renderPreview('/');
   assert.match(home, /data-site-intro role="dialog"[^>]* hidden/);
   assert.match(home, /data-hero-stage/);
+  assert.doesNotMatch(home, /getItem\('stryde:intro-seen:v1'\)/, 'an old seen marker cannot suppress a fresh entry');
+  assert.match(home, /removeItem\('stryde:intro-internal-return:v1'\)/, 'internal navigation intent is consumed once');
   assert(home.indexOf('data-site-intro role="dialog"') < home.indexOf('<main id="MainContent"'));
   for (const route of ['/collections/all', '/products/preview-product']) {
     const page = await renderPreview(route, new URLSearchParams('fixtures=1'));
@@ -17,10 +20,37 @@ test('the intro is a separate homepage overlay and is absent from collection and
 
 test('the site introduction runs at entry and preserves restored visits, anchors, editor sessions and reduced motion', () => {
   assert.equal(shouldPlaySiteIntro(), true);
-  for (const options of [{ reduced: true }, { designMode: true }, { hash: '#chapter-materials' }, { restoredY: 300 }, { navigationType: 'back_forward' }]) {
+  for (const options of [{ internalReturn: true }, { reduced: true }, { designMode: true }, { hash: '#chapter-materials' }, { restoredY: 300 }, { navigationType: 'back_forward' }]) {
     assert.equal(shouldPlaySiteIntro(options), false);
   }
   assert.equal(shouldPlaySiteIntro({ navigationType: 'reload', restoredY: 0 }), true);
+});
+
+test('fresh entries and reloads play while internal returns consume a short-lived navigation intent', () => {
+  const entry = { currentURL: 'https://stryde.test/', navigationType: 'navigate', now: 20000 };
+  assert.equal(isInternalHomeReturn(entry), false);
+  assert.equal(isInternalHomeReturn({ ...entry, referrer: 'https://another.test/' }), false);
+  assert.equal(isInternalHomeReturn({ ...entry, referrer: 'https://stryde.test/collections/all' }), true);
+  assert.equal(isInternalHomeReturn({ ...entry, navigationType: 'reload', referrer: 'https://stryde.test/collections/all' }), false);
+  assert.equal(isInternalHomeReturn({ ...entry, marker: { path: '/', time: 19000 } }), true);
+  assert.equal(isInternalHomeReturn({ ...entry, navigationType: 'reload', marker: { path: '/', time: 19000 } }), false);
+  assert.equal(isInternalHomeReturn({ ...entry, marker: { path: '/', time: 1000 } }), false);
+  assert.equal(isInternalHomeReturn({ ...entry, marker: { path: '/elsewhere', time: 19000 } }), false);
+  const storage = new Map();
+  const environment = { location: { href: entry.currentURL }, sessionStorage: { setItem: (key, value) => storage.set(key, value) } };
+  markInternalHomeReturn(environment, '/');
+  assert.equal(JSON.parse(storage.get(SITE_INTRO_RETURN_KEY)).path, '/');
+  assert.doesNotThrow(() => markInternalHomeReturn({ ...environment, get sessionStorage() { throw new Error('Blocked'); } }, '/'));
+});
+
+test('same-document home anchors cannot leave an internal-return intent', () => {
+  const home = 'https://stryde.test/';
+  assert.equal(isHomeDocumentNavigation('#chapter-hero', home, home), false);
+  assert.equal(isHomeDocumentNavigation('/#MainContent', home, home + '#chapter-brand'), false);
+  assert.equal(isHomeDocumentNavigation('/?view=studio#MainContent', home, home + '?view=studio'), false);
+  assert.equal(isHomeDocumentNavigation('/', home, 'https://stryde.test/collections/all'), true);
+  assert.equal(isHomeDocumentNavigation('/?view=studio', home, home), true);
+  assert.equal(isHomeDocumentNavigation('https://another.test/', home, home), false);
 });
 
 function harness({ skip = false, broken = false } = {}) {

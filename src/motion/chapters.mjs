@@ -1,5 +1,8 @@
 import { mountFormEdit } from './form-edit.mjs';
 import { mountCollectionHover } from './collection-hover.mjs';
+import { brandStudyPhase } from '../journey-poses.mjs';
+
+const brandResizeCheckpoints = new WeakMap();
 
 // Scroll choreography for chapters 02–08 (Milestone 02.6).
 // Every controller mounts inside the caller's gsap.context + matchMedia and may
@@ -421,7 +424,79 @@ function featured(root, gsap, { mobile }) {
 
 /* -------------------------------------------------------- 07 — brand */
 
+function brandStudio(root, gsap, { mobile }) {
+  const viewport = { width: window.innerWidth, height: window.innerHeight };
+  const canPin = window.innerHeight >= 740;
+  const stops = root.querySelector('[data-brand-stops]');
+  const buttons = [...root.querySelectorAll('[data-brand-step]')];
+  const caption = root.querySelector('[data-brand-caption]');
+  const checkpoint = brandResizeCheckpoints.get(root);
+  brandResizeCheckpoints.delete(root);
+  let restoring = Boolean(checkpoint && checkpoint.width === viewport.width && checkpoint.height === viewport.height);
+  let lastStableProgress = checkpoint?.progress || 0;
+  let disposed = false, unloading = false, restoreFrame = null;
+  const onUnload = event => { if (event.target === root || event.target.contains?.(root)) unloading = true; };
+  root.ownerDocument.addEventListener('shopify:section:unload', onUnload, true);
+  let phase = -1;
+  root.classList.toggle('is-brand-pinned', canPin);
+  if (stops) stops.hidden = !canPin;
+  const sync = progress => {
+    if (!restoring && canPin === (window.innerHeight >= 740)) lastStableProgress = progress;
+    root.dataset.brandProgress = progress.toFixed(5);
+    const next = brandStudyPhase(progress);
+    if (phase === next) return;
+    phase = next;
+    buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === phase)));
+    if (caption) caption.textContent = ['Follow the sidewall.', 'Light across the upper.', 'Turn to the foundation.'][phase];
+  };
+  const timeline = gsap.timeline({ scrollTrigger: {
+    trigger: root, start: canPin ? 'top top' : 'top 25%',
+    end: canPin ? () => `+=${Math.round(window.innerHeight * (mobile ? .95 : 1.4))}` : 'bottom 75%',
+    pin: canPin, scrub: .35, anticipatePin: 1, invalidateOnRefresh: true,
+  } });
+  timeline.to({ progress: 0 }, { progress: 1, duration: 1, ease: 'none' });
+  timeline.eventCallback('onUpdate', () => sync(timeline.progress()));
+  sync(timeline.progress());
+  if (restoring) {
+    // Removing a pin changes document length. Restore the same product phase
+    // after the replacement trigger has measured its new, possibly flowing range.
+    restoreFrame = window.requestAnimationFrame(() => {
+      restoreFrame = null;
+      if (disposed || !root.isConnected || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const trigger = timeline.scrollTrigger;
+      trigger.refresh();
+      window.scrollTo({ top: trigger.start + checkpoint.progress * (trigger.end - trigger.start), behavior: 'instant' });
+      restoring = false;
+      timeline.progress(checkpoint.progress);
+      sync(checkpoint.progress);
+    });
+  }
+  const click = event => {
+    const button = event.target.closest?.('[data-brand-step]');
+    if (!canPin || !button) return;
+    const index = Number(button.dataset.brandStep), progress = [.04, .32, .72][index];
+    if (!Number.isFinite(progress)) return;
+    const trigger = timeline.scrollTrigger;
+    window.scrollTo({ top: trigger.start + (trigger.end - trigger.start) * progress, behavior: 'smooth' });
+  };
+  root.addEventListener('click', click);
+  return () => {
+    disposed = true;
+    if (restoreFrame !== null) window.cancelAnimationFrame(restoreFrame);
+    const viewportChanged = window.innerWidth !== viewport.width || window.innerHeight !== viewport.height;
+    if (!unloading && root.isConnected && viewportChanged && lastStableProgress > 0 && lastStableProgress < 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      brandResizeCheckpoints.set(root, { progress: lastStableProgress, width: window.innerWidth, height: window.innerHeight });
+    }
+    root.ownerDocument.removeEventListener('shopify:section:unload', onUnload, true);
+    root.removeEventListener('click', click);
+    root.classList.remove('is-brand-pinned');
+    delete root.dataset.brandProgress;
+    if (stops) stops.hidden = true;
+  };
+}
+
 function brand(root, gsap, { mobile }) {
+  if (root.hasAttribute?.('data-brand-live')) return brandStudio(root, gsap, { mobile });
   const stage = root.querySelector('[data-brand-stage]');
   if (!stage) return;
   const image = root.querySelector('.brand-visual > img');
@@ -596,7 +671,7 @@ export function mountChapter(root, { gsap, mobile, fine }) {
   const controller = CONTROLLERS[root.dataset.chapter];
   if (!controller) return undefined;
   const dispose = controller(root, gsap, { mobile, fine }) || undefined;
-  if (!mobile) {
+  if (!mobile && !root.hasAttribute?.('data-brand-live')) {
     sceneFlow(root, gsap);
     // Chapter handoff: the anatomy composition rises over the hero's sky,
     // where the clipped region shows the page field and reads as a

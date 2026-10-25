@@ -1,8 +1,12 @@
+import { mountCollectionStudio } from '../collection-studio.mjs';
+
 // Local reference photography stays non-commerce. Native Shopify listings
 // retain their server-rendered filters, sorting and product links.
 export function mountListing(root) {
+  const disposeStudio = mountCollectionStudio(root);
+  if (root?.querySelector?.('[data-photo-shop]')?.matches?.('[data-photo-shop]')) return disposeStudio;
   const catalog = root?.querySelector?.('[data-reference-catalog]');
-  if (!catalog?.querySelectorAll) return () => {};
+  if (!catalog?.querySelectorAll) return disposeStudio;
   const cards = [...catalog.querySelectorAll('[data-photography-reference]')];
   const buttons = [...catalog.querySelectorAll('[data-reference-filter]')];
   const query = catalog.querySelector('[data-reference-query]');
@@ -38,6 +42,7 @@ export function mountListing(root) {
   update();
   return () => {
     listeners.abort();
+    disposeStudio();
     catalog.classList.remove('is-filterable');
     cards.forEach(card => { card.hidden = false; });
     buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.referenceFilter === 'all')));

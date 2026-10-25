@@ -1,7 +1,36 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { gsap } from 'gsap';
-import { mountHero } from '../src/motion/hero.mjs';
+import { mountHero, waitForHeroOpening } from '../src/motion/hero.mjs';
+
+test('headline entrance waits for both intro states and releases its observer exactly once', () => {
+  const classes = new Set(['site-intro-pending']);
+  const document = { documentElement: { classList: { contains: name => classes.has(name) } } };
+  let mutation, disconnected = 0, played = 0;
+  const environment = { MutationObserver: class {
+    constructor(callback) { mutation = callback; }
+    observe() {}
+    disconnect() { disconnected++; }
+  } };
+  const cancel = waitForHeroOpening(document, environment, () => played++);
+  assert.equal(played, 0, 'nothing runs behind the opening overlay');
+  classes.delete('site-intro-pending'); classes.add('site-intro-playing'); mutation();
+  assert.equal(played, 0, 'the pending-to-playing transition must keep the headline paused');
+  classes.delete('site-intro-playing'); mutation(); mutation();
+  assert.equal(played, 1);
+  assert.equal(disconnected, 1);
+  cancel();
+});
+
+test('teardown cancels a pending headline entrance, including a queued mutation', () => {
+  const classes = new Set(['site-intro-playing']);
+  const document = { documentElement: { classList: { contains: name => classes.has(name) } } };
+  let mutation, played = 0;
+  const environment = { MutationObserver: class { constructor(callback) { mutation = callback; } observe() {} disconnect() {} } };
+  const cancel = waitForHeroOpening(document, environment, () => played++);
+  cancel(); classes.clear(); mutation();
+  assert.equal(played, 0);
+});
 
 function heroHarness({ glyphs = false } = {}) {
   const selectors = [

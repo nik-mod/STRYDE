@@ -4,21 +4,21 @@
     assign photography_references = true
   endif
 %}
-<section class="page-shell collection-page{% if photography_references %} collection-page-photography{% endif %}" data-listing-section data-section-id="{{ section.id }}">
+<section class="page-shell collection-page collection-studio{% if photography_references %} collection-page-photography{% endif %}" data-listing-section data-section-id="{{ section.id }}">
   {% if section.preview_photo_shop.size > 0 %}
-    <header class="listing-heading photo-shop-heading" data-listing-heading>
-      <div><p class="listing-eyebrow">STRYDE / YOUR SHOE ARCHIVE</p><h1>Find your pair.</h1></div>
-      <div class="listing-introduction"><p>Takeout photo sequences stay together; unmatched photos await visual grouping and shoe identification.</p><p class="listing-preview-note">Review brand and model before adding products to the live store</p></div>
+    <header class="listing-heading photo-shop-heading studio-heading" data-listing-heading>
+      <h1>The collection.</h1>
+      <div class="studio-heading-note"><p>Footwear, from every perspective.</p><p class="listing-preview-note">Photo studies · Purchases unavailable</p></div>
     </header>
-    {% render 'photo-shop-catalog', catalog: section.preview_photo_shop %}
+    {% render 'photo-shop-catalog', state: section.preview_photo_state, payload: section.preview_photo_payload %}
   {% elsif photography_references %}
     <header class="listing-heading" data-listing-heading>
-      <div><p class="listing-eyebrow">STRYDE / FOOTWEAR PHOTOGRAPHY</p><h1>Different by design.</h1></div>
-      <div class="listing-introduction"><p>Independent photographs of distinctive sneaker models.</p><p class="listing-preview-note">Development references · Not store inventory or available for purchase</p></div>
+      <div><h1>The collection.</h1></div>
+      <div class="listing-introduction"><p>Independent footwear photography.</p><p class="listing-preview-note">Photo studies · Purchases unavailable</p></div>
     </header>
     {% render 'photography-catalog', catalog: section.preview_photography %}
   {% else %}
-  <div class="page-heading listing-heading" data-listing-heading><span class="micro">{{ 'general.collection' | t }}</span><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
+  <div class="page-heading listing-heading studio-heading" data-listing-heading><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
   {% paginate collection.products by 12 %}
     <form method="get" action="{{ collection.url }}" class="collection-controls">
       <div class="filter-groups">

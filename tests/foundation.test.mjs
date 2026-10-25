@@ -70,7 +70,9 @@ test('home stages the eight cinematic chapters with honest temporary assets', as
 
 test('native empty routes render useful content and fixture commerce stays labeled', async () => {
   assert.match(await renderPreview('/cart'), /Your bag is empty/);
-  assert.match(await renderPreview('/collections/all', new URLSearchParams('concepts=0')), /889 PHOTO GROUPS/);
+  const collection = await renderPreview('/collections/all', new URLSearchParams('concepts=0'));
+  assert.match(collection, /1–12 of 889 designs/);
+  assert.equal((collection.match(/data-photo-card /g) || []).length, 12);
   assert.match(await renderPreview('/search', new URLSearchParams('q=test')), /No results/);
   const fixture = await renderPreview('/cart', new URLSearchParams('fixtures=1'));
   assert.match(fixture, /name="updates\[\]"/); assert.match(fixture, /name="checkout"/); assert.match(fixture, /COMMERCE DISABLED/);

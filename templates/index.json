@@ -30,7 +30,7 @@
         "part_5_title": "Black finishing details",
         "part_5_body": "Black laces, a dark padded collar and the heel-side Swoosh complete this white-and-black model.",
         "use_drift_model": true,
-        "kicker": "02 \u2014 Air Max Plus Drift"
+        "kicker": "02 — Air Max Plus Drift"
       }
     },
     "materials": {
@@ -70,7 +70,7 @@
       "type": "chapter-collection",
       "settings": {
         "use_tn_model": true,
-        "kicker": "05 \u2014 The form edit",
+        "kicker": "05 — The form edit",
         "heading": "Form studies.",
         "tile_title": "TN study",
         "field_1": "#9cc3e2",
@@ -83,7 +83,7 @@
       "type": "chapter-featured",
       "settings": {
         "use_tn_model": true,
-        "kicker": "06 \u2014 After hours",
+        "kicker": "06 — After hours",
         "fallback_title": "Deep blue.",
         "story": "Saturated blue. Deep navy waves. A bright white midsole. This darker Air Max Plus brings a different mood to the same flowing silhouette.",
         "fallback_cta": "View the collection",
@@ -96,10 +96,16 @@
       "type": "chapter-brand",
       "settings": {
         "use_tn_model": true,
-        "line_1": "Start",
-        "line_2": "with the line.",
+        "line_1": "",
+        "line_2": "",
         "line_3": "",
-        "manifesto": "White curves divide the blue panels. The same line carries from the forefoot to the heel, a small detail that holds the whole silhouette together."
+        "manifesto": "Blue mesh. White curves. Dark tread.",
+        "value_1_title": "The line, up close.",
+        "value_1_body": "White ribs trace the blue upper from forefoot to heel, above a sculpted midsole and black tread.",
+        "value_2_title": "",
+        "value_2_body": "",
+        "value_3_title": "",
+        "value_3_body": ""
       }
     },
     "finale": {

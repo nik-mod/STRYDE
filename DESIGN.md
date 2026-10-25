@@ -19,14 +19,14 @@ colors:
 typography:
   display:
     fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
-    fontSize: "clamp(88px, 11.6vw, 290px)"
+    fontSize: "clamp(64px, 8.4vw, 220px)"
     fontWeight: 900
     lineHeight: 0.79
     letterSpacing: "-0.04em"
     fontVariation: "'wght' 900, 'wdth' 76"
   display-secondary:
     fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
-    fontSize: "clamp(88px, 11.6vw, 290px)"
+    fontSize: "clamp(64px, 8.4vw, 220px)"
     lineHeight: 0.79
     letterSpacing: "-0.04em"
     fontVariation: "'wght' 720, 'wdth' 82"
@@ -143,7 +143,7 @@ The palette moves from airy blue exhibition fields to deep ocean, always retaini
 
 **Body Font:** The same Archivo family. Normal and italic files are bundled locally; both expose weight (100–900) and width (62–125%) axes.
 
-The display is compressed, assertive and tightly spaced; captions and prose remain open and readable. The hero's second line is italic, lighter and wider than its first. Chapter headings use a condensed width (85%) with balanced wrapping.
+The display is compressed, assertive and tightly spaced; captions and prose remain open and readable. The hero's second line is italic and lighter, sharing the first line's condensed width. Chapter headings use a condensed width (85%) with balanced wrapping.
 
 ### Hierarchy
 
@@ -167,9 +167,9 @@ Short desktop viewports (minimum width 1181px, maximum height 820px) tighten her
 
 The product supplies the primary depth. Pale and dark environmental fields, ghost outline numbers and fine rules organize the remaining surface. Material insets use a diffuse shadow; credited reference plates have a stronger photographic shadow. Buttons lift slightly on hover. Broad content areas and the brand image stay flat and square.
 
-**The One Subject Rule.** The fixed canvas owns only the currently active disclosed model study. Keep credited reference photography separate and retain the image fallback until the scene successfully owns its host.
+**The Product Window Rule.** The fixed canvas owns the currently active disclosed model study, or both visible chapter windows during a handoff. Keep credited reference photography separate and retain the image fallback until the scene successfully owns its host.
 
-One renderer follows hero, anatomy, materials, technology, featured and finale hosts; absolute poses reveal real profile, upper and outsole views. Chapter handoffs fade between authored product windows instead of translating the shoe across headings. Nested hero grids use minmax(0, 1fr) tracks and min-height: 0 to prevent intrinsic image sizing from expanding the canvas below its frame. The finale has no extra HTML scale or float on the live model. Material anchors correspond to the visible Color, Structure and Foundation study. The renderer is decorative and does not capture pointer events. Native Profile, Upper and Outsole buttons let visitors inspect real model surfaces, with a 650ms pose transition; scrolling restores the authored sequence. These controls appear only while WebGL is available, and stay hidden on short phones and portrait tablets to preserve the composition. Reduced motion and no-JavaScript modes keep the entire product story in normal document flow with static imagery and useful links.
+One renderer follows hero, anatomy, materials, technology, featured, Brand and finale hosts. Deliberate bounded tilts inspect the real profile, upper and foundation, with zero roll and no idle rocking. Each chapter fits its camera once across its authored poses and models; scrolling does not continually zoom the shoe. Models keep uniform natural proportions, and asset changes use one complete opaque shoe at a neutral view. At chapter boundaries the same renderer draws both visible authored product windows using separate viewports and scissors. The shoe stays inside its chapter; no large canvas travels across the intervening heading. The hero and finale have no extra HTML scale, rotation or float on the live model. Material anchors correspond to the visible Color, Structure and Foundation study. The renderer is decorative and does not capture pointer events. Hero thumbnail view controls are removed; Brand retains its existing useful view buttons. Reduced motion and no-JavaScript modes keep the entire product story in normal document flow with static imagery and useful links.
 
 ## Shapes
 
@@ -206,14 +206,14 @@ Square media, straight hairlines and rectangular ledgers establish the form lang
 - Don't add long empty pinned intervals or a blank closing tail.
 
 
-The second recording refinement reduces headline scales throughout, limits hero horizontal text drift to 2%, and retains camera margins during every hero/finale pose. Anatomy uses a start-aligned sticky visual. The bundled Brand image is a two-plate detail/heel study; configured merchant imagery keeps its original single-image composition.
+The second recording refinement reduces headline scales throughout, limits hero horizontal text drift to 2%, and retains camera margins during every hero/finale pose. Anatomy uses a start-aligned sticky visual. The bundled Brand chapter uses a live 3D lighting studio; configured merchant imagery keeps its original single-image composition.
 
 
 ## Multiple TN models within the existing chapters
 
 The original intro, blue/white hero, typography, palettes and eight-chapter layout are preserved. Chapter 02 now studies the user supplied white/black Air Max Plus Drift in its original anatomy layout. Chapter 03 retains its three material panels: the blue Air Max Plus in Color, then the white/black Drift in Structure and Foundation. Each panel's model, fallback, inset, title, description and specs describe the same shoe. There is no added bottom section.
 
-One shared journey canvas and camera select the model declared by the active product window. Models are cached separately with their own framing hull and base yaw: 90 degrees for the blue TN, zero for the Drift. The Drift loads as chapter 02 approaches; unavailable models retain matching static imagery. Model changes stay opaque during a matched heel turn. Both meshes share an interpolated silhouette envelope and one camera; complementary surface masks replace the shoe during the heel view without a fade or blank frame. Product windows travel continuously between adjacent chapters, and captions use non-overlapping masked reveals. Scroll seeks and reverse scrolling use the same deterministic transition. Hidden tabs release their WebGL renderer. The intro triptych uses blue TN, Drift profile and a clean white/cyan TN photograph, with contained framing for the two new shoes.
+One shared journey canvas and camera select the model declared by the active product window. Models are cached separately with their own framing hull and base yaw: 90 degrees for the blue TN, zero for the Drift. The Drift loads as chapter 02 approaches; unavailable models retain matching static imagery. Each asset keeps its natural proportions. At an asset boundary, a neutral view exchanges one complete opaque model for the next without shader-spliced parts or an artificial heel spin. Captions use non-overlapping masked reveals. Scroll seeks and reverse scrolling resolve to the same absolute pose. Hidden tabs release their WebGL renderer. The intro triptych uses blue TN, Drift profile and a clean white/cyan TN photograph, with contained framing for the two new shoes.
 
 
 ## Third supplied TN — chapter 06
@@ -221,3 +221,27 @@ One shared journey canvas and camera select the model declared by the active pro
 The deep blue/navy Air Max Plus uses the existing featured layout, titled Deep blue, with its own model, fallback renders and matching detail ledger. On desktop, a short pin holds the complete composition while the original blue TN turns into the navy shoe through the shared opaque heel handoff. Phone and short flowing layouts time the same change to the visible shoe window. Merchant imagery retains precedence. The intro files were restored to their pre-turn content and are unchanged by this integration.
 
 The two dense supplied scans use UV- and normal-aware 180,000-triangle delivery copies with unchanged embedded PBR maps and transforms. Original user files remain intact; source framing hulls are retained. The original blue hero model is unchanged.
+
+
+## Collection and product studios — 25 October 2026
+
+Collection and product routes retain the ice/ocean/cobalt palette and local Archivo but use a denser commerce hierarchy. Their styles load after storefront.css and only on their own routes. navigation.css opts eligible documents into short native page transitions; reduced motion opts out. Product media has a separate shared transition name, assigned to only the clicked collection cover.
+
+The collection uses a 40–64px title, concise preview disclosure, a search/brand/color/sort row and product-first cards. Three columns become two at 1000px; redundant card brand labels hide on compact layouts. Mobile controls are compressed to expose footwear in the first fold, with 44px interaction targets. Local photographs use 12 entries per page with URL-backed search, filters, sort, numbered pagination and Back/Forward behavior. All 889 supplied groups remain reachable. Named designs filters existing identity metadata; no sizes, prices or stock are invented. Native Shopify products retain Shopify filters, pagination, links and availability.
+
+Product pages use one dominant image, a horizontally scrollable thumbnail rail, view counts, previous/next controls and a full-screen native dialog with zoom, keyboard arrows, Escape and touch swipe. On mobile, 44px arrows sit in a dedicated footer beneath the image area. Imported white-ground photographs receive bounded content framing from a small cached image analysis; their source assets are unchanged. Real merchant imagery keeps its authored framing. Native merchandise retains variant select/form fields, quantity, availability, prices and policies; accessible variant buttons are a progressive enhancement. No-JavaScript thumbnails remain real links.
+
+The full intro plays on fresh direct or external homepage entry and on a reload at the top. Internal navigation back home skips the full overlay, while same-home logo activation scrolls to the opening without reloading. Reduced motion, restored history, anchors and mid-story reloads keep their existing skip behavior. A previous visit must not permanently suppress the intro for the rest of the tab. The homepage hero removes the generic description, metadata block and ticker. Chapter 05 is now a staggered two-column photographic field with bounded scroll parallax, not a pinned slideshow. The navy feature keeps its own matching model and static fallback at every position. The Brand chapter now uses the live lighting studio described below.
+
+
+### Brand lighting studio
+
+The bundled chapter 07 replaces the paired enlarged raster crops with one complete live 3D sneaker. A compact “In a different light.” heading and short current-view caption sit above the product; view controls and collection/detail links sit below. No large manifesto or repeated photo wall appears in this branch. A selected merchant campaign photograph remains authoritative in the static branch.
+
+GSAP scrubs a deliberate profile → gentle upper → gentle foundation inspection, then holds the final view, with a real key light moving from one side to the other. Pitch stays within ±.62 radians and roll stays zero on every viewport. Rim, ambient and environment levels are composed for the ocean stage and explicitly reset outside this chapter. The same existing renderer, model cache, framing hull and scheduler serve the scene; no second WebGL context is created.
+
+### Hero focus and motion refinement
+
+The bundled hero uses a left-aligned two-line headline and a separate complete shoe on desktop; phones stack the headline above the shoe. Its only supporting elements are a collection action and a quiet model credit. Edition labels, thumbnail controls, ticker and duplicate actions are removed. Masked staggered glyphs reveal only after the existing site intro releases the page. On scroll the two lines separate by a few pixels while the shoe makes a restrained inspection turn inside a fixed frame. Reverse scroll and interrupted entrances settle deterministically. Merchant product information and forms remain native. Intro replay rules and all other section layouts are unchanged by this refinement.
+
+Desktop travel is 1.4 viewport heights. Taller phones use a shorter .95 viewport pin; viewports below 740px high use normal flow. The active labels and rendered pose share the timeline progress, including seeks and reverse scrolling. Three view buttons seek the actual timeline when pinned. They are hidden in static or unavailable-WebGL states, leaving genuine navigation links and a full-shoe high-resolution fallback. Generic chapter arrival transforms do not compete with the pinned studio. The brand-specific media condition remounts its context when the height mode changes and restores the same viewed phase. Studio top spacing includes the fixed header and local preview banner.

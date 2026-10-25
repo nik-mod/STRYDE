@@ -12,7 +12,7 @@
 <section id="chapter-featured" class="chapter chapter-surface chapter-featured" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
   {% if section.settings.outline_word != blank %}<p class="feat-word" aria-hidden="true" data-feat-word>{{ section.settings.outline_word | upcase | escape }}</p>{% endif %}
   <div class="feat-grid">
-    <div class="frame feat-frame"{% if section.settings.use_tn_model and section.settings.use_navy_model and product == blank and presentation_image == blank %} data-journey-model="{{ 'nike-tn-deep-blue.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="navy" data-journey-from-primary data-journey-change-start="0.15" data-journey-change-end="0.85"{% endif %}>
+    <div class="frame feat-frame"{% if section.settings.use_tn_model and section.settings.use_navy_model and product == blank and presentation_image == blank %} data-journey-model="{{ 'nike-tn-deep-blue.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="navy"{% endif %}>
       {% if product != blank and presentation_image == blank %}
         <p class="editorial-image-pending">{{ 'hero.asset_pending' | t }}</p>
       {% elsif section.settings.use_tn_model and presentation_image == blank %}

@@ -96,23 +96,35 @@ test('Brand merchant image replaces model and concept studies with opt-in concep
   assert.doesNotMatch(concept, /data-brand-model|hero.model_preview/);
 });
 
-test('Brand empty campaign settings retain editable story and a disclosed visual fallback', async () => {
+test('Brand static campaign settings retain editable story and a disclosed visual fallback', async () => {
   for (const image of [undefined, null, '']) {
     const settings = { image, line_1: 'Closer & clearer', line_2: '<em>Move</em>', line_3: 'Stay curious.', manifesto: 'A story <script>unsafe()</script> & a detail.' };
-    for (const use_tn_model of [true, false]) {
-      const html = await renderChapter('brand', { ...settings, use_tn_model });
-      assert.match(html, /Closer &amp; clearer/);
-      assert.match(html, /&lt;em&gt;Move&lt;\/em&gt;/);
-      assert.match(html, /Stay curious\./);
-      // The manifesto renders word by word; each fragment must still escape.
-      assert.match(html, /<span class="brand-word">A<\/span> <span class="brand-word">story<\/span>/);
-      assert.match(html, /<span class="brand-word">&lt;script&gt;unsafe\(\)&lt;\/script&gt;<\/span>/);
-      assert.match(html, /<span class="brand-word">&amp;<\/span> <span class="brand-word">a<\/span> <span class="brand-word">detail\.<\/span>/);
-      assert.doesNotMatch(html, /<script>|<em>|src=""/);
-      assert.match(html, use_tn_model ? /hero.model_preview/ : /assets.concept_tag/);
-      assert.match(html, use_tn_model ? /tn-detail-2800.webp/ : /data-concept-image="material_2"/);
-    }
+    const html = await renderChapter('brand', { ...settings, use_tn_model: false });
+    assert.match(html, /Closer &amp; clearer/);
+    assert.match(html, /&lt;em&gt;Move&lt;\/em&gt;/);
+    assert.match(html, /Stay curious\./);
+    // The manifesto renders word by word; each fragment must still escape.
+    assert.match(html, /<span class="brand-word">A<\/span> <span class="brand-word">story<\/span>/);
+    assert.match(html, /<span class="brand-word">&lt;script&gt;unsafe\(\)&lt;\/script&gt;<\/span>/);
+    assert.match(html, /<span class="brand-word">&amp;<\/span> <span class="brand-word">a<\/span> <span class="brand-word">detail\.<\/span>/);
+    assert.doesNotMatch(html, /<script>|<em>|src=""/);
+    assert.match(html, /assets.concept_tag/);
+    assert.match(html, /data-concept-image="material_2"/);
   }
+});
+
+test('Brand live studio replaces the raster wall and keeps merchant campaign precedence', async () => {
+  const studio = await renderChapter('brand', { use_tn_model: true, studio_heading: 'Light & <form>' });
+  assert.match(studio, /data-brand-live data-tn-editorial/);
+  assert.match(studio, /Light &amp; &lt;form&gt;/);
+  assert.match(studio, /data-brand-window/);
+  assert.match(studio, /tn-profile-2800\.webp/);
+  assert.match(studio, /hero.model_preview/);
+  assert.equal((studio.match(/<img\b/g) || []).length, 1, 'only a complete whole-shoe fallback is present');
+  assert.doesNotMatch(studio, /tn-detail|tn-heel|brand-visual-pair|brand-word|brand-values/);
+  const merchant = await renderChapter('brand', { use_tn_model: true, image: campaignImage });
+  assert.match(merchant, /merchant-campaign.jpg/);
+  assert.doesNotMatch(merchant, /data-brand-live|data-brand-window|tn-profile/);
 });
 
 test('Materials detail pickers replace every automatic macro crop without inheriting its disclosure', async () => {
@@ -197,19 +209,19 @@ test('blank Brand lines create no empty display rows while configured story and 
   }
 });
 
-test('Hero TN edition belongs only to its bundled model, never merchant imagery or merchandise', async () => {
+test('Hero keeps one quiet bundled disclosure and omits ornamental controls for every media source', async () => {
   const bundled = await renderChapter('hero', { use_tn_model: true });
-  assert.match(bundled, /01 \/ TN/);
+  assert.match(bundled, /data-model-yaw="90"/);
+  assert.match(bundled, /hero-model-credit/);
+  assert.doesNotMatch(bundled, /hero-edition|hero-views|hero-ticker|hero-cue|hero-ring/);
   for (const override of [
     { image: campaignImage },
     { model_url: '/merchant.glb' },
     { featured_product: { title: 'Merchant shoe', selected_or_first_available_variant: { id: 771, price: 24900, available: true } } },
   ]) {
     const html = await renderChapter('hero', { use_tn_model: true, ...override });
-    const edition = html.match(/<div class="hero-edition">[\s\S]*?<\/div>/)?.[0];
-    assert(edition);
-    assert.doesNotMatch(edition, /TN/);
-    assert.match(edition, /<span>01<\/span>/);
+    assert.doesNotMatch(html, /data-model-yaw="90"|hero-model-credit/);
+    assert.doesNotMatch(html, /hero-edition|hero-views|hero-ticker|hero-cue|hero-ring/);
   }
 });
 

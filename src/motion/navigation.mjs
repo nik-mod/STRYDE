@@ -1,9 +1,19 @@
+import { markInternalHomeReturn } from './site-intro.mjs';
+
 export function inPageAnchor(href, currentURL) {
   try {
     const current = new URL(currentURL), target = new URL(href, currentURL);
     if (target.origin !== current.origin || target.pathname !== current.pathname || target.search !== current.search || !target.hash) return null;
     return decodeURIComponent(target.hash.slice(1)) || null;
   } catch { return null; }
+}
+
+export function isHomeDocumentNavigation(href, homeHref, currentURL) {
+  try {
+    const current = new URL(currentURL), home = new URL(homeHref, current), target = new URL(href, current);
+    return target.origin === current.origin && target.origin === home.origin && target.pathname === home.pathname
+      && (target.pathname !== current.pathname || target.search !== current.search);
+  } catch { return false; }
 }
 
 // One delegated owner covers section remounts, keyboard focus, and smooth
@@ -43,6 +53,21 @@ export function mountNavigation({ document, environment = window, getScroller, o
     const link = event.target.closest?.('a[href]');
     if (menu && (link || !menu.contains(event.target))) close(menu);
     if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || link.hasAttribute('download') || link.target === '_blank') return;
+    // A logo on the homepage is a return to the opening composition, not a
+    // document reload. Cross-page logo navigation remains a normal native link.
+    if (link.matches('.wordmark') && document.querySelector('[data-hero]')) {
+      const current = new URL(environment.location.href), home = new URL(link.href, current);
+      if (home.origin === current.origin && home.pathname === current.pathname) {
+        event.preventDefault();
+        if (current.hash) environment.history.replaceState(null, '', current.pathname + current.search);
+        const scroller = getScroller();
+        if (scroller) { scroller.start(); scroller.scrollTo(0, { duration: .9 }); }
+        else environment.scrollTo({ top: 0, behavior: environment.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        return;
+      }
+    }
+    const homeLink = document.querySelector('.site-header .wordmark');
+    if (homeLink && isHomeDocumentNavigation(link.href, homeLink.href, environment.location.href)) markInternalHomeReturn(environment, link.href);
     const id = inPageAnchor(link.href, environment.location.href);
     const scroller = getScroller();
     const target = id && document.getElementById(id);

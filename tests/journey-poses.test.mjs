@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Euler, Vector3 } from 'three';
-import { JOURNEY_CHAPTERS, journeyPose, journeyProgress, flowingMaterialSample, inspectionPose, journeyHandoff } from '../src/journey-poses.mjs';
+import { JOURNEY_CHAPTERS, journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandStudyPhase, brandLighting } from '../src/journey-poses.mjs';
 
 test('live journey poses remain finite and reverse seeks restore the same product pose', () => {
   for (const chapter of JOURNEY_CHAPTERS) {
@@ -10,7 +10,7 @@ test('live journey poses remain finite and reverse seeks restore the same produc
     assert.deepEqual(forward, [...positions].reverse().map(progress => journeyPose(chapter, progress)).reverse());
     for (const pose of forward) {
       assert(Object.values(pose).every(Number.isFinite));
-      assert(pose.fill >= .8 && pose.fill <= 1.15, 'only bounded deliberate close-ups may overfill the frame');
+      assert(pose.fill >= .8 && pose.fill <= .9, 'the whole shoe always retains a camera margin');
     }
     assert.deepEqual(journeyPose(chapter, -100), journeyPose(chapter, 0));
     assert.deepEqual(journeyPose(chapter, 100), journeyPose(chapter, 1));
@@ -28,13 +28,41 @@ test('hero and finale preserve a camera margin throughout the turn', () => {
   assert(Math.abs(journeyPose('finale', 0).fill - journeyPose('finale', 1).fill) < .03);
 });
 
-test('inspection controls expose actual upper and outsole surfaces', () => {
-  for (const [view, axis] of [['upper', new Vector3(0, 1, 0)], ['outsole', new Vector3(0, -1, 0)]]) {
-    const pose = inspectionPose(view);
-    assert(axis.applyEuler(new Euler(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ')).z > .9);
-    assert(pose.fill < 1);
+test('every chapter uses restrained pitch, no roll, and a constant framing margin', () => {
+  for (const chapter of JOURNEY_CHAPTERS) for (let index = 0; index <= 200; index++) {
+    const pose = journeyPose(chapter, index / 200);
+    assert(Math.abs(pose.rotationX) <= .65, `${chapter} never rolls flat or upside down`);
+    assert(Math.abs(pose.rotationY) <= .3, `${chapter} avoids end-on spins`);
+    assert.equal(pose.rotationZ, 0, `${chapter} has no decorative roll`);
+    assert.equal(pose.fill, journeyPose(chapter, 0).fill);
   }
-  assert.equal(inspectionPose('unknown'), null);
+  assert.deepEqual(journeyPose('hero', .48), journeyPose('hero', 1), 'hero holds its settled profile');
+  for (const chapter of ['deconstruction', 'materials', 'technology', 'featured', 'finale']) {
+    for (const axis of ['rotationX', 'rotationY']) {
+      const samples = Array.from({ length: 201 }, (_, index) => journeyPose(chapter, index / 200)[axis]);
+      const direction = Math.sign(samples.at(-1) - samples[0]);
+      for (let i = 1; i < samples.length; i++) assert((samples[i] - samples[i - 1]) * direction >= -1e-10, `${chapter} does not rock back and forth`);
+    }
+  }
+});
+
+test('the live Brand studio reveals real surfaces and reverses its moving light exactly', () => {
+  assert.equal(brandStudyPhase(.04), 0);
+  assert.equal(brandStudyPhase(.32), 1);
+  assert.equal(brandStudyPhase(.72), 2);
+  assert.equal(brandStudyPhase(1), 2);
+  const upper = journeyPose('brand', .32), sole = journeyPose('brand', .72);
+  assert(new Vector3(0, 1, 0).applyEuler(new Euler(upper.rotationX, upper.rotationY, upper.rotationZ, 'XYZ')).z > .5);
+  assert(new Vector3(0, -1, 0).applyEuler(new Euler(sole.rotationX, sole.rotationY, sole.rotationZ, 'XYZ')).z > .5);
+  const positions = [0, .25, .5, .72, 1];
+  assert.deepEqual(positions.map(brandLighting), [...positions].reverse().map(brandLighting).reverse());
+  assert(brandLighting(0).key[0] < -3);
+  assert(brandLighting(1).key[0] > 3);
+  for (let index = 0; index <= 100; index++) {
+    const p = index / 100;
+    assert(journeyPose('brand', p).fill <= .9, 'the whole shoe keeps a clear camera margin');
+    assert(brandLighting(p).key.every(Number.isFinite));
+  }
 });
 
 test('chapter handoffs switch only inside visible product windows and reverse deterministically', () => {
@@ -54,8 +82,8 @@ test('materials genuinely turn from the upper to the outsole in world space', ()
   const outsole = journeyPose('materials', .84);
   const upperNormal = new Vector3(0, 1, 0).applyEuler(new Euler(upper.rotationX, upper.rotationY, upper.rotationZ, 'XYZ'));
   const outsoleNormal = new Vector3(0, -1, 0).applyEuler(new Euler(outsole.rotationX, outsole.rotationY, outsole.rotationZ, 'XYZ'));
-  assert(upperNormal.z > .7, 'the upper faces the viewer in the color phase');
-  assert(outsoleNormal.z > .9, 'the real underside faces the viewer in the foundation phase');
+  assert(upperNormal.z > .5 && upperNormal.y > .7, 'the upper is visible through a gentle tilt, not a flat overhead flip');
+  assert(outsoleNormal.z > .5 && outsoleNormal.y < -.7, 'the real underside is visible without turning the shoe upside down');
 });
 
 test('journey progress clamps jumps and rejects invalid geometry', () => {
@@ -77,5 +105,5 @@ test('flowing materials follow the visible frame instead of the first equally op
   assert.deepEqual(samples[0], samples[4]);
   const outsole = journeyPose('materials', samples[2].progress);
   const normal = new Vector3(0, -1, 0).applyEuler(new Euler(outsole.rotationX, outsole.rotationY, outsole.rotationZ, 'XYZ'));
-  assert(normal.z > .9, 'the third flowing panel renders the actual underside');
+  assert(normal.z > .5 && normal.y < -.7, 'the third flowing panel shows a restrained view of the actual underside');
 });

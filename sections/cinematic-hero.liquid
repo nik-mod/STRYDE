@@ -10,90 +10,31 @@
   endif
   assign collection_url = section.settings.collection.url | default: routes.all_products_collection_url
 %}
-<section class="hero{% if featured_product != blank %} hero-has-product{% endif %}" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} {% if bundled_tn %} data-model-yaw="90" data-model-size="3.1"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
+<section class="hero{% if featured_product != blank %} hero-has-product{% endif %}{% if bundled_tn %} hero-editorial-model{% endif %}" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} {% if bundled_tn %} data-model-yaw="90" data-model-size="3.1"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
   <div class="hero-stage" data-hero-stage>
     <div class="hero-atmo" aria-hidden="true"></div>
-    <div class="hero-launch-light" data-hero-launch-light aria-hidden="true"></div>
-    <div class="hero-edition"><span>{{ 'hero.edition' | t }}</span><span>{% if bundled_tn %}01 / TN{% else %}01{% endif %}</span></div>
-    <div class="hero-model-shadow" aria-hidden="true"></div>
     <h1 class="sr-only" id="HeroTitle-{{ section.id }}">{{ section.settings.headline_first | escape }} {{ section.settings.headline_second | escape }}</h1>
-
-    <div class="hero-type" aria-hidden="true" data-hero-type>
-      <span class="hero-line hero-line-1"><span class="hero-line-inner" data-hero-line-1>{{ section.settings.headline_first | upcase | escape }}</span></span>
-      <span class="hero-line hero-line-2"><span class="hero-line-inner" data-hero-line-2>{{ section.settings.headline_second | upcase | escape }}</span></span>
-    </div>
-
-    <div class="hero-ring" aria-hidden="true" data-hero-ring>
-      <span class="hero-ring-dot hero-ring-dot-a"></span>
-      <span class="hero-ring-dot hero-ring-dot-b"></span>
-    </div>
-
-    <div class="hero-art" data-hero-art>
-      <div class="hero-arrival" data-hero-arrival>
-      <div class="hero-float" data-hero-float>
-        <div class="hero-depth" data-hero-depth>
-          <div class="hero-media" data-scene-host>
-            {% if presentation_image != blank %}
-              {{ presentation_image | image_url: width: 1800 | image_tag: class: 'hero-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 58vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
-            {% elsif bundled_tn %}
-              <img class="hero-image" src="{{ 'tn-angle-1400.webp' | asset_url }}" width="1400" height="1050" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager">
-            {% elsif featured_product != blank %}
-              <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
-            {% elsif model_url == blank %}
-              <figure class="concept-visual">
-                <img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" alt="{{ 'assets.concept_alt' | t | escape }}" fetchpriority="high" loading="eager">
-              </figure>
-            {% else %}
-              <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
-            {% endif %}
-            <p class="model-status" data-model-status role="status" aria-live="polite" hidden></p>
-          </div>
-        </div>
+    <div class="hero-editorial">
+      <div class="hero-type" aria-hidden="true" data-hero-type>
+        <span class="hero-line hero-line-1"><span class="hero-line-inner" data-hero-line-1>{{ section.settings.headline_first | upcase | escape }}</span></span>
+        <span class="hero-line hero-line-2"><span class="hero-line-inner" data-hero-line-2>{{ section.settings.headline_second | upcase | escape }}</span></span>
       </div>
-    </div>
-
-    </div>
-
-    <div class="hero-study" aria-hidden="true" data-hero-study>
-      <span class="hero-study-label" data-hero-study-label>01 / THE SILHOUETTE</span>
-      <span class="hero-study-track"><i data-hero-study-progress></i></span>
-      <span class="hero-study-note">A change of perspective.</span>
-    </div>
-
-    <div class="hero-copy" data-hero-copy>
-      {% if section.settings.statement != blank %}<p class="hero-statement" data-hero-statement>{{ section.settings.statement | escape }}</p>{% endif %}
-      <p class="hero-description">{{ section.settings.description | escape }}</p>
-      {% if bundled_tn %}
-      <div class="hero-views" role="group" aria-label="Inspect the 3D sneaker">
-        <button type="button" data-scene-view="profile" aria-pressed="false"><img src="{{ 'tn-profile-1000.webp' | asset_url }}" width="1000" height="750" alt="" loading="lazy"><span>Profile</span></button>
-        <button type="button" data-scene-view="upper" aria-pressed="false"><img src="{{ 'tn-top-1000.webp' | asset_url }}" width="1000" height="750" alt="" loading="lazy"><span>Upper</span></button>
-        <button type="button" data-scene-view="outsole" aria-pressed="false"><img src="{{ 'tn-sole-1000.webp' | asset_url }}" width="1000" height="750" alt="" loading="lazy"><span>Outsole</span></button>
-      </div>
-      {% endif %}
-    </div>
-
-    {% if bundled_tn %}
-    <dl class="hero-metadata" aria-label="Model study">
-      <div><dt>Silhouette</dt><dd>Air Max Plus / TN</dd></div>
-      <div><dt>Palette</dt><dd>Blue. White. Black.</dd></div>
-      <div><dt>Perspective</dt><dd data-hero-view-label>Three-quarter</dd></div>
-    </dl>
-    {% endif %}
-
-    <div class="hero-foot" data-hero-foot>
-      <div class="hero-product-info">
+      {% unless bundled_tn %}{% if section.settings.description != blank %}<div class="hero-copy" data-hero-copy><p class="hero-description">{{ section.settings.description | escape }}</p></div>{% endif %}{% endunless %}
+      <div class="hero-foot" data-hero-foot>
+        {% if bundled_tn %}
+          <div class="hero-actions"><a class="hero-cart" data-magnetic href="{{ collection_url }}"><span data-magnetic-content>{{ section.settings.cta | escape }}</span>{% render 'icon', name: 'arrow' %}</a></div>
+          <p class="hero-model-credit">{{ section.settings.concept_name | escape }} <span>· {{ 'hero.model_preview' | t }}</span></p>
+        {% else %}
+          <div class="hero-product-info">
         {% if featured_product != blank %}
           <p class="hero-price">{{ hero_variant.price | money_with_currency }}</p>
           <div class="hero-info-rule" aria-hidden="true"></div>
           <a class="hero-name" href="{{ featured_product.url }}">{{ featured_product.title | escape }}</a>
           <p class="hero-availability">{% if hero_variant.available %}{{ 'products.available' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</p>
-        {% else %}
-          <p class="hero-concept-kicker">{% if bundled_tn %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</p>
-          <p class="hero-name">{{ section.settings.concept_name | escape }}</p>
         {% endif %}
-      </div>
-      <div class="hero-actions">
-        <a class="hero-editorial-link" href="#chapter-deconstruction">{{ 'general.explore_details' | t }} <span aria-hidden="true">↘</span></a>
+            {% if featured_product == blank %}<p class="hero-concept-kicker">{{ 'assets.concept_tag' | t }}</p><p class="hero-name">{{ section.settings.concept_name | escape }}</p>{% endif %}
+          </div>
+          <div class="hero-actions">
         {% if featured_product != blank %}
           {% form 'product', featured_product, class: 'hero-form' %}
             <div class="hero-form-errors">{{ form.errors | default_errors }}</div>
@@ -101,41 +42,29 @@
             <button class="hero-cart" type="submit" name="add" data-magnetic{% unless hero_variant.available %} disabled{% endunless %}><span data-magnetic-content>{% if hero_variant.available %}{{ 'hero.add_to_cart' | t }}{% else %}{{ 'products.sold_out' | t }}{% endif %}</span></button>
           {% endform %}
           <a class="hero-details" href="{{ featured_product.url }}">{{ 'hero.details' | t }}</a>
-        {% else %}
-          <a class="hero-cart" data-magnetic href="{{ collection_url }}"><span data-magnetic-content>{{ section.settings.cta | escape }}</span><span class="hero-cta-arrow" aria-hidden="true">↗</span></a>
+        {% endif %}
+            {% if featured_product == blank %}<a class="hero-cart" data-magnetic href="{{ collection_url }}"><span data-magnetic-content>{{ section.settings.cta | escape }}</span>{% render 'icon', name: 'arrow' %}</a>{% endif %}
+          </div>
         {% endif %}
       </div>
     </div>
-
-    <div class="hero-cue" aria-hidden="true" data-hero-cue>
-      <span>{{ 'hero.scroll' | t }}</span>
-      <span class="hero-cue-line" data-hero-cue-line></span>
-    </div>
-
-    <div class="hero-ticker" aria-hidden="true" data-hero-ticker>
-      <div class="hero-ticker-track">
-        {% for pass in (1..2) %}
-          {% if bundled_tn %}
-            <span class="hero-ticker-item">NIKE AIR MAX PLUS <i>✳</i></span>
-            <span class="hero-ticker-item">BLUE. WHITE. UNMISTAKABLE. <i>✳</i></span>
-            <span class="hero-ticker-item">A DIFFERENT PERSPECTIVE <i>✳</i></span>
-            <span class="hero-ticker-item">SELECTED BY STRYDE <i>✳</i></span>
+    <div class="hero-art" data-hero-art>
+      <div class="hero-arrival" data-hero-arrival><div class="hero-float" data-hero-float><div class="hero-depth" data-hero-depth>
+        <div class="hero-media" data-scene-host>
+          {% if presentation_image != blank %}
+            {{ presentation_image | image_url: width: 1800 | image_tag: class: 'hero-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 46vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
+          {% elsif bundled_tn %}
+            <img class="hero-image" src="{{ 'tn-angle-1400.webp' | asset_url }}" width="1400" height="1050" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager">
+          {% elsif featured_product != blank %}
+            <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
+          {% elsif model_url == blank %}
+            <figure class="concept-visual"><img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" alt="{{ 'assets.concept_alt' | t | escape }}" fetchpriority="high" loading="eager"></figure>
           {% else %}
-          {% for index in (2..8) %}
-            {% case index %}
-              {% when 2 %}{% assign label = 'Anatomy' %}
-              {% when 3 %}{% assign label = 'Materials' %}
-              {% when 4 %}{% assign label = 'Technology' %}
-              {% when 5 %}{% assign label = 'Collection' %}
-              {% when 6 %}{% assign label = 'Featured' %}
-              {% when 7 %}{% assign label = 'Brand' %}
-              {% when 8 %}{% assign label = 'Finale' %}
-            {% endcase %}
-            <span class="hero-ticker-item">{{ index | prepend: '0' | slice: -2, 2 }} — {{ label }}</span>
-          {% endfor %}
+            <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
           {% endif %}
-        {% endfor %}
-      </div>
+          <p class="model-status" data-model-status role="status" aria-live="polite" hidden></p>
+        </div>
+      </div></div></div>
     </div>
   </div>
 </section>

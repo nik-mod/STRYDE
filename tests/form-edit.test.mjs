@@ -17,7 +17,7 @@ test('the four-look edit ships four photographs with truthful captions and no in
     assert.equal(createHash('sha256').update(await readFile(file)).digest('hex'), provenance.sha256);
   }
   assert.doesNotMatch(html, /Photographic reference|Not store inventory|Nike Air Max Plus Tuned|priceCurrency|\$\d/);
-  assert.equal((html.match(/data-form-progress/g) || []).length, 4);
+  assert.doesNotMatch(html, /data-form-progress/, 'the edit remains in document flow instead of trapping browsing inside a slide sequence');
 });
 
 test('native collection products take precedence over the editorial edit', async () => {

@@ -103,7 +103,7 @@ function mountHeroSection(root) {
 function mountChapterSection(root) {
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
-    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)' }, ({ conditions }) => {
+    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)', ...(root.dataset.chapter === 'brand' ? { brandFit: '(min-height: 740px)' } : {}) }, ({ conditions }) => {
       if (!conditions.motion) return;
       const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : root.dataset.chapter === 'materials' ? conditions.materialsFlow : conditions.mobile || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
       return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });

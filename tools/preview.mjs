@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Liquid } from 'liquidjs';
 import { photographyCatalog } from './fixtures/photography-catalog.mjs';
+import { prepareCatalog, catalogPage } from '../src/collection-studio.mjs';
 let photoShopCatalog = [];
 
 const root = process.cwd();
@@ -96,7 +97,10 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
     const preview_search_photography = type === 'main-search' && !populated && context.search.performed
       ? photographyCatalog.filter(photo => context.search.terms.toLowerCase().trim().split(/\s+/).every(word => photo.name.toLowerCase().includes(word))) : undefined;
     const preview_photo_shop = type === 'main-collection' && pathname === '/collections/all' && !populated ? photoShopCatalog : undefined;
-    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography, preview_search_photography, preview_photo_shop } });
+    const preview_photo_entries = preview_photo_shop ? prepareCatalog(preview_photo_shop) : undefined;
+    const preview_photo_state = preview_photo_entries ? catalogPage(preview_photo_entries, query, pathname) : undefined;
+    const preview_photo_payload = preview_photo_entries ? JSON.stringify(preview_photo_entries).replaceAll('<', '\\u003c') : '';
+    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography, preview_search_photography, preview_photo_shop, preview_photo_state, preview_photo_payload } });
   }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));
   let content = '';

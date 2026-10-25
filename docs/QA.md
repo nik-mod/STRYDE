@@ -397,3 +397,127 @@ origins are recorded from repository model, concept, and photographic source
 records; unknown reference origins remain explicitly unknown. No new shipping
 image was generated in this rebuild. Store-connected checkout and physical-device
 production frame rate are outside these local checks. No deployment was run.
+
+## Premium storefront implementation — 2026-10-25
+
+Reviewed the 42.24-second owner recording from beginning to end through 32
+captured frames, both supplied collection/product screenshots, and the actual
+localhost:9292 homepage, collection and product pages before implementation.
+The old catalog created 889 simultaneous cards and a roughly 188,584px document;
+the old product view placed a huge title and archive diagnostics before a raw
+image grid.
+
+Implemented in place:
+
+- Intro bootstrap and runtime share a session-once marker. The first entrance
+  records it immediately; same-home logo activation uses the existing scroller
+  without a document reload. Reload, cross-route home return, reduced motion,
+  anchors, restored history and editor contexts skip inappropriate replay.
+- Collection is a compact product studio with 12 cards per page, 75 pages and all 889
+  supplied groups reachable. Existing metadata supports brand/color filters,
+  model/name search, sorting and the Named designs view. URL state, Back/Forward,
+  empty/reset, native GET forms and no-JS pagination work. Native Shopify
+  collection products, filters, prices, availability and pagination retain
+  precedence. Cards use alternate photographs and bounded cached framing.
+- Product studio uses a dominant active image, thumbnail rail, count, keyboard
+  arrows, touch swipe, full-screen native dialog, zoom, Escape/focus restoration,
+  loading/error recovery and linked no-JS images. Visible loaded thumbnails are
+  framed progressively; offscreen images remain lazy. On phones, 44px arrows
+  occupy a separate image footer. Native variant select/quantity/form fields,
+  prices, availability and real policies remain authoritative. Preview photo
+  sets explicitly remain unavailable to purchase.
+- Global short native page transitions and shared product image continuity
+  preserve normal navigation. Cancelled transition promises are handled.
+- Homepage hero removes generic description/metadata/ticker clutter. Four
+  Form Studies photographs now occupy a flowing staggered gallery with bounded
+  parallax rather than a pinned slideshow. One WebGL context draws separate
+  scissored product windows during chapter boundaries, keeping the shoe away
+  from headings. The navy feature always uses its matching model/fallback;
+  physical-detail Brand copy replaces internal editorial diagnostics.
+
+Source map (plus rebuilt theme.js/lazy scene chunks):
+
+- Intro/navigation: layout/theme.liquid, src/motion/site-intro.mjs,
+  src/motion/navigation.mjs, assets/navigation.css.
+- Collection: sections/main-collection.liquid, snippets/photo-shop-catalog.liquid,
+  snippets/product-card.liquid, src/collection-studio.mjs,
+  src/motion/listing.mjs, assets/collection-studio.css and the local-only
+  catalog-state integration in tools/preview.mjs.
+- Products: sections/main-product.liquid, snippets/photo-product-preview.liquid,
+  snippets/product-studio-gallery.liquid, src/commerce.mjs,
+  src/product-gallery.mjs and assets/product-studio.css.
+- Homepage/3D: sections/cinematic-hero.liquid, sections/chapter-featured.liquid,
+  sections/chapter-brand.liquid, snippets/form-edit-scenes.liquid,
+  templates/index.json, src/motion/hero.mjs, src/motion/form-edit.mjs,
+  src/journey-scene.mjs, src/journey-transition.mjs, assets/experience.css
+  and assets/form-edit.css.
+- Regression coverage: collection-studio/product-studio tests, updated native
+  catalog/foundation expectations, intro, Form Edit and journey model/transition
+  tests. Design contracts updated in DESIGN.md and the surface briefs.
+
+Validation: build succeeds; 94 tests pass; structural validation passes; Shopify
+Theme Check has zero errors and only the pre-existing orphaned development-catalog
+snippet warning. Browser walks covered 1440×900, 1366×768, 768×1024, 390×844 and 375×667,
+all eight homepage chapters, intermediate boundaries and reverse scroll. Actual
+collection filters/pagination/history/reload/no-results/reset, native variants
+and price changes, product opening/gallery/lightbox/zoom, touch swipe, keyboard,
+failed-image recovery, no-JS and reduced-motion paths passed. No page errors or
+horizontal overflow were observed. A separate final design evaluation returned
+PASS with no blocking defects after tablet density, phone fold and thumbnail
+framing refinements. Evidence is in .impeccable/review/premium/ and
+.impeccable/review/premium-motion/ (ignored local screenshots).
+
+Remaining limits: some supplied photographs have low native resolution and stay
+soft when enlarged. Connected-store checkout, other browser engines and physical
+device frame rate were not verified. No commit, push or deployment was performed.
+
+## Intro entry behavior clarified — 2026-10-25
+
+At the owner's correction, replaced the tab-long intro suppression with
+entry-aware navigation. Direct/external homepage entry and reloads at the top
+play the original intro again. Same-home logo clicks remain smooth without
+reloading; internal returns from collection/product routes skip the overlay.
+The previous intro-seen flag is discarded. Internal navigation intent is
+one-shot and short-lived; history restoration, anchors, mid-story reloads,
+reduced motion and the editor retain their existing skip behavior.
+
+Verified in the browser with the previous seen flag pre-seeded: direct entry,
+top reload and a new direct visit in the same tab play; same-home logo and
+collection-to-home logo do not replay; reduced motion remains respected. No
+browser page errors. Build succeeds and all 95 regression tests pass.
+
+## Brand chapter lighting studio — 2026-10-25
+
+Replaced the owner's rejected paired enlarged crop wall with a single live 3D
+sneaker studio. GSAP controls a continuous profile/upper/outsole/profile turn
+and a real moving key/rim lighting setup. The chapter uses the existing model,
+renderer, cache and scheduler. The full shoe stays inside its authored product
+window, clear of the heading and navigation. Genuine Profile/Upper/Foundation
+buttons seek the timeline on pinned layouts. A selected merchant campaign image
+still takes precedence; a complete high-resolution profile image is the fallback.
+No shipping raster was generated or modified.
+
+Desktop pin travel is 1.4 viewport heights; tall phones use .95 viewport heights,
+and heights below 740px use normal flow. Phone framing includes a gentle diagonal
+roll. Responsive mode changes preserve the viewed phase rather than jumping past
+the removed pin into the finale. Studio spacing includes the preview banner and
+header; reverse-scroll phone measurement gives 24px title clearance. Phase buttons
+and live captions hide when the renderer is unavailable. Reduced motion and no-JS
+retain a readable whole-shoe presentation and working navigation.
+
+Files: sections/chapter-brand.liquid; assets/experience.css; brand controller in
+src/motion/chapters.mjs; brand target/lighting in src/journey-scene.mjs; deterministic
+poses, phase and light helpers in src/journey-poses.mjs; brand-only height media
+condition in src/theme.mjs; corresponding journey/merchant-precedence regression
+tests; DESIGN.md and the Brand surface brief.
+
+Browser checks covered 1440×900, 2556×1438, 390×844 and 375×667 at quarter stops,
+reverse seeks, actual view controls, mid-chapter reload, adjacent chapter handoffs,
+WebGL loss/recovery, runtime reduced motion and no-JS. Resize 844→730→844 preserves
+approximately .7506 progress, correct ownership and pin/flow modes. One canvas,
+zero horizontal overflow and zero page errors were observed. Build and structural
+validation pass; 97 tests pass. Theme Check retains only the pre-existing orphaned
+snippet warning. Screenshots are in .impeccable/review/brand-studio/.
+No commit, push or deployment was performed.
+
+Independent final Brand evaluation: PASS after fresh resize, reverse-header, view-control and fallback rechecks. No blocking defects remain in the tested scope. Physical-device frame rate and other browser engines remain unmeasured.
