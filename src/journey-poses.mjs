@@ -42,8 +42,8 @@ const TRACKS = {
   technology: [
     [0, pose(.1, -.18, -.08, .93)],
     [.42, pose(.4, .48, .06, .93)],
-    [.75, pose(-.95, .4, .05, .95)],
-    [1, pose(-1.4, 0, 0, .91)],
+    [.75, pose(.25, -.28, -.025, .93)],
+    [1, pose(.13, -.08, 0, .92)],
   ],
   featured: [
     [0, pose(.32, -.5, .12, .89)],
@@ -71,8 +71,7 @@ export function inspectionPose(view) {
   }[view] || null;
 }
 
-// A handoff stays inside the two authored product windows. It fades to the
-// next window instead of dragging a model across the intervening heading.
+// One product stage travels between the two visible authored windows.
 export function journeyHandoff(from, to, viewportHeight) {
   if (!(viewportHeight > 0)) return null;
   const fromBottom = from.top + from.height;
@@ -83,7 +82,7 @@ export function journeyHandoff(from, to, viewportHeight) {
   if (toCenter <= fromCenter) return null;
   const progress = clamp((viewportHeight / 2 - fromCenter) / (toCenter - fromCenter));
   if (progress <= 0 || progress >= 1) return null;
-  return { index: progress < .5 ? 0 : 1, opacity: smooth(Math.abs(progress * 2 - 1)) };
+  return { index: progress < .5 ? 0 : 1, progress, opacity: 1 };
 }
 
 export function journeyProgress(scroll, start, end) {

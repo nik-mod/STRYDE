@@ -1,0 +1,9 @@
+{
+  "source": "User supplied New Project 10_24_2026.glb",
+  "model": "nike-tn-monochrome.glb",
+  "sha256": "0f16e16a712f5fa44433c857e276ac45ccd0a474070b953ac2d53a47bfd6c032",
+  "method": "Three.js render of original geometry and embedded textures",
+  "generated": false,
+  "width": 2800,
+  "transparent": true
+}

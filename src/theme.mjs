@@ -12,6 +12,7 @@ import { mountMagnetic } from './motion/magnetic.mjs';
 import { mountListing } from './motion/listing.mjs';
 import { mountNavigation } from './motion/navigation.mjs';
 import { mountTriggerInspection } from './motion/inspection.mjs';
+import { mountSiteIntro, shouldPlaySiteIntro } from './motion/site-intro.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
 // All high-frequency work shares GSAP's clock. No second requestAnimationFrame loop.
@@ -136,12 +137,16 @@ function mount(scope = document) {
   });
 }
 function unmount(scope) { for (const [root, dispose] of instances) if (scope === root || scope.contains(root)) { dispose(); instances.delete(root); } }
+const siteIntro = mountSiteIntro({
+  gsap, document, environment: window, onChange: () => { syncScroll(); ScrollTrigger.refresh(); },
+  skip: !shouldPlaySiteIntro({ reduced: reduceQuery.matches, restoredY: reloadScroll?.y || window.scrollY, hash: location.hash, navigationType: performance.getEntriesByType('navigation')[0]?.type }),
+});
 syncScroll(); mount();
 let disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll });
 let disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location });
 document.addEventListener('shopify:section:load', event => { mount(event.target); syncScroll(); });
 document.addEventListener('shopify:section:unload', event => { unmount(event.target); syncScroll(); ScrollTrigger.refresh(); });
-reduceQuery.addEventListener('change', () => { syncScroll(); unmount(document); mount(); });
+reduceQuery.addEventListener('change', () => { siteIntro.finish(); syncScroll(); unmount(document); mount(); });
 const modalObserver = new MutationObserver(syncScroll);
 modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] });
 document.addEventListener('visibilitychange', () => { if (document.hidden) lenis?.stop(); else syncScroll(); });
@@ -149,6 +154,7 @@ window.addEventListener('pagehide', () => {
   exitScroll = scrollCheckpoint();
   try { sessionStorage.setItem(checkpointKey, JSON.stringify(exitScroll)); } catch { /* Optional restoration only. */ }
   pageActive = false;
+  siteIntro.dispose();
   disposeInspection();
   progressTween?.scrollTrigger?.kill(); progressTween?.revert(); progressTween = null;
   disposeNavigation();

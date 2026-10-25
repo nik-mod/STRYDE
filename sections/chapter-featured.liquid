@@ -2,15 +2,21 @@
   assign product = section.settings.product
   assign selected_variant = product.selected_or_first_available_variant
   assign presentation_image = section.settings.image | default: product.featured_image
+  assign featured_prefix = 'tn'
+  assign featured_label = 'Blue and white TN'
+  if section.settings.use_navy_model
+    assign featured_prefix = 'tn-navy'
+    assign featured_label = 'Deep blue and navy Air Max Plus'
+  endif
 %}
 <section id="chapter-featured" class="chapter chapter-surface chapter-featured" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="featured" data-env="featured" data-section-id="{{ section.id }}" aria-labelledby="FeatHeading-{{ section.id }}">
   {% if section.settings.outline_word != blank %}<p class="feat-word" aria-hidden="true" data-feat-word>{{ section.settings.outline_word | upcase | escape }}</p>{% endif %}
   <div class="feat-grid">
-    <div class="frame feat-frame">
+    <div class="frame feat-frame"{% if section.settings.use_tn_model and section.settings.use_navy_model and product == blank and presentation_image == blank %} data-journey-model="{{ 'nike-tn-deep-blue.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="navy" data-journey-from-primary data-journey-change-start="0.15" data-journey-change-end="0.85"{% endif %}>
       {% if product != blank and presentation_image == blank %}
         <p class="editorial-image-pending">{{ 'hero.asset_pending' | t }}</p>
       {% elsif section.settings.use_tn_model and presentation_image == blank %}
-        <img src="{{ 'tn-angle-2800.webp' | asset_url }}" srcset="{{ 'tn-angle-1000.webp' | asset_url }} 1000w, {{ 'tn-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" data-featured-model alt="Blue and white TN — angle view rendered from the 3D model">
+        <img src="{{ featured_prefix | append: '-angle-2800.webp' | asset_url }}" srcset="{{ featured_prefix | append: '-angle-1000.webp' | asset_url }} 1000w, {{ featured_prefix | append: '-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" data-featured-model alt="{{ featured_label }} — angle view rendered from the 3D model">
         <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
       {% else %}
       {% assign supplied_concept = false %}
@@ -74,6 +80,7 @@
   "name":"Featured product",
   "settings":[
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
+    {"type":"checkbox","id":"use_navy_model","label":"Use supplied deep blue TN model","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"06 \u2014 Featured"},
     {"type":"text","id":"outline_word","label":"Outlined background word","default":"In focus"},
     {"type":"product","id":"product","label":"Featured product"},

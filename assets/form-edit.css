@@ -1,0 +1,60 @@
+/* Chapter 05: editorial photographs, four looks, no extra GPU canvas. */
+.chapter-collection[data-form-edit] { --edit-paper:#d9e9f1; background:var(--edit-paper); overflow:hidden; }
+[data-form-edit] .coll-head { position:relative; z-index:8; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+[data-form-edit] .coll-head .chapter-heading { font-size:12px; letter-spacing:.16em; margin:0; font-weight:500; }
+[data-form-edit] .coll-head .chapter-kicker { margin:0; }
+[data-form-edit] .coll-stage { width:100%; }
+.form-look { position:relative; min-height:620px; isolation:isolate; background:var(--edit-paper); }
+.form-look-type { position:absolute; top:4%; left:0; width:66%; color:var(--look-accent); opacity:.10; font-size:clamp(88px,13vw,225px); line-height:.78; letter-spacing:-.085em; font-weight:850; }
+.form-look-type > span { display:block; }
+.form-look-art { position:absolute; inset:0 31% 0 -6%; display:grid; place-items:center; mix-blend-mode:multiply; pointer-events:none; }
+.form-look-art img { display:block; width:100%; height:100%; object-fit:contain; transform:scale(2.12); }
+.form-look-copy { position:absolute; left:68%; right:0; top:25%; }
+.form-look-index { font-size:10px; font-weight:700; letter-spacing:.14em; display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid #12334133; padding-bottom:15px; margin:0 0 24px; }
+.form-look-copy h3 { font-size:clamp(32px,3.4vw,64px); line-height:1.02; letter-spacing:-.055em; margin:0 0 22px; font-weight:750; }
+.form-look-deck { font-size:clamp(15px,1.2vw,21px); line-height:1.35; margin:0 0 12px; font-weight:650; }
+.form-look-body { font-size:clamp(13px,1.05vw,18px); line-height:1.6; max-width:34ch; opacity:.8; margin:0; }
+.form-look-spec { margin:30px 0 0; font-size:11px; line-height:1.5; }
+.form-look-spec > div { display:flex; justify-content:space-between; gap:15px; border-top:1px solid #12334126; padding:12px 0; }
+.form-look-spec dt { opacity:.6; text-transform:uppercase; letter-spacing:.09em; }
+.form-look-spec dd { margin:0; text-align:right; }
+.form-rail { display:none; }
+[data-form-edit] .coll-summary { position:relative; z-index:8; }
+@media(min-width:901px) {
+  .chapter-collection[data-form-edit].is-form-sequenced { height:100svh; min-height:650px; padding-top:calc(var(--header-height) + 48px); display:flex; flex-direction:column; }
+  [data-form-edit].is-form-sequenced .coll-stage { flex:1; min-height:0; margin-top:28px; position:relative; }
+  .is-form-sequenced .form-look { position:absolute; inset:0 0 50px; min-height:0; background:var(--edit-paper); }
+  .is-form-sequenced .form-look-type { top:6%; }
+  .is-form-sequenced .form-look-copy { top:17%; }
+  .is-form-sequenced .form-rail { position:absolute; z-index:8; bottom:0; width:100%; display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding-bottom:10px; }
+  .form-rail-stop { position:relative; font-size:11px; font-weight:650; letter-spacing:.03em; padding:0 0 14px; }
+  .form-rail-number { margin-right:16px; opacity:.5; font-size:10px; }
+  .form-rail-track { display:block; position:absolute; bottom:0; width:100%; height:2px; background:#12334124; overflow:hidden; }
+  .form-rail-track i { display:block; width:100%; height:100%; background:#123341; transform-origin:left; }
+  [data-form-edit].is-form-sequenced .coll-summary { padding-top:18px; margin-top:16px; font-size:12px; border:0; }
+}
+@media(max-width:900px) {
+  [data-form-edit] .coll-head { margin-bottom:30px; }
+  [data-form-edit] .coll-head .chapter-heading { display:none; }
+  .form-look { min-height:0; padding-top:90%; margin-bottom:65px; }
+  .form-look-type { top:1%; width:100%; font-size:clamp(80px,21vw,180px); }
+  .form-look-art { inset:0 -8% auto; height:auto; aspect-ratio:1.15; }
+  .form-look-art img { transform:scale(1.5); }
+  .form-look-copy { position:relative; left:auto; right:auto; top:auto; width:100%; }
+  .form-look-copy h3 { font-size:40px; }
+  .form-look-body { max-width:46ch; font-size:15px; }
+  .form-look-deck { font-size:18px; }
+  .form-look-spec { max-width:480px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .form-look-art { transform:none !important; }
+}
+.form-look-art img { position:absolute; inset:0; min-width:0; min-height:0; }
+
+@media(min-width:901px) {
+  .form-look:nth-child(n+3) .form-look-art img { transform:scale(1.85); }
+}
+@media(max-width:900px) {
+  .form-look { overflow:hidden; }
+  .form-look-art { inset-inline:0; overflow:hidden; }
+}

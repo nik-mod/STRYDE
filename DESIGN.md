@@ -207,3 +207,17 @@ Square media, straight hairlines and rectangular ledgers establish the form lang
 
 
 The second recording refinement reduces headline scales throughout, limits hero horizontal text drift to 2%, and retains camera margins during every hero/finale pose. Anatomy uses a start-aligned sticky visual. The bundled Brand image is a two-plate detail/heel study; configured merchant imagery keeps its original single-image composition.
+
+
+## Multiple TN models within the existing chapters
+
+The original intro, blue/white hero, typography, palettes and eight-chapter layout are preserved. Chapter 02 now studies the user supplied white/black Air Max Plus Drift in its original anatomy layout. Chapter 03 retains its three material panels: the blue Air Max Plus in Color, then the white/black Drift in Structure and Foundation. Each panel's model, fallback, inset, title, description and specs describe the same shoe. There is no added bottom section.
+
+One shared journey canvas and camera select the model declared by the active product window. Models are cached separately with their own framing hull and base yaw: 90 degrees for the blue TN, zero for the Drift. The Drift loads as chapter 02 approaches; unavailable models retain matching static imagery. Model changes stay opaque during a matched heel turn. Both meshes share an interpolated silhouette envelope and one camera; complementary surface masks replace the shoe during the heel view without a fade or blank frame. Product windows travel continuously between adjacent chapters, and captions use non-overlapping masked reveals. Scroll seeks and reverse scrolling use the same deterministic transition. Hidden tabs release their WebGL renderer. The intro triptych uses blue TN, Drift profile and a clean white/cyan TN photograph, with contained framing for the two new shoes.
+
+
+## Third supplied TN — chapter 06
+
+The deep blue/navy Air Max Plus uses the existing featured layout, titled Deep blue, with its own model, fallback renders and matching detail ledger. On desktop, a short pin holds the complete composition while the original blue TN turns into the navy shoe through the shared opaque heel handoff. Phone and short flowing layouts time the same change to the visible shoe window. Merchant imagery retains precedence. The intro files were restored to their pre-turn content and are unchanged by this integration.
+
+The two dense supplied scans use UV- and normal-aware 180,000-triangle delivery copies with unchanged embedded PBR maps and transforms. Original user files remain intact; source framing hulls are retained. The original blue hero model is unchanged.

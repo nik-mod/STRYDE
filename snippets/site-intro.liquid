@@ -1,0 +1,44 @@
+<div class="site-intro" data-site-intro role="dialog" aria-label="STRYDE introduction" aria-hidden="true" tabindex="-1" hidden>
+  <div class="site-intro-curtains" aria-hidden="true">
+    {% for i in (1..5) %}<div class="site-intro-curtain" data-intro-curtain></div>{% endfor %}
+  </div>
+  <div class="site-intro-film" data-intro-film aria-hidden="true">
+    <div class="site-intro-wash" data-intro-wash></div>
+    <div class="site-intro-grid" data-intro-grid></div>
+    <div class="site-intro-kinetic" data-intro-kinetic>
+      <div class="site-intro-speedlines" data-intro-speedlines>{% for i in (1..7) %}<i></i>{% endfor %}</div>
+      <div class="site-intro-move" data-intro-move><span data-intro-move-glyph>M</span><span data-intro-move-glyph>O</span><span data-intro-move-glyph>V</span><span data-intro-move-glyph>E</span><span class="site-intro-period" data-intro-move-glyph>.</span></div>
+      <div class="site-intro-different" data-intro-different>{% assign letters = 'D,I,F,F,E,R,E,N,T,.' | split: ',' %}{% for letter in letters %}<span data-intro-different-glyph>{{ letter }}</span>{% endfor %}</div>
+      <div class="site-intro-iris" data-intro-iris></div>
+    </div>
+    <div class="site-intro-macros" data-intro-macros>
+      <div class="site-intro-macro site-intro-macro-one" data-intro-macro><img data-intro-macro-image src="{{ 'tn-profile-1400.webp' | asset_url }}" width="1400" height="1050" alt="" loading="eager" decoding="async"></div>
+      <div class="site-intro-macro site-intro-macro-two" data-intro-macro><img data-intro-macro-image src="{{ 'tn-mono-profile-1400.webp' | asset_url }}" width="1400" height="1050" alt="" loading="eager" decoding="async"></div>
+      <div class="site-intro-macro site-intro-macro-three" data-intro-macro><img data-intro-macro-image src="{{ 'intro-tn-white-cyan.webp' | asset_url }}" width="1000" height="1000" alt="" loading="eager" decoding="async"></div>
+    </div>
+    <div class="site-intro-stage" data-intro-stage>
+      <div class="site-intro-halo" data-intro-halo></div>
+      <svg class="site-intro-orbits" data-intro-orbits viewBox="0 0 1200 800" fill="none">
+        <ellipse data-intro-orbit cx="600" cy="400" rx="510" ry="225" transform="rotate(-26 600 400)"/>
+        <ellipse data-intro-orbit cx="600" cy="400" rx="475" ry="280" transform="rotate(26 600 400)"/>
+        <ellipse data-intro-orbit cx="600" cy="400" rx="560" ry="320" transform="rotate(-26 600 400)"/>
+        <path data-intro-orbit d="M 0 625 Q 600 -130 1200 240"/>
+      </svg>
+      <div class="site-intro-type">
+        <div class="site-intro-echo" data-intro-echo>STRYDE</div>
+        <div class="site-intro-word" data-intro-word><span data-intro-glyph>S</span><span data-intro-glyph>T</span><span data-intro-glyph>R</span><span data-intro-glyph>Y</span><span data-intro-glyph>D</span><span data-intro-glyph>E</span></div>
+      </div>
+      <div class="site-intro-trail site-intro-trail-left" data-intro-trail><img src="{{ 'tn-profile-700.webp' | asset_url }}" width="700" height="525" alt="" loading="eager" decoding="async"></div>
+      <div class="site-intro-trail site-intro-trail-right" data-intro-trail><img src="{{ 'tn-heel-700.webp' | asset_url }}" width="700" height="525" alt="" loading="eager" decoding="async"></div>
+      <div class="site-intro-product">
+        <div class="site-intro-shadow" data-intro-shadow></div>
+        <img class="site-intro-shoe" data-intro-shoe src="{{ 'tn-angle-1400.webp' | asset_url }}" width="1400" height="1050" alt="" loading="eager" fetchpriority="high" decoding="async">
+      </div>
+      <div class="site-intro-light" data-intro-light></div>
+      <div class="site-intro-signoff" data-intro-signoff><span data-intro-signoff-word>A different</span><span data-intro-signoff-word>perspective.</span></div>
+      <div class="site-intro-edge site-intro-edge-top" data-intro-edge></div>
+      <div class="site-intro-edge site-intro-edge-bottom" data-intro-edge></div>
+    </div>
+    <div class="site-intro-grain"></div>
+  </div>
+</div>

@@ -18,12 +18,29 @@
     {{ 'refinements.css' | asset_url | stylesheet_tag }}
     {{ 'recovery.css' | asset_url | stylesheet_tag }}
     {{ 'signature.css' | asset_url | stylesheet_tag }}
-    {% if request.page_type == 'index' %}{{ 'experience.css' | asset_url | stylesheet_tag }}{% endif %}
+    {% if request.page_type == 'index' %}{{ 'experience.css' | asset_url | stylesheet_tag }}{{ 'form-edit.css' | asset_url | stylesheet_tag }}{% endif %}
     {{ 'storefront.css' | asset_url | stylesheet_tag }}
+    {% if request.page_type == 'index' %}
+      {{ 'site-intro.css' | asset_url | stylesheet_tag }}
+      {% unless request.design_mode %}
+        <script>
+          (() => {
+            try {
+              const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+              const returning = performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
+              if (reduced || returning || location.hash) return;
+              document.documentElement.classList.add('site-intro-pending');
+              setTimeout(() => document.documentElement.classList.remove('site-intro-pending'), 10000);
+            } catch { /* The homepage remains available if the introduction cannot start. */ }
+          })();
+        </script>
+      {% endunless %}
+    {% endif %}
     <script>document.documentElement.classList.replace('no-js','js');</script>
     <script type="module" src="{{ 'theme.js' | asset_url }}"></script>
   </head>
   <body class="template-{{ request.page_type | handle }}">
+    {% if request.page_type == 'index' %}{% render 'site-intro' %}{% endif %}
     <a class="skip-link" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
     {% sections 'header-group' %}
     <main id="MainContent" tabindex="-1">{{ content_for_layout }}</main>

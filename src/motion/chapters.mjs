@@ -1,3 +1,4 @@
+import { mountFormEdit } from './form-edit.mjs';
 import { mountCollectionHover } from './collection-hover.mjs';
 
 // Scroll choreography for chapters 02–08 (Milestone 02.6).
@@ -121,10 +122,10 @@ function materials(root, gsap, { mobile }) {
     const timeline = gsap.timeline({ scrollTrigger: {
       trigger: root, start: 'top top',
       end: () => `+=${Math.round(window.innerHeight * 1.7)}`,
-      pin: true, scrub: true, anticipatePin: 1, invalidateOnRefresh: true,
+      pin: true, scrub: .45, anticipatePin: 1, invalidateOnRefresh: true,
     }});
-    // One complete view and caption own every instant. The live rig performs
-    // the turn between studies; duplicating two HTML shoes is unnecessary.
+    // The live shoe keeps turning through the boundary. Captions use a staged
+    // masked reveal so two different product titles never overlap.
     timeline.to({ progress: 0 }, { progress: 1, duration: 1, ease: 'none' }, 0);
     panels.forEach((panel, index) => {
       const copy = panel.querySelector('.mat-copy');
@@ -132,15 +133,17 @@ function materials(root, gsap, { mobile }) {
       const image = panel.querySelector('.mat-frame > img');
       const rule = panel.querySelector('.mat-rule');
       gsap.set(panel, { autoAlpha: index === 0 ? 1 : 0 });
-      if (copy) gsap.set(copy, { opacity: index === 0 ? 1 : 0 });
+      if (copy) gsap.set(copy, { opacity: 1 });
       if (frame) gsap.set(frame, { clipPath: 'inset(0% 0% 0% 0%)' });
       if (index > 0) {
         const at = index / panels.length;
+        const duration = .055;
         timeline.set(panels[index - 1], { autoAlpha: 0 }, at)
           .set(panel, { autoAlpha: 1 }, at);
-        if (copy) timeline.set(copy, { opacity: 1 }, at);
+        if (copy) timeline.fromTo(copy, { y: 14, clipPath: 'inset(100% 0% 0% 0%)' },
+          { y: 0, clipPath: 'inset(0% 0% 0% 0%)', duration, ease: 'sine.out' }, at);
         const previousCopy = panels[index - 1].querySelector('.mat-copy');
-        if (previousCopy) timeline.set(previousCopy, { opacity: 0 }, at);
+        if (previousCopy) timeline.to(previousCopy, { y: -10, clipPath: 'inset(0% 0% 100% 0%)', duration, ease: 'sine.in' }, at - duration);
       }
       if (image) {
         const crop = readCrop(image);
@@ -255,6 +258,7 @@ function technology(root, gsap, { mobile }) {
 /* -------------------------------------------------- 05 — collection */
 
 function collection(root, gsap, { mobile, fine }) {
+  if (root.hasAttribute('data-form-edit')) return mountFormEdit(root, gsap, { mobile });
   const stage = root.querySelector('[data-coll-stage]');
   const scenes = [...root.querySelectorAll('[data-coll-scene]')];
 
@@ -395,6 +399,16 @@ function featured(root, gsap, { mobile }) {
       ease: 'none',
       scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
     });
+  }
+  if (!mobile && frame?.hasAttribute('data-journey-from-primary') && root.offsetHeight <= window.innerHeight) {
+    // Keep the entire product on screen while its identity changes. The
+    // shared journey renderer reads this pin's scrubbed progress directly.
+    gsap.timeline({ scrollTrigger: {
+      trigger: root,
+      start: () => `top ${Math.max(0, Math.min(window.innerHeight * .08, (window.innerHeight - root.offsetHeight) / 2))}px`,
+      end: () => `+=${Math.round(window.innerHeight * .85)}`,
+      pin: true, scrub: .45, anticipatePin: 1, invalidateOnRefresh: true,
+    } }).to({ progress: 0 }, { progress: 1, duration: 1, ease: 'none' });
   }
   const word = root.querySelector('[data-feat-word]');
   if (word) {

@@ -1,0 +1,54 @@
+{% comment %}Color-led editorial names describe the photographs, without claiming unverified brands or stock.{% endcomment %}
+{% for index in (1..4) %}
+  {% liquid
+    case index
+      when 1
+        assign file = 'form-edit-sky.png'
+        assign tone = 'SKY|BLUE.'
+        assign title = 'Sky blue / Gum'
+        assign detail = 'Cool blue. Warm foundation.'
+        assign body = 'Smooth blue panels meet soft suede. Cream laces and a gum sole bring a little warmth to the clean side profile.'
+        assign material = 'Suede & smooth panels'
+        assign accent = '#527e9b'
+      when 2
+        assign file = 'form-edit-midnight.png'
+        assign tone = 'MID|NIGHT.'
+        assign title = 'Midnight / Gum'
+        assign detail = 'The same quiet confidence.'
+        assign body = 'Deep navy panels, dark suede overlays and off-white laces. A low profile grounded by a warm gum sole.'
+        assign material = 'Dark suede & smooth panels'
+        assign accent = '#243b55'
+      when 3
+        assign file = 'form-edit-court.png'
+        assign tone = 'COURT|BLUE.'
+        assign title = 'Navy / Ivory'
+        assign detail = 'A softer take on court style.'
+        assign body = 'Navy suede with a white club-shaped side detail. Ivory laces, a white heel panel and a light cupsole keep the contrast crisp.'
+        assign material = 'Suede & contrasting details'
+        assign accent = '#334564'
+      when 4
+        assign file = 'form-edit-charcoal.webp'
+        assign tone = 'EARTH|TONES.'
+        assign title = 'Charcoal / Gum'
+        assign detail = 'A warm finish to the edit.'
+        assign body = 'Charcoal panels and brown suede overlays, finished with cream laces and a gum sole. Familiar lines with an earthy shift in tone.'
+        assign material = 'Brown suede & charcoal panels'
+        assign accent = '#716254'
+    endcase
+  %}
+  <article class="form-look" data-form-look style="--look-accent: {{ accent }}" aria-labelledby="FormLook-{{ section_id }}-{{ index }}">
+    <div class="form-look-type" aria-hidden="true">{% assign lines = tone | split: '|' %}{% for line in lines %}<span>{{ line }}</span>{% endfor %}</div>
+    <div class="form-look-art"><img src="{{ file | asset_url }}" width="1000" height="1000" loading="lazy" decoding="async" alt="{{ title | escape }} sneakers — {{ material | downcase | escape }}"></div>
+    <div class="form-look-copy">
+      <p class="form-look-index">THE FORM EDIT <span>0{{ index }} / 04</span></p>
+      <h3 id="FormLook-{{ section_id }}-{{ index }}">{{ title }}</h3>
+      <p class="form-look-deck">{{ detail }}</p>
+      <p class="form-look-body">{{ body }}</p>
+      <dl class="form-look-spec"><div><dt>Study</dt><dd>{{ material }}</dd></div><div><dt>Palette</dt><dd>{{ title }}</dd></div></dl>
+    </div>
+  </article>
+{% endfor %}
+<div class="form-rail" aria-label="Four looks in this edit">
+  {% assign names = 'Sky blue|Midnight|Court blue|Earth tones' | split: '|' %}
+  {% for name in names %}<span class="form-rail-stop"><span class="form-rail-number">0{{ forloop.index }}</span>{{ name }}<span class="form-rail-track"><i data-form-progress></i></span></span>{% endfor %}
+</div>

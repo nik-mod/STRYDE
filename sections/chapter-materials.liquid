@@ -4,12 +4,21 @@
     <span class="heading-line"><span>{{ section.settings.heading | escape }}</span></span>
   </h2>
   <div class="mat-panels" data-mat-panels>
+    {% liquid
+      assign panel_model = section.settings.panel_1_model | default: 'blue'
+      assign model_prefix = 'tn'
+      assign model_label = 'Blue and white Air Max Plus / TN'
+      if panel_model == 'drift'
+        assign model_prefix = 'tn-mono'
+        assign model_label = 'White and black Air Max Plus Drift'
+      endif
+    %}
     <div class="mat-panel mat-panel-upper" id="MatPanel-{{ section.id }}-1">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">01</span>
-        <div class="frame mat-frame">
+        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_1_image == blank and panel_model == 'drift' %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
           {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
-            <img src="{{ 'tn-angle-2800.webp' | asset_url }}" srcset="{{ 'tn-angle-1000.webp' | asset_url }} 1000w, {{ 'tn-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Three-quarter view of the blue gradient upper and white wave cage, rendered from the TN model">
+            <img src="{{ model_prefix | append: '-angle-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-angle-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — three-quarter view rendered from the 3D model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_1', image: section.settings.panel_1_image, image_is_concept: section.settings.panel_1_image_is_concept, crop_style: '--zoom: 2.9; --tx: 12%; --ty: -18%;' %}
@@ -17,7 +26,7 @@
         </div>
         {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
         <figure class="mat-inset" aria-hidden="true" data-mat-inset>
-          <img src="{{ 'tn-detail-2800.webp' | asset_url }}" srcset="{{ 'tn-detail-1000.webp' | asset_url }} 1000w, {{ 'tn-detail-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
+          <img src="{{ model_prefix | append: '-detail-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-detail-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-detail-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
         </figure>
         {% endif %}
       </div>
@@ -34,12 +43,21 @@
         <div class="mat-rule" aria-hidden="true"></div>
       </div>
     </div>
+    {% liquid
+      assign panel_model = section.settings.panel_2_model | default: 'blue'
+      assign model_prefix = 'tn'
+      assign model_label = 'Blue and white Air Max Plus / TN'
+      if panel_model == 'drift'
+        assign model_prefix = 'tn-mono'
+        assign model_label = 'White and black Air Max Plus Drift'
+      endif
+    %}
     <div class="mat-panel mat-panel-cage" id="MatPanel-{{ section.id }}-2">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">02</span>
-        <div class="frame mat-frame">
+        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_2_image == blank and panel_model == 'drift' %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
           {% if section.settings.use_tn_model and section.settings.panel_2_image == blank %}
-            <img src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Side profile of the white wave cage and sculpted midsole, rendered from the TN model">
+            <img src="{{ model_prefix | append: '-profile-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-profile-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — side profile rendered from the 3D model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_2', image: section.settings.panel_2_image, image_is_concept: section.settings.panel_2_image_is_concept, crop_style: '--zoom: 1; --tx: 0%; --ty: 0%;' %}
@@ -47,7 +65,7 @@
         </div>
         {% if section.settings.use_tn_model and section.settings.panel_2_image == blank %}
         <figure class="mat-inset" aria-hidden="true" data-mat-inset>
-          <img src="{{ 'tn-top-2800.webp' | asset_url }}" srcset="{{ 'tn-top-1000.webp' | asset_url }} 1000w, {{ 'tn-top-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
+          <img src="{{ model_prefix | append: '-top-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-top-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-top-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
         </figure>
         {% endif %}
       </div>
@@ -64,12 +82,21 @@
         <div class="mat-rule" aria-hidden="true"></div>
       </div>
     </div>
+    {% liquid
+      assign panel_model = section.settings.panel_3_model | default: 'blue'
+      assign model_prefix = 'tn'
+      assign model_label = 'Blue and white Air Max Plus / TN'
+      if panel_model == 'drift'
+        assign model_prefix = 'tn-mono'
+        assign model_label = 'White and black Air Max Plus Drift'
+      endif
+    %}
     <div class="mat-panel mat-panel-sole" id="MatPanel-{{ section.id }}-3">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">03</span>
-        <div class="frame mat-frame">
+        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_3_image == blank and panel_model == 'drift' %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
           {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
-            <img src="{{ 'tn-sole-2800.webp' | asset_url }}" srcset="{{ 'tn-sole-1000.webp' | asset_url }} 1000w, {{ 'tn-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="Underside view of the dark tread and blue arch, rendered from the TN model">
+            <img src="{{ model_prefix | append: '-sole-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-sole-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — outsole view rendered from the 3D model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_3', image: section.settings.panel_3_image, image_is_concept: section.settings.panel_3_image_is_concept, crop_style: '--zoom: 2.5; --tx: -70%; --ty: -10%;' %}
@@ -77,7 +104,7 @@
         </div>
         {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
         <figure class="mat-inset" aria-hidden="true" data-mat-inset>
-          <img src="{{ 'tn-heel-2800.webp' | asset_url }}" srcset="{{ 'tn-heel-1000.webp' | asset_url }} 1000w, {{ 'tn-heel-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
+          <img src="{{ model_prefix | append: '-heel-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-heel-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-heel-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 34vw, 300px" width="2800" height="2100" loading="lazy" alt="">
         </figure>
         {% endif %}
       </div>
@@ -110,12 +137,15 @@
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"03 \u2014 Materials"},
     {"type":"text","id":"heading","label":"Heading","default":"In detail"},
+    {"type":"select","id":"panel_1_model","label":"Panel 1 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"}],"default":"blue"},
     {"type":"text","id":"panel_1_title","label":"Panel 01 title","default":"Color and texture"},
     {"type":"textarea","id":"panel_1_body","label":"Panel 01 body","default":"A close view of the surface, where light brings the color and texture into focus."},
     {"type":"text","id":"panel_1_specs","label":"Panel 01 spec chips","default":"Gradient knit, Wave cage, Woven collar"},
+    {"type":"select","id":"panel_2_model","label":"Panel 2 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"}],"default":"blue"},
     {"type":"text","id":"panel_2_title","label":"Panel 02 title","default":"Lines and layers"},
     {"type":"textarea","id":"panel_2_body","label":"Panel 02 body","default":"Curved ribs divide the side panels. Follow their edges across the profile."},
     {"type":"text","id":"panel_2_specs","label":"Panel 02 spec chips","default":"Contoured midsole, Curved ribs, Heel clip"},
+    {"type":"select","id":"panel_3_model","label":"Panel 3 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"}],"default":"blue"},
     {"type":"text","id":"panel_3_title","label":"Panel 03 title","default":"The foundation"},
     {"type":"textarea","id":"panel_3_body","label":"Panel 03 body","default":"The midsole and outsole give the silhouette its shape from below."},
     {"type":"text","id":"panel_3_specs","label":"Panel 03 spec chips","default":"Rubber tread, Flex grooves, Sculpted arch"},
