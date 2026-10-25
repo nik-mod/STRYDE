@@ -10,15 +10,17 @@
     {% render 'product-studio-gallery', photos: item.photos, title: display_title, gallery_id: item.id %}
     <div class="studio-product-information">
       <div class="studio-product-title"><h1>{{ display_title | escape }}</h1>{% if item.colorway != blank %}<p class="studio-product-color">{{ item.colorway | escape }}</p>{% endif %}</div>
+      {% if item.description != blank %}<p class="studio-product-description">{{ item.description | escape }}</p>{% endif %}
       <p class="studio-preview-label">Collection preview</p>
       <dl class="studio-product-facts">
         {% if item.brand != blank %}<div><dt>Brand</dt><dd>{{ item.brand | escape }}</dd></div>{% endif %}
+        {% if item.sku != blank %}<div><dt>Style code</dt><dd>{{ item.sku | escape }}</dd></div>{% endif %}
         <div><dt>Photography</dt><dd>{{ item.count }} view{% unless item.count == 1 %}s{% endunless %}</dd></div>
         {% if item.identityStatus == 'unverified' or item.identityStatus == 'filename' %}<div><dt>Model</dt><dd>Identification pending</dd></div>{% endif %}
       </dl>
       <p class="studio-preview-note">An image study from the STRYDE collection. This item is not available to purchase.</p>
       <a class="studio-collection-return" href="{{ routes.all_products_collection_url }}"><span>Explore the collection</span>{% render 'icon', name: 'arrow' %}</a>
-      <details class="studio-photo-details"><summary>About this photo set {% render 'icon', name: 'plus' %}</summary><div><p>{% if item.colorway == 'Mixed colorways' %}This set includes multiple colorways. Each photograph can be viewed at full size.{% else %}Explore every photograph using the view selector. Open an image to inspect its details.{% endif %}</p><p>Product identity, price, sizes and stock require confirmation before sale.</p></div></details>
+      <details class="studio-photo-details"><summary>About this photo set {% render 'icon', name: 'plus' %}</summary><div><p>{% if item.colorway == 'Mixed colorways' %}This set includes multiple colorways. Each photograph can be viewed at full size.{% else %}Explore every photograph using the view selector. Open an image to inspect its details.{% endif %}</p>{% if item.sourceUrl != blank %}<p>Product name, style code and photograph sourced from <a href="{{ item.sourceUrl | escape }}" target="_blank" rel="noopener noreferrer">StockX — view the original listing</a>. This is an editorial reference, not an offer of inventory.</p>{% else %}<p>Product identity, price, sizes and stock require confirmation before sale.</p>{% endif %}</div></details>
     </div>
   </div>
 </section>

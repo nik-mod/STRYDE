@@ -7,14 +7,19 @@
 <section id="chapter-brand" class="chapter chapter-paper chapter-brand" data-chapter="brand" data-env="brand" data-section-id="{{ section.id }}"{% if brand_studio %} data-brand-live data-tn-editorial{% endif %} aria-labelledby="BrandHeading-{{ section.id }}">
   {% if brand_studio %}
   <div class="brand-studio" data-brand-stage>
-    <header class="brand-studio-head">
+    <header class="brand-studio-head"><p class="chapter-kicker">07 — A CLOSER LOOK</p>
       <h2 id="BrandHeading-{{ section.id }}">{{ section.settings.studio_heading | default: 'In a different light.' | escape }}</h2>
-      <p class="brand-studio-caption" data-brand-caption>Follow the sidewall.</p>
+      <p class="brand-studio-caption" data-brand-caption>Follow the sidewall.</p><p class="brand-editor-note">A curve. A color. A detail you come back to.<br>Take another look at the silhouette that started it.</p><span class="brand-edition">AIR MAX PLUS / THE BLUE STUDY</span>
     </header>
     <figure class="brand-studio-window" data-brand-window>
       <img data-brand-model src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" width="2800" height="2100" sizes="(max-width: 700px) 92vw, 86vw" loading="lazy" alt="The complete blue and white Nike Air Max Plus sneaker in profile">
       <figcaption class="asset-tag">{{ 'hero.model_preview' | t }}</figcaption>
     </figure>
+    <div class="brand-contact-sheet" aria-label="Details from the blue study">
+      <figure><img src="{{ 'tn-profile-1000.webp' | asset_url }}" width="1000" height="750" loading="lazy" alt="Blue Air Max Plus side profile"><figcaption>01 / THE WAVE</figcaption></figure>
+      <figure><img src="{{ 'tn-top-1000.webp' | asset_url }}" width="1000" height="750" loading="lazy" alt="Blue Air Max Plus lacing and upper"><figcaption>02 / THE TEXTURE</figcaption></figure>
+      <figure><img src="{{ 'tn-heel-1000.webp' | asset_url }}" width="1000" height="750" loading="lazy" alt="Blue Air Max Plus heel"><figcaption>03 / THE FINISH</figcaption></figure>
+    </div>
     <footer class="brand-studio-foot">
       <div class="brand-studio-stops" data-brand-stops role="group" aria-label="Choose the sneaker view" hidden>
         <button type="button" data-brand-step="0" aria-pressed="true"><span>01</span> Profile</button>

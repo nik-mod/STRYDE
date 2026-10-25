@@ -1,27 +1,35 @@
 <div class="photo-shop collection-browser" data-photo-shop>
+  <div class="collection-brand-index"><p>START WITH A NAME <span>Find your point of view.</span></p><nav aria-label="Explore brands" data-catalog-brands>{% for brand in state.brandEdits %}<a href="{{ brand.url | escape }}" data-catalog-brand="{{ brand.name | escape }}"{% if brand.active %} aria-current="true"{% endif %}>{{ brand.name }}<sup>{{ brand.count }}</sup></a>{% endfor %}</nav></div>
+  <div class="collection-gallery-heading" id="CollectionGallery"><h2>THE LINEUP<span>.</span></h2><span>Every pair has a point of view.</span></div>
+  <div class="collection-toolbar">
   <nav class="collection-edits" aria-label="Collection views">
-    <a href="{{ state.allUrl | escape }}" data-catalog-edit=""{% if state.edit == blank %} aria-current="page"{% endif %}>All footwear <span>{{ state.all }}</span></a>
-    <a href="{{ state.namedUrl | escape }}" data-catalog-edit="identified"{% if state.edit == 'identified' %} aria-current="page"{% endif %}>Named designs <span>{{ state.named }}</span></a>
+    <a href="{{ state.allUrl | escape }}" data-catalog-edit=""{% if state.edit == blank %} aria-current="page"{% endif %}><i>01</i> All footwear <span>{{ state.all }}</span></a>
+    <a href="{{ state.namedUrl | escape }}" data-catalog-edit="identified"{% if state.edit == 'identified' %} aria-current="page"{% endif %}><i>02</i> Named designs <span>{{ state.named }}</span></a>
+    {% if state.stockx > 0 %}<a href="{{ state.stockxUrl | escape }}" data-catalog-edit="stockx"{% if state.edit == 'stockx' %} aria-current="page"{% endif %}><i>03</i> StockX edit <span>{{ state.stockx }}</span></a>{% endif %}
   </nav>
   <form class="collection-browser-controls" method="get" action="{{ routes.all_products_collection_url }}" data-catalog-form role="search" aria-label="Browse the collection">
     <label class="collection-search">{% render 'icon', name: 'search' %}<span class="sr-only">Search the collection</span><input type="search" name="q" data-photo-search value="{{ state.q | escape }}" placeholder="Search a brand or model" autocomplete="off"></label>
     <label class="collection-select"><span>Brand</span><select name="brand" aria-label="Filter by brand"><option value="">All brands</option>{% for brand in state.brands %}<option value="{{ brand | escape }}"{% if brand == state.brand %} selected{% endif %}>{{ brand | escape }}</option>{% endfor %}</select></label>
     <label class="collection-select"><span>Color</span><select name="color" aria-label="Filter by color"><option value="">All colors</option>{% for color in state.colors %}<option value="{{ color | escape }}"{% if color == state.color %} selected{% endif %}>{{ color | escape }}</option>{% endfor %}</select></label>
-    <label class="collection-select collection-sort"><span>Sort</span><select name="sort" aria-label="Sort the collection"><option value="studio"{% if state.sort == 'studio' %} selected{% endif %}>Studio order</option><option value="name-ascending"{% if state.sort == 'name-ascending' %} selected{% endif %}>Name, A–Z</option><option value="name-descending"{% if state.sort == 'name-descending' %} selected{% endif %}>Name, Z–A</option><option value="views"{% if state.sort == 'views' %} selected{% endif %}>Most views</option></select></label>
+    <label class="collection-select collection-sort"><span>Sort</span><select name="sort" aria-label="Sort the collection"><option value="studio"{% if state.sort == 'studio' %} selected{% endif %}>Studio order</option><option value="name-ascending"{% if state.sort == 'name-ascending' %} selected{% endif %}>Name, A–Z</option><option value="name-descending"{% if state.sort == 'name-descending' %} selected{% endif %}>Name, Z–A</option><option value="views"{% if state.sort == 'views' %} selected{% endif %}>Most perspectives</option></select></label>
     <input type="hidden" name="edit" value="{{ state.edit | escape }}">
     <button class="collection-filter-submit" type="submit">Apply filters {% render 'icon', name: 'arrow' %}</button>
   </form>
-  <div class="collection-browser-meta"><p data-photo-results role="status" aria-live="polite">{{ state.rangeStart }}–{{ state.rangeEnd }} of {{ state.total }} designs</p><a href="{{ state.clearUrl | escape }}" data-catalog-reset{% unless state.hasFilters %} hidden{% endunless %}>Clear filters {% render 'icon', name: 'close' %}</a></div>
-  <div class="photo-shop-grid" data-catalog-grid>
+  </div>
+  <div class="collection-browser-meta"><p data-photo-results role="status" aria-live="polite">{{ state.rangeStart }}–{{ state.rangeEnd }} of {{ state.total }} designs</p><div class="collection-meta-actions"><a href="{{ state.clearUrl | escape }}" data-catalog-reset{% unless state.hasFilters %} hidden{% endunless %}>Clear filters {% render 'icon', name: 'close' %}</a><div class="collection-density" role="group" aria-label="Gallery density"><button type="button" data-catalog-density="comfortable" aria-label="Roomy gallery" aria-pressed="true"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 3h6v14H2zM12 3h6v14h-6z"/></svg></button><button type="button" data-catalog-density="compact" aria-label="Compact gallery" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1 3h4v14H1zM8 3h4v14H8zM15 3h4v14h-4z"/></svg></button></div></div></div>
+  <div class="collection-active-filters" data-catalog-active{% unless state.hasFilters %} hidden{% endunless %}>{% for filter in state.activeFilters %}<a href="{{ filter.url | escape }}" data-catalog-remove>{{ filter.label | escape }} <span aria-hidden="true">×</span><span class="sr-only">Remove filter</span></a>{% endfor %}</div>
+  <div class="photo-shop-grid" data-catalog-grid data-grid-density="comfortable">
     {% for item in state.items %}
       <article class="photo-shop-card" data-photo-card data-product-id="{{ item.id | escape }}" style="--card-order:{{ forloop.index0 }}">
         <a class="photo-shop-image" data-product-open href="{{ item.url }}" aria-label="View {{ item.title | escape }}">
+          <span class="photo-shop-card-top"><span>{% if item.brand != blank %}{{ item.brand | escape }}{% else %}THE PHOTO ARCHIVE{% endif %}</span><span>{{ item.id | replace: 'pair-', 'Nº ' }}</span></span>
           <img data-product-cover src="{{ item.cover }}" width="1000" height="1000"{% if forloop.index <= 3 %} loading="eager"{% else %} loading="lazy"{% endif %} alt="{{ item.title | escape }}">
           {% if item.alternate != blank %}<img class="photo-shop-alternate" src="{{ item.alternate }}" width="1000" height="1000" loading="lazy" alt="">{% endif %}
-          <span class="photo-shop-count">{{ item.count }} {% if item.count == 1 %}view{% else %}views{% endif %}</span>
+          <span class="photo-shop-count">{{ item.count }} {% if item.count == 1 %}perspective{% else %}perspectives{% endif %}</span>
           <span class="photo-shop-open" aria-hidden="true">{% render 'icon', name: 'arrow' %}</span>
+          <span class="photo-shop-discover" aria-hidden="true">Explore the pair</span>
         </a>
-        <div class="photo-shop-info"><div><h2><a data-product-open href="{{ item.url }}">{{ item.title | escape }}</a></h2><p class="photo-shop-colorway">{% if item.colorway != blank %}{{ item.colorway | escape }}{% elsif item.identified %}{{ item.brand | escape }}{% else %}Photo study{% endif %}</p></div><span class="photo-shop-brand">{% if item.brand != blank %}{{ item.brand | escape }}{% else %}STRYDE{% endif %}</span></div>
+        <div class="photo-shop-info"><div><h2><a data-product-open href="{{ item.url }}">{{ item.title | escape }}</a></h2><p class="photo-shop-colorway">{% if item.colorway != blank %}{{ item.colorway | escape }}{% elsif item.identified %}{{ item.brand | escape }}{% else %}Photo study{% endif %}</p></div><span class="photo-shop-card-index">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span></div>
       </article>
     {% endfor %}
   </div>

@@ -120,8 +120,8 @@ test('Brand live studio replaces the raster wall and keeps merchant campaign pre
   assert.match(studio, /data-brand-window/);
   assert.match(studio, /tn-profile-2800\.webp/);
   assert.match(studio, /hero.model_preview/);
-  assert.equal((studio.match(/<img\b/g) || []).length, 1, 'only a complete whole-shoe fallback is present');
-  assert.doesNotMatch(studio, /tn-detail|tn-heel|brand-visual-pair|brand-word|brand-values/);
+  assert.equal((studio.match(/<img\b/g) || []).length, 4, 'one whole-shoe fallback and a three-image contact sheet are present');
+  assert.doesNotMatch(studio, /tn-detail|brand-visual-pair|brand-word|brand-values/);
   const merchant = await renderChapter('brand', { use_tn_model: true, image: campaignImage });
   assert.match(merchant, /merchant-campaign.jpg/);
   assert.doesNotMatch(merchant, /data-brand-live|data-brand-window|tn-profile/);

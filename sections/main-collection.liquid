@@ -6,10 +6,7 @@
 %}
 <section class="page-shell collection-page collection-studio{% if photography_references %} collection-page-photography{% endif %}" data-listing-section data-section-id="{{ section.id }}">
   {% if section.preview_photo_shop.size > 0 %}
-    <header class="listing-heading photo-shop-heading studio-heading" data-listing-heading>
-      <h1>The collection.</h1>
-      <div class="studio-heading-note"><p>Footwear, from every perspective.</p><p class="listing-preview-note">Photo studies · Purchases unavailable</p></div>
-    </header>
+    {% render 'collection-masthead', state: section.preview_photo_state %}
     {% render 'photo-shop-catalog', state: section.preview_photo_state, payload: section.preview_photo_payload %}
   {% elsif photography_references %}
     <header class="listing-heading" data-listing-heading>

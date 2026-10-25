@@ -163,7 +163,7 @@ test('scrolling during the character reveal settles every glyph and teardown res
     const second = harness.targets['line-2'].children;
     assert.equal(first.length, 6);
     assert.equal(second.length, 9);
-    assert(first.some(glyph => glyph.opacity < 1));
+    assert(first.some(glyph => glyph.yPercent > 0 || glyph.rotationX > 0), 'the spatial character entrance is still in flight');
     harness.seek(.6);
     harness.seek(0);
     for (const glyph of [...first, ...second]) {

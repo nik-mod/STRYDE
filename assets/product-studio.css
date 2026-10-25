@@ -72,3 +72,5 @@
   .studio-gallery-caption { left: 14px; right: auto; bottom: 22px; }
   .studio-gallery-caption [data-gallery-caption] { display: none; }
 }
+
+.studio-product-description{max-width:42ch;font-size:17px;line-height:1.6;color:var(--ink);margin:22px 0}

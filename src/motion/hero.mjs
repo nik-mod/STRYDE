@@ -44,7 +44,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
   const first = splitDisplayLine(line1), second = splitDisplayLine(line2);
   const document = root.ownerDocument || (typeof globalThis.document === 'object' ? globalThis.document : null);
   const environment = document?.defaultView || window;
-  const travel = mobile ? .8 : 1.35;
+  const travel = mobile ? .6 : .85;
   let intro = null, cancelOpening = () => {};
   const settleIntro = () => {
     cancelOpening();
@@ -82,14 +82,14 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
     const letters = (glyphs, fallback, at) => {
       if (glyphs.length) {
         intro.fromTo(glyphs,
-          { yPercent: 112, opacity: 0, rotationX: 0, rotationZ: 0, '--glyph-fill': 1 },
+          { yPercent: 125, opacity: 1, rotationX: 80, rotationZ: -5, '--glyph-fill': 1 },
           { yPercent: 0, opacity: 1, rotationX: 0, rotationZ: 0, '--glyph-fill': 1,
-            duration: .88, stagger: .035, ease: 'expo.out' }, at);
+            duration: 1.12, stagger: { each: .04, from: at ? 'end' : 'start' }, ease: 'expo.out' }, at);
       } else intro.fromTo(fallback, { yPercent: 110 }, { yPercent: 0, duration: .95, ease: 'expo.out' }, at);
     };
     letters(first.glyphs, line1, 0);
     letters(second.glyphs, line2, .16);
-    if (arrival) intro.fromTo(arrival, { opacity: 0, scale: 1, xPercent: 0, y: 0, rotation: 0 }, { opacity: 1, scale: 1, xPercent: 0, y: 0, rotation: 0, duration: .75, ease: 'power2.out' }, .08);
+    if (arrival) intro.fromTo(arrival, { opacity: 1, scale: .9, xPercent: 4, y: 48, rotation: -4 }, { opacity: 1, scale: 1, xPercent: 0, y: 0, rotation: 0, duration: 1.4, ease: 'expo.out' }, .06);
     if (copy) intro.fromTo(copy, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, .35);
     if (foot) intro.fromTo(foot, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .65, ease: 'power3.out' }, .45);
     cancelOpening = waitForHeroOpening(document, environment, () => {

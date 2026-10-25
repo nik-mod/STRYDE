@@ -1,0 +1,19 @@
+<header class="collection-masthead" data-collection-masthead data-listing-heading>
+  <div class="collection-masthead-top"><span>STRYDE / THE FOOTWEAR EDIT</span><span>Good shoes. New perspectives.</span></div>
+  <div class="collection-masthead-copy">
+    <p class="collection-eyebrow"><span></span> THE COLLECTION</p>
+    <h1><span>FIND YOUR</span><em>NEXT MOVE.</em></h1>
+    <div class="collection-masthead-bottom"><p>Different shapes. Different stories.<br>Find the pair that feels like you.</p><a href="#CollectionGallery" class="collection-explore">Explore the edit {% render 'icon', name: 'arrow' %}</a></div>
+  </div>
+  <div class="collection-masthead-art" aria-label="From the collection">
+    <div class="collection-orbit" aria-hidden="true"><span>EVERYDAY / ANYWHERE</span></div>
+    <span class="collection-art-mark" aria-hidden="true">S/</span>
+    {% for item in state.featured %}
+      <a href="{{ item.url | escape }}" class="collection-hero-piece collection-hero-piece-{{ forloop.index }}" aria-label="Explore {{ item.title | escape }}">
+        <div class="collection-hero-media"><img data-catalog-hero-image src="{{ item.cover | escape }}" width="1000" height="1000" loading="eager" decoding="async" alt="{{ item.title | escape }} — {{ item.colorway | escape }}"></div>
+        <span class="collection-hero-caption">0{{ forloop.index }} / {{ item.brand }}</span>
+      </a>
+    {% endfor %}
+  </div>
+  <div class="collection-masthead-foot"><span><b>{{ state.all }}</b> footwear studies. Endless ways to wear them.</span><span>Photo studies · Purchases unavailable</span></div>
+</header>

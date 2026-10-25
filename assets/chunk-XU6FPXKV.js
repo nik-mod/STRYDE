@@ -4231,7 +4231,7 @@ void main() {
       vec2 grain = fract(sin(vec2(dot(floor(grainUv), vec2(127.1,311.7)), dot(floor(grainUv), vec2(269.5,183.3)))) * 43758.5453) - 0.5;
       mapN.xy += grain * 0.10 * studyPale * grainVisibility;
       mapN.xy *= normalScale;
-    `))},i.customProgramCacheKey=()=>"stryde-preview-surface-v2",i.needsUpdate=!0}function vv(i,{fov:e,aspect:t,y:n=0,fill:s=.94}){let r=Math.tan(e*Math.PI/360)*s,a=.01;for(let o of i)a=Math.max(a,o.z+Math.abs(o.x)/(r*t),o.z+Math.abs(o.y-n)/r);return a}export{sr as a,pc as b,yt as c,Cc as d,U as e,wn as f,fn as g,ks as h,Yt as i,mn as j,ht as k,Jo as l,Yo as m,Js as n,Zo as o,Qo as p,Rt as q,nr as r,Oe as s,ho as t,wu as u,Uu as v,pv as w,Vu as x,_v as y,vv as z};
+    `))},i.customProgramCacheKey=()=>"stryde-preview-surface-v2",i.needsUpdate=!0}function vv(i,{fov:e,aspect:t,y:n=0,fill:s=.94}){let r=Math.tan(e*Math.PI/360)*s,a=.01;for(let o of i)a=Math.max(a,o.z+Math.abs(o.x)/(r*t),o.z+Math.abs(o.y-n)/r);return a}export{sr as a,pc as b,yt as c,Cc as d,U as e,wn as f,fn as g,ks as h,Yt as i,Pt as j,mn as k,ht as l,ls as m,Ai as n,Jo as o,Yo as p,Js as q,Zo as r,Qo as s,Rt as t,nr as u,Oe as v,ho as w,wu as x,Uu as y,pv as z,Vu as A,_v as B,vv as C};
 /*! Bundled license information:
 
 three/build/three.core.js:

@@ -76,7 +76,10 @@ export function mountNavigation({ document, environment = window, getScroller, o
     const clearance = (document.querySelector('.site-header')?.offsetHeight || 0) + (document.querySelector('.preview-notice')?.offsetHeight || 0) + 18;
     if (environment.location.hash !== `#${id}`) environment.history.pushState(null, '', `#${encodeURIComponent(id)}`);
     scroller.start();
-    scroller.scrollTo(target, { offset: -clearance, duration: 1.1, onComplete: () => focusTarget(target) });
+    // A numeric destination avoids Lenis adding CSS scroll-margin and scroll-padding
+    // on top of the explicit fixed-header clearance.
+    const destination = target.getBoundingClientRect ? (environment.scrollY || 0) + target.getBoundingClientRect().top : target;
+    scroller.scrollTo(destination, { offset: -clearance, duration: 1.1, onComplete: () => focusTarget(target) });
   }, options);
   environment.addEventListener('resize', () => { const menu = openMenu(); if (menu && !menu.getClientRects().length) close(menu); }, options);
   return () => controller.abort();

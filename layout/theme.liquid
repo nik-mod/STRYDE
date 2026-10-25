@@ -21,6 +21,7 @@
     {% if request.page_type == 'index' %}{{ 'experience.css' | asset_url | stylesheet_tag }}{{ 'form-edit.css' | asset_url | stylesheet_tag }}{% endif %}
     {{ 'storefront.css' | asset_url | stylesheet_tag }}
     {{ 'navigation.css' | asset_url | stylesheet_tag }}
+    {% if request.page_type == 'index' %}{{ 'campaign-refinement.css' | asset_url | stylesheet_tag }}{% endif %}
     {% if request.page_type == 'collection' %}{{ 'collection-studio.css' | asset_url | stylesheet_tag }}{% endif %}
     {% if request.page_type == 'product' %}{{ 'product-studio.css' | asset_url | stylesheet_tag }}{% endif %}
     {% if request.page_type == 'index' %}

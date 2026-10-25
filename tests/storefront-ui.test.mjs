@@ -53,3 +53,17 @@ test('catalog combines filters, recovers from no matches, and detaches on unload
   dispose();dispose(); input('no match');
   assert(cards.every(card=>!card.hidden));assert(!classes.has('is-filterable'));
 });
+
+test('chapter navigation applies header clearance once despite CSS scroll margins',async()=>{
+ const {mountNavigation}=await import('../src/motion/navigation.mjs');
+ let click,request,focused=false;
+ const target={getBoundingClientRect:()=>({top:1200}),hasAttribute:()=>true,focus:()=>{focused=true;}};
+ const link={href:'https://store.example/#chapter-materials',target:'',hasAttribute:()=>false,matches:()=>false};
+ const document={addEventListener:(name,fn)=>{if(name==='click')click=fn;},getElementById:()=>target,querySelector:selector=>selector==='[data-mobile-menu][open]'?null:selector==='.site-header'?{offsetHeight:80}:selector==='.preview-notice'?{offsetHeight:30}:null};
+ const environment={scrollY:500,location:{href:'https://store.example/',hash:''},history:{pushState(){}},addEventListener(){}};
+ const scroller={start(){},scrollTo:(destination,options)=>{request={destination,...options};}};
+ const dispose=mountNavigation({document,environment,getScroller:()=>scroller,onMenuChange(){}});
+ click({target:{closest:()=>link},button:0,preventDefault(){}});
+ assert.equal(request.destination,1700);assert.equal(request.offset,-128);
+ request.onComplete();assert(focused);dispose();
+});

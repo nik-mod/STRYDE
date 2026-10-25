@@ -44,6 +44,8 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
   locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
   try { photoShopCatalog = JSON.parse(await readFile('tools/fixtures/photo-shop.json', 'utf8')); }
   catch { photoShopCatalog = []; /* The local photo catalog is optional until a Takeout archive is imported. */ }
+  try { photoShopCatalog = [...JSON.parse(await readFile('tools/fixtures/stockx-edit.json', 'utf8')), ...photoShopCatalog]; }
+  catch { /* Curated references are optional in local preview. */ }
   const settings = JSON.parse(await readFile('config/settings_data.json', 'utf8')).current;
   const fixture = {
     id: 1, title: 'Preview fixture / Footwear', handle: 'preview-product', url: '/products/preview-product', vendor: 'Preview data', available: true, price: 18000, price_varies: true,

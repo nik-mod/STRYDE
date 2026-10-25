@@ -19,18 +19,6 @@ function readCrop(element) {
   };
 }
 
-// The next composition rises over the previous one: the incoming section is
-// clipped to nothing and uncovers top-down as it scrolls into view. The clip
-// lives entirely inside the motion context, so no-JS visitors are unaffected.
-function wipeIn(section, gsap) {
-  gsap.set(section, { clipPath: 'inset(0% 0% 100% 0%)' });
-  gsap.to(section, {
-    clipPath: 'inset(0% 0% 0% 0%)',
-    ease: 'none',
-    scrollTrigger: { trigger: section, start: 'top 98%', end: 'top 4%', scrub: true },
-  });
-}
-
 /* ------------------------------------------------- 02 — deconstruction */
 
 function deconstruction(root, gsap) {
@@ -124,7 +112,7 @@ function materials(root, gsap, { mobile }) {
     root.classList.add('is-journey-host');
     const timeline = gsap.timeline({ scrollTrigger: {
       trigger: root, start: 'top top',
-      end: () => `+=${Math.round(window.innerHeight * 1.7)}`,
+      end: () => `+=${Math.round(window.innerHeight * 1.9)}`,
       pin: true, scrub: .45, anticipatePin: 1, invalidateOnRefresh: true,
     }});
     // The live shoe keeps turning through the boundary. Captions use a staged
@@ -140,14 +128,17 @@ function materials(root, gsap, { mobile }) {
       if (frame) gsap.set(frame, { clipPath: 'inset(0% 0% 0% 0%)' });
       if (index > 0) {
         const at = index / panels.length;
-        const duration = .055;
+        const duration = .085;
         timeline.set(panels[index - 1], { autoAlpha: 0 }, at)
           .set(panel, { autoAlpha: 1 }, at);
-        if (copy) timeline.fromTo(copy, { y: 14, clipPath: 'inset(100% 0% 0% 0%)' },
-          { y: 0, clipPath: 'inset(0% 0% 0% 0%)', duration, ease: 'sine.out' }, at);
+        if (copy) timeline.fromTo(copy, { y: 38, rotationX: -6, clipPath: 'inset(100% 0% 0% 0%)' },
+          { y: 0, rotationX: 0, clipPath: 'inset(0% 0% 0% 0%)', duration, ease: 'power3.out' }, at);
         const previousCopy = panels[index - 1].querySelector('.mat-copy');
-        if (previousCopy) timeline.to(previousCopy, { y: -10, clipPath: 'inset(0% 0% 100% 0%)', duration, ease: 'sine.in' }, at - duration);
+        if (previousCopy) timeline.to(previousCopy, { y: -30, clipPath: 'inset(0% 0% 100% 0%)', duration, ease: 'power2.in' }, at - duration);
       }
+      const ghost = panel.querySelector('.mat-ghost');
+      if (ghost) timeline.fromTo(ghost, { xPercent: 15, yPercent: 9 },
+        { xPercent: -10, yPercent: -7, duration: 1 / panels.length, ease: 'none' }, index / panels.length);
       if (image) {
         const crop = readCrop(image);
         timeline.fromTo(image,
@@ -426,10 +417,12 @@ function featured(root, gsap, { mobile }) {
 
 function brandStudio(root, gsap, { mobile }) {
   const viewport = { width: window.innerWidth, height: window.innerHeight };
-  const canPin = window.innerHeight >= 740;
+  const canPin = !mobile && window.innerHeight >= 740;
   const stops = root.querySelector('[data-brand-stops]');
   const buttons = [...root.querySelectorAll('[data-brand-step]')];
   const caption = root.querySelector('[data-brand-caption]');
+  const contact = root.querySelectorAll('.brand-contact-sheet figure');
+  if (contact.length) gsap.fromTo(contact, { y: 60, rotation: 5 }, { y: 0, rotation: 0, stagger: .08, ease: 'power2.out', scrollTrigger: { trigger: root, start: 'top 75%', end: 'top 5%', scrub: .6 } });
   const checkpoint = brandResizeCheckpoints.get(root);
   brandResizeCheckpoints.delete(root);
   let restoring = Boolean(checkpoint && checkpoint.width === viewport.width && checkpoint.height === viewport.height);
@@ -441,7 +434,7 @@ function brandStudio(root, gsap, { mobile }) {
   root.classList.toggle('is-brand-pinned', canPin);
   if (stops) stops.hidden = !canPin;
   const sync = progress => {
-    if (!restoring && canPin === (window.innerHeight >= 740)) lastStableProgress = progress;
+    if (!restoring && canPin === (!mobile && window.innerHeight >= 740)) lastStableProgress = progress;
     root.dataset.brandProgress = progress.toFixed(5);
     const next = brandStudyPhase(progress);
     if (phase === next) return;
@@ -546,6 +539,15 @@ function brand(root, gsap, { mobile }) {
 function finale(root, gsap, { mobile }) {
   const stage = root.querySelector('[data-finale-stage]');
   if (!stage) return;
+  if (stage.hasAttribute('data-finale-edit')) {
+    const cards = [...stage.querySelectorAll('.finale-edit-card')];
+    const reveal = gsap.timeline({ scrollTrigger: { trigger: stage, start: 'top 85%', end: 'top 8%', scrub: .65 } });
+    cards.forEach((card, index) => reveal.fromTo(card,
+      { y: 150 + index * 24, x: (index - 1.5) * -65, rotation: (index - 1.5) * 16, scale: .88 },
+      { y: 0, x: 0, rotation: (index - 1.5) * 4, scale: 1, duration: .85, ease: 'power3.out' }, index * .07));
+    reveal.fromTo(stage.querySelector('.finale-heading'), { y: 60, rotationX: 18 }, { y: 0, rotationX: 0, duration: .7, ease: 'power3.out' }, .18);
+    return;
+  }
   const shoe = root.querySelector('[data-finale-shoe]');
   const heading = root.querySelector('.finale-heading');
   const word = root.querySelector('[data-finale-word]');
@@ -624,7 +626,7 @@ const CONTROLLERS = { deconstruction, materials, technology, collection, feature
 // Everything is scrubbed, therefore reversible, and lives inside the
 // chapter's own motion context.
 const FLOW = {
-  deconstruction: { stage: '.decon-grid', arrive: { rotationX: 4, yPercent: 9, scale: .97 }, depart: -5 },
+  deconstruction: { stage: '.decon-introduction', arrive: { yPercent: 5 }, depart: 0 },
   materials: { stage: '[data-mat-panels]', arrive: { yPercent: 7, scale: .985 }, pin: true },
   technology: { stage: '.tech-stage', arrive: { rotationX: 3, yPercent: 8, scale: .98 }, depart: -5 },
   collection: { stage: '[data-coll-stage]', arrive: { yPercent: 7, scale: .985 }, pin: true },
@@ -673,14 +675,7 @@ export function mountChapter(root, { gsap, mobile, fine }) {
   const dispose = controller(root, gsap, { mobile, fine }) || undefined;
   if (!mobile && !root.hasAttribute?.('data-brand-live')) {
     sceneFlow(root, gsap);
-    // Chapter handoff: the anatomy composition rises over the hero's sky,
-    // where the clipped region shows the page field and reads as a
-    // continuation of the gradient. Elsewhere the clip would expose the
-    // raw body between two light fields, so those boundaries rely on the
-    // scene-flow arrivals instead.
-    if (root.dataset.chapter === 'deconstruction') {
-      wipeIn(root, gsap);
-    }
+
   }
   return dispose;
 }

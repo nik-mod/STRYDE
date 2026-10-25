@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { studyTransition, windowTransition, exchangeModelSpec, chapterCameraDistance, productWindowViewport } from '../src/journey-transition.mjs';
+import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose, chapterCameraDistance, productWindowViewport } from '../src/journey-transition.mjs';
 import { JOURNEY_CHAPTERS, journeyPose } from '../src/journey-poses.mjs';
 import { Euler, Vector3 } from 'three';
 
@@ -51,15 +51,41 @@ test('scroll seeks and reverse scrolling select the same model exchange interval
   assert.equal(forward[2].to, drift);
 });
 
-test('different models exchange as complete objects in a shared neutral pose', () => {
+test('different models exchange as complete objects at the narrow end view', () => {
   const exchange = progress => ({ from: blue, to: drift, progress });
   assert.equal(exchangeModelSpec(blue, exchange(.49999)), blue);
   assert.equal(exchangeModelSpec(blue, exchange(.5)), drift);
   assert.equal(exchangeModelSpec(navy), navy);
-  assert.deepEqual(journeyPose('materials', .27), journeyPose('materials', .39), 'the model changes during an authored neutral hold');
+  const authored = journeyPose('materials', 1 / 3);
+  const cut = modelExchangePose(authored, .5);
+  assert(Math.abs(cut.rotationY - Math.PI / 2) < 1e-10);
+  assert(Math.abs(cut.rotationX - .12) < 1e-10);
+  assert(Math.abs(cut.rotationZ) < 1e-10);
+  const before = modelExchangePose(authored, .4999), after = modelExchangePose(authored, .5001);
+  assert(Math.abs(before.rotationY - after.rotationY) < .002, 'the cut keeps angular continuity');
+  const point = new Vector3(1, .3, .2);
+  const start = modelExchangePose(authored, 0), end = modelExchangePose(authored, 1);
+  assert(point.clone().applyEuler(new Euler(start.rotationX, start.rotationY, start.rotationZ)).distanceTo(point.clone().applyEuler(new Euler(end.rotationX, end.rotationY, end.rotationZ))) < 1e-10, 'the short turn returns to the authored pose');
   for (let index = 0; index <= 100; index++) {
     const selected = exchangeModelSpec(blue, exchange(index / 100));
     assert(selected === blue || selected === drift, 'one original model identity, never a hybrid surface');
+  }
+});
+
+test('exchange motion is reversible and a fixed camera contains the entire orbit', () => {
+  const corners = [-1.3, 1.3].flatMap(x => [-.57, .57].flatMap(y => [-.43, .43].map(z => new Vector3(x, y, z))));
+  for (const chapter of ['deconstruction', 'materials', 'featured']) for (const aspect of [.7, 1.5, 2.6]) {
+    const exchangeRanges = chapter === 'materials' ? [[1 / 3 - .105, 1 / 3 + .105], [2 / 3 - .105, 2 / 3 + .105], [1.1 / 3, 1.65 / 3], [2.1 / 3, 2.65 / 3]] : chapter === 'deconstruction' ? [[.38, .72]] : [[.12, .7]];
+    const camera = chapterCameraDistance([corners], chapter, { aspect, includeExchange: true, exchangeRanges });
+    const poseAt = (start, end, index) => modelExchangePose(journeyPose(chapter, start + (end - start) * index / 400), index / 400);
+    const poses = exchangeRanges.flatMap(([start, end]) => Array.from({ length: 401 }, (_, index) => poseAt(start, end, index)));
+    assert.deepEqual(poses, exchangeRanges.flatMap(([start, end]) => Array.from({ length: 401 }, (_, index) => poseAt(start, end, 400 - index)).reverse()));
+    const tangent = Math.tan(32 * Math.PI / 360);
+    for (const pose of poses) for (const source of corners) {
+      const point = source.clone().applyEuler(new Euler(pose.rotationX, pose.rotationY, pose.rotationZ));
+      assert(Math.abs(point.x / ((camera - point.z) * tangent * aspect)) < .9);
+      assert(Math.abs((point.y - pose.cameraY) / ((camera - point.z) * tangent)) < .9);
+    }
   }
 });
 

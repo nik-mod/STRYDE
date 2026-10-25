@@ -35,7 +35,7 @@ test('the original opening stays blue and the new model occupies the existing ch
   assert.doesNotMatch(intro, /intro-tn-orange|tn-mono-detail/);
   assert.doesNotMatch(html, /model-spotlight|drift-spotlight|spotlight-model/);
   assert.equal((html.match(/data-model-url=/g) || []).length, 1);
-  assert.equal((html.match(/data-journey-model="\/assets\/nike-tn-monochrome.glb"/g) || []).length, 3);
+  assert.equal((html.match(/data-journey-model="\/assets\/nike-tn-monochrome.glb"/g) || []).length, 2);
   const anatomy = html.slice(html.indexOf('id="chapter-deconstruction"'), html.indexOf('id="chapter-materials"'));
   assert.match(anatomy, /Air Max Plus Drift/);
   assert.match(anatomy, /White \/ Black \/ Silver/);
@@ -45,13 +45,16 @@ test('the original opening stays blue and the new model occupies the existing ch
   assert.doesNotMatch(anatomy, /Sky blue|White laces|Blue \/ White/);
   const material = html.slice(html.indexOf('id="chapter-materials"'), html.indexOf('id="chapter-technology"'));
   const blue = material.slice(0, material.indexOf('id="MatPanel-materials-2"'));
-  const white = material.slice(material.indexOf('id="MatPanel-materials-2"'));
+  const white = material.slice(material.indexOf('id="MatPanel-materials-2"'), material.indexOf('id="MatPanel-materials-3"'));
+  const navy = material.slice(material.indexOf('id="MatPanel-materials-3"'));
   assert.match(blue, /tn-angle-2800.webp/);
   assert.match(blue, /The original, in blue/);
   assert.match(white, /The Drift, in detail/);
   assert.match(white, /tn-mono-profile-2800.webp/);
-  assert.match(white, /The Drift, from below/);
-  assert.match(white, /tn-mono-sole-2800.webp/);
+  assert.match(navy, /After hours\. In blue/);
+  assert.match(navy, /tn-navy-angle-2800.webp/);
+  assert.match(navy, /nike-tn-deep-blue.glb/);
+  assert.doesNotMatch(navy, /tn-mono-sole/);
   assert.doesNotMatch(white, /blue accents|white laces|gradient upper/);
 });
 
@@ -81,7 +84,7 @@ test('the third supplied shoe owns chapter 06 and ships with a bounded delivery 
   const html = await renderPreview('/');
   const featured = html.slice(html.indexOf('id="chapter-featured"'), html.indexOf('id="chapter-brand"'));
   assert.match(featured, /nike-tn-deep-blue\.glb/);
-  assert.doesNotMatch(featured, /data-journey-from-primary/, 'the deep-blue feature must never begin with the unrelated blue/white identity');
+  assert.doesNotMatch(featured, /data-journey-from-primary/, 'the navy chapter presents its own model without a repeated spin');
   assert.match(featured, /tn-navy-angle-2800\.webp/);
   assert.match(featured, /Blue \/ Navy \/ White/);
   const bytes = await readFile(new URL('../assets/nike-tn-deep-blue.glb', import.meta.url));

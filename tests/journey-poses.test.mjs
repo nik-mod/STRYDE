@@ -28,20 +28,19 @@ test('hero and finale preserve a camera margin throughout the turn', () => {
   assert(Math.abs(journeyPose('finale', 0).fill - journeyPose('finale', 1).fill) < .03);
 });
 
-test('every chapter uses restrained pitch, no roll, and a constant framing margin', () => {
+test('authored product tours keep bounded pitch, bank and a constant framing margin', () => {
   for (const chapter of JOURNEY_CHAPTERS) for (let index = 0; index <= 200; index++) {
     const pose = journeyPose(chapter, index / 200);
     assert(Math.abs(pose.rotationX) <= .65, `${chapter} never rolls flat or upside down`);
-    assert(Math.abs(pose.rotationY) <= .3, `${chapter} avoids end-on spins`);
-    assert.equal(pose.rotationZ, 0, `${chapter} has no decorative roll`);
+    assert(Math.abs(pose.rotationY) <= .55, `${chapter} holds a readable product view outside an exchange`);
+    assert(Math.abs(pose.rotationZ) <= .065, `${chapter} keeps its authored bank inside the camera margin`);
     assert.equal(pose.fill, journeyPose(chapter, 0).fill);
   }
   assert.deepEqual(journeyPose('hero', .48), journeyPose('hero', 1), 'hero holds its settled profile');
-  for (const chapter of ['deconstruction', 'materials', 'technology', 'featured', 'finale']) {
-    for (const axis of ['rotationX', 'rotationY']) {
+  for (const chapter of JOURNEY_CHAPTERS) {
+    for (const axis of ['rotationX', 'rotationY', 'rotationZ']) {
       const samples = Array.from({ length: 201 }, (_, index) => journeyPose(chapter, index / 200)[axis]);
-      const direction = Math.sign(samples.at(-1) - samples[0]);
-      for (let i = 1; i < samples.length; i++) assert((samples[i] - samples[i - 1]) * direction >= -1e-10, `${chapter} does not rock back and forth`);
+      for (let i = 1; i < samples.length; i++) assert(Math.abs(samples[i] - samples[i - 1]) < .08, `${chapter} has no angular discontinuity`);
     }
   }
 });
@@ -77,13 +76,12 @@ test('chapter handoffs switch only inside visible product windows and reverse de
   assert.equal(journeyHandoff({ top: 100, height: 500 }, { top: 950, height: 500 }, 900), null);
 });
 
-test('materials genuinely turn from the upper to the outsole in world space', () => {
-  const upper = journeyPose('materials', 0);
-  const outsole = journeyPose('materials', .84);
-  const upperNormal = new Vector3(0, 1, 0).applyEuler(new Euler(upper.rotationX, upper.rotationY, upper.rotationZ, 'XYZ'));
-  const outsoleNormal = new Vector3(0, -1, 0).applyEuler(new Euler(outsole.rotationX, outsole.rotationY, outsole.rotationZ, 'XYZ'));
-  assert(upperNormal.z > .5 && upperNormal.y > .7, 'the upper is visible through a gentle tilt, not a flat overhead flip');
-  assert(outsoleNormal.z > .5 && outsoleNormal.y < -.7, 'the real underside is visible without turning the shoe upside down');
+test('all three material studies retain a recognizable upper and side silhouette', () => {
+  for (const progress of [.18, .53, .92]) {
+    const pose = journeyPose('materials', progress);
+    const upper = new Vector3(0, 1, 0).applyEuler(new Euler(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ'));
+    assert(upper.z > .3 && upper.y > .8, 'the upper faces the viewer while the side remains readable');
+  }
 });
 
 test('journey progress clamps jumps and rejects invalid geometry', () => {
@@ -103,7 +101,7 @@ test('flowing materials follow the visible frame instead of the first equally op
   samples.forEach(({ index, progress }) => assert(progress >= index / 3 && progress <= (index + 1) / 3));
   assert.deepEqual(samples[1], samples[3], 'reverse restores the same frame and material phase');
   assert.deepEqual(samples[0], samples[4]);
-  const outsole = journeyPose('materials', samples[2].progress);
-  const normal = new Vector3(0, -1, 0).applyEuler(new Euler(outsole.rotationX, outsole.rotationY, outsole.rotationZ, 'XYZ'));
-  assert(normal.z > .5 && normal.y < -.7, 'the third flowing panel shows a restrained view of the actual underside');
+  const final = journeyPose('materials', samples[2].progress);
+  const normal = new Vector3(0, 1, 0).applyEuler(new Euler(final.rotationX, final.rotationY, final.rotationZ, 'XYZ'));
+  assert(normal.z > 0 && normal.y > .8, 'the navy study keeps the upper visible in flowing layouts');
 });

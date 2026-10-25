@@ -4,11 +4,14 @@
   assign presentation_image = section.settings.image | default: product.featured_image
 %}
 <section id="chapter-finale" class="chapter chapter-finale" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="finale" data-env="finale" data-section-id="{{ section.id }}" aria-labelledby="FinaleHeading-{{ section.id }}">
-  <div class="finale-stage" data-finale-stage>
+  <div class="finale-stage" data-finale-stage{% if section.settings.use_tn_model and presentation_image == blank and product == blank %} data-finale-edit{% endif %}>
     <div class="finale-spot" aria-hidden="true" data-finale-spot></div>
     <p class="finale-word" aria-hidden="true" data-finale-word>{{ settings.brand_name | default: shop.name | escape }}<span class="finale-sheen" data-finale-sheen aria-hidden="true"></span></p>
     <div class="finale-floor" aria-hidden="true" data-finale-floor></div>
     <div class="finale-inner" data-finale-inner>
+      {% if section.settings.use_tn_model and presentation_image == blank and product == blank %}
+      {% render 'finale-photo-edit', routes: routes %}
+      {% else %}
       <div class="finale-shoe" data-finale-shoe{% if section.settings.use_tn_model and presentation_image == blank and product == blank %} data-finale-model{% endif %}>
         {% if product != blank and presentation_image == blank %}
           <p class="editorial-image-pending">{{ 'hero.asset_pending' | t }}</p>
@@ -23,6 +26,7 @@
         {% render 'presentation-image', slot: 'finale', image: presentation_image, image_is_concept: supplied_concept, sizes: '(min-width: 900px) 430px, 76vw' %}
         {% endif %}
       </div>
+      {% endif %}
       <p class="chapter-kicker finale-kicker">{{ section.settings.kicker | escape }}</p>
       <h2 class="finale-heading" id="FinaleHeading-{{ section.id }}">
         <span class="heading-line"><span>{{ section.settings.heading_line_1 | upcase | escape }}</span></span>

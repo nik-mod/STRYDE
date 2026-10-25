@@ -4,7 +4,7 @@ import { journeyPose } from './journey-poses.mjs';
 import { fittedCameraZ } from './scene-framing.mjs';
 
 const clamp = value => Math.min(1, Math.max(0, value));
-export function studyTransition(specs, progress, radius = .065) {
+export function studyTransition(specs, progress, radius = .105) {
   for (let index = 1; index < specs.length; index++) {
     if (journeyModelKey(specs[index - 1]) === journeyModelKey(specs[index])) continue;
     const boundary = index / specs.length;
@@ -22,22 +22,37 @@ export function windowTransition(from, to, progress, start = .24, end = .64) {
   return { spec: local < .5 ? from : to, blend: { from, to, progress: local } };
 }
 
-// A model identity is exchanged as one complete opaque product at the
-// caption boundary. No axis stretching, half-shoe splice or heel spin.
+// The complete product changes at the narrow end view of a continuous orbit.
 export function exchangeModelSpec(spec, exchange = null) {
   return exchange ? (exchange.progress < .5 ? exchange.from : exchange.to) : spec;
 }
 
+// A short reversible turn hides the identity cut at the narrow end view.
+// The model returns along the same arc instead of making a full revolution.
+export function modelExchangePose(authored, progress = null) {
+  if (progress === null) return { ...authored };
+  const p = clamp(progress), envelope = Math.sin(Math.PI * p) ** 2;
+  return { ...authored,
+    rotationX: authored.rotationX * (1 - envelope) + .12 * envelope,
+    rotationY: authored.rotationY * (1 - envelope) + Math.PI / 2 * envelope,
+    rotationZ: authored.rotationZ * (1 - envelope),
+    exposure: authored.exposure + .035 * envelope,
+  };
+}
+
 // Fit the entire authored inspection once. The camera then stays put while
 // the model turns, rather than retreating and advancing at every scroll step.
-export function chapterCameraDistance(pointSets, chapter, { aspect, fov = 32 }) {
+export function chapterCameraDistance(pointSets, chapter, { aspect, fov = 32, includeExchange = false, exchangeRanges = [[0, 1]] }) {
   if (!(aspect > 0) || !pointSets.length) return 0;
   const points = pointSets.flat();
   const world = points.map(() => new Vector3());
   const rotation = new Euler(0, 0, 0, 'XYZ');
   let distance = 0;
-  for (let index = 0; index <= 40; index++) {
-    const pose = journeyPose(chapter, index / 40);
+  const poses = Array.from({ length: 81 }, (_, index) => journeyPose(chapter, index / 80));
+  if (includeExchange) for (const [start, end] of exchangeRanges) {
+    poses.push(...Array.from({ length: 81 }, (_, index) => modelExchangePose(journeyPose(chapter, start + (end - start) * index / 80), index / 80)));
+  }
+  for (const pose of poses) {
     rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
     points.forEach((point, i) => world[i].copy(point).applyEuler(rotation));
     distance = Math.max(distance, fittedCameraZ(world, { fov, aspect, y: pose.cameraY, fill: pose.fill }));

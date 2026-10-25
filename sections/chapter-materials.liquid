@@ -7,16 +7,22 @@
     {% liquid
       assign panel_model = section.settings.panel_1_model | default: 'blue'
       assign model_prefix = 'tn'
+      assign model_file = 'nike-tn-blue-white.glb'
       assign model_label = 'Blue and white Air Max Plus / TN'
       if panel_model == 'drift'
         assign model_prefix = 'tn-mono'
+        assign model_file = 'nike-tn-monochrome.glb'
         assign model_label = 'White and black Air Max Plus Drift'
+      elsif panel_model == 'navy'
+        assign model_prefix = 'tn-navy'
+        assign model_file = 'nike-tn-deep-blue.glb'
+        assign model_label = 'Deep blue and navy Air Max Plus'
       endif
     %}
     <div class="mat-panel mat-panel-upper" id="MatPanel-{{ section.id }}-1">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">01</span>
-        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_1_image == blank and panel_model == 'drift' %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
+        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_1_image == blank and panel_model != 'blue' %} data-journey-model="{{ model_file | asset_url }}" data-journey-yaw="0" data-journey-variant="{{ panel_model }}"{% endif %}>
           {% if section.settings.use_tn_model and section.settings.panel_1_image == blank %}
             <img src="{{ model_prefix | append: '-angle-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-angle-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-angle-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — three-quarter view rendered from the 3D model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
@@ -46,16 +52,22 @@
     {% liquid
       assign panel_model = section.settings.panel_2_model | default: 'blue'
       assign model_prefix = 'tn'
+      assign model_file = 'nike-tn-blue-white.glb'
       assign model_label = 'Blue and white Air Max Plus / TN'
       if panel_model == 'drift'
         assign model_prefix = 'tn-mono'
+        assign model_file = 'nike-tn-monochrome.glb'
         assign model_label = 'White and black Air Max Plus Drift'
+      elsif panel_model == 'navy'
+        assign model_prefix = 'tn-navy'
+        assign model_file = 'nike-tn-deep-blue.glb'
+        assign model_label = 'Deep blue and navy Air Max Plus'
       endif
     %}
     <div class="mat-panel mat-panel-cage" id="MatPanel-{{ section.id }}-2">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">02</span>
-        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_2_image == blank and panel_model == 'drift' %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
+        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_2_image == blank and panel_model != 'blue' %} data-journey-model="{{ model_file | asset_url }}" data-journey-yaw="0" data-journey-variant="{{ panel_model }}"{% endif %}>
           {% if section.settings.use_tn_model and section.settings.panel_2_image == blank %}
             <img src="{{ model_prefix | append: '-profile-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-profile-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — side profile rendered from the 3D model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
@@ -85,18 +97,25 @@
     {% liquid
       assign panel_model = section.settings.panel_3_model | default: 'blue'
       assign model_prefix = 'tn'
+      assign model_file = 'nike-tn-blue-white.glb'
       assign model_label = 'Blue and white Air Max Plus / TN'
       if panel_model == 'drift'
         assign model_prefix = 'tn-mono'
+        assign model_file = 'nike-tn-monochrome.glb'
         assign model_label = 'White and black Air Max Plus Drift'
+      elsif panel_model == 'navy'
+        assign model_prefix = 'tn-navy'
+        assign model_file = 'nike-tn-deep-blue.glb'
+        assign model_label = 'Deep blue and navy Air Max Plus'
       endif
     %}
+    {% assign panel_3_view = '-sole' %}{% if panel_model == 'navy' %}{% assign panel_3_view = '-angle' %}{% endif %}
     <div class="mat-panel mat-panel-sole" id="MatPanel-{{ section.id }}-3">
       <div class="mat-media">
         <span class="mat-ghost" aria-hidden="true">03</span>
-        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_3_image == blank and panel_model == 'drift' %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
+        <div class="frame mat-frame"{% if section.settings.use_tn_model and section.settings.panel_3_image == blank and panel_model != 'blue' %} data-journey-model="{{ model_file | asset_url }}" data-journey-yaw="0" data-journey-variant="{{ panel_model }}"{% endif %}>
           {% if section.settings.use_tn_model and section.settings.panel_3_image == blank %}
-            <img src="{{ model_prefix | append: '-sole-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-sole-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — outsole view rendered from the 3D model">
+            <img src="{{ model_prefix | append: panel_3_view | append: '-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: panel_3_view | append: '-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: panel_3_view | append: '-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 46vw" width="2800" height="2100" loading="lazy" data-macro-image style="--zoom: 1; --tx: 0%; --ty: 0%;" alt="{{ model_label }} — {% if panel_model == 'navy' %}three-quarter{% else %}outsole{% endif %} view rendered from the 3D model">
             <span class="asset-tag">{{ 'hero.model_preview' | t }}</span>
           {% else %}
           {% render 'presentation-image', slot: 'material_3', image: section.settings.panel_3_image, image_is_concept: section.settings.panel_3_image_is_concept, crop_style: '--zoom: 2.5; --tx: -70%; --ty: -10%;' %}
@@ -109,7 +128,7 @@
         {% endif %}
       </div>
       <div class="mat-copy">
-        <p class="mat-index">03 / Foundation</p>
+        <p class="mat-index">03 / {% if panel_model == 'navy' %}After hours{% else %}Foundation{% endif %}</p>
         <h3>{{ section.settings.panel_3_title | escape }}</h3>
         <p>{{ section.settings.panel_3_body | escape }}</p>
         {% assign panel_3_specs = section.settings.panel_3_specs | split: ',' %}
@@ -126,7 +145,7 @@
     <ol class="mat-rail" data-mat-rail>
       <li class="is-active"><a href="#MatPanel-{{ section.id }}-1" data-study-index="0" aria-controls="MatPanel-{{ section.id }}-1" aria-current="step"><span>01</span><strong>Color</strong><em>Upper &amp; panel contrast</em></a></li>
       <li><a href="#MatPanel-{{ section.id }}-2" data-study-index="1" aria-controls="MatPanel-{{ section.id }}-2"><span>02</span><strong>Structure</strong><em>Lines &amp; layered surfaces</em></a></li>
-      <li><a href="#MatPanel-{{ section.id }}-3" data-study-index="2" aria-controls="MatPanel-{{ section.id }}-3"><span>03</span><strong>Foundation</strong><em>Midsole &amp; outsole</em></a></li>
+      <li><a href="#MatPanel-{{ section.id }}-3" data-study-index="2" aria-controls="MatPanel-{{ section.id }}-3"><span>03</span><strong>{% if section.settings.panel_3_model == 'navy' %}After hours{% else %}Foundation{% endif %}</strong><em>{% if section.settings.panel_3_model == 'navy' %}Deep blue &amp; navy waves{% else %}Midsole &amp; outsole{% endif %}</em></a></li>
     </ol>
   </nav>
 </section>
@@ -137,15 +156,15 @@
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"03 \u2014 Materials"},
     {"type":"text","id":"heading","label":"Heading","default":"In detail"},
-    {"type":"select","id":"panel_1_model","label":"Panel 1 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"}],"default":"blue"},
+    {"type":"select","id":"panel_1_model","label":"Panel 1 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"},{"value":"navy","label":"Deep blue and navy Air Max Plus"}],"default":"blue"},
     {"type":"text","id":"panel_1_title","label":"Panel 01 title","default":"Color and texture"},
     {"type":"textarea","id":"panel_1_body","label":"Panel 01 body","default":"A close view of the surface, where light brings the color and texture into focus."},
     {"type":"text","id":"panel_1_specs","label":"Panel 01 spec chips","default":"Gradient knit, Wave cage, Woven collar"},
-    {"type":"select","id":"panel_2_model","label":"Panel 2 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"}],"default":"blue"},
+    {"type":"select","id":"panel_2_model","label":"Panel 2 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"},{"value":"navy","label":"Deep blue and navy Air Max Plus"}],"default":"blue"},
     {"type":"text","id":"panel_2_title","label":"Panel 02 title","default":"Lines and layers"},
     {"type":"textarea","id":"panel_2_body","label":"Panel 02 body","default":"Curved ribs divide the side panels. Follow their edges across the profile."},
     {"type":"text","id":"panel_2_specs","label":"Panel 02 spec chips","default":"Contoured midsole, Curved ribs, Heel clip"},
-    {"type":"select","id":"panel_3_model","label":"Panel 3 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"}],"default":"blue"},
+    {"type":"select","id":"panel_3_model","label":"Panel 3 shoe","options":[{"value":"blue","label":"Blue and white Air Max Plus"},{"value":"drift","label":"White and black Air Max Plus Drift"},{"value":"navy","label":"Deep blue and navy Air Max Plus"}],"default":"blue"},
     {"type":"text","id":"panel_3_title","label":"Panel 03 title","default":"The foundation"},
     {"type":"textarea","id":"panel_3_body","label":"Panel 03 body","default":"The midsole and outsole give the silhouette its shape from below."},
     {"type":"text","id":"panel_3_specs","label":"Panel 03 spec chips","default":"Rubber tread, Flex grooves, Sculpted arch"},

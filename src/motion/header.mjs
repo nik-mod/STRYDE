@@ -15,7 +15,9 @@ export function mountHeader(header, environment = window) {
     ticking = false;
     const y = environment.scrollY || 0;
     header.classList.toggle('is-solid', y > 24);
-    if (y > lastY + 2 && y > 180 && !header.contains(document.activeElement)) {
+    if (header.ownerDocument?.body?.classList.contains('template-collection')) {
+      header.classList.remove('is-hidden');
+    } else if (y > lastY + 2 && y > 180 && !header.contains(document.activeElement)) {
       header.classList.add('is-hidden');
     } else if (y < lastY - 2 || y <= 180) {
       header.classList.remove('is-hidden');

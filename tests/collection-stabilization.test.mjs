@@ -82,3 +82,12 @@ test('header unload cancels its queued frame and ignores a late callback', () =>
   assert.equal(cancelled,1);assert.equal(header.dataset.headerBound,undefined);
   const after=writes;queued();environment.dispatchEvent(new Event('scroll'));assert.equal(writes,after);
 });
+
+test('collection header stays at its fixed position while scrolling down and back up',()=>{
+ const environment=new EventTarget();environment.scrollY=0;let frame;
+ environment.requestAnimationFrame=fn=>{frame=fn;return 1;};environment.cancelAnimationFrame=()=>{};
+ const classes=new Set();const header={dataset:{},ownerDocument:{body:{classList:{contains:name=>name==='template-collection'}}},classList:{toggle:(name,on)=>on?classes.add(name):classes.delete(name),add:name=>classes.add(name),remove:(...names)=>names.forEach(name=>classes.delete(name))}};
+ const dispose=mountHeader(header,environment);
+ for(const y of [300,1600,600,0]){environment.scrollY=y;environment.dispatchEvent(new Event('scroll'));frame();assert(!classes.has('is-hidden'));}
+ dispose();
+});

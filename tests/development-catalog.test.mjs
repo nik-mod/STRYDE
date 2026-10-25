@@ -16,7 +16,7 @@ test('local all-products page paginates the imported photo groups and keeps comm
   assert.equal(catalog.reduce((count,item)=>count+item.count,0),1296);
   assert.equal((html.match(/class="photo-shop-card" data-photo-card/g)||[]).length,12);
   const payload=JSON.parse(html.match(/<script type="application\/json" data-catalog-data>([\s\S]*?)<\/script>/)[1]);
-  assert.equal(payload.length,889);
+  assert.equal(payload.length,908);
   const sameShoe=catalog.find(item=>item.photos.some(photo=>photo.source==='20241125_135432.jpg'));
   assert.equal(sameShoe.count,4);
   assert.deepEqual(sameShoe.photos.map(photo=>photo.source),[
@@ -40,7 +40,7 @@ test('local all-products page paginates the imported photo groups and keeps comm
   assert.match(html,/Photo studies · Purchases unavailable/);
   const second=listing(await renderPreview('/collections/all',new URLSearchParams('page=2')));
   assert.equal((second.match(/class="photo-shop-card" data-photo-card/g)||[]).length,12);
-  assert.match(second,/13–24 of 889 designs/);
+  assert.match(second,/13–24 of 908 designs/);
 });
 
 test('the imported catalog remains on the local all-products route and yields to native fixtures',async()=>{
@@ -49,7 +49,7 @@ test('the imported catalog remains on the local all-products route and yields to
     assert.doesNotMatch(html,/data-concept-entry|Arc Study|Tide Study/);
     if(query.includes('fixtures')){assert.match(html,/href="\/products\/preview-product"/);assert.match(html,/\$180\.00 USD/);assert.match(html,/preview-fixture.svg/);assert.match(html,/name="sort_by"/);}
     else if(path==='/collections/other')assert.match(html,/No products found/);
-    else assert.match(html,/1–12 of 889 designs/);
+    else assert.match(html,/1–12 of 908 designs/);
   }
   assert.doesNotMatch(await renderPreview('/'),/data-concept-entry/);
 });
