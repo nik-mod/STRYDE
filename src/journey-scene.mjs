@@ -101,6 +101,32 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   let disposed = false, lost = false, loaded = false, dirty = true, targetsDirty = true;
   let targets = [], owned = [], width = 0, height = 0, lastSignature = '';
   let detachFrame = () => {};
+  let lastFrameTime = null;
+  // Authored poses are reached through a short exponential settle instead of a
+  // 1:1 scrub mapping: wheel steps read as one continuous camera move. The
+  // converge target is always the exact scroll-derived progress, so seeking,
+  // reverse scrolls and the deterministic model exchanges stay correct.
+  const smoothedProgress = new Map();
+  const dampProgress = (key, target, dt) => {
+    const previous = smoothedProgress.has(key) ? smoothedProgress.get(key) : target;
+    const next = Math.abs(target - previous) < .0003
+      ? target
+      : previous + (target - previous) * (1 - Math.exp(-dt * 7.5));
+    smoothedProgress.set(key, next);
+    return next;
+  };
+  // Resting life: a slow breath on the stages where the reader pauses. The
+  // amplitude dies out as soon as the authored pose takes over from scroll.
+  const idleStrength = (chapter, progress) => chapter === 'hero' ? 1 - clamp(progress / .1)
+    : chapter === 'finale' ? clamp(1 - (1 - progress) / .12) : 0;
+  const applyIdle = (rig, chapter, progress, time) => {
+    const strength = idleStrength(chapter, progress);
+    if (strength <= 0) { rig.position.y = 0; return false; }
+    rig.position.y = Math.sin(time * .85) * .02 * strength;
+    rig.rotation.z += Math.sin(time * .55 + 1.1) * .014 * strength;
+    rig.rotation.x += Math.sin(time * .38) * .008 * strength;
+    return true;
+  };
   const release = () => {
     owned.forEach(target => target.classList.remove('has-journey-scene'));
     owned = [];
@@ -342,7 +368,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     return light;
   }
 
-  function renderBoundary(views, chapter) {
+  function renderBoundary(views, chapter, dt, time) {
     const targetWidth = Math.ceil(environment.innerWidth / 64) * 64;
     const targetHeight = Math.ceil(environment.innerHeight / 64) * 64;
     if (width !== targetWidth || height !== targetHeight) {
@@ -356,7 +382,9 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     const motion = [];
     for (const view of views) {
       if (!selectModel(view.modelSpec, view.modelBlend)) continue;
-      const { rect, pose } = view;
+      const smooth = dampProgress(`${view.chapter}:${view.visuals.indexOf(view.visual)}`, view.progress, dt);
+      const pose = journeyPose(view.chapter, smooth);
+      const { rect } = view;
       if (rect.width < 2 || rect.height < 2) continue;
       const cameraZ = cameraDistanceFor(view);
       if (cameraZ === null) continue;
@@ -365,7 +393,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       renderer.setViewport(...window.viewport);
       renderer.setScissor(...window.scissor); renderer.setScissorTest(true); renderer.clearDepth();
       camera.aspect = rect.width / rect.height; camera.updateProjectionMatrix();
-      rig.position.y = 0; rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ'); rig.updateMatrixWorld(true);
+      rig.position.y = 0;
+      rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
+      applyIdle(rig, view.chapter, view.progress, time);
+      rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
         const world = asset.worldPoints[index].copy(point).applyMatrix4(rig.matrixWorld);
@@ -375,7 +406,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
       shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
       camera.position.set(0, pose.cameraY, cameraZ);
-      const light = lightFor(view.chapter, view.progress);
+      const light = lightFor(view.chapter, smooth);
       renderer.toneMappingExposure = pose.exposure * light.exposure;
       renderer.render(scene, camera);
       if (inspectMotion) motion.push({ chapter: view.chapter, model: overlay.dataset.model, pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() });
@@ -436,17 +467,23 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     loaded = true; root.classList.add('has-scene'); setStatus('');
     collectTargets();
 
-    detachFrame = scheduler.add(() => {
+    detachFrame = scheduler.add(time => {
       if (disposed || lost || !loaded || document.hidden || !root.isConnected) { if (!root.isConnected) release(); return; }
+      const dt = lastFrameTime === null ? 1 / 60 : Math.min(.06, Math.max(.001, time - lastFrameTime));
+      lastFrameTime = time;
       const current = resolve();
       if (!current) { release(); lastSignature = ''; return; }
-      if (current.views) { renderBoundary(current.views, current.chapter); return; }
+      if (current.views) { renderBoundary(current.views, current.chapter, dt, time); return; }
       const desiredKey = journeyModelKey(current.modelSpec);
       if (failed.has(desiredKey)) { release(); lastSignature = ''; return; }
       if (!selectModel(current.modelSpec, current.modelBlend)) { release(); lastSignature = ''; return; }
-      const { rect, pose } = current;
+      const { rect } = current;
       const cameraZ = cameraDistanceFor(current);
       if (cameraZ === null) { release(); lastSignature = ''; return; }
+      const poseKey = `${current.chapter}:${current.visuals.length > 1 ? current.visuals.indexOf(current.visual) : 0}`;
+      const smooth = dampProgress(poseKey, current.progress, dt);
+      const pose = journeyPose(current.chapter, smooth);
+      if (idleStrength(current.chapter, current.progress) > 0) dirty = true;
       const signature = [activeModelKey, ...Object.values(pose).map(value => value.toFixed(5)), current.chapter, current.progress.toFixed(5), rect.left.toFixed(2), rect.top.toFixed(2), rect.width.toFixed(2), rect.height.toFixed(2), current.opacity.toFixed(3), cameraZ.toFixed(5)].join(':');
       if (!dirty && signature === lastSignature) return;
       lastSignature = signature; dirty = false;
@@ -463,6 +500,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       Object.assign(overlay.style, { display: 'block', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, opacity: String(current.opacity) });
       rig.position.y = 0;
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
+      applyIdle(rig, current.chapter, current.progress, time);
       rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
@@ -473,7 +511,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
       shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
       camera.position.set(0, pose.cameraY, cameraZ);
-      const light = lightFor(current.chapter, current.progress);
+      const light = lightFor(current.chapter, smooth);
       renderer.toneMappingExposure = pose.exposure * light.exposure;
       renderer.setScissorTest(false); renderer.setViewport(0, 0, width, height);
       renderer.render(scene, camera);

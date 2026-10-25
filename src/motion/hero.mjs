@@ -1,4 +1,5 @@
 import { chapterState } from './contracts.mjs';
+import { mountAtmosphere } from './atmosphere.mjs';
 
 // The accessible heading remains intact. Split only its decorative rendering,
 // then restore it so theme-editor remounts never nest the glyph wrappers.
@@ -32,6 +33,8 @@ export function waitForHeroOpening(document, environment, play) {
 export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface = '#effaff', paper = '#b7ddef' }) {
   const stage = root.querySelector('[data-hero-stage]');
   if (!stage) return;
+  // The sky set keeps a slow living mote field behind the type and product.
+  const disposeAtmosphere = mountAtmosphere(stage, { gsap });
   const line1 = root.querySelector('[data-hero-line-1]');
   const line2 = root.querySelector('[data-hero-line-2]');
   const art = root.querySelector('[data-hero-art]');

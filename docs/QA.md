@@ -521,3 +521,39 @@ snippet warning. Screenshots are in .impeccable/review/brand-studio/.
 No commit, push or deployment was performed.
 
 Independent final Brand evaluation: PASS after fresh resize, reverse-header, view-control and fallback rechecks. No blocking defects remain in the tested scope. Physical-device frame rate and other browser engines remain unmeasured.
+
+## Pass 9 — living hero, premium motion, model credit
+
+Owner feedback: the hero text read plain, the background felt static, and the
+3D shoe movement needed to feel premium and smooth. The homepage hero and its
+shoe are owned by `journey-scene.mjs` (the persistent renderer shared across
+the eight chapters), so the work landed there:
+
+- **Atmosphere**: `src/motion/atmosphere.mjs` adds a slow field of soft light
+  motes behind the hero content — three depth layers that drift, sway and
+  twinkle, parallax against scroll and pointer, drawn on a 2D canvas driven by
+  the shared GSAP ticker (no second rAF loop, no second WebGL context), gated
+  by IntersectionObserver and reduced-motion. Mounted from `mountHero`; the
+  canvas sits between the sky set and the content (`.hero-atmo-canvas`).
+- **Premium motion**: authored poses are now reached through a short
+  exponential settle per chapter (`dampProgress`, ~130ms time-based damping in
+  the journey frame loop) instead of a 1:1 scrub mapping — wheel steps read as
+  one continuous camera move while converging to the exact scroll-derived
+  pose, so model exchanges, seeks and reverse scrolls stay deterministic. The
+  hero and finale stages gain a resting breath (small time-based lift and
+  sway that dies out as scrolling takes over), and lighting/exposure follow
+  the damped progress.
+- **Model credit**: "NIKE AIR MAX PLUS / TN · 3D model preview" now uses the
+  chapter-kicker hairline system — leading rule, tracked uppercase, two ink
+  weights — instead of a plain grey sentence. The honest 3D-preview
+  disclosure is retained.
+- Orphaned hero-ticker CSS removed (the parallel hero rebuild had dropped the
+  markup).
+
+Gates after the work: build clean, 99/99 tests, structural validation,
+Theme Check (same single pre-existing orphaned-snippet warning). Verified in
+the browser at 1440×900: motes visible at rest and parallaxing under scroll,
+credit styled, shoe pose settling smoothly between wheel steps, journey pose
+dataset converging. The parallel session's site intro plays before the hero
+on a fresh session; verification waited it out. Not tested: connected-store
+checkout, real merchandise.
