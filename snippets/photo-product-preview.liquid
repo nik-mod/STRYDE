@@ -1,0 +1,8 @@
+<section class="photo-product-preview page-shell">
+  <nav class="breadcrumbs micro" aria-label="Breadcrumbs"><a href="/collections/all">The collection</a><span aria-hidden="true">/</span><span>{{ item.title | escape }}</span></nav>
+  <header class="photo-product-heading"><p class="micro">{% if item.identityStatus == 'unverified' %}IDENTITY NEEDS REVIEW{% elsif item.identityStatus == 'filename' %}FILENAME SUGGESTION · VERIFY{% elsif item.identityStatus == 'source-verified' %}RETAILER ID MATCHED · VERIFY PHOTO{% else %}VISUALLY IDENTIFIED{% endif %} · {{ item.count }} PHOTOS</p><h1>{{ item.title | escape }}</h1>{% if item.colorway != blank %}<p>{{ item.colorway | escape }}</p>{% endif %}<p>{{ item.description | escape }}</p><p>Grouped by {{ item.grouping | escape }}. Similar but separately named colorways are kept apart.</p></header>
+  <div class="photo-product-gallery">
+    {% for photo in item.photos %}<figure><img src="{{ photo.src }}" loading="lazy" alt="{{ item.title | escape }} — view {{ forloop.index }}"><figcaption class="micro">VIEW {{ forloop.index | prepend: '0' }}</figcaption></figure>{% endfor %}
+  </div>
+  <aside class="photo-product-note"><p class="micro">BEFORE THIS GOES LIVE</p><p>Confirm the shoe name, brand, price, sizes and stock. Checkout is disabled in this local preview.</p><a class="text-link" href="/collections/all">Back to all grouped pairs ↗</a></aside>
+</section>

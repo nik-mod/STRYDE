@@ -9,12 +9,12 @@ export const buildOptions = {
 };
 
 export function isGeneratedScript(file) {
-  return /^(theme\.js|(scene-|chunk-).*\.js)$/.test(basename(file));
+  return /^(theme\.js|((?:journey-scene|spotlight-scene|scene|chunk)-).*\.js)$/.test(basename(file));
 }
 
 export async function pruneChunks(result) {
   const current = new Set(Object.keys(result.metafile.outputs).map(file => basename(file)));
   for (const file of await readdir('assets')) {
-    if (/^(scene-|chunk-).*\.js$/.test(file) && !current.has(file)) await unlink(`assets/${file}`);
+    if (/^((?:journey-scene|spotlight-scene|scene|chunk)-).*\.js$/.test(file) && !current.has(file)) await unlink(`assets/${file}`);
   }
 }

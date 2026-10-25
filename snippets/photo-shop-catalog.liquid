@@ -1,0 +1,44 @@
+<div class="photo-shop" data-photo-shop>
+  <div class="photo-shop-toolbar"><p class="micro">{{ catalog.size }} PHOTO GROUPS · YOUR TAKEOUT ARCHIVE</p><p class="photo-shop-disclosure">Local catalog · identity labels show what still needs review</p></div>
+  <div class="photo-shop-filters" role="search" aria-label="Filter photo groups">
+    <label><span class="micro">SEARCH NAME OR SOURCE</span><input type="search" data-photo-search placeholder="Try Nike, Air Max, or filename" autocomplete="off"></label>
+    <label><span class="micro">IDENTIFICATION</span><select data-photo-status><option value="">All groups</option><option value="source-verified">Retailer ID matched</option><option value="visually-identified">Visually identified</option><option value="filename">Filename suggestion</option><option value="unverified">Needs shoe ID</option></select></label>
+    <p class="micro" data-photo-results role="status" aria-live="polite"></p>
+  </div>
+  <div class="photo-shop-grid">
+    {% for item in catalog %}
+      <article class="photo-shop-card" data-photo-card data-photo-status-value="{{ item.identityStatus }}" data-photo-query="{{ item.title | append: ' ' | append: item.colorway | append: ' ' | append: item.sourceSet | escape }}">
+        <a class="photo-shop-image" href="{{ item.url }}" aria-label="View {{ item.title | escape }} · {{ item.count }} photos">
+          {% assign cover = item.coverPhoto | default: item.photos.first %}
+          <img src="{{ cover.src }}" loading="lazy" alt="{{ item.title | escape }} — photo 1 of {{ item.count }}">
+          <span class="photo-shop-count">{{ item.count }} PHOTOS</span>
+        </a>
+        <div class="photo-shop-info"><p class="micro">{% if item.identityStatus == 'unverified' %}NEEDS SHOE ID{% elsif item.identityStatus == 'filename' %}FILENAME ID · CHECK{% elsif item.identityStatus == 'source-verified' %}RETAILER ID · CHECK PHOTO{% else %}VISUALLY IDENTIFIED{% endif %} / {{ forloop.index }}</p><h2><a href="{{ item.url }}">{{ item.title | escape }}</a></h2>{% if item.colorway != blank %}<p class="photo-shop-colorway">{{ item.colorway | escape }}</p>{% endif %}<p class="photo-shop-description">{{ item.description | escape }}</p><a class="photo-shop-link" href="{{ item.url }}">Review {{ item.count }} photo{% if item.count != 1 %}s{% endif %} <span aria-hidden="true">↗</span></a></div>
+      </article>
+    {% endfor %}
+  </div>
+  <script>
+    (() => {
+      const root = document.querySelector('[data-photo-shop]');
+      if (!root || root.dataset.filterReady) return;
+      root.dataset.filterReady = 'true';
+      const cards = [...root.querySelectorAll('[data-photo-card]')];
+      const search = root.querySelector('[data-photo-search]');
+      const status = root.querySelector('[data-photo-status]');
+      const results = root.querySelector('[data-photo-results]');
+      const update = () => {
+        const term = search.value.trim().toLowerCase();
+        let visible = 0;
+        for (const card of cards) {
+          const matches = (!term || card.dataset.photoQuery.toLowerCase().includes(term)) && (!status.value || card.dataset.photoStatusValue === status.value);
+          card.hidden = !matches;
+          if (matches) visible++;
+        }
+        results.textContent = `${visible} of ${cards.length} groups`;
+      };
+      search.addEventListener('input', update);
+      status.addEventListener('change', update);
+      update();
+    })();
+  </script>
+</div>

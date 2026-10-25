@@ -49,10 +49,24 @@ const scene = json.scenes[json.scene || 0];
 for (const node of scene.nodes) visit(node,new Matrix4());
 const hull = new ConvexHull().setFromPoints(points), vertices = new Set();
 for (const face of hull.faces) {let edge=face.edge;do{vertices.add(edge.head().point);edge=edge.next;}while(edge!==face.edge);}
-assert(vertices.size > 3 && vertices.size < 5000);
-scene.extras = {...scene.extras, strydeFramingHull:[...vertices].map(p=>p.toArray().map(value=>+value.toFixed(5)))};
+assert(vertices.size > 3);
+// Dense scans can have thousands of convex surface vertices. Keep support
+// points in evenly distributed directions so fitting stays cheap per frame.
+let framing = [...vertices];
+if (framing.length >= 5000) {
+  const support = new Set();
+  for (let i = 0; i < 1024; i++) {
+    const y = 1 - 2 * i / 1023, radius = Math.sqrt(1 - y * y), angle = i * Math.PI * (3 - Math.sqrt(5));
+    const direction = new Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+    let best, score = -Infinity;
+    for (const point of framing) { const projection = point.dot(direction); if (projection > score) { score = projection; best = point; } }
+    support.add(best);
+  }
+  framing = [...support];
+}
+scene.extras = {...scene.extras, strydeFramingHull:framing.map(p=>p.toArray().map(value=>+value.toFixed(5)))};
 const encoded = Buffer.from(JSON.stringify(json)), padded = Math.ceil(encoded.length/4)*4;
 const header=Buffer.from(bytes.subarray(0,20)); header.writeUInt32LE(padded,12);
 const result=Buffer.concat([header,encoded,Buffer.alloc(padded-encoded.length,32),bytes.subarray(20+jsonLength)]);
 result.writeUInt32LE(result.length,8); await writeFile(output,result);
-console.log(JSON.stringify({vertices:points.length,hullPoints:vertices.size,bytes:result.length}));
+console.log(JSON.stringify({vertices:points.length,hullPoints:framing.length,bytes:result.length}));

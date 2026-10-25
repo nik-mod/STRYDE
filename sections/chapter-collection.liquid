@@ -4,11 +4,15 @@
   if collection != blank and collection.products_count > 0
     assign has_products = true
   endif
+  assign form_edit = false
+  if section.settings.use_form_edit and has_products == false
+    assign form_edit = true
+  endif
   assign field_1 = section.settings.field_1 | default: '#41b4f0'
   assign field_2 = section.settings.field_2 | default: '#7fa9f6'
   assign field_3 = section.settings.field_3 | default: '#4fc4d4'
 %}
-<section id="chapter-collection" class="chapter chapter-paper chapter-collection" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
+<section id="chapter-collection" class="chapter chapter-paper chapter-collection" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} {% if form_edit %}data-form-edit{% endif %} data-chapter="collection" data-env="collection" data-section-id="{{ section.id }}" aria-labelledby="CollHeading-{{ section.id }}">
   <div class="coll-head">
     <p class="chapter-kicker">{{ section.settings.kicker | escape }}</p>
     <h2 class="chapter-heading" id="CollHeading-{{ section.id }}">
@@ -39,6 +43,8 @@
           </div>
         </article>
       {% endfor %}
+    {% elsif form_edit %}
+      {% render 'form-edit-scenes', section_id: section.id %}
     {% elsif section.preview_photography %}
       {% comment %} Local preview only: licensed owner photography stands in for the
          empty-merchandise state. Real Shopify products always take precedence, and an
@@ -100,7 +106,7 @@
     {% endif %}
   </div>
   <div class="chapter-summary coll-summary">
-    <p>{% if has_products %}{{ collection.title | escape }}{% else %}Three silhouettes. Three perspectives.{% endif %}</p>
+    <p>{% if has_products %}{{ collection.title | escape }}{% elsif form_edit %}Four looks. A different rhythm.{% else %}Three silhouettes. Three perspectives.{% endif %}</p>
     <a href="{{ collection.url | default: routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a>
   </div>
 </section>
@@ -108,6 +114,7 @@
 {
   "name":"Collection reveal",
   "settings":[
+    {"type":"checkbox","id":"use_form_edit","label":"Show four-look form edit","default":false,"info":"Curated photographs with color and material titles. Assigned collection products take precedence."},
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"05 \u2014 The collection"},
     {"type":"text","id":"heading","label":"Heading","default":"The lineup"},

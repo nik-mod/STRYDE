@@ -5,42 +5,51 @@
       "settings": {
         "use_tn_model": true,
         "concept_name": "NIKE AIR MAX PLUS / TN",
-        "description": "A familiar silhouette. A different perspective. Discover every curve of the blue-and-white TN.",
+        "description": "Signature waves. Sculpted Air. Blue that makes an entrance.",
         "headline_first": "BEYOND",
         "headline_second": "ORDINARY.",
-        "cta": "View the collection"
+        "cta": "Explore the collection",
+        "statement": "Made to stand out."
       }
     },
     "deconstruction": {
       "type": "chapter-deconstruction",
       "settings": {
         "use_tn_model": true,
-        "heading_line_1": "Every line.",
-        "heading_line_2": "Every angle.",
-        "intro": "Follow the details that make this silhouette unmistakable. A closer look at the model, from its blue upper to its black outsole.",
-        "part_1_title": "Gradient upper",
-        "part_1_body": "Sky blue at the forefoot, deeper blue toward the heel. The color moves with the shape.",
-        "part_2_title": "Wave cage",
-        "part_2_body": "White ribs trace the side profile, framing the blue panels beneath.",
+        "heading_line_1": "Air Max Plus.",
+        "heading_line_2": "Drift.",
+        "intro": "A different expression of the TN family. Sculpted white curves wrap dark mesh, while black laces and visible Air define the Air Max Plus Drift.",
+        "part_1_title": "Tonal mesh",
+        "part_1_body": "Silver-grey mesh and dark panels sit beneath the white cage. A monochrome upper with depth from every angle.",
+        "part_2_title": "Sculpted cage",
+        "part_2_body": "Broad white curves wrap the upper, giving the Drift its distinct, flowing profile.",
         "part_3_title": "Visible Air",
-        "part_3_body": "A sculpted white midsole frames the visible cushioning windows.",
+        "part_3_body": "Air windows punctuate the white midsole at the forefoot and heel.",
         "part_4_title": "Black outsole",
-        "part_4_body": "The dark tread anchors the palette and defines the shoe from below.",
-        "part_5_title": "Finishing details",
-        "part_5_body": "White laces, a padded collar and a small side Swoosh complete the composition."
+        "part_4_body": "Dark tread and a sculpted midfoot arch ground the white silhouette.",
+        "part_5_title": "Black finishing details",
+        "part_5_body": "Black laces, a dark padded collar and the heel-side Swoosh complete this white-and-black model.",
+        "use_drift_model": true,
+        "kicker": "02 \u2014 Air Max Plus Drift"
       }
     },
     "materials": {
       "type": "chapter-materials",
       "settings": {
         "use_tn_model": true,
-        "heading": "Closer changes everything.",
-        "panel_1_title": "Color with depth.",
-        "panel_1_body": "Move from the light blue forefoot into the deeper tones at the heel. The white cage gives every panel its own edge.",
-        "panel_2_title": "The signature line.",
-        "panel_2_body": "Curved ribs, layered panels and the side Swoosh. A study in the details of an instantly recognizable profile.",
-        "panel_3_title": "A different foundation.",
-        "panel_3_body": "Turn the silhouette over. Dark tread, blue accents and a sculpted arch give the underside its own identity."
+        "heading": "Two forms. One attitude.",
+        "panel_1_title": "The original, in blue.",
+        "panel_1_body": "The blue-and-white Air Max Plus pairs a gradient upper with slim white waves. The silhouette that opens the story.",
+        "panel_2_title": "The Drift, in detail.",
+        "panel_2_body": "The Air Max Plus Drift takes a different line. A broader white cage frames tonal mesh, with black laces and a small heel-side Swoosh.",
+        "panel_3_title": "The Drift, from below.",
+        "panel_3_body": "The same white-and-black Drift turns over to reveal its dark tread, sculpted arch and contrasting white midsole.",
+        "panel_1_model": "blue",
+        "panel_1_specs": "Blue gradient, Slim wave cage, White laces",
+        "panel_2_model": "drift",
+        "panel_2_specs": "Sculpted cage, Tonal mesh, Black laces",
+        "panel_3_model": "drift",
+        "panel_3_specs": "Dark tread, Sculpted arch, White midsole"
       }
     },
     "technology": {
@@ -53,8 +62,8 @@
         "row_1_body": "A long, low silhouette with white waves moving across a blue upper.",
         "row_2_title": "The contrast",
         "row_2_body": "Bright white framing, translucent details and a dark outsole bring the layers into focus.",
-        "row_3_title": "The outsole",
-        "row_3_body": "Dark tread beneath a white midsole. Blue accents continue around the arch."
+        "row_3_title": "The upper",
+        "row_3_body": "White laces and flowing waves frame the blue mesh. A gentle turn brings the upper into view."
       }
     },
     "collection": {
@@ -66,17 +75,21 @@
         "tile_title": "TN study",
         "field_1": "#9cc3e2",
         "field_2": "#c6dff0",
-        "field_3": "#a9dcdc"
+        "field_3": "#a9dcdc",
+        "use_form_edit": true
       }
     },
     "featured": {
       "type": "chapter-featured",
       "settings": {
         "use_tn_model": true,
-        "kicker": "06 \u2014 In focus",
-        "fallback_title": "Blue / white.",
-        "story": "A blue upper framed by white waves. The dark outsole gives the light silhouette a distinct edge.",
-        "fallback_cta": "View the collection"
+        "kicker": "06 \u2014 After hours",
+        "fallback_title": "Deep blue.",
+        "story": "Saturated blue. Deep navy waves. A bright white midsole. This darker Air Max Plus brings a different mood to the same flowing silhouette.",
+        "fallback_cta": "View the collection",
+        "use_navy_model": true,
+        "specs": "Blue upper, Navy wave cage, Visible Air",
+        "details": "Colourway: Blue / Navy / White | Upper: Dark waves over blue panels | Sole: White midsole, dark tread"
       }
     },
     "brand": {

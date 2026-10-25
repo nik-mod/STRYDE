@@ -1,3 +1,13 @@
+{% liquid
+  assign model_prefix = 'tn'
+  assign model_label = 'Blue and white Air Max Plus / TN'
+  assign middle_view = 'heel'
+  if section.settings.use_drift_model
+    assign model_prefix = 'tn-mono'
+    assign model_label = 'White and black Air Max Plus Drift'
+    assign middle_view = 'top'
+  endif
+%}
 <section id="chapter-deconstruction" class="chapter chapter-surface chapter-deconstruction" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="deconstruction" data-env="deconstruction" data-section-id="{{ section.id }}" aria-labelledby="DeconHeading-{{ section.id }}">
   <div class="decon-grid">
     <div class="decon-list">
@@ -30,19 +40,19 @@
     </div>
     <div class="decon-visual">
       <span class="decon-ghost" aria-hidden="true">02</span>
-      <div class="frame decon-frame">
+      <div class="frame decon-frame"{% if section.settings.use_tn_model and section.settings.use_drift_model %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
         <div class="decon-crop is-active" style="--zoom: {% if section.settings.use_tn_model %}1.06{% else %}1.25{% endif %}; --tx: 0%; --ty: 0%;">
-          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-profile-2800.webp' | asset_url }}" srcset="{{ 'tn-profile-1000.webp' | asset_url }} 1000w, {{ 'tn-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — profile view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
+          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ model_prefix | append: '-profile-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-profile-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="{{ model_label }} — profile view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
         </div>
-        <div class="decon-crop" style="--zoom: {% if section.settings.use_tn_model %}1.25{% else %}1.35{% endif %}; --tx: 0%; --ty: 0%;">
-          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-heel-2800.webp' | asset_url }}" srcset="{{ 'tn-heel-1000.webp' | asset_url }} 1000w, {{ 'tn-heel-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — heel view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
+        <div class="decon-crop" style="--zoom: {% if section.settings.use_drift_model %}1{% elsif section.settings.use_tn_model %}1.25{% else %}1.35{% endif %}; --tx: 0%; --ty: 0%;">
+          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ model_prefix | append: '-' | append: middle_view | append: '-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-' | append: middle_view | append: '-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-' | append: middle_view | append: '-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="{{ model_label }} — {% if section.settings.use_drift_model %}upper{% else %}heel{% endif %} view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
         </div>
         <div class="decon-crop" style="--zoom: {% if section.settings.use_tn_model %}1{% else %}1.2{% endif %}; --tx: 0%; --ty: 0%;">
-          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ 'tn-sole-2800.webp' | asset_url }}" srcset="{{ 'tn-sole-1000.webp' | asset_url }} 1000w, {{ 'tn-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="Blue and white TN — sole view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
+          {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ model_prefix | append: '-sole-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-sole-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-sole-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="{{ model_label }} — outsole view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="" aria-hidden="true">{% endif %}
         </div>
         <div class="decon-notes" aria-hidden="true">
           <span class="decon-note" data-decon-note><i>01</i>Upper and side structure</span>
-          <span class="decon-note" data-decon-note><i>02</i>Heel geometry and cage</span>
+          <span class="decon-note" data-decon-note><i>02</i>{% if section.settings.use_drift_model %}Upper and black lacing{% else %}Heel geometry and cage{% endif %}</span>
           <span class="decon-note" data-decon-note><i>03</i>Outsole and cushioning</span>
         </div>
         <span class="decon-tick" aria-hidden="true"></span>
@@ -50,9 +60,9 @@
       </div>
       {% if section.settings.use_tn_model %}
       <dl class="chapter-ledger decon-ledger">
-        <div><dt>Silhouette</dt><dd>Air Max Plus / TN</dd></div>
-        <div><dt>Color study</dt><dd>Blue / White</dd></div>
-        <div><dt>View sequence</dt><dd>Profile / Heel / Outsole</dd></div>
+        <div><dt>Silhouette</dt><dd>{% if section.settings.use_drift_model %}Air Max Plus Drift{% else %}Air Max Plus / TN{% endif %}</dd></div>
+        <div><dt>Color study</dt><dd>{% if section.settings.use_drift_model %}White / Black / Silver{% else %}Blue / White{% endif %}</dd></div>
+        <div><dt>View sequence</dt><dd>Profile / {% if section.settings.use_drift_model %}Upper{% else %}Heel{% endif %} / Outsole</dd></div>
       </dl>
       {% endif %}
     </div>
@@ -63,6 +73,7 @@
   "name":"Deconstruction",
   "settings":[
     {"type":"checkbox","id":"use_tn_model","label":"Use TN model editorial images","default":false},
+    {"type":"checkbox","id":"use_drift_model","label":"Show white and black Drift model","default":false},
     {"type":"text","id":"kicker","label":"Kicker","default":"02 \u2014 Anatomy"},
     {"type":"text","id":"heading_line_1","label":"Heading line one","default":"Anatomy of"},
     {"type":"text","id":"heading_line_2","label":"Heading line two","default":"a silhouette"},

@@ -1,6 +1,19 @@
+<div class="reference-catalog" data-reference-catalog data-study-one="{{ 'references.study_one' | t | escape }}" data-study-other="{{ 'references.study_other' | t | escape }}">
+  <div class="reference-tools" data-reference-tools>
+    <div class="reference-brands" role="group" aria-label="{{ 'references.filter_brand' | t | escape }}">
+      <button type="button" data-reference-filter="all" aria-pressed="true">{{ 'references.all' | t }}</button>
+      <button type="button" data-reference-filter="Nike" aria-pressed="false">Nike</button>
+      <button type="button" data-reference-filter="Adidas" aria-pressed="false">Adidas</button>
+      <button type="button" data-reference-filter="New Balance" aria-pressed="false">New Balance</button>
+    </div>
+    <label class="reference-search">{% render 'icon', name: 'search' %}<span class="sr-only">{{ 'references.search' | t }}</span><input type="search" data-reference-query placeholder="{{ 'references.search' | t | escape }}" autocomplete="off"></label>
+  </div>
+  <p class="reference-count micro" data-reference-count role="status" aria-live="polite">{{ catalog.size }} {{ 'references.study_other' | t }}</p>
 <div class="photography-grid">
   {% for photo in catalog %}
-    <article class="photography-reference" data-photography-reference="{{ photo.id | escape }}">
+    {% assign reference_brand = photo.name | split: ' ' | first %}
+    {% if photo.name contains 'New Balance' %}{% assign reference_brand = 'New Balance' %}{% endif %}
+    <article class="photography-reference" data-photography-reference="{{ photo.id | escape }}" data-reference-brand="{{ reference_brand | escape }}" data-reference-name="{{ photo.name | downcase | escape }}">
       <figure>
         <img src="{{ photo.asset | asset_url }}" width="{{ photo.width }}" height="{{ photo.height }}" loading="lazy" alt="{{ photo.name | escape }} — independent photographic reference">
         <figcaption><h2>{{ photo.name | escape }}</h2><p>Photographic reference · Not store inventory</p></figcaption>
@@ -10,4 +23,12 @@
   {% else %}
     <div class="empty-state"><h2>Photography coming soon.</h2><p>Licensed reference photographs are not yet available. Store products will appear here when a collection is connected.</p></div>
   {% endfor %}
+</div>
+
+  <div class="reference-empty empty-state" data-reference-empty hidden>
+    <p class="micro">{{ 'references.no_matches_kicker' | t }}</p>
+    <h2>{{ 'references.no_matches' | t }}</h2>
+    <p>{{ 'references.try_another' | t }}</p>
+    <button class="button button-dark" type="button" data-reference-reset>{{ 'collection.clear' | t }} {% render 'icon', name: 'arrow' %}</button>
+  </div>
 </div>

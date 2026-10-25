@@ -7,7 +7,7 @@ import { renderPreview } from '../tools/preview.mjs';
 test('preview uses localized singular and zero-count phrases without leaking interpolation markup', async () => {
   const listing = await renderPreview('/collections/all', new URLSearchParams('fixtures=1&image=1'));
   assert.match(listing, /class="collection-count micro">1 product<\/div>/);
-  const empty = await renderPreview('/collections/all', new URLSearchParams('concepts=0'));
+  const empty = await renderPreview('/collections/other', new URLSearchParams('concepts=0'));
   assert.match(empty, /class="collection-count micro">0 products<\/div>/);
   for (const fixtures of [false, true]) {
     const query = new URLSearchParams({ q: '<script>shoe</script>' });

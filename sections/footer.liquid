@@ -4,8 +4,9 @@
 {% endcapture %}
 {% assign footer_links = footer_links | strip %}
 <footer class="site-footer">
+  <div class="footer-signoff"><p>{{ 'footer.statement' | t }}</p><a href="{{ routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a></div>
   <a class="wordmark" href="{{ routes.root_url }}">{{ settings.brand_name | default: shop.name | escape }}</a>
-  {% if footer_links != blank %}<nav class="footer-links" aria-label="{{ 'general.footer_navigation' | t }}">{{ footer_links }}</nav>{% endif %}
+  <nav class="footer-links" aria-label="{{ 'general.footer_navigation' | t }}">{% if footer_links != blank %}{{ footer_links }}{% else %}<a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a><a href="{{ routes.root_url }}#chapter-deconstruction">{{ 'general.the_details' | t }}</a><a href="{{ routes.root_url }}#chapter-brand">{{ 'general.our_perspective' | t }}</a>{% endif %}</nav>
   <div class="footer-meta"><p>© {{ 'now' | date: '%Y' }} {{ shop.name | escape }}</p><a href="#MainContent" class="back-top">{{ 'general.back_to_top' | t }} {% render 'icon', name: 'arrow-up' %}</a></div>
 </footer>
 {% schema %}

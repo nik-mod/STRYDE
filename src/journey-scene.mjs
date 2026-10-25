@@ -4,6 +4,8 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { refinePreviewMaterial } from './scene-materials.mjs';
 import { fittedCameraZ } from './scene-framing.mjs';
+import { journeyModelSpec, journeyModelKey } from './journey-models.mjs';
+import { shoeTurn, studyTransition, windowTransition, turnPose, travelWindow, transitionCamera } from './journey-transition.mjs';
 import { environmentFor } from './motion/environments.mjs';
 import { journeyPose, journeyProgress, interpolateJourneyPose, flowingMaterialSample, inspectionPose, journeyHandoff } from './journey-poses.mjs';
 
@@ -27,7 +29,50 @@ function disposeModel(model) {
 
 // The scene owns only its overlay and model. GSAP retains ownership of section
 // pins and HTML choreography; no canvas is moved into a transformed pin.
-export async function mountJourneyScene({ root, url, scheduler, signal, bus, ScrollTrigger }) {
+export async function mountJourneyScene(options) {
+  const { root, signal } = options;
+  const document = root.ownerDocument;
+  const environment = document.defaultView;
+  if (signal.aborted || environment.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};
+
+  // Each Chrome preview tab used to create a full WebGL context and load both
+  // shoe models, even while hidden. Start only in the foreground and release
+  // its GPU buffers when hidden; reopen with the same lifecycle when focused.
+  let closed = false;
+  let starting = false;
+  let activeCleanup = null;
+  const boot = async () => {
+    if (closed || starting || activeCleanup || document.hidden) return;
+    starting = true;
+    try {
+      const cleanup = await createJourneyScene(options);
+      if (closed || document.hidden) cleanup();
+      else activeCleanup = cleanup;
+    } finally {
+      starting = false;
+    }
+  };
+  const visibility = () => {
+    if (document.hidden) {
+      activeCleanup?.();
+      activeCleanup = null;
+    } else void boot();
+  };
+  const cleanup = () => {
+    if (closed) return;
+    closed = true;
+    document.removeEventListener('visibilitychange', visibility);
+    signal.removeEventListener('abort', cleanup);
+    activeCleanup?.();
+    activeCleanup = null;
+  };
+  document.addEventListener('visibilitychange', visibility);
+  signal.addEventListener('abort', cleanup, { once: true });
+  await boot();
+  return cleanup;
+}
+
+async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTrigger }) {
   const document = root.ownerDocument, environment = document.defaultView;
   if (signal.aborted || environment.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};
   const overlay = document.createElement('div');
@@ -47,12 +92,18 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
   const rim = new THREE.DirectionalLight(0xbfe8ff, 2); rim.position.set(-3, 2, -2);
   const fill = new THREE.DirectionalLight(0x8fd2f4, .65); fill.position.set(-2.6, .7, 3.4);
   scene.add(ambient, key, rim, fill);
-  let renderer, model, reflection, shadow, shadowPlane, shadowTexture;
+  let renderer, reflection, shadow, shadowPlane, shadowTexture;
+  const primary = { url, yaw: Number(root.dataset.modelYaw) || 90, variant: 'blue' };
+  const assets = new Map(), loading = new Map(), failed = new Set();
+  let selectedAssets = [];
+  const sweepResolution = { value: new THREE.Vector2(1, 1) };
+  let activeModelKey = '', modelObserver;
   let disposed = false, lost = false, loaded = false, dirty = true, targetsDirty = true;
   let targets = [], owned = [], width = 0, height = 0, lastSignature = '', previousY = environment.scrollY, lastScrollTime = 0;
   let detachFrame = () => {};
   let inspection = null, inspectionStart = 0, inspectionFrom = null, renderedPose = journeyPose('hero', 0);
   let releaseFrom = null, releaseStart = 0;
+  let previousFrameTime = 0;
   const viewButtons = [...root.querySelectorAll('[data-scene-view]')];
   const resetInspection = () => {
     inspection = null;
@@ -72,7 +123,6 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
     dirty = true;
   };
   root.addEventListener('click', inspect);
-  const points = [], worldPoints = [];
   const release = () => {
     owned.forEach(target => target.classList.remove('has-journey-scene'));
     owned = [];
@@ -93,7 +143,8 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
     signal.removeEventListener('abort', cleanup);
     renderer?.domElement.removeEventListener('webglcontextlost', onLost);
     renderer?.domElement.removeEventListener('webglcontextrestored', onRestored);
-    disposeModel(model);
+    modelObserver?.disconnect();
+    assets.forEach(asset => disposeModel(asset.model)); assets.clear();
     shadowPlane?.geometry.dispose(); key.shadow.dispose();
     shadow?.dispose(); shadowTexture?.dispose(); reflection?.dispose();
     renderer?.dispose(); renderer?.forceContextLoss(); overlay.remove();
@@ -131,7 +182,8 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
       ? bus.state.local
       : pin ? journeyProgress(environment.scrollY, pin.start, pin.end)
         : clamp((environment.innerHeight * .75 - sectionRect.top) / Math.max(1, sectionRect.height));
-    let visual = target.visuals[0];
+    if (['materials', 'featured'].includes(target.chapter) && pin?.animation) progress = pin.animation.progress();
+    let visual = target.visuals[0], flowBlend = null, flowRect = null;
     if (target.visuals.length > 1 && !pin) {
       // Flowing panels all have opacity 1. Use their actual on-screen geometry,
       // then map the visible panel's local reading progress into its third.
@@ -142,6 +194,19 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
       );
       visual = target.visuals[flow.index];
       progress = flow.progress;
+      for (let index = 1; index < target.visuals.length; index++) {
+        const from = target.visuals[index - 1], to = target.visuals[index];
+        const fromSpec = journeyModelSpec(from.closest('[data-journey-model]')?.dataset, primary);
+        const toSpec = journeyModelSpec(to.closest('[data-journey-model]')?.dataset, primary);
+        if (journeyModelKey(fromSpec) === journeyModelKey(toSpec)) continue;
+        const fromRect = from.getBoundingClientRect(), toRect = to.getBoundingClientRect();
+        const handoff = journeyHandoff(fromRect, toRect, environment.innerHeight);
+        if (handoff) {
+          flowBlend = { from: fromSpec, to: toSpec, progress: handoff.progress };
+          flowRect = travelWindow(fromRect, toRect, handoff.progress);
+          break;
+        }
+      }
     } else if (target.visuals.length > 1) {
       // A caption's visible owner is the same panel that owns the live model.
       // Scoring opacity also handles seeks during a merchant's fade transition.
@@ -154,7 +219,126 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
         if (opacity > score) { score = opacity; visual = candidate; }
       }
     }
-    return { ...target, progress, visual, rect: visual.getBoundingClientRect(), sectionRect, pose: journeyPose(target.chapter, progress) };
+    const modelOwner = visual.closest('[data-journey-model]');
+    if (!pin && modelOwner?.hasAttribute('data-journey-from-primary')) {
+      // On flowing layouts the shoe changes while its actual visual window
+      // is inside the screen, rather than after a long mobile text column.
+      progress = clamp((environment.innerHeight * .6 - visual.getBoundingClientRect().top) / (environment.innerHeight * .48));
+    }
+    let modelSpec = journeyModelSpec(modelOwner?.dataset, primary);
+    let modelBlend = flowBlend || (target.chapter === 'materials' && pin ? studyTransition(
+      target.visuals.map(frame => journeyModelSpec(frame.closest('[data-journey-model]')?.dataset, primary)), progress,
+    ) : null);
+    if (modelOwner?.hasAttribute('data-journey-from-primary')) {
+      const transition = windowTransition(primary, modelSpec, progress,
+        Number(modelOwner.dataset.journeyChangeStart), Number(modelOwner.dataset.journeyChangeEnd));
+      modelSpec = transition.spec; modelBlend = transition.blend;
+    }
+    const pose = journeyPose(target.chapter, progress);
+    return { ...target, progress, visual, modelSpec, modelBlend, rect: flowRect || visual.getBoundingClientRect(), sectionRect, pose: modelBlend ? turnPose(pose, modelBlend.progress) : pose };
+  }
+
+  async function loadModel(spec) {
+    const id = journeyModelKey(spec);
+    if (assets.has(id)) return assets.get(id);
+    if (loading.has(id)) return loading.get(id);
+    if (failed.has(id) || disposed || signal.aborted) return null;
+    const task = (async () => {
+      const modelURL = new URL(spec.url, url).href;
+      const response = await fetch(modelURL, { signal, credentials: 'omit' });
+      if (!response.ok) throw new Error(`Model response ${response.status}`);
+      const bytes = await response.arrayBuffer();
+      if (disposed || signal.aborted) return null;
+      const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes, new URL('.', modelURL).href);
+      if (disposed || signal.aborted) { disposeModel(gltf.scene); return null; }
+      const object = gltf.scene;
+      try {
+        const yaw = THREE.MathUtils.degToRad(spec.yaw);
+        object.rotation.y += yaw;
+        const bounds = new THREE.Box3().setFromObject(object);
+        const size = bounds.getSize(new THREE.Vector3()), center = bounds.getCenter(new THREE.Vector3());
+        if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty product model');
+        object.position.sub(center);
+        const surface = [], hull = object.userData.strydeFramingHull;
+        if (Array.isArray(hull) && hull.length > 3 && hull.length < 5000 && hull.every(point => Array.isArray(point) && point.length === 3 && point.every(Number.isFinite))) {
+          const axis = new THREE.Vector3(0, 1, 0);
+          hull.forEach(point => surface.push(new THREE.Vector3().fromArray(point).applyAxisAngle(axis, yaw).sub(center)));
+        } else {
+          const centered = new THREE.Box3().setFromObject(object);
+          for (const x of [centered.min.x, centered.max.x]) for (const y of [centered.min.y, centered.max.y]) for (const z of [centered.min.z, centered.max.z]) surface.push(new THREE.Vector3(x, y, z));
+        }
+        const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+        const cut = { value: -1 }, role = { value: 0 };
+        const treatedMaterials = new Set();
+        object.traverse(node => {
+          for (const material of (Array.isArray(node.material) ? node.material : [node.material])) {
+            if (!material || treatedMaterials.has(material)) continue;
+            treatedMaterials.add(material);
+            for (const texture of [material.map, material.normalMap, material.roughnessMap, material.metalnessMap]) if (texture) { texture.anisotropy = anisotropy; texture.needsUpdate = true; }
+            if (material.normalScale) material.normalScale.set(1.2, 1.2);
+            if (spec.variant !== 'blue') {
+              material.envMapIntensity = .55;
+              if ('specularIntensity' in material) material.specularIntensity = .6;
+              material.specularColor?.setRGB(.8, .8, .8);
+            } else refinePreviewMaterial(material, THREE.ShaderChunk.normal_fragment_maps);
+            const compile = material.onBeforeCompile.bind(material);
+            const cacheKey = material.customProgramCacheKey.bind(material);
+            material.onBeforeCompile = (shader, webgl) => {
+              compile(shader, webgl);
+              Object.assign(shader.uniforms, { uShoeCut: cut, uShoeRole: role, uShoeResolution: sweepResolution });
+              shader.fragmentShader = 'uniform float uShoeCut; uniform float uShoeRole; uniform vec2 uShoeResolution;\n' + shader.fragmentShader;
+              shader.fragmentShader = shader.fragmentShader.replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+                float shoeX = gl_FragCoord.x / uShoeResolution.x;
+                float shoeY = gl_FragCoord.y / uShoeResolution.y;
+                float shoeSurface = shoeX + .025 * sin(shoeY * 6.2831853);
+                if (uShoeRole != 0.0 && (shoeSurface - uShoeCut) * uShoeRole < 0.0) discard;
+              `);
+            };
+            material.customProgramCacheKey = () => cacheKey() + '|opaque-shoe-turn-v1';
+          }
+        });
+        const scale = 2.6 / Math.max(size.x, size.y, size.z);
+        const group = new THREE.Group(); group.scale.setScalar(scale); group.add(object);
+        surface.forEach(point => point.multiplyScalar(scale));
+        const asset = { model: object, group, points: surface, worldPoints: surface.map(() => new THREE.Vector3()), cut, role,
+          scale, size: size.clone().multiplyScalar(scale), fitScale: new THREE.Vector3(1, 1, 1) };
+        assets.set(id, asset); dirty = true;
+        return asset;
+      } catch (error) { disposeModel(object); throw error; }
+    })().catch(error => {
+      failed.add(id);
+      if (!disposed && !signal.aborted) console.warn('[STRYDE] Product model unavailable:', error.message);
+      return null;
+    }).finally(() => loading.delete(id));
+    loading.set(id, task);
+    return task;
+  }
+
+  function selectModel(spec, blend = null) {
+    const specs = blend ? [blend.from, blend.to] : [spec];
+    const ids = specs.map(journeyModelKey), id = ids.join('|');
+    const next = ids.map(key => assets.get(key));
+    if (next.some(asset => !asset)) { specs.forEach(candidate => { void loadModel(candidate); }); return false; }
+    if (activeModelKey !== id) {
+      selectedAssets.forEach(asset => { rig.remove(asset.group); asset.role.value = 0; });
+      selectedAssets = next;
+      next.forEach(asset => rig.add(asset.group));
+      activeModelKey = id; lastSignature = ''; dirty = true;
+    }
+    const surface = blend ? shoeTurn(blend.progress).surface : 0;
+    const envelope = blend ? next[0].size.clone().lerp(next[1].size, surface) : null;
+    next.forEach((asset, index) => {
+      asset.role.value = blend ? (index === 0 ? 1 : -1) : 0;
+      asset.cut.value = - .05 + surface * 1.1;
+      // Match the full silhouette envelope at the heel, then restore the new
+      // shoe's exact proportions as the turn opens back into its side view.
+      asset.fitScale.set(1, 1, 1);
+      if (envelope) asset.fitScale.copy(envelope).divide(asset.size);
+      asset.group.scale.copy(asset.fitScale).multiplyScalar(asset.scale);
+    });
+    overlay.dataset.model = blend ? (surface <= 0 ? blend.from.variant : surface >= 1 ? blend.to.variant : `${blend.from.variant}-to-${blend.to.variant}`) : spec.variant;
+    overlay.dataset.transition = blend ? blend.progress.toFixed(4) : '';
+    return true;
   }
 
   function resolve() {
@@ -172,7 +356,13 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
       const from = samples[index - 1], to = samples[index];
       if (chapterOrder.indexOf(to.chapter) !== chapterOrder.indexOf(from.chapter) + 1) continue;
       const handoff = journeyHandoff(from.rect, to.rect, environment.innerHeight);
-      if (handoff) return { ...[from, to][handoff.index], visuals: [from.visual, to.visual], opacity: handoff.opacity };
+      if (handoff) {
+        const modelBlend = journeyModelKey(from.modelSpec) !== journeyModelKey(to.modelSpec)
+          ? { from: from.modelSpec, to: to.modelSpec, progress: handoff.progress } : null;
+        const pose = interpolateJourneyPose(from.pose, to.pose, handoff.progress);
+        return { ...[from, to][handoff.index], modelBlend, pose: modelBlend ? turnPose(pose, modelBlend.progress) : pose,
+          rect: travelWindow(from.rect, to.rect, handoff.progress), visuals: [...from.visuals, ...to.visuals], opacity: 1 };
+      }
     }
     if (!current) return null;
     const rect = current.rect;
@@ -183,7 +373,7 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
     const nextLive = samples.some(target => chapterOrder.indexOf(target.chapter) === index + 1);
     const enter = previousLive || current.chapter === 'hero' ? 1 : clamp((environment.innerHeight - current.sectionRect.top) / (environment.innerHeight * .4));
     const leave = nextLive || current.chapter === 'finale' ? 1 : clamp(current.sectionRect.bottom / (environment.innerHeight * .4));
-    return { ...current, visuals: [current.visual], opacity: Math.min(enter, leave) };
+    return { ...current, visuals: current.chapter === 'materials' ? current.visuals : [current.visual], opacity: Math.min(enter, leave) };
   }
 
   try {
@@ -197,39 +387,19 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
     renderer.domElement.addEventListener('webglcontextlost', onLost);
     renderer.domElement.addEventListener('webglcontextrestored', onRestored);
     overlay.append(renderer.domElement);
-    const response = await fetch(url, { signal, credentials: 'omit' });
-    if (!response.ok) throw new Error(`Model response ${response.status}`);
-    const bytes = await response.arrayBuffer();
+    const original = await loadModel(primary);
     if (disposed || signal.aborted) return cleanup;
-    const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes, new URL('.', url).href);
-    if (disposed || signal.aborted) { disposeModel(gltf.scene); return cleanup; }
-    model = gltf.scene;
-    const yaw = THREE.MathUtils.degToRad(Number(root.dataset.modelYaw) || 90);
-    model.rotation.y += yaw;
-    const bounds = new THREE.Box3().setFromObject(model);
-    const size = bounds.getSize(new THREE.Vector3()), center = bounds.getCenter(new THREE.Vector3());
-    if (!Number.isFinite(size.length()) || size.length() === 0) throw new Error('Empty product model');
-    model.position.sub(center);
-    const hull = model.userData.strydeFramingHull;
-    if (Array.isArray(hull) && hull.length > 3 && hull.length < 5000 && hull.every(point => Array.isArray(point) && point.length === 3 && point.every(Number.isFinite))) {
-      const axis = new THREE.Vector3(0, 1, 0);
-      hull.forEach(point => points.push(new THREE.Vector3().fromArray(point).applyAxisAngle(axis, yaw).sub(center)));
-    } else {
-      const centered = new THREE.Box3().setFromObject(model);
-      for (const x of [centered.min.x, centered.max.x]) for (const y of [centered.min.y, centered.max.y]) for (const z of [centered.min.z, centered.max.z]) points.push(new THREE.Vector3(x, y, z));
-    }
-    points.forEach(() => worldPoints.push(new THREE.Vector3()));
-    rig.scale.setScalar(2.6 / Math.max(size.x, size.y, size.z));
-    const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    model.traverse(node => {
-      for (const material of (Array.isArray(node.material) ? node.material : [node.material])) {
-        if (!material) continue;
-        for (const texture of [material.map, material.normalMap, material.roughnessMap, material.metalnessMap]) if (texture) { texture.anisotropy = anisotropy; texture.needsUpdate = true; }
-        if (material.normalScale) material.normalScale.set(1.2, 1.2);
-        refinePreviewMaterial(material, THREE.ShaderChunk.normal_fragment_maps);
+    if (!original) throw new Error('Opening model unavailable');
+    selectModel(primary);
+    // Load alternate shoes shortly before their authored windows enter view.
+    // Both models share the existing canvas, camera, lighting and poses.
+    modelObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) {
+        const spec = journeyModelSpec(entry.target.dataset, primary);
+        void loadModel(spec); modelObserver.unobserve(entry.target);
       }
-    });
-    rig.add(model);
+    }, { rootMargin: '700px' });
+    document.querySelectorAll('[data-journey-model]').forEach(target => modelObserver.observe(target));
     const pmrem = new THREE.PMREMGenerator(renderer), room = new RoomEnvironment();
     reflection = pmrem.fromScene(room, .04); room.dispose(); pmrem.dispose();
     scene.environment = reflection.texture; scene.environmentIntensity = .36;
@@ -253,9 +423,14 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
     collectTargets();
 
     detachFrame = scheduler.add(time => {
+      const dt = Math.min(.05, Math.max(0, time - (previousFrameTime || time - 1 / 60)));
+      previousFrameTime = time;
       if (disposed || lost || !loaded || document.hidden || !root.isConnected) { if (!root.isConnected) release(); return; }
       const current = resolve();
       if (!current) { release(); lastSignature = ''; return; }
+      const desiredKey = journeyModelKey(current.modelSpec);
+      if (failed.has(desiredKey)) { release(); lastSignature = ''; return; }
+      if (!selectModel(current.modelSpec, current.modelBlend)) { release(); lastSignature = ''; return; }
       const { rect } = current;
       const scroll = environment.scrollY;
       const now = performance.now() / 1000;
@@ -267,11 +442,17 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
       const inspectionProgress = clamp((now - inspectionStart) / .65);
       const releaseProgress = clamp((now - releaseStart) / .35);
       if (releaseProgress >= 1) releaseFrom = null;
-      const pose = inspection ? interpolateJourneyPose(inspectionFrom, inspection, inspectionProgress)
+      const targetPose = inspection ? interpolateJourneyPose(inspectionFrom, inspection, inspectionProgress)
         : releaseFrom ? interpolateJourneyPose(releaseFrom, current.pose, releaseProgress) : current.pose;
+      // Frame-rate independent settling absorbs wheel steps, trackpad bursts
+      // and chapter jumps without changing the authored final angles.
+      const settle = 1 - Math.exp(-12 * dt);
+      const pose = Object.fromEntries(Object.entries(targetPose).map(([key, value]) => [key,
+        Math.abs(value - renderedPose[key]) < .00001 ? value : renderedPose[key] + (value - renderedPose[key]) * settle,
+      ]));
       renderedPose = pose;
       const resting = !inspection && !releaseFrom && time - lastScrollTime > .2 && ((current.chapter === 'hero' && current.progress < .06) || (current.chapter === 'finale' && current.progress > .82));
-      const signature = [current.chapter, current.progress.toFixed(5), rect.left.toFixed(2), rect.top.toFixed(2), rect.width.toFixed(2), rect.height.toFixed(2), current.opacity.toFixed(3), inspection ? inspectionProgress.toFixed(4) + ':' + viewButtons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.sceneView : releaseFrom ? `release-${releaseProgress.toFixed(4)}` : 'scroll'].join(':');
+      const signature = [activeModelKey, current.modelBlend?.progress.toFixed(5) || '', ...Object.values(pose).map(value => value.toFixed(5)), current.chapter, current.progress.toFixed(5), rect.left.toFixed(2), rect.top.toFixed(2), rect.width.toFixed(2), rect.height.toFixed(2), current.opacity.toFixed(3), inspection ? inspectionProgress.toFixed(4) + ':' + viewButtons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.sceneView : releaseFrom ? `release-${releaseProgress.toFixed(4)}` : 'scroll'].join(':');
       if (!dirty && !resting && signature === lastSignature) return;
       lastSignature = signature; dirty = false;
       // CSS geometry remains exact, but GPU storage changes only at 64px
@@ -279,8 +460,9 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
       const targetWidth = Math.max(64, Math.ceil(rect.width / 64) * 64), targetHeight = Math.max(64, Math.ceil(rect.height / 64) * 64);
       if (width !== targetWidth || height !== targetHeight) {
         width = targetWidth; height = targetHeight;
-        const dpr = Math.min(environment.devicePixelRatio || 1, environment.innerWidth <= 700 ? 1.5 : 1.75, Math.sqrt(2500000 / (width * height)));
+        const dpr = Math.min(environment.devicePixelRatio || 1, 1.5, Math.sqrt(2000000 / (width * height)));
         renderer.setPixelRatio(Math.max(1, dpr)); renderer.setSize(width, height, false);
+        sweepResolution.value.set(renderer.domElement.width, renderer.domElement.height);
       }
       const aspect = rect.width / rect.height;
       if (camera.aspect !== aspect) { camera.aspect = aspect; camera.updateProjectionMatrix(); }
@@ -290,14 +472,16 @@ export async function mountJourneyScene({ root, url, scheduler, signal, bus, Scr
       rig.rotation.set(pose.rotationX, pose.rotationY + (resting ? Math.sin(time * .43) * .016 : 0), pose.rotationZ, 'XYZ');
       rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-      points.forEach((point, index) => {
-        const world = worldPoints[index].copy(point).applyMatrix4(rig.matrixWorld);
+      selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
+        const world = asset.worldPoints[index].copy(point).multiply(asset.fitScale).applyMatrix4(rig.matrixWorld);
         bottom = Math.min(bottom, world.y); minX = Math.min(minX, world.x); maxX = Math.max(maxX, world.x);
         minZ = Math.min(minZ, world.z); maxZ = Math.max(maxZ, world.z);
-      });
+      }));
       shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
       shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
-      camera.position.set(0, pose.cameraY, fittedCameraZ(worldPoints, { fov: camera.fov, aspect: camera.aspect, y: pose.cameraY, fill: environment.innerWidth <= 700 ? Math.min(.95, pose.fill) : pose.fill }));
+      const fit = { fov: camera.fov, aspect: camera.aspect, y: pose.cameraY, fill: environment.innerWidth <= 700 ? Math.min(.95, pose.fill) : pose.fill };
+      const distances = selectedAssets.map(asset => fittedCameraZ(asset.worldPoints, fit));
+      camera.position.set(0, pose.cameraY, current.modelBlend ? transitionCamera(distances[0], distances[1], current.modelBlend.progress) : distances[0]);
       const light = environmentFor(current.chapter);
       key.intensity = light.key; rim.intensity = light.rim;
       renderer.toneMappingExposure = pose.exposure * light.exposure;

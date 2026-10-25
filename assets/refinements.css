@@ -421,7 +421,7 @@ html{scroll-padding-top:100px}
   .chapter-materials .chapter-heading { font-size: 40px; max-width: 14ch; }
   .mat-panels { margin-top: 32px; }
   .mat-panel { min-height: 0; padding: 0 0 54px; gap: 25px; }
-  [data-tn-editorial] .mat-frame, .mat-frame { height: 360px; aspect-ratio: auto!important; }
+  [data-tn-editorial] .mat-frame, .mat-frame { height: auto; aspect-ratio: 4 / 3; }
   .mat-panel-cage .mat-frame { height: 320px; }
   .mat-panel-sole .mat-frame { height: 370px; }
   .mat-copy { padding: 0 3%; }

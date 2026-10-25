@@ -31,6 +31,16 @@ async function renderChapter(name, supplied = {}) {
   });
 }
 
+test('the navy feature uses its live model only for the bundled study and yields to merchant imagery', async () => {
+  const bundled = await renderChapter('featured', { use_tn_model: true, use_navy_model: true });
+  assert.match(bundled, /nike-tn-deep-blue\.glb/);
+  assert.match(bundled, /tn-navy-angle-2800\.webp/);
+  const actual = await renderChapter('featured', { use_tn_model: true, use_navy_model: true,
+    product: { title: 'Actual shoe', url: '/products/actual-shoe', featured_image: productImage, selected_or_first_available_variant: { price: 12000 } } });
+  assert.match(actual, /merchant-product\.jpg/);
+  assert.doesNotMatch(actual, /data-journey-model|tn-navy|data-featured-model/);
+});
+
 test('Technology prioritizes editorial override, then actual product imagery, before disclosed studies', async () => {
   const settings = { use_tn_model: true, product: { featured_image: productImage }, image: campaignImage };
   const override = await renderChapter('technology', settings);

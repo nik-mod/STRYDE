@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Liquid } from 'liquidjs';
 import { photographyCatalog } from './fixtures/photography-catalog.mjs';
+let photoShopCatalog = [];
 
 const root = process.cwd();
 const engine = new Liquid({ root: [resolve('snippets')], extname: '.liquid', strictFilters: false });
@@ -40,6 +41,8 @@ function prepare(source) {
 }
 export async function renderPreview(pathname, query = new URLSearchParams()) {
   locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
+  try { photoShopCatalog = JSON.parse(await readFile('tools/fixtures/photo-shop.json', 'utf8')); }
+  catch { photoShopCatalog = []; /* The local photo catalog is optional until a Takeout archive is imported. */ }
   const settings = JSON.parse(await readFile('config/settings_data.json', 'utf8')).current;
   const fixture = {
     id: 1, title: 'Preview fixture / Footwear', handle: 'preview-product', url: '/products/preview-product', vendor: 'Preview data', available: true, price: 18000, price_varies: true,
@@ -53,20 +56,24 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
   fixture.selected_or_first_available_variant = fixture.variants.find(variant => String(variant.id) === query.get('variant')) || fixture.variants[0];
   if (query.get('image') === '1') fixture.featured_image = { url: '/preview-fixture.svg', alt: 'Local test image — fixture data only' };
   const populated = query.get('fixtures') === '1';
-  const template = pathname === '/' ? 'index' : pathname.startsWith('/products/') ? 'product' : pathname.startsWith('/collections/') ? 'collection' : pathname === '/cart' ? 'cart' : pathname === '/search' ? 'search' : pathname.startsWith('/pages/') ? 'page' : '404';
+  const photoProduct = photoShopCatalog.find(item => item.url === pathname);
+  const template = pathname === '/' ? 'index' : pathname.startsWith('/products/') ? 'product' : pathname.startsWith('/collections/') ? 'collection' : pathname === '/cart' ? 'cart' : pathname === '/search' ? 'search' : (pathname === '/account' || pathname.startsWith('/pages/')) ? 'page' : '404';
   const context = {
     settings, shop: { name: settings.brand_name, policies: [], customer_accounts_enabled: true }, request: { locale: { iso_code: 'en' }, page_type: template }, page_title: template === 'index' ? settings.brand_name : template, current_page: 1, canonical_url: `http://localhost:${process.env.PORT || 9292}${pathname}`,
     routes: { root_url: '/', all_products_collection_url: '/collections/all', search_url: '/search', cart_url: '/cart', account_url: '/account' },
     cart: { item_count: populated && template === 'cart' ? 1 : 0, items: populated && template === 'cart' ? [{ product: fixture, variant: fixture.variants[0], quantity: 1, index: 0, final_price: 18000, final_line_price: 18000, url: fixture.url, url_to_remove: '/cart', properties: [] }] : [], total_price: 18000, currency: { iso_code: 'USD' } },
     product: fixture, collection: { title: 'The collection', url: '/collections/all', products: populated ? [fixture] : [], products_count: populated ? 1 : 0, filters: [], sort_options: [{ name: 'Featured', value: 'manual' }, { name: 'Price, low to high', value: 'price-ascending' }], default_sort_by: 'manual' },
-    search: { performed: Boolean(query.get('q')), terms: query.get('q') || '', results: populated ? [{ ...fixture, object_type: 'product' }] : [], results_count: populated ? 1 : 0 }, page: { title: 'Preview page', content: '<p>Merchant content will appear here.</p>' }, paginate: { pages: 1, current_page: 1, parts: [] }, form: {}
+    search: { performed: Boolean(query.get('q')), terms: query.get('q') || '', results: populated ? [{ ...fixture, object_type: 'product' }] : [], results_count: populated ? 1 : 0 }, page: { title: pathname === '/account' ? 'Your account' : 'Preview page', content: pathname === '/account' ? '<p>Customer sign-in will be available when the Shopify store is connected.</p><p>You can explore the collection and the product experience in this preview.</p><a class="button button-dark" href="/collections/all">Explore the collection</a>' : '<p>Merchant content will appear here.</p>' }, paginate: { pages: 1, current_page: 1, parts: [] }, form: {}
   };
   async function section(type, id, supplied = {}) {
     const source = await readFile(`sections/${type}.liquid`, 'utf8');
     const schema = JSON.parse(source.match(/{%\s*schema\s*%}([\s\S]*?){%\s*endschema\s*%}/)?.[1] || '{}');
     const defaults = Object.fromEntries((schema.settings || []).filter(setting => setting.default !== undefined).map(setting => [setting.id, setting.default]));
     const sectionSettings = { ...defaults, ...supplied };
-    if (query.get('artwork') === 'concept') sectionSettings.use_tn_model = false;
+    if (query.get('artwork') === 'concept') {
+      sectionSettings.use_tn_model = false;
+      sectionSettings.use_form_edit = false;
+    }
     if (type === 'cinematic-hero' || type === 'chapter-featured' || type === 'chapter-finale') {
       if (populated && type !== 'chapter-finale') { sectionSettings.featured_product = fixture; sectionSettings.product = fixture; }
       if (populated && type === 'chapter-finale') { sectionSettings.product = fixture; }
@@ -76,16 +83,20 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
       }
     }
     if (type === 'chapter-collection' && populated) sectionSettings.collection = context.collection;
+    if (type === 'main-product' && photoProduct) sectionSettings.preview_photo_product = photoProduct;
     // This additional render property does not exist on Shopify's SectionDrop.
     // It is never a theme setting and never goes into collection.products.
     // A populated native collection always wins. References are never merchandise.
     const preview_reference_mode = type === 'main-collection' && pathname === '/collections/all' &&
-      context.collection.products_count === 0 && query.get('concepts') !== '0' && query.get('photography') !== '0';
+      context.collection.products_count === 0 && query.get('concepts') !== '0' && query.get('photography') !== '0' && photoShopCatalog.length === 0;
     // The homepage collection chapter shows licensed photography by default;
     // ?artwork=concept (QA) and ?photography=0 restore the disclosed concept studies.
     const preview_photography = (preview_reference_mode || (type === 'chapter-collection' && !populated)) &&
       query.get('artwork') !== 'concept' && query.get('photography') !== '0' ? photographyCatalog : undefined;
-    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography } });
+    const preview_search_photography = type === 'main-search' && !populated && context.search.performed
+      ? photographyCatalog.filter(photo => context.search.terms.toLowerCase().trim().split(/\s+/).every(word => photo.name.toLowerCase().includes(word))) : undefined;
+    const preview_photo_shop = type === 'main-collection' && pathname === '/collections/all' && !populated ? photoShopCatalog : undefined;
+    return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography, preview_search_photography, preview_photo_shop } });
   }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));
   let content = '';
@@ -103,16 +114,15 @@ export function createPreviewServer({ handleRequest, transformHTML = html => htm
       const url = new URL(req.url, 'http://localhost');
       if (handleRequest?.(req, res, url)) return;
       if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('Local preview: commerce disabled.'); }
-      if (url.pathname === '/account') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(transformHTML('<!doctype html><html lang="en"><title>Local account preview</title><body><h1>Account preview</h1><p>No store is connected. Customer sign-in uses Shopify on a real storefront.</p><a href="/">Return to preview</a></body></html>')); }
       if (url.pathname === '/preview-fixture.svg') { res.writeHead(200, { 'Content-Type': 'image/svg+xml' }); return res.end('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700"><rect width="900" height="700" fill="#effaff"/><text x="450" y="330" text-anchor="middle" fill="#073653" font-family="sans-serif" font-size="42">LOCAL TEST IMAGE</text><text x="450" y="390" text-anchor="middle" fill="#073653" font-family="sans-serif" font-size="24">Fixture only · No merchandise</text></svg>'); }
       if (url.pathname.startsWith('/assets/')) {
         const path = resolve(root, `.${decodeURIComponent(url.pathname)}`);
         if (!path.startsWith(resolve(root, 'assets') + sep)) { res.writeHead(403); return res.end(); }
-        const type = ({ '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.woff': 'font/woff' })[extname(path)] || 'application/octet-stream';
+        const type = ({ '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.woff': 'font/woff' })[extname(path)] || 'application/octet-stream';
         const data = await readFile(path); res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' }); return res.end(data);
       }
       const html = await renderPreview(url.pathname, url.searchParams);
-      const known = /^\/$|^\/products\/[^/]+$|^\/collections\/[^/]+$|^\/cart$|^\/search$|^\/pages\/[^/]+$/.test(url.pathname);
+      const known = /^\/$|^\/products\/[^/]+$|^\/collections\/[^/]+$|^\/cart$|^\/search$|^\/account$|^\/pages\/[^/]+$/.test(url.pathname);
       res.writeHead(known ? 200 : 404, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(transformHTML(html));
     } catch (error) { console.error(error); res.writeHead(error.code === 'ENOENT' ? 404 : 500); res.end(`Preview rendering failed: ${error.message}`); }
   });

@@ -1,0 +1,14 @@
+{
+  "source": "User supplied New Project 10_24_2026.glb",
+  "originalSha256": "658ea06e0a1d162b2e24289f85267619991f4a7f5c1162597e3b4e8ea87c4791",
+  "originalBytes": 13471392,
+  "processedFile": "nike-tn-monochrome.glb",
+  "process": "UV- and normal-aware delivery mesh. Original texture maps, materials and transforms preserved; source framing hull retained.",
+  "vertices": 153650,
+  "triangles": 180000,
+  "baseYaw": 0,
+  "matchingRenders": "tn-mono-*",
+  "productReference": "Nike Air Max Plus Drift, white / black; user supplied reference photos.",
+  "originalTriangles": 1482912,
+  "measuredSimplificationError": 0.0004495704488363117
+}
