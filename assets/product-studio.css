@@ -1,5 +1,6 @@
 /* STRYDE product studio — shared by native merchandise and photographic previews. */
-@view-transition { navigation: auto; }
+/* Keep the detail page and Collection from cross-fading their interfaces. */
+@view-transition { navigation: none; }
 .studio-product { --studio-ink: var(--ink, #102b3b); --studio-blue: #265fbd; --studio-line: rgba(16,43,59,.2); padding: calc(var(--header-height) + var(--preview-height) + 28px) clamp(22px, 4.5vw, 100px) 76px; max-width: 1900px; color: var(--studio-ink); }
 .studio-product ::selection { background: #265fbd; color: #f2f5f4; }
 .studio-breadcrumbs,.studio-product .breadcrumbs { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 24px; margin: 0; font-size: 12px; }

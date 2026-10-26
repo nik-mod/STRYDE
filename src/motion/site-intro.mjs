@@ -40,6 +40,7 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
   const shoe = one('shoe');
   const trails = all('trail');
   const skipButton = one('skip');
+  const heroFrame = () => document.querySelector('[data-hero-art]')?.getBoundingClientRect?.() || { left: 0, top: 0, width: 1440, height: 900 };
   let timeline, watchdog, done = false;
 
   const finish = ({ restoreFocus = true } = {}) => {
@@ -132,25 +133,33 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
       .fromTo(all('signoff-word'), { yPercent: 120, rotation: 5, opacity: 0 }, { yPercent: 0, rotation: 0, opacity: 1, duration: .75, stagger: .09, ease: 'expo.out' }, 4.11)
       .fromTo(one('light'), { xPercent: -100, opacity: 0 }, { xPercent: 100, opacity: .65, duration: 1.2, ease: 'power2.inOut' }, 4.31)
       .to(one('light'), { opacity: 0, duration: .18 }, 5.31)
-      // The shoe passes the lens; five shutters carry the motion into the page.
+      // Dock the same photographic subject into the live product's camera gate.
+      // The film, shutters and live Hero overlap in time, so there is no empty beat.
       .to(one('echo'), { y: 80, opacity: 0, duration: .45 }, 5.41)
-      .to(shoe, { xPercent: -30, yPercent: -65, rotation: -24, scale: 1.9, opacity: 0, duration: .66, ease: 'power3.in' }, 5.54)
+      .to(one('product'), {
+        left: () => heroFrame().left + heroFrame().width / 2,
+        top: () => heroFrame().top + heroFrame().height / 2,
+        width: () => heroFrame().width * 1.4,
+        height: () => heroFrame().height * 1.4,
+        duration: .95, ease: 'power3.inOut',
+      }, 5.15)
+      .to(shoe, { xPercent: 0, yPercent: 0, rotation: 0, scale: 1, opacity: 0, duration: .75, ease: 'power2.inOut' }, 5.55)
       .to(one('shadow'), { scaleX: .4, opacity: 0, duration: .35 }, 5.54)
-      .to(glyphs, { yPercent: i => i % 2 ? 120 : -120, rotation: i => (i - 2.5) * -12,
-        opacity: 0, duration: .5, stagger: { each: .03, from: 'center' }, ease: 'power3.in',
+      .to(glyphs, { yPercent: -28, rotation: 0,
+        opacity: 0, duration: .5, stagger: .015, ease: 'power2.in',
       }, 5.67)
       .to(one('signoff'), { y: -18, opacity: 0, duration: .35, ease: 'power2.in' }, 5.76)
-      .to(one('stage'), { opacity: 0, duration: .2 }, 6.18)
-      .to(one('film'), { opacity: 0, duration: .2 }, 6.29)
+      .to([one('wash'), one('halo'), one('orbits'), one('grid')], { opacity: 0, duration: .55 }, 5.2)
+      .to(one('film'), { backgroundColor: '#b7ddef', opacity: 0, duration: .8 }, 5.55)
       .to(all('curtain'), { yPercent: i => i % 2 ? 101 : -101, duration: .85,
         stagger: { each: .055, from: 'center' }, ease: 'power4.inOut',
-      }, 6.38);
+      }, 5.55);
     // Start the existing Hero entrance beneath the opening shutters. Its own
     // timeline still owns the headline and live model; no second 3D controller.
     timeline.call?.(() => {
       html.setAttribute?.('data-intro-revealing', '');
       document.dispatchEvent(new environment.Event('stryde:intro-reveal'));
-    }, [], 6.38);
+    }, [], 5.55);
     timeline.timeScale?.(1.35);
     timeline.play();
   } catch {

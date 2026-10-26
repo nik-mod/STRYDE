@@ -2,8 +2,8 @@ import { mountCollectionStudio } from '../collection-studio.mjs';
 
 // Local reference photography stays non-commerce. Native Shopify listings
 // retain their server-rendered filters, sorting and product links.
-export function mountListing(root) {
-  const disposeStudio = mountCollectionStudio(root);
+export function mountListing(root, options = {}) {
+  const disposeStudio = mountCollectionStudio(root, options);
   if (root?.querySelector?.('[data-photo-shop]')?.matches?.('[data-photo-shop]')) return disposeStudio;
   const catalog = root?.querySelector?.('[data-reference-catalog]');
   if (!catalog?.querySelectorAll) return disposeStudio;

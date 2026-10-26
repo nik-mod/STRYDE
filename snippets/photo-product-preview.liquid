@@ -5,7 +5,7 @@
   endif
 %}
 <section class="studio-product studio-product-preview page-shell" data-product-section>
-  <nav class="studio-breadcrumbs" aria-label="Breadcrumbs"><a href="{{ routes.all_products_collection_url }}">{% render 'icon', name: 'arrow' %} Collection</a><span>{{ item.brand | default: 'Footwear' | escape }}</span></nav>
+  <nav class="studio-breadcrumbs" aria-label="Breadcrumbs"><a data-collection-return href="{{ routes.all_products_collection_url }}">{% render 'icon', name: 'arrow' %} Back to Collection</a><span>{{ item.brand | default: 'Footwear' | escape }}</span></nav>
   <div class="studio-product-layout">
     {% render 'product-studio-gallery', photos: item.photos, title: display_title, gallery_id: item.id %}
     <div class="studio-product-information">
@@ -19,7 +19,7 @@
         {% if item.identityStatus == 'unverified' or item.identityStatus == 'filename' %}<div><dt>Model</dt><dd>Identification pending</dd></div>{% endif %}
       </dl>
       <p class="studio-preview-note">An image study from the STRYDE collection. This item is not available to purchase.</p>
-      <a class="studio-collection-return" href="{{ routes.all_products_collection_url }}"><span>Explore the collection</span>{% render 'icon', name: 'arrow' %}</a>
+      <a class="studio-collection-return" data-collection-return href="{{ routes.all_products_collection_url }}"><span>Back to Collection</span>{% render 'icon', name: 'arrow' %}</a>
       <details class="studio-photo-details"><summary>About this photo set {% render 'icon', name: 'plus' %}</summary><div><p>{% if item.colorway == 'Mixed colorways' %}This set includes multiple colorways. Each photograph can be viewed at full size.{% else %}Explore every photograph using the view selector. Open an image to inspect its details.{% endif %}</p>{% if item.sourceUrl != blank %}<p>Product name, style code and photograph sourced from <a href="{{ item.sourceUrl | escape }}" target="_blank" rel="noopener noreferrer">StockX — view the original listing</a>. This is an editorial reference, not an offer of inventory.</p>{% else %}<p>Product identity, price, sizes and stock require confirmation before sale.</p>{% endif %}</div></details>
     </div>
   </div>

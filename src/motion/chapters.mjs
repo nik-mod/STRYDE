@@ -22,9 +22,11 @@ function readCrop(element) {
 
 /* ------------------------------------------------- 02 — deconstruction */
 
-function deconstruction(root, gsap) {
+function deconstruction(root, gsap, { mobile }) {
   const crops = [...root.querySelectorAll('.decon-crop')];
   const items = [...root.querySelectorAll('.decon-item')];
+  const hold = !mobile && window.innerWidth > 1000 && window.innerHeight >= 720 && root.hasAttribute('data-tn-editorial');
+  root.classList.toggle('is-anatomy-pinned', hold);
   // The ghost numeral shares the outlined-numeral language with chapter 03
   // and keeps drifting through the whole chapter, tying the two fields.
   const ghost = root.querySelector('.decon-ghost');
@@ -36,8 +38,10 @@ function deconstruction(root, gsap) {
   }
   if (crops.length > 1) {
     const sequence = gsap.timeline({
-      scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
+      scrollTrigger: { trigger: root, start: 'top top', end: hold ? () => `+=${Math.round(window.innerHeight * .85)}` : 'bottom top', pin: hold, scrub: true, invalidateOnRefresh: true },
     });
+    root.dataset.anatomyProgress = '0';
+    sequence.eventCallback('onUpdate', () => { root.dataset.anatomyProgress = String(sequence.progress()); });
     for (let index = 1; index < crops.length; index++) {
       const at = index / crops.length - .16;
       // Replace both image owners at the same instant. A sequential fade
@@ -92,6 +96,7 @@ function deconstruction(root, gsap) {
       scrollTrigger: { trigger: root, start: 'top bottom', end: 'bottom top', scrub: true },
     });
   }
+  return () => { delete root.dataset.anatomyProgress; root.classList.remove('is-anatomy-pinned'); };
 }
 
 /* ---------------------------------------------------- 03 — materials */

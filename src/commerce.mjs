@@ -4,6 +4,7 @@
 // remains the single submitted source of variant identity.
 
 import { mountProductGallery } from './product-gallery.mjs';
+import { mountCollectionReturn } from './collection-return.mjs';
 import { mountVariantPicker, normalizeOptions, normalizeVariants, relaxConflicts, resolveVariant, selectionFromVariant } from './variant-picker.mjs';
 import { mountProductForm } from './product-form.mjs';
 
@@ -12,13 +13,14 @@ export function selectVariant(variants, id) {
 }
 
 export function mountProduct(root) {
+  const disposeReturn = mountCollectionReturn(root);
   const gallery = mountProductGallery(root);
   const select = root.querySelector('[data-variant-select]');
   const data = root.querySelector('[data-product-variants]');
   const form = mountProductForm(root, { devPreview: document.body.hasAttribute('data-local-preview') });
-  if (!select || !data) return () => { form(); gallery.dispose(); };
+  if (!select || !data) return () => { disposeReturn(); form(); gallery.dispose(); };
   let payload;
-  try { payload = JSON.parse(data.textContent); } catch { return () => { form(); gallery.dispose(); }; }
+  try { payload = JSON.parse(data.textContent); } catch { return () => { disposeReturn(); form(); gallery.dispose(); }; }
   const variants = normalizeVariants(payload.variants);
   const options = normalizeOptions(payload.options);
   const labels = payload.labels || {};
@@ -68,7 +70,7 @@ export function mountProduct(root) {
     if (changeURL) {
       const url = new URL(location.href);
       url.searchParams.set('variant', variant.id);
-      history.replaceState({}, '', url);
+      history.replaceState({ ...history.state }, '', url);
     }
   }
 
@@ -81,6 +83,7 @@ export function mountProduct(root) {
 
   update(false);
   return () => {
+    disposeReturn();
     abort.abort();
     picker.dispose();
     form();

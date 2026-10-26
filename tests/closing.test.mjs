@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { Liquid } from 'liquidjs';
+import { gsap as realGsap } from 'gsap';
 import { mountClosingCampaign } from '../src/motion/closing.mjs';
 
 async function footer(page, { links = [], policies = [], payments = [] } = {}) {
@@ -38,6 +39,10 @@ test('an unconfigured footer exposes real browse routes without inventing suppor
   const html = await footer('index');
   for (const url of ['/collections/all', '/search', '/#chapter-deconstruction', '/#chapter-brand']) assert(html.includes(`href="${url}"`));
   assert.doesNotMatch(html, /\/policies\/|\/pages\/contact|instagram|newsletter|data-payment=/);
+  assert.equal((html.match(/data-footer-letter/g) || []).length, 6);
+  assert.match(html, /aria-label="STRYDE — general.home"/);
+  const letters = [...html.matchAll(/data-footer-letter>(.*?)<\/span>/g)].map(match => match[1]).join('');
+  assert.equal(letters, 'STRYDE', 'letter masks retain one complete accessible linked identity');
 });
 
 test('footer section replacement reconnects only its own reveal and disposal removes the shared lifecycle listeners', () => {
@@ -66,4 +71,31 @@ test('footer section replacement reconnects only its own reveal and disposal rem
   assert.equal(reversions, 2);
   document.dispatchEvent(new Event('shopify:section:load'));
   assert.equal(contexts, 2);
+});
+
+test('every footer letter starts below its mask and the stagger reverses to the same positions', () => {
+  const letters = Array.from({ length: 6 }, () => ({ yPercent: 0, rotationX: 0, scaleY: 1, backgroundPositionX: '0%', force3D: true }));
+  const classes = new Set();
+  const word = { querySelectorAll: () => letters, classList: { add: x => classes.add(x), remove: x => classes.delete(x) } };
+  const target = () => ({ y: 0, yPercent: 0, xPercent: 0, scale: 1, rotationX: 0, rotationY: 0, rotationZ: 0, opacity: 1, autoAlpha: 1, backgroundColor: '#061e30' });
+  const footer = { querySelector: selector => selector === '[data-footer-word]' ? word : target() };
+  const document = new EventTarget(); document.defaultView = { innerWidth: 1440, innerHeight: 900 }; document.querySelector = () => footer;
+  const nodes = new Map();
+  const root = { ownerDocument: document, querySelector: selector => { if (!nodes.has(selector)) nodes.set(selector, target()); return nodes.get(selector); }, querySelectorAll: () => [target(), target(), target()] };
+  const timelines = [];
+  const clock = { ...realGsap, context: callback => realGsap.context(callback), timeline({ scrollTrigger, ...settings } = {}) {
+    const timeline = realGsap.timeline({ ...settings, paused: true }); timelines.push(timeline); return timeline;
+  } };
+  const dispose = mountClosingCampaign(root, clock, { mobile: false });
+  const identity = timelines[1];
+  try {
+    assert(letters.every(letter => letter.yPercent === 115), 'later staggered letters must not flash at their final position on entry');
+    identity.progress(.4);
+    const forward = letters.map(letter => letter.yPercent);
+    assert(forward[0] < forward[5], 'S leads the final E from bottom to top');
+    identity.progress(1); assert(letters.every(letter => letter.yPercent === 0));
+    identity.progress(.4); assert.deepEqual(letters.map(letter => letter.yPercent), forward);
+    identity.progress(0); assert(letters.every(letter => letter.yPercent === 115));
+  } finally { dispose(); timelines.forEach(timeline => timeline.kill()); realGsap.ticker.sleep(); }
+  assert(!classes.has('is-letter-revealing'), 'unload restores the fully visible static word');
 });

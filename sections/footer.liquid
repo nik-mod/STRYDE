@@ -7,7 +7,7 @@
 <footer class="site-footer"{% if request.page_type == 'index' %} data-signature-footer{% endif %}>
   {% if request.page_type == 'index' %}
   <div class="signature-identity" data-footer-identity>
-    <a class="signature-wordmark" href="{{ routes.root_url }}" aria-label="{{ footer_brand | escape }} — {{ 'general.home' | t }}" style="--brand-characters: {{ footer_brand | size }}"><span data-footer-word>{{ footer_brand | escape }}</span></a>
+    <a class="signature-wordmark" href="{{ routes.root_url }}" aria-label="{{ footer_brand | escape }} — {{ 'general.home' | t }}" style="--brand-characters: {{ footer_brand | size }}"><span data-footer-word aria-hidden="true">{% assign footer_letters = footer_brand | split: '' %}{% for letter in footer_letters %}<span class="signature-letter-mask"><span data-footer-letter>{{ letter | escape }}</span></span>{% endfor %}</span></a>
   </div>
   <div class="signature-commerce">
     <p class="signature-statement">{{ 'footer.statement' | t }}</p>

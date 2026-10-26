@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose, chapterCameraDistance, productWindowViewport } from '../src/journey-transition.mjs';
+import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose, chapterCameraDistance, productWindowViewport, STUDY_EXCHANGE_RADIUS } from '../src/journey-transition.mjs';
 import { JOURNEY_CHAPTERS, journeyPose } from '../src/journey-poses.mjs';
 import { Euler, Vector3 } from 'three';
 
@@ -75,7 +75,7 @@ test('different models exchange as complete objects at the narrow end view', () 
 test('exchange motion is reversible and a fixed camera contains the entire orbit', () => {
   const corners = [-1.3, 1.3].flatMap(x => [-.57, .57].flatMap(y => [-.43, .43].map(z => new Vector3(x, y, z))));
   for (const chapter of ['deconstruction', 'materials', 'featured']) for (const aspect of [.7, 1.5, 2.6]) {
-    const exchangeRanges = chapter === 'materials' ? [[1 / 3 - .105, 1 / 3 + .105], [2 / 3 - .105, 2 / 3 + .105], [1.1 / 3, 1.65 / 3], [2.1 / 3, 2.65 / 3]] : chapter === 'deconstruction' ? [[.38, .72]] : [[.12, .7]];
+    const exchangeRanges = chapter === 'materials' ? [[1 / 3 - STUDY_EXCHANGE_RADIUS, 1 / 3 + STUDY_EXCHANGE_RADIUS], [2 / 3 - STUDY_EXCHANGE_RADIUS, 2 / 3 + STUDY_EXCHANGE_RADIUS], [1.1 / 3, 1.65 / 3], [2.1 / 3, 2.65 / 3]] : chapter === 'deconstruction' ? [[.38, .72]] : [[.12, .7]];
     const camera = chapterCameraDistance([corners], chapter, { aspect, includeExchange: true, exchangeRanges });
     const poseAt = (start, end, index) => modelExchangePose(journeyPose(chapter, start + (end - start) * index / 400), index / 400);
     const poses = exchangeRanges.flatMap(([start, end]) => Array.from({ length: 401 }, (_, index) => poseAt(start, end, index)));

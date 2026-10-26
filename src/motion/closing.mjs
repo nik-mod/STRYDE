@@ -36,15 +36,31 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
     if (!footer) return;
     footerContext = gsap.context(() => {
       const word = footer.querySelector('[data-footer-word]');
+      const letters = [...(word?.querySelectorAll?.('[data-footer-letter]') || [])];
       const commerce = footer.querySelector('.signature-commerce');
       const identity = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        trigger: footer, start: 'top 96%', end: 'top 24%', scrub: true, invalidateOnRefresh: true,
+        trigger: footer, start: 'top 110%', end: 'top 20%', scrub: .35, invalidateOnRefresh: true,
       } });
       // The only monumental STRYDE mark is the real, linked footer wordmark.
       // It rises as the photographic stage releases, then stays fully readable.
-      identity.fromTo(word, { yPercent: 20, rotationX: -24, opacity: .35 },
-        { yPercent: 0, rotationX: 0, opacity: 1, duration: .78 }, 0)
-        .fromTo(commerce, { y: 20, opacity: .65 }, { y: 0, opacity: 1, duration: .5 }, .3);
+      if (letters.length) {
+        word.classList.add('is-letter-revealing');
+        gsap.set(letters, { yPercent: 115, rotationX: -24, scaleY: 1.12, backgroundPositionX: '0%' });
+        identity.fromTo(letters, { yPercent: 115, rotationX: -24, scaleY: 1.12, backgroundPositionX: '0%' },
+          { yPercent: 0, rotationX: 0, scaleY: 1, backgroundPositionX: '100%', duration: .62,
+            stagger: .055, force3D: true }, 0);
+      } else {
+        identity.fromTo(word, { yPercent: 38, rotationX: -28, color: '#527f94', opacity: .65 },
+          { yPercent: 0, rotationX: 0, color: '#dcecf2', opacity: 1, duration: .78 }, 0);
+      }
+      identity.fromTo(commerce, { y: 20, opacity: .65 }, { y: 0, opacity: 1, duration: .5 }, .45);
+      if (!compact) {
+        // Continue the same print's path AFTER the existing pin releases. Its
+        // upward peel and the rising linked wordmark form one counter-movement.
+        identity.fromTo(focus, { xPercent: -5, yPercent: -6, scale: 1.04, rotationY: 0 },
+          { xPercent: -14, yPercent: -24, scale: .88, rotationY: 14, duration: .72, immediateRender: false }, .12);
+      }
+      return () => word?.classList?.remove('is-letter-revealing');
     }, footer);
   };
   const onSection = event => {

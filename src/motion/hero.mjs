@@ -36,6 +36,8 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
   if (!stage) return;
   const line1 = root.querySelector('[data-hero-line-1]');
   const line2 = root.querySelector('[data-hero-line-2]');
+  const firstFrame = line1?.closest?.('.hero-line') || line1;
+  const secondFrame = line2?.closest?.('.hero-line') || line2;
   const art = root.querySelector('[data-hero-art]');
   const arrival = root.querySelector('[data-hero-arrival]') || art;
   const copy = root.querySelector('[data-hero-copy]');
@@ -69,13 +71,20 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
   // The line containers own restrained scroll separation; the glyphs own the
   // entrance. The product frame never scales, rolls or flies under HTML motion.
   timeline
-    .fromTo(line1, { xPercent: 0, yPercent: 0, scale: 1 }, { xPercent: mobile ? 1 : 3, yPercent: -12, scale: 1, duration: .52, immediateRender: false }, 0)
-    .fromTo(line2, { xPercent: 0, yPercent: 0, scale: 1 }, { xPercent: mobile ? 2 : 5, yPercent: 10, scale: 1, duration: .52, immediateRender: false }, 0)
-    .to(line1, { xPercent: 0, yPercent: -4, duration: .48 }, .52)
-    .to(line2, { xPercent: 0, yPercent: 4, duration: .48 }, .52)
+    .fromTo(firstFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' }, { xPercent: 0, y: mobile ? -22 : -64, scale: .84, duration: .46, immediateRender: false }, 0)
+    .fromTo(secondFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' }, { xPercent: mobile ? 2 : 3, y: mobile ? -22 : -64, scale: .84, duration: .46, immediateRender: false }, .06)
+    .to(firstFrame, { xPercent: 0, y: mobile ? -12 : -28, scale: .94, duration: .48 }, .52)
+    .to(secondFrame, { xPercent: 1, y: mobile ? -12 : -28, scale: .94, duration: .48 }, .52)
     .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, duration: .84, immediateRender: false }, 0)
     .to(foot, { opacity: 0, y: -10, duration: .16 }, .84)
     .fromTo(stage, { backgroundColor: paper }, { backgroundColor: surface, immediateRender: true, duration: 1, ease: progress => Math.max(0, (progress - .72) / .28) }, 0);
+  for (const [index, glyphs] of [first.glyphs, second.glyphs].entries()) if (glyphs.length) {
+    // The complete words stay solid and readable. A shallow, ordered type fold
+    // follows the same scroll beat as the upper reveal and resolves at exit.
+    timeline.fromTo(glyphs, { yPercent: 0, rotationX: 0 },
+      { yPercent: index ? -12 : -16, rotationX: index ? 14 : 18, duration: .28, stagger: .022, immediateRender: false, force3D: true }, .07)
+      .to(glyphs, { yPercent: 0, rotationX: 0, duration: .3, stagger: .012 }, .56);
+  }
   if (copy) timeline.fromTo(copy, { opacity: 1, y: 0 }, { opacity: .8, y: -4, duration: .84, immediateRender: false }, 0);
   if (atmosphere) timeline.fromTo(atmosphere, { yPercent: 0, opacity: 1 }, { yPercent: -3, opacity: .65, duration: 1, immediateRender: false }, 0);
 

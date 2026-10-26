@@ -1,7 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Euler, Vector3 } from 'three';
-import { JOURNEY_CHAPTERS, journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandStudyPhase, brandLighting } from '../src/journey-poses.mjs';
+import { JOURNEY_CHAPTERS, journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandStudyPhase, brandLighting, heroProductGate } from '../src/journey-poses.mjs';
+
+test('the camera gate returns to its exact handoff and leaves phone width protected', () => {
+  const rect = { left: 20, top: 290, width: 350, height: 340 };
+  assert.deepEqual(heroProductGate(rect, 0), rect);
+  assert.deepEqual(heroProductGate(rect, 1), rect);
+  const forward = [0,.25,.5,.75,1].map(p => heroProductGate(rect, p));
+  assert.deepEqual(forward, [1,.75,.5,.25,0].map(p => heroProductGate(rect, p)).reverse());
+  for (const p of [.25,.5,.75]) {
+    const compact = heroProductGate(rect, p, true);
+    assert.equal(compact.left, rect.left); assert.equal(compact.width, rect.width);
+    assert(compact.top < rect.top && compact.top > rect.top - 13);
+  }
+});
 
 test('live journey poses remain finite and reverse seeks restore the same product pose', () => {
   for (const chapter of JOURNEY_CHAPTERS) {
@@ -15,6 +28,18 @@ test('live journey poses remain finite and reverse seeks restore the same produc
     assert.deepEqual(journeyPose(chapter, -100), journeyPose(chapter, 0));
     assert.deepEqual(journeyPose(chapter, 100), journeyPose(chapter, 1));
   }
+});
+
+test('inspection keys carry continuous angular velocity instead of stopping each segment', () => {
+  const epsilon = 1e-5;
+  for (const key of [.25, .52, .76]) for (const axis of ['rotationX', 'rotationY', 'rotationZ']) {
+    const center = journeyPose('hero', key)[axis];
+    const before = (center - journeyPose('hero', key - epsilon)[axis]) / epsilon;
+    const after = (journeyPose('hero', key + epsilon)[axis] - center) / epsilon;
+    assert(Math.abs(before - after) < .003, `${axis} velocity is continuous at ${key}`);
+  }
+  const movingYaw = (journeyPose('hero', .25 + epsilon).rotationY - journeyPose('hero', .25 - epsilon).rotationY) / (2 * epsilon);
+  assert(movingYaw > .3, 'the intermediate profile key carries motion through the upper reveal');
 });
 
 test('hero and finale preserve a camera margin throughout the turn', () => {

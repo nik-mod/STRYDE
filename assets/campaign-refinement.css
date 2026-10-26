@@ -9,6 +9,12 @@
 .template-index .chapter-deconstruction .chapter-intro {font-size:clamp(16px,1.1vw,23px);line-height:1.5;margin-top:18px}
 .template-index .decon-ledger {gap:18px;flex-wrap:wrap}
 .template-index .decon-notes {display:none}
+.template-index .chapter-deconstruction.is-anatomy-pinned { height: 100svh; min-height: 720px; padding-block: 42px; display: grid; align-items: center; }
+.template-index .is-anatomy-pinned .decon-grid { align-items: center; }
+.template-index .chapter-deconstruction.is-anatomy-pinned .decon-visual { position: relative; top: auto; align-self: center; margin-top: 0; }
+.template-index .chapter-deconstruction.is-anatomy-pinned .chapter-heading { font-size: clamp(36px,3.25vw,56px); }
+.template-index .is-anatomy-pinned .decon-introduction { margin-bottom: 16px; }
+.template-index .chapter-deconstruction.is-anatomy-pinned .decon-item { padding-block: 12px; }
 .template-index .chapter-materials.is-journey-host {padding-top:calc(var(--header-height) + var(--preview-height) + 22px);padding-bottom:24px}
 .template-index .chapter-materials .chapter-kicker {margin-bottom:12px}
 .template-index .chapter-materials .chapter-heading {font-size:clamp(32px,3.4vw,76px);max-width:none}
@@ -54,7 +60,7 @@
 
 /* Restored campaign: tighter reading spreads and a product-led closing wall. */
 .template-index .chapter-deconstruction .decon-visual { margin-top: 12px; }
-.template-index .chapter-deconstruction .decon-frame { height: clamp(340px,39vw,570px); }
+.template-index .chapter-deconstruction .decon-frame { height: clamp(320px,29vw,460px); max-height: 55svh; }
 .template-index .chapter-deconstruction .decon-ghost { font-size: 9vw; top: 0; opacity: .55; }
 .template-index .decon-ledger { margin-top: 14px; padding-top: 16px; }
 .template-index .chapter-materials.is-journey-host .mat-panels { flex: 1; min-height: 0; }
@@ -75,7 +81,7 @@
 .template-index .brand-contact-sheet figure:last-child img { transform-origin: 65% 50%; }
 .template-index .brand-contact-sheet figcaption { padding: 12px 0 0; color: #d3e5ef; }
 @media (max-width: 900px) {
-  .template-index .chapter-deconstruction .decon-frame { height: 66vw; }
+  .template-index .chapter-deconstruction .decon-frame { height: 66vw; max-height: none; }
   .template-index .chapter-deconstruction .decon-visual { margin-top: 0; }
   .template-index .chapter-deconstruction .decon-ghost { font-size: 20vw; }
   .template-index .chapter-materials:not(.is-journey-host) .mat-panel { padding-block: 28px 24px; gap: 12px; }

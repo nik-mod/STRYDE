@@ -1,5 +1,6 @@
 /* The STRYDE collection: an editorial opening, then a useful footwear gallery. */
-@view-transition { navigation: auto; }
+/* Native page changes must not leave a shared-photo layer over the next list. */
+@view-transition { navigation: none; }
 .collection-studio {
   --studio-ice: #e7eef0; --studio-ink: #102b3b; --studio-blue: #265fbd;
   --studio-line: #102b3b26; --studio-surface: #f2f5f4;
@@ -257,3 +258,5 @@
 /* The preview notice and fixed header share a stable top edge. */
 .template-collection[data-local-preview]{padding-top:30px}
 .template-collection > .preview-notice{position:fixed;inset:0 0 auto;width:100%}
+
+#CollectionHeading { scroll-margin-top: calc(var(--header-height) + var(--preview-height) + 18px); }

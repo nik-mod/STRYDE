@@ -1,4 +1,5 @@
 import { photoContentBounds, fitPhotoContent } from './product-gallery.mjs';
+import { rememberCollectionProduct } from './collection-return.mjs';
 
 const MANAGED = ['q', 'brand', 'color', 'edit', 'sort', 'page'];
 const clean = value => String(value || '').trim();
@@ -99,17 +100,32 @@ function paginationMarkup(state) {
   return `<a class="collection-page-direction${state.previous ? '' : ' is-disabled'}" ${state.previous ? `href="${escapeHTML(state.previous)}" data-catalog-page` : 'aria-disabled="true"'}>${arrow}<span>Previous</span></a><div class="collection-page-numbers">${state.pagination.map(part => part.ellipsis ? '<span class="collection-page-gap" aria-hidden="true">…</span>' : `<a href="${escapeHTML(part.url)}" data-catalog-page${part.current ? ' aria-current="page"' : ''} aria-label="Page ${part.number}">${part.label}</a>`).join('')}</div><a class="collection-page-direction${state.next ? '' : ' is-disabled'}" ${state.next ? `href="${escapeHTML(state.next)}" data-catalog-page` : 'aria-disabled="true"'}><span>Next</span>${arrow}</a>`;
 }
 
-function mountProductContinuity(section) {
+function mountProductContinuity(section, captureScroll) {
   const environment = section?.ownerDocument?.defaultView;
   if (!environment || !section.addEventListener) return () => {};
   const listeners = new AbortController();
+  let activation = null;
   const clear = () => {
     section.querySelectorAll('[data-product-cover], .product-card-cover').forEach(image => image.style.removeProperty('view-transition-name'));
     section.querySelectorAll('.is-opening').forEach(card => card.classList.remove('is-opening'));
   };
+  // Focus a pointer-selected card without the browser scrolling its oversized
+  // framed photograph into view before the outgoing history snapshot.
+  section.addEventListener('pointerdown', event => {
+    const link = event.target.closest('[data-product-open]');
+    activation = null;
+    if (link && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+      activation = { href: link.href, checkpoint: captureScroll?.(), time: Date.now() };
+      link.focus({ preventScroll: true });
+    }
+  }, { signal: listeners.signal });
   section.addEventListener('click', event => {
     const link = event.target.closest('[data-product-open]');
-    if (!link || environment.matchMedia('(prefers-reduced-motion: reduce)').matches || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    if (!link || event.defaultPrevented || link.target === '_blank' || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    const checkpoint = activation?.href === link.href && Date.now() - activation.time < 2000 ? activation.checkpoint : captureScroll?.();
+    activation = null;
+    rememberCollectionProduct(environment, link.href, checkpoint, link.closest('[data-product-id]')?.dataset.productId);
+    if (environment.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     clear();
     const image = link.closest('[data-product-id]')?.querySelector('[data-product-cover], .product-card-cover');
     if (image) {
@@ -162,8 +178,8 @@ function mountCatalogFraming(root) {
   return { refresh: fitAll, dispose() { listeners.abort(); observer?.disconnect(); cache.clear(); } };
 }
 
-export function mountCollectionStudio(section) {
-  const disposeContinuity = mountProductContinuity(section);
+export function mountCollectionStudio(section, { captureScroll, restoreScroll, scrollToGallery } = {}) {
+  const disposeContinuity = mountProductContinuity(section, captureScroll);
   if (!section?.ownerDocument?.defaultView) return disposeContinuity;
   const root = section.querySelector?.('[data-photo-shop]');
   const payload = root?.querySelector('[data-catalog-data]');
@@ -199,7 +215,7 @@ export function mountCollectionStudio(section) {
   };
   try { setDensity(environment.sessionStorage.getItem('stryde-gallery-density')); } catch { /* Default density stays usable. */ }
   revealCards();
-  let timer, transition;
+  let timer;
   const setControls = state => {
     for (const name of ['q', 'brand', 'color', 'sort']) if (form.elements[name]) form.elements[name].value = state[name];
     form.elements.edit.value = state.edit;
@@ -219,7 +235,10 @@ export function mountCollectionStudio(section) {
     const state = catalogPage(entries, url.searchParams, url.pathname);
     // Out-of-range URLs and unknown sorts resolve to the same canonical state.
     const canonical = new URL(collectionHref(url.searchParams, { page: state.page, sort: state.sort }, url.pathname), url.origin);
-    if (history !== 'none') environment.history[history === 'replace' ? 'replaceState' : 'pushState']({}, '', canonical);
+    if (history !== 'none') {
+      if (history === 'push') environment.history.replaceState({ ...environment.history.state, strydeCollectionScroll: captureScroll?.() }, '');
+      environment.history[history === 'replace' ? 'replaceState' : 'pushState'](history === 'replace' ? environment.history.state : {}, '', canonical);
+    }
     const update = () => {
       grid.innerHTML = state.items.map(cardMarkup).join('');
       framing.refresh();
@@ -230,17 +249,14 @@ export function mountCollectionStudio(section) {
       reset.hidden = !state.hasFilters;
       root.querySelectorAll('[data-catalog-reset]').forEach(link => { link.href = state.clearUrl; });
       setControls(state);
-      if (scroll) galleryStart.scrollIntoView({ behavior: media.matches ? 'instant' : 'smooth', block: 'start' });
+      if (scroll) {
+        if (scrollToGallery) scrollToGallery(galleryStart);
+        else galleryStart.scrollIntoView({ behavior: 'instant', block: 'start' });
+      }
+      if (history === 'none') restoreScroll?.(environment.history.state?.strydeCollectionScroll);
       if (focus) { result.tabIndex = -1; result.focus({ preventScroll: true }); }
     };
-    transition?.skipTransition?.();
-    if (doc.startViewTransition && !media.matches && scroll) {
-      try {
-        transition = doc.startViewTransition(update);
-        transition.ready.catch(() => {});
-        transition.finished.catch(() => {});
-      } catch { update(); }
-    } else update();
+    update();
   };
   const apply = (history = 'push') => {
     const url = new URL(environment.location.href);
@@ -264,6 +280,6 @@ export function mountCollectionStudio(section) {
   }, { signal: listeners.signal });
   environment.addEventListener('popstate', () => render(new URL(environment.location.href), { history: 'none' }), { signal: listeners.signal });
   root.classList.add('is-studio-ready');
-  return () => { listeners.abort(); disposeContinuity(); framing.dispose(); cardObserver?.disconnect(); masthead?.classList.remove('is-collection-entering'); clearTimeout(timer); transition?.skipTransition?.(); root.classList.remove('is-studio-ready'); };
+  return () => { listeners.abort(); disposeContinuity(); framing.dispose(); cardObserver?.disconnect(); masthead?.classList.remove('is-collection-entering'); clearTimeout(timer); root.classList.remove('is-studio-ready'); };
 }
 

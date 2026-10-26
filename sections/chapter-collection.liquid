@@ -106,7 +106,7 @@
     {% endif %}
   </div>
   <div class="chapter-summary coll-summary">
-    <p>{% if has_products %}{{ collection.title | escape }}{% elsif form_edit %}Four looks. A different rhythm.{% else %}Three silhouettes. Three perspectives.{% endif %}</p>
+    <p>{% if has_products %}{{ collection.title | escape }}{% elsif form_edit %}Photographic references · Not store inventory{% else %}Three silhouettes. Three perspectives.{% endif %}</p>
     <a href="{{ collection.url | default: routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a>
   </div>
 </section>

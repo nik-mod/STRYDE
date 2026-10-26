@@ -16,7 +16,8 @@ test('the four-look edit ships four photographs with truthful captions and no in
     const provenance = JSON.parse(await readFile(`${file}.json`, 'utf8'));
     assert.equal(createHash('sha256').update(await readFile(file)).digest('hex'), provenance.sha256);
   }
-  assert.doesNotMatch(html, /Photographic reference|Not store inventory|Nike Air Max Plus Tuned|priceCurrency|\$\d/);
+  assert.match(html, /Photographic references · Not store inventory/);
+  assert.doesNotMatch(html, /Nike Air Max Plus Tuned|priceCurrency|\$\d/);
   assert.equal((html.match(/data-form-progress/g) || []).length, 4, 'the restored sequence has one progress stop per photograph');
 });
 

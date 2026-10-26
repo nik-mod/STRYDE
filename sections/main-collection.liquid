@@ -7,7 +7,7 @@
 <section class="page-shell collection-page collection-studio{% if photography_references %} collection-page-photography{% endif %}" data-listing-section data-section-id="{{ section.id }}">
   {% if section.preview_photo_shop.size > 0 %}
     {% render 'collection-masthead', state: section.preview_photo_state %}
-    {% render 'photo-shop-catalog', state: section.preview_photo_state, payload: section.preview_photo_payload %}
+    {% render 'photo-shop-catalog', state: section.preview_photo_state, payload: section.preview_photo_payload, routes: routes %}
   {% elsif photography_references %}
     <header class="listing-heading" data-listing-heading>
       <div><h1>The collection.</h1></div>
@@ -15,7 +15,7 @@
     </header>
     {% render 'photography-catalog', catalog: section.preview_photography %}
   {% else %}
-  <div class="page-heading listing-heading studio-heading" data-listing-heading><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
+  <div id="CollectionHeading" class="page-heading listing-heading studio-heading" data-listing-heading><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
   {% paginate collection.products by 12 %}
     <form method="get" action="{{ collection.url }}" class="collection-controls">
       <button type="button" class="filters-toggle" data-filters-toggle aria-expanded="false" aria-controls="FilterGroups-{{ section.id }}" data-open-label="{{ 'collection.filters' | t | escape }}" data-close-label="{{ 'collection.filters_hide' | t | escape }}">{{ 'collection.filters' | t }}{% assign active_filter_count = 0 %}{% for filter in collection.filters %}{% assign active_filter_count = active_filter_count | plus: filter.active_values.size %}{% endfor %}{% if active_filter_count > 0 %} ({{ active_filter_count }}){% endif %}</button>
@@ -34,7 +34,7 @@
     <div class="active-filters">{% for filter in collection.filters %}{% for value in filter.active_values %}<a href="{{ value.url_to_remove }}">{{ filter.label | escape }}: {{ value.label | escape }} <span aria-hidden="true">×</span><span class="sr-only">{{ 'collection.remove_filter' | t }}</span></a>{% endfor %}{% if filter.type == 'price_range' %}{% if filter.min_value.value != null or filter.max_value.value != null %}<a href="{{ filter.url_to_remove }}">{{ filter.label | escape }} <span aria-hidden="true">×</span><span class="sr-only">{{ 'collection.remove_filter' | t }}</span></a>{% endif %}{% endif %}{% endfor %}</div>
     <div class="collection-count micro">{{ 'collection.product_count' | t: count: collection.products_count }}</div>
     <div class="product-grid">{% for product in collection.products %}{% render 'product-card', card_product: product %}{% else %}<div class="empty-state"><h2>{{ 'collection.empty' | t }}</h2><p>{{ 'collection.empty_description' | t }}</p><a class="text-link" href="{{ collection.url }}">{{ 'collection.clear' | t }} {% render 'icon', name: 'arrow' %}</a></div>{% endfor %}</div>
-    {% render 'pagination', paginate: paginate %}
+    {% render 'pagination', paginate: paginate, anchor: 'CollectionHeading' %}
   {% endpaginate %}
   {% endif %}
   <script>

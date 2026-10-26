@@ -33,6 +33,10 @@
 .signature-identity { padding-block: 6px; perspective: 1200px; }
 .signature-wordmark { display: block; width: 100%; color: #dcecf2; font-size: calc((100vw - 2 * var(--gutter)) / (var(--brand-characters) * .60)); font-variation-settings: 'wght' 900, 'wdth' 80; font-weight: 900; font-style: italic; letter-spacing: -.04em; line-height: 1.04; text-decoration: none; text-shadow: 0 2px 0 #48768c; }
 .signature-wordmark > span { display: inline-block; transform-origin: 50% 100%; }
+.signature-wordmark { white-space: nowrap; }
+.signature-letter-mask { display: inline-block; overflow: clip; vertical-align: bottom; padding: .08em .12em; margin: -.08em -.12em; perspective: 900px; }
+[data-footer-letter] { display: inline-block; white-space: pre; transform-origin: 50% 100%; padding-inline: .14em; margin-inline: -.14em; }
+.is-letter-revealing [data-footer-letter] { background: linear-gradient(110deg,#88aaba 0%,#dcecf2 38%,#fff 48%,#dcecf2 58%); background-size: 250% 100%; background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; text-shadow: none; }
 .signature-wordmark:focus-visible { outline: 2px solid #88d9ee; outline-offset: 6px; }
 .signature-commerce { display: flex; justify-content: space-between; align-items: center; gap: 30px; padding-bottom: 30px; border-bottom: 1px solid #315064; }
 .signature-statement { margin: 0; max-width: 22ch; font-size: clamp(28px,3vw,52px); line-height: 1.08; letter-spacing: -.03em; font-weight: 550; }

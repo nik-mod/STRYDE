@@ -32,13 +32,17 @@ test('teardown cancels a pending headline entrance, including a queued mutation'
   assert.equal(played, 0);
 });
 
-function heroHarness({ glyphs = false } = {}) {
+function heroHarness({ glyphs = false, frames = false } = {}) {
   const selectors = [
     'stage', 'line-1', 'line-2', 'art', 'float', 'depth', 'type', 'ring', 'copy', 'foot', 'cue',
   ];
   const targets = Object.fromEntries(selectors.map(name => [name, {
     opacity: 1, x: 0, y: 0, xPercent: 0, yPercent: 0, scale: 1, rotation: 0,
   }]));
+  if (frames) for (const name of ['line-1', 'line-2']) {
+    targets[`${name}-frame`] = { xPercent: 0, y: 0, scale: 1 };
+    targets[name].closest = () => targets[`${name}-frame`];
+  }
   if (glyphs) {
     for (const [name, text] of [['line-1', 'BEYOND'], ['line-2', 'ORDINARY.']]) {
       const line = targets[name];
@@ -91,6 +95,20 @@ function heroHarness({ glyphs = false } = {}) {
     dispose() { dispose(); timelines.forEach(timeline => timeline.kill()); gsap.ticker.sleep(); },
   };
 }
+
+test('scroll moves the heading masks with their words instead of clipping the inner lettering', () => {
+  const previous = globalThis.window;
+  globalThis.window = Object.assign(new EventTarget(), { scrollY: 0 });
+  const h = heroHarness({ glyphs: true, frames: true });
+  try {
+    h.intro.progress(1, true); h.seek(.5);
+    assert(h.targets['line-1-frame'].y < -50);
+    assert.equal(h.targets['line-1'].y, 0);
+    h.seek(0);
+    assert.equal(h.targets['line-1-frame'].y, 0);
+    assert.equal(h.targets['line-1-frame'].scale, 1);
+  } finally { h.dispose(); globalThis.window = previous; }
+});
 
 test('first hero scroll takes over an unfinished entrance and reverses to the established composition', () => {
   const previousWindow = globalThis.window;

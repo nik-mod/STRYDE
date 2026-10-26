@@ -4,7 +4,8 @@ import { journeyPose } from './journey-poses.mjs';
 import { fittedCameraZ } from './scene-framing.mjs';
 
 const clamp = value => Math.min(1, Math.max(0, value));
-export function studyTransition(specs, progress, radius = .065) {
+export const STUDY_EXCHANGE_RADIUS = .11;
+export function studyTransition(specs, progress, radius = STUDY_EXCHANGE_RADIUS) {
   for (let index = 1; index < specs.length; index++) {
     if (journeyModelKey(specs[index - 1]) === journeyModelKey(specs[index])) continue;
     const boundary = index / specs.length;

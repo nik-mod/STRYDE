@@ -4,9 +4,9 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { refinePreviewMaterial } from './scene-materials.mjs';
 import { journeyModelSpec, journeyModelKey } from './journey-models.mjs';
-import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose, chapterCameraDistance, productWindowViewport } from './journey-transition.mjs';
+import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose, chapterCameraDistance, productWindowViewport, STUDY_EXCHANGE_RADIUS } from './journey-transition.mjs';
 import { environmentFor } from './motion/environments.mjs';
-import { journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandLighting } from './journey-poses.mjs';
+import { journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandLighting, heroProductGate } from './journey-poses.mjs';
 import { createHeroWorld, expandHeroCamera } from './hero-world.mjs';
 
 const chapterOrder = ['hero', 'deconstruction', 'materials', 'technology', 'collection', 'featured', 'brand', 'finale'];
@@ -188,6 +188,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
         : clamp((environment.innerHeight * .75 - sectionRect.top) / Math.max(1, sectionRect.height));
     if (['materials', 'featured', 'brand'].includes(target.chapter) && pin?.animation) progress = pin.animation.progress();
     if (target.chapter === 'brand' && !pin && Number.isFinite(Number(target.section.dataset.brandProgress))) progress = clamp(Number(target.section.dataset.brandProgress));
+    if (target.chapter === 'deconstruction' && Number.isFinite(Number(target.section.dataset.anatomyProgress))) progress = clamp(Number(target.section.dataset.anatomyProgress));
     let visual = target.visuals[0];
     if (target.visuals.length > 1 && !pin) {
       // Flowing panels all have opacity 1. Use their actual on-screen geometry,
@@ -239,7 +240,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       modelSpec = view.modelSpecs[index];
       if (view.pinned) modelBlend = studyTransition(view.modelSpecs, progress);
       else if (index > 0) {
-        const state = windowTransition(view.modelSpecs[index - 1], modelSpec, progress * view.modelSpecs.length - index, .22, .53);
+        const state = windowTransition(view.modelSpecs[index - 1], modelSpec, progress * view.modelSpecs.length - index, .16, .64);
         modelSpec = state.spec; modelBlend = state.blend;
       }
     }
@@ -342,7 +343,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       for (let index = 1; index < view.modelSpecs.length; index++) {
         if (journeyModelKey(view.modelSpecs[index - 1]) === journeyModelKey(view.modelSpecs[index])) continue;
         const boundary = index / view.modelSpecs.length;
-        exchangeRanges.push([boundary - .065, boundary + .065], [(index + .22) / view.modelSpecs.length, (index + .53) / view.modelSpecs.length]);
+        exchangeRanges.push([boundary - STUDY_EXCHANGE_RADIUS, boundary + STUDY_EXCHANGE_RADIUS], [(index + .16) / view.modelSpecs.length, (index + .64) / view.modelSpecs.length]);
       }
     } else if (view.exchangeWindow) exchangeRanges.push([view.exchangeWindow.start, view.exchangeWindow.end]);
     const key = JSON.stringify([view.chapter, aspect, unique.map(([id]) => id).sort(), exchangeRanges]);
@@ -462,7 +463,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       renderer.toneMappingExposure = pose.exposure * light.exposure;
       heroWorld.group.visible = isHero; scene.fog = isHero ? heroWorld.fog : null; shadowPlane.visible = !isHero;
       if (isHero) {
-        expandHeroCamera(camera, rect, worldRect);
+        expandHeroCamera(camera, heroProductGate(rect, view.progress, environment.innerWidth <= 700), worldRect);
         heroWorld.update(worldTime, view.progress, dt, camera, rig, key, rim);
         updateHeroShadow(view.progress);
       }
@@ -510,7 +511,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     }
     const { pose } = current;
     camera.position.set(0, pose.cameraY, cameraZ);
-    expandHeroCamera(camera, current.rect, stageRect);
+    expandHeroCamera(camera, heroProductGate(current.rect, current.progress, environment.innerWidth <= 700), stageRect);
     rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
     lightFor('hero', current.progress);
     heroWorld.group.visible = true; scene.fog = heroWorld.fog; shadowPlane.visible = false;
@@ -523,9 +524,14 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     current.visual.classList.add('has-journey-scene'); owned = [current.visual];
     overlay.dataset.chapter = 'hero';
     if (inspectMotion) {
+      const projected = selectedAssets.flatMap(asset => asset.points.map(point => {
+        const p = point.clone().applyMatrix4(rig.matrixWorld).project(camera);
+        return [stageRect.left + (p.x + 1) * stageRect.width / 2, stageRect.top + (1 - p.y) * stageRect.height / 2];
+      }));
       overlay.dataset.world = JSON.stringify({ time: worldTime, progress: current.progress, camera: camera.position.toArray(),
         surface: heroWorld.group.position.toArray(), calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
-        buffer: [renderer.domElement.width, renderer.domElement.height] });
+        buffer: [renderer.domElement.width, renderer.domElement.height],
+        productBounds: { left: Math.min(...projected.map(p => p[0])), right: Math.max(...projected.map(p => p[0])), top: Math.min(...projected.map(p => p[1])), bottom: Math.max(...projected.map(p => p[1])) } });
       overlay.dataset.motion = JSON.stringify([{ chapter: 'hero', model: overlay.dataset.model,
         pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() }]);
     }

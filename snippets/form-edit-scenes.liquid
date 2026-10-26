@@ -10,6 +10,7 @@
         assign body = 'Smooth blue panels meet soft suede. Cream laces and a gum sole bring a little warmth to the clean side profile.'
         assign material = 'Suede & smooth panels'
         assign accent = '#527e9b'
+        assign photo_width = 0.600
       when 2
         assign file = 'form-edit-midnight.png'
         assign tone = 'MID|NIGHT.'
@@ -18,6 +19,7 @@
         assign body = 'Deep navy panels, dark suede overlays and off-white laces. A low profile grounded by a warm gum sole.'
         assign material = 'Dark suede & smooth panels'
         assign accent = '#243b55'
+        assign photo_width = 0.595
       when 3
         assign file = 'form-edit-court.png'
         assign tone = 'COURT|BLUE.'
@@ -26,6 +28,7 @@
         assign body = 'Navy suede with a white club-shaped side detail. Ivory laces, a white heel panel and a light cupsole keep the contrast crisp.'
         assign material = 'Suede & contrasting details'
         assign accent = '#334564'
+        assign photo_width = 0.747
       when 4
         assign file = 'form-edit-charcoal.webp'
         assign tone = 'EARTH|TONES.'
@@ -34,13 +37,14 @@
         assign body = 'Charcoal panels and brown suede overlays, finished with cream laces and a gum sole. Familiar lines with an earthy shift in tone.'
         assign material = 'Brown suede & charcoal panels'
         assign accent = '#716254'
+        assign photo_width = 0.778
     endcase
   %}
-  <article class="form-look" data-form-look style="--look-accent: {{ accent }}" aria-labelledby="FormLook-{{ section_id }}-{{ index }}">
+  <article class="form-look" data-form-look style="--look-accent: {{ accent }}; --photo-width: {{ photo_width }}" aria-labelledby="FormLook-{{ section_id }}-{{ index }}">
     <div class="form-look-type" aria-hidden="true">{% assign lines = tone | split: '|' %}{% for line in lines %}<span>{{ line }}</span>{% endfor %}</div>
     <div class="form-look-art"><img src="{{ file | asset_url }}" width="1000" height="1000" loading="lazy" decoding="async" alt="{{ title | escape }} sneakers — {{ material | downcase | escape }}"></div>
     <div class="form-look-copy">
-      <p class="form-look-index">THE FORM EDIT <span>0{{ index }} / 04</span></p>
+      <p class="form-look-index">PHOTOGRAPHIC REFERENCE <span>0{{ index }} / 04</span></p>
       <h3 id="FormLook-{{ section_id }}-{{ index }}">{{ title }}</h3>
       <p class="form-look-deck">{{ detail }}</p>
       <p class="form-look-body">{{ body }}</p>

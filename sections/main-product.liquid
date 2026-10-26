@@ -1,5 +1,5 @@
 {% if section.settings.preview_photo_product %}
-  {% render 'photo-product-preview', item: section.settings.preview_photo_product %}
+  {% render 'photo-product-preview', item: section.settings.preview_photo_product, routes: routes %}
 {% else %}
 {% liquid
   assign selected_variant = product.selected_or_first_available_variant
@@ -7,7 +7,7 @@
   assign product_image = selected_variant.featured_image | default: product.featured_image
 %}
 <section class="product-page studio-product page-shell" data-product-section>
-  <nav class="studio-breadcrumbs" aria-label="{{ 'general.breadcrumbs' | t }}"><a href="{{ routes.all_products_collection_url }}">{% render 'icon', name: 'arrow' %} {{ 'general.collection' | t }}</a><span>{{ product.title | escape }}</span></nav>
+  <nav class="studio-breadcrumbs" aria-label="{{ 'general.breadcrumbs' | t }}"><a data-collection-return href="{{ routes.all_products_collection_url }}">{% render 'icon', name: 'arrow' %} {{ 'general.collection' | t }}</a><span>{{ product.title | escape }}</span></nav>
   <div class="product-layout studio-product-layout">
     {% if product.images.size > 0 or product_image != blank %}
       {% render 'product-studio-gallery', photos: product.images, title: product.title, gallery_id: section.id, native: true, selected_image: product_image %}

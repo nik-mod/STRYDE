@@ -9,10 +9,28 @@ export function interpolateJourneyPose(from, to, progress) {
   return Object.fromEntries(Object.keys(from).map(key => [key, mix(from[key], to[key] ?? from[key], p)]));
 }
 
-function through(stops, progress) {
+// Shape-preserving Hermite tangents carry velocity across inspection keys.
+// A genuine change of direction or an authored hold still settles to zero;
+// intermediate keys no longer restart an easing curve at every scroll beat.
+function tourThrough(stops, progress) {
   const p = clamp(progress);
-  for (let i = 1; i < stops.length; i++) {
-    if (p <= stops[i][0]) return interpolateJourneyPose(stops[i - 1][1], stops[i][1], (p - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0]));
+  const tangent = (index, key) => {
+    if (index === 0 || index === stops.length - 1) return 0;
+    const h0 = stops[index][0] - stops[index - 1][0], h1 = stops[index + 1][0] - stops[index][0];
+    const d0 = (stops[index][1][key] - stops[index - 1][1][key]) / h0;
+    const d1 = (stops[index + 1][1][key] - stops[index][1][key]) / h1;
+    if (!d0 || !d1 || Math.sign(d0) !== Math.sign(d1)) return 0;
+    const w0 = 2 * h1 + h0, w1 = h1 + 2 * h0;
+    return (w0 + w1) / (w0 / d0 + w1 / d1);
+  };
+  for (let i = 1; i < stops.length; i++) if (p <= stops[i][0]) {
+    const [a, from] = stops[i - 1], [b, to] = stops[i], h = b - a, t = (p - a) / h;
+    if (t === 0) return { ...from };
+    if (t === 1) return { ...to };
+    const t2 = t * t, t3 = t2 * t;
+    return Object.fromEntries(Object.keys(from).map(key => from[key] === to[key] ? [key, from[key]] : [key,
+      (2 * t3 - 3 * t2 + 1) * from[key] + (t3 - 2 * t2 + t) * h * tangent(i - 1, key)
+      + (-2 * t3 + 3 * t2) * to[key] + (t3 - t2) * h * tangent(i, key)]));
   }
   return { ...stops.at(-1)[1] };
 }
@@ -24,16 +42,18 @@ const pose = (rotationX, rotationY, rotationZ, fill = .94, cameraY = .04, exposu
 const TRACKS = {
   hero: [
     [0, pose(.18, -.26, -.018, .88)],
-    [.25, pose(.32, -.08, -.008, .88)],
-    [.52, pose(.62, .32, .012, .88)],
-    [.76, pose(.38, .16, 0, .88)],
+    [.25, pose(.28, -.06, -.012, .88)],
+    [.52, pose(.50, .22, .012, .88)],
+    [.76, pose(.32, .12, .006, .88)],
     [1, pose(.18, -.10, 0, .88)],
   ],
   deconstruction: [
     [0, pose(.18, -.10, 0, .88)],
-    [.38, pose(.34, .06, 0, .88)],
-    [.68, pose(.56, .20, 0, .88)],
-    [.84, pose(.56, .20, 0, .88)],
+    [.17, pose(.18, -.10, 0, .88)],
+    [.30, pose(.50, .10, 0, .88)],
+    [.50, pose(.50, .10, 0, .88)],
+    [.65, pose(-.32, .08, 0, .88)],
+    [.84, pose(-.32, .08, 0, .88)],
     [1, pose(.22, -.06, 0, .88)],
   ],
   materials: [
@@ -76,19 +96,30 @@ const TRACKS = {
 export const JOURNEY_CHAPTERS = Object.freeze(Object.keys(TRACKS));
 
 export function journeyPose(chapter, progress) {
-  return through(TRACKS[chapter] || TRACKS.hero, progress);
+  return tourThrough(TRACKS[chapter] || TRACKS.hero, progress);
 }
 
 // Shared editorial beats. The environment, actual camera and HTML timeline
 // all consume the existing Hero progress; there is no additional scroll clock.
 export function heroDirection(progress) {
-  return through([
+  return tourThrough([
     [0, { dolly: 1, truck: 0, lift: 0, world: 0, strength: 1, light: 0 }],
-    [.25, { dolly: .98, truck: .24, lift: .04, world: .26, strength: 1.12, light: .24 }],
-    [.52, { dolly: .96, truck: .62, lift: .07, world: .64, strength: 1.22, light: .56 }],
-    [.76, { dolly: .98, truck: .88, lift: .04, world: 1.04, strength: .94, light: .82 }],
-    [1, { dolly: 1.02, truck: 1.0, lift: 0, world: 1.40, strength: .68, light: 1 }],
+    [.25, { dolly: .98, truck: .40, lift: .04, world: .62, strength: .95, light: .24 }],
+    [.52, { dolly: .95, truck: 1.10, lift: .08, world: 1.40, strength: .72, light: .56 }],
+    [.76, { dolly: .98, truck: 1.45, lift: .04, world: 1.85, strength: .86, light: .82 }],
+    [1, { dolly: 1.02, truck: 1.60, lift: 0, world: 2.20, strength: .68, light: 1 }],
   ], progress);
+}
+
+// A virtual camera gate, not a DOM/model scale. It opens into the space yielded
+// by the headline, then resolves to the original gate before the handoff.
+export function heroProductGate(rect, progress, compact = false) {
+  const p = clamp(progress);
+  if (p === 0 || p === 1) return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+  if (compact) return { left: rect.left, top: rect.top - rect.height * .035 * Math.sin(Math.PI * p) ** 2, width: rect.width, height: rect.height };
+  const swell = Math.sin(Math.PI * p) ** 2 * .08;
+  return { ...rect, left: rect.left - rect.width * swell, top: rect.top - rect.height * swell,
+    width: rect.width * (1 + swell), height: rect.height * (1 + swell) };
 }
 
 export function brandStudyPhase(progress) {

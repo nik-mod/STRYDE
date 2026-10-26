@@ -24,18 +24,19 @@ const scheduler = createScheduler(gsap.ticker);
 gsap.ticker.lagSmoothing(0);
 const reduceQuery = matchMedia('(prefers-reduced-motion: reduce)');
 const instances = new Map();
-const checkpointKey = `stryde:scroll-checkpoint:${location.pathname}${location.search}${location.hash}`;
+const checkpointKey = () => `stryde:scroll-checkpoint:${location.pathname}${location.search}${location.hash}`;
 let pageActive = true;
 let exitScroll = null;
 let reloadScroll = null;
 try {
   if (['reload', 'back_forward'].includes(performance.getEntriesByType('navigation')[0]?.type)) {
-    reloadScroll = JSON.parse(sessionStorage.getItem(checkpointKey) || 'null');
+    reloadScroll = history.state?.strydeCollectionScroll || JSON.parse(sessionStorage.getItem(checkpointKey()) || 'null');
   }
 } catch { /* Storage may be unavailable; native restoration remains the fallback. */ }
 
 function scrollCheckpoint() {
-  return { y: scrollY, width: innerWidth, height: innerHeight, url: location.href, reduced: reduceQuery.matches, time: Date.now() };
+  return { y: scrollY, width: innerWidth, height: innerHeight, url: location.href, reduced: reduceQuery.matches, time: Date.now(),
+    focusProduct: document.activeElement?.closest?.('[data-product-id]')?.dataset.productId || history.state?.strydeCollectionScroll?.focusProduct };
 }
 
 function restoreScroll(checkpoint) {
@@ -45,12 +46,22 @@ function restoreScroll(checkpoint) {
   // Pagehide cleanup removes pins and can clamp the browser's saved scroll.
   // Restore only a same-viewport reload/BFCache entry, after fonts and pins settle.
   document.fonts.ready.then(() => requestAnimationFrame(() => {
-    if (!pageActive) return;
+    if (!pageActive || checkpoint.url !== location.href) return;
     ScrollTrigger.refresh();
     if (lenis) { lenis.resize(); lenis.scrollTo(checkpoint.y, { immediate: true, force: true }); }
     else window.scrollTo({ top: checkpoint.y, behavior: 'instant' });
     ScrollTrigger.update();
+    if (checkpoint.focusProduct) [...document.querySelectorAll('[data-product-id]')].find(card => card.dataset.productId === checkpoint.focusProduct)?.querySelector('[data-product-open]:not([aria-hidden="true"])')?.focus({ preventScroll: true });
   }));
+}
+
+function scrollToGallery(target) {
+  ScrollTrigger.refresh();
+  const clearance = (document.querySelector('.site-header')?.offsetHeight || 0) + (document.querySelector('.preview-notice')?.offsetHeight || 0) + 18;
+  const y = Math.max(0, target.getBoundingClientRect().top + scrollY - clearance);
+  if (lenis) { lenis.resize(); lenis.scrollTo(y, { immediate: true, force: true }); }
+  else window.scrollTo({ top: y, behavior: 'instant' });
+  ScrollTrigger.update();
 }
 
 function isModalOpen() { return [...document.querySelectorAll('dialog[open], [aria-modal="true"]:not([hidden]), [data-mobile-menu][open]')].some(element => element.matches('dialog') ? element.open : element.getClientRects().length > 0); }
@@ -106,7 +117,7 @@ function mountHeroSection(root) {
 function mountChapterSection(root) {
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
-    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)', ...(root.dataset.chapter === 'brand' ? { brandFit: '(min-height: 740px)' } : {}) }, ({ conditions }) => {
+    media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)', ...(root.dataset.chapter === 'brand' ? { brandFit: '(min-height: 740px)' } : {}), ...(root.dataset.chapter === 'deconstruction' ? { anatomyFit: '(min-width: 1001px) and (min-height: 720px)' } : {}) }, ({ conditions }) => {
       if (!conditions.motion) return;
       const flow = root.dataset.chapter === 'collection' ? conditions.collectionFlow : root.dataset.chapter === 'materials' ? conditions.materialsFlow : conditions.mobile || (root.dataset.chapter === 'finale' && conditions.portraitTablet);
       return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });
@@ -131,7 +142,7 @@ function mount(scope = document) {
   if (scope.matches?.('[data-hero], [data-chapter], [data-product-section], [data-listing-section], [data-cart-page], [data-recommendations-url], [data-predictive-root]')) roots.push(scope);
   for (const root of roots) {
     if (instances.has(root)) continue;
-    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : root.matches('[data-predictive-root]') ? mountPredictiveSearch(root) : root.matches('[data-listing-section]') ? mountListing(root, { gsap }) : root.matches('[data-cart-page]') ? mountCartPage(root) : root.matches('[data-recommendations-url]') ? mountRecommendations(root) : mountProduct(root));
+    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : root.matches('[data-predictive-root]') ? mountPredictiveSearch(root) : root.matches('[data-listing-section]') ? mountListing(root, { captureScroll: scrollCheckpoint, restoreScroll, scrollToGallery }) : root.matches('[data-cart-page]') ? mountCartPage(root) : root.matches('[data-recommendations-url]') ? mountRecommendations(root) : mountProduct(root));
   }
   ScrollTrigger.refresh();
   const progress = document.querySelector('[data-story-progress]');
@@ -156,8 +167,14 @@ const modalObserver = new MutationObserver(syncScroll);
 modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] });
 document.addEventListener('visibilitychange', () => { if (document.hidden) lenis?.stop(); else syncScroll(); });
 window.addEventListener('pagehide', () => {
-  exitScroll = scrollCheckpoint();
-  try { sessionStorage.setItem(checkpointKey, JSON.stringify(exitScroll)); } catch { /* Optional restoration only. */ }
+  // A cross-document media transition can change the outgoing scroll before
+  // pagehide. Keep the collection position captured at product activation.
+  exitScroll = history.state?.strydeOpeningProduct && history.state.strydeCollectionScroll?.url === location.href
+    ? history.state.strydeCollectionScroll : scrollCheckpoint();
+  try {
+    sessionStorage.setItem(checkpointKey(), JSON.stringify(exitScroll));
+    if (document.querySelector('[data-listing-section]')) history.replaceState({ ...history.state, strydeCollectionScroll: exitScroll }, '');
+  } catch { /* Optional restoration only. */ }
   pageActive = false;
   siteIntro.dispose();
   disposeInspection();
@@ -168,6 +185,7 @@ window.addEventListener('pagehide', () => {
 });
 window.addEventListener('pageshow', event => {
   pageActive = true;
+  if (history.state?.strydeOpeningProduct) history.replaceState({ ...history.state, strydeOpeningProduct: null }, '');
   if (event.persisted) { syncScroll(); disposeCartDrawer = mountCartDrawer({ document }); mount(); disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll }); disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location }); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
   restoreScroll(event.persisted ? exitScroll : reloadScroll);
   reloadScroll = null;

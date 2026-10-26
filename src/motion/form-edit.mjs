@@ -6,7 +6,7 @@ export function mountFormEdit(root, gsap, { mobile }) {
   if (mobile) {
     looks.forEach(look => {
       gsap.from(look.querySelector('.form-look-art'), {
-        y: 50, rotation: -5, scale: .94, ease: 'none',
+        y: 28, rotation: 0, scale: 1, ease: 'none',
         scrollTrigger: { trigger: look, start: 'top 85%', end: 'top 25%', scrub: .45 },
       });
       gsap.from(look.querySelectorAll('.form-look-copy > *'), {
@@ -45,7 +45,7 @@ export function mountFormEdit(root, gsap, { mobile }) {
       timeline.to(previous.querySelector('.form-look-art'), { xPercent: -18, yPercent: -3, rotation: 3, scale: 1, duration: .55, ease: 'power2.inOut' }, at)
         .to(previous.querySelectorAll('.form-look-type > span'), { xPercent: -24, duration: .45, ease: 'power2.inOut' }, at);
     } else {
-      timeline.fromTo(art, { rotation: -4, yPercent: 6, scale: .96 }, { rotation: 0, yPercent: 0, scale: 1, duration: .65, ease: 'power2.out' }, 0);
+      timeline.fromTo(art, { rotation: 0, yPercent: 3, scale: 1 }, { rotation: 0, yPercent: 0, scale: 1, duration: .65, ease: 'none' }, 0);
     }
     // Quiet movement during the hold, followed by a decisive spatial exchange.
     timeline.to(art, { yPercent: -2, duration: .32, ease: 'none' }, at + .65)

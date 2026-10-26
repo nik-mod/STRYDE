@@ -72,6 +72,6 @@ test('Shopify-shaped empty context cannot expose local concepts; native filters,
   const product={title:'Authentic merchant shoe',url:'/products/merchant-shoe',price:24900,available:false,price_varies:true,featured_image:{url:'/merchant.jpg'}};
   const html=await nativeCollection([product],{catalog:conceptCatalog});
   assert.match(html,/Authentic merchant shoe/);assert.match(html,/href="\/products\/merchant-shoe"/);assert.match(html,/\$249 USD/);assert.match(html,/products.sold_out/);assert.match(html,/products.from/);
-  assert.match(html,/name="filter.v.option.color"/);assert.match(html,/value="price-ascending" selected/);assert.match(html,/href="\/collections\/all\?page=2"/);
+  assert.match(html,/name="filter.v.option.color"/);assert.match(html,/value="price-ascending" selected/);assert.match(html,/href="\/collections\/all\?page=2#CollectionHeading"/);
   assert.doesNotMatch(html,/data-concept-entry|Arc Study/);
 });
