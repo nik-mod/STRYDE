@@ -39,6 +39,7 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
   const panels = all('macro');
   const shoe = one('shoe');
   const trails = all('trail');
+  const skipButton = one('skip');
   let timeline, watchdog, done = false;
 
   const finish = ({ restoreFocus = true } = {}) => {
@@ -47,6 +48,8 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
     timeline?.kill();
     environment.clearTimeout(watchdog);
     document.removeEventListener('keydown', onKey);
+    skipButton?.removeEventListener?.('click', onSkip);
+    html.removeAttribute?.('data-intro-revealing');
     root.hidden = true;
     root.setAttribute('aria-hidden', 'true');
     root.removeAttribute('aria-modal');
@@ -59,9 +62,10 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
     }
     onChange();
   };
+  const onSkip = () => finish();
   const onKey = event => {
     if (event.key === 'Escape') { event.preventDefault(); finish(); }
-    if (event.key === 'Tab') { event.preventDefault(); root.focus({ preventScroll: true }); }
+    if (event.key === 'Tab') { event.preventDefault(); (skipButton?.focus ? skipButton : root).focus({ preventScroll: true }); }
   };
 
   root.hidden = false;
@@ -71,8 +75,9 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
   html.classList.add('site-intro-playing');
   html.classList.remove('site-intro-pending');
   document.addEventListener('keydown', onKey);
+  skipButton?.addEventListener?.('click', onSkip);
   root.focus({ preventScroll: true });
-  watchdog = environment.setTimeout(() => finish(), 8500);
+  watchdog = environment.setTimeout(() => finish(), 7500);
 
   try {
     timeline = gsap.timeline({ paused: true, onComplete: () => finish() });
@@ -84,11 +89,11 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
       }, .05)
       .fromTo(one('speedlines'), { xPercent: -25, scaleX: .4 }, { xPercent: 15, scaleX: 1.4, duration: 1.4, ease: 'power2.inOut' }, 0)
       .to(one('move'), { scale: 1.15, rotation: -7, duration: .45, ease: 'power2.in' }, .52)
-      .to(move, { yPercent: -150, rotationX: 55, opacity: 0, duration: .4, stagger: .025, ease: 'power3.in' }, .69)
+      .to(move, { yPercent: -150, rotationX: 55, opacity: 0, duration: .28, stagger: .012, ease: 'power3.in' }, .59)
       .fromTo(different, { yPercent: 130, scaleY: 1.7, rotation: 12, opacity: 0 }, {
         yPercent: 0, scaleY: 1, rotation: 0, opacity: 1, duration: .6, stagger: .025, ease: 'expo.out',
-      }, .82)
-      .to(one('different'), { scaleX: .6, scaleY: .6, rotation: -10, opacity: 0, duration: .42, ease: 'power3.in' }, 1.38)
+      }, .94)
+      .to(one('different'), { scaleX: .6, scaleY: .6, rotation: -10, opacity: 0, duration: .42, ease: 'power3.in' }, 1.55)
       .to(one('iris'), { scale: 1, duration: .72, ease: 'power4.inOut' }, 1.38)
       .to(one('kinetic'), { autoAlpha: 0, duration: .2 }, 2.03)
       // Three product views sweep through on alternating vectors, with a brief
@@ -111,7 +116,7 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
       }, { xPercent: 0, yPercent: 0, rotationX: 0, rotation: 0, scale: 1, opacity: 1,
         duration: 1.02, stagger: { each: .04, from: 'center' }, ease: 'expo.out',
       }, 3.05)
-      .fromTo(trails, { opacity: 0, yPercent: 40, scale: .55 }, { opacity: .55, yPercent: -5, scale: 1, duration: .72, stagger: .1, ease: 'power3.out' }, 3.06)
+      .fromTo(trails, { opacity: 0, yPercent: 40, scale: .55 }, { opacity: .18, yPercent: -5, scale: 1, duration: .72, stagger: .1, ease: 'power3.out' }, 3.06)
       .to(trails, { yPercent: -85, opacity: 0, scale: 1.15, duration: .8, stagger: .08, ease: 'power2.in' }, 3.72)
       .fromTo(shoe, { opacity: 0, xPercent: 52, yPercent: 40, scale: 1.65, rotation: -32 }, {
         opacity: 1, xPercent: 0, yPercent: 0, scale: 1, rotation: -8, duration: 1.05, ease: 'expo.out',
@@ -140,6 +145,13 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
       .to(all('curtain'), { yPercent: i => i % 2 ? 101 : -101, duration: .85,
         stagger: { each: .055, from: 'center' }, ease: 'power4.inOut',
       }, 6.38);
+    // Start the existing Hero entrance beneath the opening shutters. Its own
+    // timeline still owns the headline and live model; no second 3D controller.
+    timeline.call?.(() => {
+      html.setAttribute?.('data-intro-revealing', '');
+      document.dispatchEvent(new environment.Event('stryde:intro-reveal'));
+    }, [], 6.38);
+    timeline.timeScale?.(1.35);
     timeline.play();
   } catch {
     finish();

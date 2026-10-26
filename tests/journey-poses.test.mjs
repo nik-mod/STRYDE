@@ -36,7 +36,8 @@ test('authored product tours keep bounded pitch, bank and a constant framing mar
     assert(Math.abs(pose.rotationZ) <= .065, `${chapter} keeps its authored bank inside the camera margin`);
     assert.equal(pose.fill, journeyPose(chapter, 0).fill);
   }
-  assert.deepEqual(journeyPose('hero', .48), journeyPose('hero', 1), 'hero holds its settled profile');
+  assert(journeyPose('hero', .52).rotationX > journeyPose('hero', 0).rotationX + .2, 'the middle beat reveals the upper');
+  assert.deepEqual(journeyPose('hero', 1), journeyPose('deconstruction', 0), 'the exit resolves to the next canonical profile');
   for (const chapter of JOURNEY_CHAPTERS) {
     for (const axis of ['rotationX', 'rotationY', 'rotationZ']) {
       const samples = Array.from({ length: 201 }, (_, index) => journeyPose(chapter, index / 200)[axis]);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-24T17:54:21.0038947Z",
+  "generatedAt": "2026-10-26T14:43:55.844Z",
   "title": "Design System: STRYDE",
   "extensions": {
     "colorMeta": {
@@ -200,6 +200,126 @@
           "oklch(83.57% 0.0442 237.37)",
           "oklch(95% 0.0442 237.37)"
         ]
+      },
+      "closing-ocean": {
+        "role": "primary",
+        "displayName": "Closing Ocean",
+        "purpose": "Photographic stage; resolves into the existing ocean-deep token.",
+        "tonalRamp": [
+          "oklch(15% 0.0606 237.78)",
+          "oklch(26.43% 0.0606 237.78)",
+          "oklch(37.86% 0.0606 237.78)",
+          "oklch(49.29% 0.0606 237.78)",
+          "oklch(60.71% 0.0606 237.78)",
+          "oklch(72.14% 0.0606 237.78)",
+          "oklch(83.57% 0.0606 237.78)",
+          "oklch(95% 0.0606 237.78)"
+        ]
+      },
+      "closing-cyan": {
+        "role": "secondary",
+        "displayName": "Closing Cyan",
+        "purpose": "Closing heading emphasis, action rule and visible focus.",
+        "tonalRamp": [
+          "oklch(15% 0.0843 216.10)",
+          "oklch(26.43% 0.0843 216.10)",
+          "oklch(37.86% 0.0843 216.10)",
+          "oklch(49.29% 0.0843 216.10)",
+          "oklch(60.71% 0.0843 216.10)",
+          "oklch(72.14% 0.0843 216.10)",
+          "oklch(83.57% 0.0843 216.10)",
+          "oklch(95% 0.0843 216.10)"
+        ]
+      },
+      "closing-copy": {
+        "role": "neutral",
+        "displayName": "Closing Copy",
+        "purpose": "Supporting copy and footer metadata.",
+        "tonalRamp": [
+          "oklch(15% 0.0332 229.31)",
+          "oklch(26.43% 0.0332 229.31)",
+          "oklch(37.86% 0.0332 229.31)",
+          "oklch(49.29% 0.0332 229.31)",
+          "oklch(60.71% 0.0332 229.31)",
+          "oklch(72.14% 0.0332 229.31)",
+          "oklch(83.57% 0.0332 229.31)",
+          "oklch(95% 0.0332 229.31)"
+        ]
+      },
+      "closing-silver": {
+        "role": "neutral",
+        "displayName": "Closing Silver",
+        "purpose": "Square dimensional photographic print field.",
+        "tonalRamp": [
+          "oklch(15% 0.0247 226.50)",
+          "oklch(26.43% 0.0247 226.50)",
+          "oklch(37.86% 0.0247 226.50)",
+          "oklch(49.29% 0.0247 226.50)",
+          "oklch(60.71% 0.0247 226.50)",
+          "oklch(72.14% 0.0247 226.50)",
+          "oklch(83.57% 0.0247 226.50)",
+          "oklch(95% 0.0247 226.50)"
+        ]
+      },
+      "closing-rule": {
+        "role": "neutral",
+        "displayName": "Closing Rule",
+        "purpose": "Featured photograph caption hairline.",
+        "tonalRamp": [
+          "oklch(15% 0.0423 235.54)",
+          "oklch(26.43% 0.0423 235.54)",
+          "oklch(37.86% 0.0423 235.54)",
+          "oklch(49.29% 0.0423 235.54)",
+          "oklch(60.71% 0.0423 235.54)",
+          "oklch(72.14% 0.0423 235.54)",
+          "oklch(83.57% 0.0423 235.54)",
+          "oklch(95% 0.0423 235.54)"
+        ]
+      },
+      "signature-ink": {
+        "role": "neutral",
+        "displayName": "Signature Ink",
+        "purpose": "Homepage footer identity and collection navigation.",
+        "tonalRamp": [
+          "oklch(15% 0.0189 222.17)",
+          "oklch(26.43% 0.0189 222.17)",
+          "oklch(37.86% 0.0189 222.17)",
+          "oklch(49.29% 0.0189 222.17)",
+          "oklch(60.71% 0.0189 222.17)",
+          "oklch(72.14% 0.0189 222.17)",
+          "oklch(83.57% 0.0189 222.17)",
+          "oklch(95% 0.0189 222.17)"
+        ]
+      },
+      "signature-rule": {
+        "role": "neutral",
+        "displayName": "Signature Rule",
+        "purpose": "Homepage footer directory and metadata hairlines.",
+        "tonalRamp": [
+          "oklch(15% 0.0497 237.93)",
+          "oklch(26.43% 0.0497 237.93)",
+          "oklch(37.86% 0.0497 237.93)",
+          "oklch(49.29% 0.0497 237.93)",
+          "oklch(60.71% 0.0497 237.93)",
+          "oklch(72.14% 0.0497 237.93)",
+          "oklch(83.57% 0.0497 237.93)",
+          "oklch(95% 0.0497 237.93)"
+        ]
+      },
+      "signature-edge": {
+        "role": "neutral",
+        "displayName": "Signature Edge",
+        "purpose": "Restrained footer wordmark text-shadow edge.",
+        "tonalRamp": [
+          "oklch(15% 0.0610 230.03)",
+          "oklch(26.43% 0.0610 230.03)",
+          "oklch(37.86% 0.0610 230.03)",
+          "oklch(49.29% 0.0610 230.03)",
+          "oklch(60.71% 0.0610 230.03)",
+          "oklch(72.14% 0.0610 230.03)",
+          "oklch(83.57% 0.0610 230.03)",
+          "oklch(95% 0.0610 230.03)"
+        ]
       }
     },
     "typographyMeta": {
@@ -226,6 +346,26 @@
       "label": {
         "displayName": "Chapter label",
         "purpose": "Tracked uppercase indexing and kickers."
+      },
+      "closing-heading": {
+        "displayName": "Closing heading",
+        "purpose": "Homepage ending only; compact size clamp(48px, 12.5vw, 92px)."
+      },
+      "closing-body": {
+        "displayName": "Closing body",
+        "purpose": "Homepage ending only; 31ch measure, 14px and 34ch at up to 900px."
+      },
+      "closing-product-title": {
+        "displayName": "Featured print title",
+        "purpose": "Nike photographic print caption; 21px on compact layouts."
+      },
+      "signature-wordmark": {
+        "displayName": "Signature footer wordmark",
+        "purpose": "The sole monumental linked footer identity, italic with merchant-brand character-count sizing."
+      },
+      "signature-statement": {
+        "displayName": "Signature statement",
+        "purpose": "Homepage commerce signoff; compact clamp(29px, 5.5vw, 42px), max-width 18ch."
       }
     },
     "shadows": [
@@ -243,6 +383,21 @@
         "name": "action-hover",
         "value": "0 6px 20px #102b3b15",
         "purpose": "Retained primary-action hover shadow."
+      },
+      {
+        "name": "closing-print",
+        "value": "0 24px 44px #03131e55",
+        "purpose": "Dimensional silver photo print on the desktop closing stage."
+      },
+      {
+        "name": "closing-print-compact",
+        "value": "0 14px 24px #03131e33",
+        "purpose": "Flowing photographic prints at up to 900px."
+      },
+      {
+        "name": "signature-wordmark-edge",
+        "value": "0 2px 0 #48768c",
+        "purpose": "Text shadow on the homepage footer identity."
       }
     ],
     "motion": [
@@ -265,6 +420,21 @@
         "name": "journey-pose",
         "value": "p * p * (3 - 2 * p)",
         "purpose": "Clamped interpolation of absolute product poses; window-bound chapter fades in src/journey-poses.mjs."
+      },
+      {
+        "name": "closing-desktop-pin",
+        "value": ".9 * viewport height; ease: none; scrub: true",
+        "purpose": "Absolute reversible samples enlarge and settle the genuine Nike print while three separate supporting photographs recede. No GLB substitution."
+      },
+      {
+        "name": "closing-compact-flow",
+        "value": "top 65% -> bottom 25%; y: 22 -> -8; rotationX: 5 -> 0; no pin",
+        "purpose": "Small dimensional movement in normal flow at up to 900px."
+      },
+      {
+        "name": "signature-wordmark-reveal",
+        "value": "top 96% -> top 24%; yPercent: 20 -> 0; rotationX: -24 -> 0; opacity: .35 -> 1",
+        "purpose": "The actual linked footer identity resolves as the photographic stage releases. The footer stays in normal flow."
       }
     ],
     "breakpoints": [
@@ -287,6 +457,10 @@
       {
         "name": "short-phone",
         "value": "max-width: 700px and max-height: 740px"
+      },
+      {
+        "name": "closing-compact",
+        "value": "max-width: 900px"
       }
     ],
     "source": {
@@ -317,6 +491,22 @@
       "reducedMotion": "No journey renderer; static imagery and content in normal flow.",
       "noJavaScript": "Static imagery, complete HTML story and native links.",
       "canvas": "aria-hidden; pointer-events: none"
+    },
+    "closing": {
+      "scope": "Accepted Finale and homepage-only signature footer; preserves Intro, Hero and other routes.",
+      "source": [
+        "assets/closing.css",
+        "src/motion/closing.mjs",
+        "snippets/closing-campaign.liquid",
+        "sections/footer.liquid"
+      ],
+      "spacing": "Desktop photo inset 14px, focus inset 24px, actions gap 18px 24px; compact photo inset 10px, focus inset 18px, gallery gap 12px. Footer gap 30px and directory gap 28px; compact gap 28px and directory gap 16px.",
+      "geometry": "Desktop stage 100svh, min-height 660px; perspective 1500px. Footer min-height min(880px,100svh), compact min(680px,100svh).",
+      "accessibility": "Static reduced-motion/no-JavaScript composition and native links; no WebGL dependency. Closing focus 3px solid #88d9ee / 5px offset; footer focus 2px / 5px, wordmark 6px offset.",
+      "productTruth": "Existing genuine StockX-edit photographs and provenance are reused. Nike Air Max Plus Celestine Blue is a complete photo, with adidas Samba OG, New Balance 9060 and ASICS GEL-1130 as supporting prints. No new raster, renderer or dependency.",
+      "commerce": "Collection/search remain native links. Configured footer menu, shop policies, enabled payment icons and back-to-top are retained; no fabricated social, support or legal links.",
+      "evidence": "Accepted independent finish review: ship, no material findings; 1440x900, 1366x768, 390x844 and 375x667, forward/reverse source and actual captures.",
+      "screenshots": "C:/Users/LENOVO_LEGION/.codex/visualizations/2026/10/26/01a177f2-e40f-78b3-9884-15a85543f237/closing/after-{1440,1366,390,375}-{finale-0,footer-last}.png"
     }
   },
   "components": [
@@ -382,6 +572,22 @@
       "description": "Numbered ruled content row used beside the product study.",
       "html": "<div class=\"ds-ledger\"><span class=\"ds-number\">01</span><div><h3>The silhouette</h3><p>Follow the curves, panel edges and sculpted profile.</p></div></div>",
       "css": ".ds-ledger{display:grid;grid-template-columns:32px minmax(0,1fr);gap:18px;padding-block:clamp(16px,1.7vw,36px);border-top:1px solid color-mix(in srgb,var(--ink,#102b3b) 24%,transparent);color:var(--ink,#102b3b);font-family:Archivo,Arial,sans-serif}.ds-number{font-size:clamp(11px,.8vw,17px)}.ds-ledger h3{margin:0;font-size:clamp(22px,2vw,46px);line-height:1.1;letter-spacing:-.025em}.ds-ledger p{margin-bottom:0;font-size:clamp(15px,1.1vw,24px);line-height:1.55;max-width:39ch}"
+    },
+    {
+      "name": "Closing collection action",
+      "kind": "button",
+      "refersTo": "closing-collection-action",
+      "description": "Square pale collection link used in the photographic homepage ending.",
+      "html": "<a class=\"ds-closing-action\" href=\"/collections/all\">View the collection <span aria-hidden=\"true\">→</span></a>",
+      "css": ".ds-closing-action{display:inline-flex;align-items:center;justify-content:space-between;gap:32px;min-height:56px;padding:16px 22px;background:#e4f2f8;color:#102b3b;border-radius:0;text-decoration:none;font:650 14px Archivo,\"Helvetica Neue\",Helvetica,Arial,sans-serif}.ds-closing-action:hover{background:#fff}.ds-closing-action:focus-visible{outline:3px solid #88d9ee;outline-offset:5px}"
+    },
+    {
+      "name": "Signature homepage footer",
+      "kind": "custom",
+      "refersTo": "signature-footer",
+      "description": "The real linked identity and commerce signoff resolve on deep ocean in normal flow; configured directory and legal links follow in the storefront.",
+      "html": "<footer class=\"ds-signature\"><a class=\"ds-signature-word\" href=\"/\" aria-label=\"STRYDE — Home\">STRYDE</a><div class=\"ds-signature-commerce\"><p>Find your next perspective.</p><a href=\"/collections/all\">View the collection <span aria-hidden=\"true\">→</span></a></div></footer>",
+      "css": ".ds-signature{--gutter:clamp(24px,4.5vw,128px);--brand-characters:6;background:#061e30;color:#dcecf2;padding:42px var(--gutter) 24px;font-family:Archivo,\"Helvetica Neue\",Helvetica,Arial,sans-serif}.ds-signature-word{display:block;color:inherit;font-size:calc((100vw - 2 * var(--gutter)) / (var(--brand-characters) * .60));font-weight:900;font-style:italic;font-variation-settings:\"wght\" 900,\"wdth\" 80;letter-spacing:-.04em;line-height:1.04;text-shadow:0 2px 0 #48768c;text-decoration:none}.ds-signature-commerce{display:flex;align-items:center;justify-content:space-between;gap:30px;padding-bottom:30px;border-bottom:1px solid #315064}.ds-signature p{max-width:22ch;font-size:clamp(28px,3vw,52px);font-weight:550;line-height:1.08;letter-spacing:-.03em}.ds-signature-commerce a{display:inline-flex;align-items:center;justify-content:space-between;gap:55px;min-height:60px;padding:12px 0;border-bottom:1px solid #88d9ee;color:inherit;font-size:16px;text-decoration:none}.ds-signature-commerce a:hover{color:#88d9ee}.ds-signature a:focus-visible{outline:2px solid #88d9ee;outline-offset:5px}.ds-signature-word:focus-visible{outline-offset:6px}@media(max-width:900px){.ds-signature{padding-top:38px}.ds-signature-commerce{flex-direction:column;align-items:stretch;gap:20px;padding-bottom:24px}.ds-signature p{font-size:clamp(29px,5.5vw,42px);max-width:18ch}.ds-signature-commerce a{font-size:15px;min-height:54px}}"
     }
   ],
   "narrative": {

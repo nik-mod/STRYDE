@@ -3,10 +3,28 @@
   {% for link in section.settings.menu.links %}<a href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}
 {% endcapture %}
 {% assign footer_links = footer_links | strip %}
-<footer class="site-footer">
+{% assign footer_brand = settings.brand_name | default: shop.name %}
+<footer class="site-footer"{% if request.page_type == 'index' %} data-signature-footer{% endif %}>
+  {% if request.page_type == 'index' %}
+  <div class="signature-identity" data-footer-identity>
+    <a class="signature-wordmark" href="{{ routes.root_url }}" aria-label="{{ footer_brand | escape }} — {{ 'general.home' | t }}" style="--brand-characters: {{ footer_brand | size }}"><span data-footer-word>{{ footer_brand | escape }}</span></a>
+  </div>
+  <div class="signature-commerce">
+    <p class="signature-statement">{{ 'footer.statement' | t }}</p>
+    <a class="signature-shop" href="{{ routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a>
+  </div>
+  <div class="signature-directory">
+    <nav class="signature-explore" aria-label="{{ 'general.collection' | t }}">
+      <a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a>
+      <a href="{{ routes.search_url }}">{{ 'general.search' | t }}</a>
+    </nav>
+    <nav class="footer-links" aria-label="{{ 'general.footer_navigation' | t }}">{% if footer_links != blank %}{{ footer_links }}{% else %}<a href="{{ routes.root_url }}#chapter-deconstruction">{{ 'general.the_details' | t }}</a><a href="{{ routes.root_url }}#chapter-brand">{{ 'general.our_perspective' | t }}</a>{% endif %}</nav>
+  </div>
+  {% else %}
   <div class="footer-signoff"><p>{{ 'footer.statement' | t }}</p><a href="{{ routes.all_products_collection_url }}">{{ 'general.explore_collection' | t }} {% render 'icon', name: 'arrow' %}</a></div>
   <a class="wordmark" href="{{ routes.root_url }}">{{ settings.brand_name | default: shop.name | escape }}</a>
   <nav class="footer-links" aria-label="{{ 'general.footer_navigation' | t }}">{% if footer_links != blank %}{{ footer_links }}{% else %}<a href="{{ routes.all_products_collection_url }}">{{ 'general.collection' | t }}</a><a href="{{ routes.root_url }}#chapter-deconstruction">{{ 'general.the_details' | t }}</a><a href="{{ routes.root_url }}#chapter-brand">{{ 'general.our_perspective' | t }}</a>{% endif %}</nav>
+  {% endif %}
   {% if shop.enabled_payment_types.size > 0 %}<div class="footer-payments" aria-label="Accepted payment methods">{% for type in shop.enabled_payment_types %}{{ type | payment_type_svg_tag: class: 'payment-icon' }}{% endfor %}</div>{% endif %}
   <div class="footer-meta"><p>© {{ 'now' | date: '%Y' }} {{ shop.name | escape }}</p><a href="#MainContent" class="back-top">{{ 'general.back_to_top' | t }} {% render 'icon', name: 'arrow-up' %}</a></div>
 </footer>

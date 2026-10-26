@@ -7,6 +7,7 @@ import { journeyModelSpec, journeyModelKey } from './journey-models.mjs';
 import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose, chapterCameraDistance, productWindowViewport } from './journey-transition.mjs';
 import { environmentFor } from './motion/environments.mjs';
 import { journeyPose, journeyProgress, flowingMaterialSample, journeyHandoff, brandLighting } from './journey-poses.mjs';
+import { createHeroWorld, expandHeroCamera } from './hero-world.mjs';
 
 const chapterOrder = ['hero', 'deconstruction', 'materials', 'technology', 'collection', 'featured', 'brand', 'finale'];
 const clamp = value => Math.min(1, Math.max(0, value));
@@ -26,8 +27,9 @@ function disposeModel(model) {
   geometries.forEach(geometry => geometry.dispose());
 }
 
-// The scene owns only its overlay and model. GSAP retains ownership of section
-// pins and HTML choreography; no canvas is moved into a transformed pin.
+// One renderer owns the product and hero world. In the hero its canvas is
+// absolute inside the pinned stage, beneath HTML. Later chapters use the
+// existing fixed/scissored windows; GSAP still owns every pin and scroll clock.
 export async function mountJourneyScene(options) {
   const { root, signal } = options;
   const document = root.ownerDocument;
@@ -92,8 +94,16 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   const rim = new THREE.DirectionalLight(0xbfe8ff, 2); rim.position.set(-3, 2, -2);
   const fill = new THREE.DirectionalLight(0x8fd2f4, .65); fill.position.set(-2.6, .7, 3.4);
   scene.add(ambient, key, rim, fill);
-  let renderer, reflection, shadow, shadowPlane, shadowTexture, motionWake, wakeMaterial;
-  const wakeGeometries = [];
+  let renderer, reflection, shadow, shadowPlane, shadowTexture, heroWorld;
+  const heroStage = root.querySelector('[data-hero-stage]');
+  let worldTime = 0;
+  let shadowTime = -1, shadowProgress = -1;
+  const updateHeroShadow = progress => {
+    if (worldTime - shadowTime >= .1 || Math.abs(progress - shadowProgress) > .015) {
+      renderer.shadowMap.needsUpdate = true;
+      shadowTime = worldTime; shadowProgress = progress;
+    }
+  };
   const primary = { url, yaw: Number(root.dataset.modelYaw) || 90, variant: 'blue' };
   const assets = new Map(), loading = new Map(), failed = new Set();
   let selectedAssets = [];
@@ -115,18 +125,6 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       : previous + (target - previous) * (1 - Math.exp(-dt * 7.5));
     smoothedProgress.set(key, next);
     return next;
-  };
-  // Resting life: a slow breath on the stages where the reader pauses. The
-  // amplitude dies out as soon as the authored pose takes over from scroll.
-  const idleStrength = (chapter, progress) => chapter === 'hero' ? 1 - clamp(progress / .1)
-    : chapter === 'finale' ? clamp(1 - (1 - progress) / .12) : 0;
-  const applyIdle = (rig, chapter, progress, time) => {
-    const strength = idleStrength(chapter, progress);
-    if (strength <= 0) { rig.position.y = 0; return false; }
-    rig.position.y = Math.sin(time * .85) * .02 * strength;
-    rig.rotation.z += Math.sin(time * .55 + 1.1) * .014 * strength;
-    rig.rotation.x += Math.sin(time * .38) * .008 * strength;
-    return true;
   };
   const release = () => {
     owned.forEach(target => target.classList.remove('has-journey-scene'));
@@ -150,7 +148,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     assets.forEach(asset => disposeModel(asset.model)); assets.clear(); cameraFits.clear();
     shadowPlane?.geometry.dispose(); key.shadow.dispose();
     shadow?.dispose(); shadowTexture?.dispose(); reflection?.dispose();
-    wakeGeometries.forEach(geometry => geometry.dispose()); wakeMaterial?.dispose();
+    heroWorld?.dispose();
     renderer?.dispose(); renderer?.forceContextLoss(); overlay.remove();
     root.classList.remove('has-scene'); setStatus('');
   };
@@ -241,7 +239,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       modelSpec = view.modelSpecs[index];
       if (view.pinned) modelBlend = studyTransition(view.modelSpecs, progress);
       else if (index > 0) {
-        const state = windowTransition(view.modelSpecs[index - 1], modelSpec, progress * view.modelSpecs.length - index, .1, .65);
+        const state = windowTransition(view.modelSpecs[index - 1], modelSpec, progress * view.modelSpecs.length - index, .22, .53);
         modelSpec = state.spec; modelBlend = state.blend;
       }
     }
@@ -283,9 +281,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
           const centered = new THREE.Box3().setFromObject(object);
           for (const x of [centered.min.x, centered.max.x]) for (const y of [centered.min.y, centered.max.y]) for (const z of [centered.min.z, centered.max.z]) surface.push(new THREE.Vector3(x, y, z));
         }
-        const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+        const anisotropy = Math.min(environment.innerWidth <= 700 ? 4 : 16, renderer.capabilities.getMaxAnisotropy());
         const treatedMaterials = new Set();
         object.traverse(node => {
+          if (node.isMesh) node.castShadow = true;
           for (const material of (Array.isArray(node.material) ? node.material : [node.material])) {
             if (!material || treatedMaterials.has(material)) continue;
             treatedMaterials.add(material);
@@ -295,7 +294,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
               material.envMapIntensity = .55;
               if ('specularIntensity' in material) material.specularIntensity = .6;
               material.specularColor?.setRGB(.8, .8, .8);
-            } else refinePreviewMaterial(material, THREE.ShaderChunk.normal_fragment_maps);
+            } else refinePreviewMaterial(material, node.geometry);
           }
         });
         const scale = 2.6 / Math.max(size.x, size.y, size.z);
@@ -343,7 +342,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       for (let index = 1; index < view.modelSpecs.length; index++) {
         if (journeyModelKey(view.modelSpecs[index - 1]) === journeyModelKey(view.modelSpecs[index])) continue;
         const boundary = index / view.modelSpecs.length;
-        exchangeRanges.push([boundary - .105, boundary + .105], [(index + .1) / view.modelSpecs.length, (index + .65) / view.modelSpecs.length]);
+        exchangeRanges.push([boundary - .065, boundary + .065], [(index + .22) / view.modelSpecs.length, (index + .53) / view.modelSpecs.length]);
       }
     } else if (view.exchangeWindow) exchangeRanges.push([view.exchangeWindow.start, view.exchangeWindow.end]);
     const key = JSON.stringify([view.chapter, aspect, unique.map(([id]) => id).sort(), exchangeRanges]);
@@ -395,29 +394,30 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     } else {
       key.position.set(3, 4, 5); rim.position.set(-3, 2, -2);
       key.intensity = light.key; rim.intensity = light.rim;
-      ambient.intensity = 1.05; fill.intensity = .65; scene.environmentIntensity = .36;
+      ambient.intensity = .62; fill.intensity = .34; scene.environmentIntensity = .46;
+      if (chapter === 'hero') {
+        key.position.set(2.6 - progress * .7, 4.5, 5);
+        rim.position.set(-3.6, 2.6, -1.8);
+        ambient.intensity = .52; fill.intensity = .28;
+      }
       if (['deconstruction', 'materials', 'technology', 'featured'].includes(chapter)) {
-        key.position.x += Math.sin(progress * Math.PI * 2 - .6) * 1.4;
-        rim.position.z += Math.cos(progress * Math.PI * 2) * .8;
+        key.position.x += Math.sin(progress * Math.PI - .6) * .7;
+        rim.position.z += Math.cos(progress * Math.PI) * .35;
       }
     }
-    const energy = exchange ? Math.sin(Math.PI * exchange.progress) ** 2 : 0;
-    if (motionWake) {
-      motionWake.visible = energy > .001;
-      if (motionWake.visible) {
-        const angle = exchange.progress * Math.PI * 2;
-        motionWake.rotation.z = -.4 + angle * .42;
-        wakeMaterial.opacity = energy * .28;
-        wakeMaterial.color.set(chapter === 'featured' ? 0x69b6dd : 0x4c849f);
-        key.position.set(Math.sin(angle - .8) * 4.4, 3.2, Math.cos(angle - .8) * 4.4);
-        rim.position.set(-Math.sin(angle - .8) * 3.4, 1.8, -Math.cos(angle - .8) * 3.4);
-        key.intensity += energy * 1.8; rim.intensity += energy * 1.2;
-      }
+    // A short softbox traverse follows the exchange, with no orbit traces
+    // or orbiting lights. The material remains readable at the identity cut.
+    if (exchange) {
+      const energy = Math.sin(Math.PI * exchange.progress) ** 2;
+      key.position.x += energy * .7;
+      key.intensity += energy * .3;
+      rim.intensity += energy * .15;
     }
     return light;
   }
 
-  function renderBoundary(views, chapter, dt, time) {
+  function renderBoundary(views, chapter, dt) {
+    restoreProductWindow();
     const targetWidth = Math.ceil(environment.innerWidth / 64) * 64;
     const targetHeight = Math.ceil(environment.innerHeight / 64) * 64;
     if (width !== targetWidth || height !== targetHeight) {
@@ -437,14 +437,17 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       if (rect.width < 2 || rect.height < 2) continue;
       const cameraZ = cameraDistanceFor(view);
       if (cameraZ === null) continue;
-      const window = productWindowViewport(rect, view.sectionRect, { width: environment.innerWidth, height: environment.innerHeight }, { width, height });
+      const isHero = view.chapter === 'hero';
+      const worldRect = isHero ? heroStage.getBoundingClientRect() : rect;
+      const window = productWindowViewport(worldRect, view.sectionRect, { width: environment.innerWidth, height: environment.innerHeight }, { width, height });
       if (!window) continue;
       renderer.setViewport(...window.viewport);
       renderer.setScissor(...window.scissor); renderer.setScissorTest(true); renderer.clearDepth();
+      if (camera.view?.enabled) camera.clearViewOffset();
+      camera.rotation.set(0, 0, 0);
       camera.aspect = rect.width / rect.height; camera.updateProjectionMatrix();
-      rig.position.y = 0;
+      rig.position.set(0, 0, 0);
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
-      applyIdle(rig, view.chapter, view.progress, time);
       rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
@@ -457,11 +460,20 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       camera.position.set(0, pose.cameraY, cameraZ);
       const light = lightFor(view.chapter, view.progress, view.modelBlend);
       renderer.toneMappingExposure = pose.exposure * light.exposure;
+      heroWorld.group.visible = isHero; scene.fog = isHero ? heroWorld.fog : null; shadowPlane.visible = !isHero;
+      if (isHero) {
+        expandHeroCamera(camera, rect, worldRect);
+        heroWorld.update(worldTime, view.progress, dt, camera, rig, key, rim);
+        updateHeroShadow(view.progress);
+      }
       renderer.render(scene, camera);
       if (inspectMotion) motion.push({ chapter: view.chapter, model: overlay.dataset.model, pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() });
       visible.push(...(view.chapter === 'materials' && view.pinned ? view.visuals : [view.visual]));
     }
     renderer.autoClear = true; renderer.setScissorTest(false);
+    heroWorld.group.visible = false; scene.fog = null; shadowPlane.visible = true;
+    if (camera.view?.enabled) camera.clearViewOffset();
+    camera.rotation.set(0, 0, 0); rig.position.set(0, 0, 0);
     owned.filter(target => !visible.includes(target)).forEach(target => target.classList.remove('has-journey-scene'));
     visible.forEach(target => target.classList.add('has-journey-scene')); owned = visible;
     overlay.dataset.chapter = chapter;
@@ -470,11 +482,69 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     lastSignature = ''; dirty = true;
   }
 
+  // Exit the hero without leaking its projection, fog, shadows or DOM owner
+  // into a later chapter. Reparenting happens only at an ownership boundary.
+  function restoreProductWindow() {
+    if (overlay.parentElement !== document.body) document.body.append(overlay);
+    overlay.style.position = 'fixed';
+    if (camera.view?.enabled) camera.clearViewOffset();
+    camera.rotation.set(0, 0, 0);
+    rig.position.set(0, 0, 0);
+    if (heroWorld) heroWorld.group.visible = false;
+    scene.fog = null;
+    if (shadowPlane) shadowPlane.visible = true;
+  }
+
+  function renderHeroWorld(current, cameraZ, dt) {
+    const stageRect = heroStage.getBoundingClientRect();
+    if (stageRect.bottom <= 0 || stageRect.top >= environment.innerHeight) { release(); return; }
+    if (overlay.parentElement !== heroStage) heroStage.append(overlay);
+    Object.assign(overlay.style, { position: 'absolute', display: 'block', left: '0px', top: '0px',
+      width: `${stageRect.width}px`, height: `${stageRect.height}px`, opacity: String(current.opacity) });
+    const targetWidth = Math.max(64, Math.ceil(stageRect.width / 64) * 64);
+    const targetHeight = Math.max(64, Math.ceil(stageRect.height / 64) * 64);
+    if (width !== targetWidth || height !== targetHeight) {
+      width = targetWidth; height = targetHeight;
+      renderer.setPixelRatio(Math.min(environment.devicePixelRatio || 1, environment.innerWidth <= 700 ? 1.25 : 1.5, Math.sqrt((environment.innerWidth <= 700 ? 650000 : 2000000) / (width * height))));
+      renderer.setSize(width, height, false);
+    }
+    const { pose } = current;
+    camera.position.set(0, pose.cameraY, cameraZ);
+    expandHeroCamera(camera, current.rect, stageRect);
+    rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
+    lightFor('hero', current.progress);
+    heroWorld.group.visible = true; scene.fog = heroWorld.fog; shadowPlane.visible = false;
+    heroWorld.update(worldTime, current.progress, dt, camera, rig, key, rim, bus?.state?.entrance ?? 1);
+    renderer.toneMappingExposure = pose.exposure * environmentFor('hero').exposure;
+    updateHeroShadow(current.progress);
+    renderer.setScissorTest(false); renderer.setViewport(0, 0, width, height);
+    renderer.render(scene, camera);
+    owned.filter(target => target !== current.visual).forEach(target => target.classList.remove('has-journey-scene'));
+    current.visual.classList.add('has-journey-scene'); owned = [current.visual];
+    overlay.dataset.chapter = 'hero';
+    if (inspectMotion) {
+      overlay.dataset.world = JSON.stringify({ time: worldTime, progress: current.progress, camera: camera.position.toArray(),
+        surface: heroWorld.group.position.toArray(), calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+        buffer: [renderer.domElement.width, renderer.domElement.height] });
+      overlay.dataset.motion = JSON.stringify([{ chapter: 'hero', model: overlay.dataset.model,
+        pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() }]);
+    }
+    lastSignature = '';
+  }
+
   try {
     setStatus(root.dataset.loadingLabel || 'Loading product view…');
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.autoUpdate = false;
+    key.castShadow = true;
+    const shadowSize = environment.innerWidth <= 700 ? 256 : 512;
+    key.shadow.mapSize.set(shadowSize, shadowSize);
+    Object.assign(key.shadow.camera, { left: -2.7, right: 2.7, top: 2.7, bottom: -2.7, near: .5, far: 16 });
+    key.shadow.normalBias = .025; key.shadow.bias = -.00015;
+    key.shadow.radius = 5; key.shadow.intensity = .5;
     renderer.setClearColor(0x000000, 0);
     renderer.domElement.setAttribute('aria-hidden', 'true');
     Object.assign(renderer.domElement.style, { display: 'block', width: '100%', height: '100%' });
@@ -513,29 +583,24 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadow);
     shadowPlane.rotation.x = -Math.PI / 2;
     scene.add(shadowPlane);
-    // Three fine orbit traces appear only during a model exchange. They use
-    // the same scene and clock, behind the product, with no additional canvas.
-    motionWake = new THREE.Group(); motionWake.visible = false;
-    wakeMaterial = new THREE.LineBasicMaterial({ color: 0x4c849f, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
-    for (let index = 0; index < 3; index++) {
-      const points = Array.from({ length: 40 }, (_, step) => {
-        const angle = index * 2.1 + step / 39 * 1.15;
-        return new THREE.Vector3(Math.cos(angle) * (1.48 + index * .07), Math.sin(angle) * .76, -.72);
-      });
-      const geometry = new THREE.BufferGeometry().setFromPoints(points); wakeGeometries.push(geometry);
-      motionWake.add(new THREE.Line(geometry, wakeMaterial));
-    }
-    scene.add(motionWake);
+    heroWorld = createHeroWorld({ scene, root, compact: environment.innerWidth <= 700 });
     loaded = true; root.classList.add('has-scene'); setStatus('');
     collectTargets();
 
     detachFrame = scheduler.add(time => {
       if (disposed || lost || !loaded || document.hidden || !root.isConnected) { if (!root.isConnected) release(); return; }
-      const dt = lastFrameTime === null ? 1 / 60 : Math.min(.06, Math.max(.001, time - lastFrameTime));
+      const dt = lastFrameTime === null ? 1 / 60 : Math.min(.12, Math.max(.001, time - lastFrameTime));
       lastFrameTime = time;
+      const opening = document.documentElement.classList.contains('site-intro-playing') || document.documentElement.classList.contains('site-intro-pending');
+      // Establish one frame behind the film; resume during the shutter reveal
+      // so the existing Hero arrival is already moving when it becomes visible.
+      if (opening && owned.length && !document.documentElement.hasAttribute('data-intro-revealing')) return;
       let current = resolve();
       if (!current) { release(); lastSignature = ''; return; }
-      if (current.views) { renderBoundary(current.views, current.chapter, dt, time); return; }
+      if (current.views) {
+        if (!opening && current.views.some(view => view.chapter === 'hero')) worldTime += dt;
+        renderBoundary(current.views, current.chapter, dt); return;
+      }
       current = motionFor(current, dt);
       const desiredKey = journeyModelKey(current.modelSpec);
       if (failed.has(desiredKey)) { release(); lastSignature = ''; return; }
@@ -543,8 +608,12 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       const { rect } = current;
       const cameraZ = cameraDistanceFor(current);
       if (cameraZ === null) { release(); lastSignature = ''; return; }
+      if (current.chapter === 'hero') {
+        if (!opening) worldTime += dt;
+        renderHeroWorld(current, cameraZ, dt); return;
+      }
+      restoreProductWindow();
       const { pose } = current;
-      if (idleStrength(current.chapter, current.progress) > 0) dirty = true;
       const signature = [activeModelKey, ...Object.values(pose).map(value => value.toFixed(5)), current.chapter, current.progress.toFixed(5), rect.left.toFixed(2), rect.top.toFixed(2), rect.width.toFixed(2), rect.height.toFixed(2), current.opacity.toFixed(3), cameraZ.toFixed(5)].join(':');
       if (!dirty && signature === lastSignature) return;
       lastSignature = signature; dirty = false;
@@ -561,7 +630,6 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       Object.assign(overlay.style, { display: 'block', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`, opacity: String(current.opacity) });
       rig.position.y = 0;
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
-      applyIdle(rig, current.chapter, current.progress, time);
       rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {

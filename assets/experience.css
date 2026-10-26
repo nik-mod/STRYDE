@@ -26,9 +26,12 @@
 /* Opening: lettering spans the field; the live object performs across it. */
 .template-index .hero-stage {
   min-height: calc(100svh - var(--preview-height));
-  background: linear-gradient(155deg, #a8cfe8 0%, #c7e6f2 58%, #e3f0f5 100%);
+  background: #b9dced;
 }
-.template-index .hero-atmo { background: none; }
+/* The sky is the static fallback. The live landscape occupies the same
+   stage and renderer as the sneaker; the headline remains above its canvas. */
+.template-index .hero-atmo { inset: 0; background: radial-gradient(ellipse at 76% 39%, #edf7fa 0%, #c5e2ee 38%, transparent 72%), linear-gradient(115deg, #aecfdf, #c5e2ee 62%, #d9edf4); }
+.template-index .hero-stage > .journey-canvas { z-index: 4; }
 .template-index .hero .hero-edition { top: calc(var(--header-height) + 24px); font-size: var(--film-label); letter-spacing: .12em; }
 .template-index .hero .hero-type {
   top: 18%; left: var(--gutter); right: var(--gutter); width: auto;
@@ -486,15 +489,15 @@
 
 /* Hero correction: one readable statement beside one calm product window. */
 .template-index .hero[data-hero] .hero-stage { height: calc(100svh - var(--preview-height)); min-height: 620px; padding: 0; }
-.template-index .hero[data-hero] .hero-editorial { position: absolute; top: 52%; left: var(--gutter); width: 44%; transform: translateY(-50%); z-index: 8; display: flex; flex-direction: column; align-items: flex-start; gap: clamp(24px,2.4vw,54px); }
-.template-index .hero[data-hero] .hero-type { position: relative; inset: auto; width: 100%; margin: 0; font-size: clamp(64px,8.4vw,220px); line-height: .92; letter-spacing: -.035em; font-stretch: normal; gap: .08em; perspective: none; }
+.template-index .hero[data-hero] .hero-editorial { position: absolute; top: 51%; left: var(--gutter); width: 43%; transform: translateY(-50%); z-index: 8; display: flex; flex-direction: column; align-items: flex-start; gap: clamp(30px,3.2vw,64px); }
+.template-index .hero[data-hero] .hero-type { position: relative; inset: auto; width: 100%; margin: 0; font-size: clamp(64px,8.65vw,220px); line-height: .92; letter-spacing: -.035em; font-stretch: normal; gap: .08em; perspective: none; }
 .template-index .hero[data-hero] .hero-line { align-self: flex-start; margin: -.1em -.08em; padding: .1em .08em; transform: none; overflow: hidden; font-size: 1em; }
 .template-index .hero[data-hero] .hero-line-inner { background: none; color: var(--ink); -webkit-text-fill-color: currentColor; letter-spacing: -.035em; }
 .template-index .hero[data-hero] .hero-type .hero-line-1 .hero-line-inner { font-variation-settings: 'wght' 900, 'wdth' 76; }
 .template-index .hero[data-hero] .hero-type .hero-line-2 .hero-line-inner { color: var(--film-cobalt); font-style: italic; font-variation-settings: 'wght' 720, 'wdth' 76; }
 .template-index .hero[data-hero] .hero-line-2 .hero-glyph { color: inherit; -webkit-text-stroke: 0; }
 .template-index .hero[data-hero] .hero-glyph::after { display: none; }
-.template-index .hero[data-hero] .hero-art { position: absolute; left: 51%; right: 4%; top: 21%; bottom: 16%; width: auto; height: auto; min-height: 0; margin: 0; transform: none; }
+.template-index .hero[data-hero] .hero-art { position: absolute; left: 46%; right: 1.5%; top: 18%; bottom: 17%; width: auto; height: auto; min-height: 0; margin: 0; transform: none; }
 .template-index .hero[data-hero] .hero-arrival { transform: none; }
 .template-index .hero[data-hero] .hero-copy { position: relative; inset: auto; width: 100%; max-width: 37ch; margin: 0; font-size: 16px; }
 .template-index .hero[data-hero] .hero-description { margin: 0; font-size: 16px; line-height: 1.5; }
@@ -502,8 +505,6 @@
 .template-index .hero[data-hero] .hero-actions { width: auto; display: flex; gap: 20px; align-items: center; }
 .template-index .hero[data-hero] .hero-cart { width: auto; min-height: 56px; padding: 16px 23px; display: inline-flex; align-items: center; gap: 32px; font-size: 14px; }
 .template-index .hero[data-hero] .hero-cart svg { width: 19px; height: 19px; }
-.template-index .hero[data-hero] .hero-model-credit { margin: 0; font-size: clamp(10px,.8vw,16px); font-weight: 500; line-height: 1.5; letter-spacing: .025em; }
-.template-index .hero[data-hero] .hero-model-credit span { opacity: .7; }
 .template-index .hero[data-hero] .hero-name { font-size: clamp(20px,1.7vw,36px); }
 @media (max-width: 900px) and (orientation: portrait) {
   .template-index .hero[data-hero] .hero-editorial { display: contents; transform: none; }
@@ -515,12 +516,11 @@
   .template-index .hero[data-hero].hero-has-product .hero-art { top: 35%; bottom: 35%; }
 }
 @media (max-width: 700px) {
-  .template-index .hero[data-hero] .hero-type { top: 18%; font-size: clamp(56px,14.1vw,90px); }
+  .template-index .hero[data-hero] .hero-type { top: 18%; font-size: clamp(56px,15.1vw,96px); }
   .template-index .hero[data-hero] .hero-art { top: 36%; bottom: 22%; left: 5%; right: 5%; }
   .template-index .hero[data-hero] .hero-foot { bottom: 5%; gap: 14px; }
   .template-index .hero[data-hero] .hero-cart { min-height: 52px; padding: 15px 20px; font-size: 14px; }
   .template-index .hero[data-hero] .hero-actions { width: auto; }
-  .template-index .hero[data-hero] .hero-model-credit { font-size: 10px; }
   .template-index .hero[data-hero] .hero-copy { bottom: 24%; font-size: 14px; }
   .template-index .hero[data-hero] .hero-description { font-size: 14px; }
   .template-index .hero[data-hero].hero-has-product .hero-type { font-size: 13vw; top: 17%; }
@@ -531,3 +531,7 @@
   .template-index .hero[data-hero] .hero-art { top: 37%; bottom: 26%; }
   .template-index .hero[data-hero] .hero-foot { bottom: 4%; gap: 12px; }
 }
+
+/* The static poster shares the live shoe's profile and framing. Legacy
+   image transforms must not turn the loading or reduced-motion view. */
+.template-index .hero[data-hero].hero-editorial-model .hero-image { position: absolute; left: -13%; top: -5%; transform: none !important; object-fit: contain; width: 126%; height: 126%; max-width: none; }

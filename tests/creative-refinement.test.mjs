@@ -121,7 +121,7 @@ test('Brand live studio replaces the raster wall and keeps merchant campaign pre
   assert.match(studio, /tn-profile-2800\.webp/);
   assert.match(studio, /hero.model_preview/);
   assert.equal((studio.match(/<img\b/g) || []).length, 4, 'one whole-shoe fallback and a three-image contact sheet are present');
-  assert.doesNotMatch(studio, /tn-detail|brand-visual-pair|brand-word|brand-values/);
+  assert.doesNotMatch(studio, /brand-visual-pair|brand-word|brand-values/);
   const merchant = await renderChapter('brand', { use_tn_model: true, image: campaignImage });
   assert.match(merchant, /merchant-campaign.jpg/);
   assert.doesNotMatch(merchant, /data-brand-live|data-brand-window|tn-profile/);
@@ -209,10 +209,11 @@ test('blank Brand lines create no empty display rows while configured story and 
   }
 });
 
-test('Hero keeps one quiet bundled disclosure and omits ornamental controls for every media source', async () => {
+test('Hero omits the preview credit and ornamental controls while retaining the bundled model and collection action', async () => {
   const bundled = await renderChapter('hero', { use_tn_model: true });
   assert.match(bundled, /data-model-yaw="90"/);
-  assert.match(bundled, /hero-model-credit/);
+  assert.doesNotMatch(bundled, /hero-model-credit|3D model preview/);
+  assert.match(bundled, /class="hero-cart"[^>]+href=/);
   assert.doesNotMatch(bundled, /hero-edition|hero-views|hero-ticker|hero-cue|hero-ring/);
   for (const override of [
     { image: campaignImage },

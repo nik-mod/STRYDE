@@ -1,6 +1,7 @@
 import { mountFormEdit } from './form-edit.mjs';
 import { mountCollectionHover } from './collection-hover.mjs';
 import { brandStudyPhase } from '../journey-poses.mjs';
+import { mountClosingCampaign } from './closing.mjs';
 
 const brandResizeCheckpoints = new WeakMap();
 
@@ -112,7 +113,7 @@ function materials(root, gsap, { mobile }) {
     root.classList.add('is-journey-host');
     const timeline = gsap.timeline({ scrollTrigger: {
       trigger: root, start: 'top top',
-      end: () => `+=${Math.round(window.innerHeight * 1.9)}`,
+      end: () => `+=${Math.round(window.innerHeight * 1.65)}`,
       pin: true, scrub: .45, anticipatePin: 1, invalidateOnRefresh: true,
     }});
     // The live shoe keeps turning through the boundary. Captions use a staged
@@ -422,7 +423,7 @@ function brandStudio(root, gsap, { mobile }) {
   const buttons = [...root.querySelectorAll('[data-brand-step]')];
   const caption = root.querySelector('[data-brand-caption]');
   const contact = root.querySelectorAll('.brand-contact-sheet figure');
-  if (contact.length) gsap.fromTo(contact, { y: 60, rotation: 5 }, { y: 0, rotation: 0, stagger: .08, ease: 'power2.out', scrollTrigger: { trigger: root, start: 'top 75%', end: 'top 5%', scrub: .6 } });
+  if (contact.length) gsap.fromTo(contact, { y: 24, rotation: 1.5 }, { y: 0, rotation: 0, stagger: .08, ease: 'power2.out', scrollTrigger: { trigger: root, start: 'top 75%', end: 'top 5%', scrub: .6 } });
   const checkpoint = brandResizeCheckpoints.get(root);
   brandResizeCheckpoints.delete(root);
   let restoring = Boolean(checkpoint && checkpoint.width === viewport.width && checkpoint.height === viewport.height);
@@ -537,14 +538,15 @@ function brand(root, gsap, { mobile }) {
 /* ------------------------------------------------------- 08 — finale */
 
 function finale(root, gsap, { mobile }) {
+  if (root.hasAttribute('data-closing-campaign')) return mountClosingCampaign(root, gsap, { mobile });
   const stage = root.querySelector('[data-finale-stage]');
   if (!stage) return;
   if (stage.hasAttribute('data-finale-edit')) {
     const cards = [...stage.querySelectorAll('.finale-edit-card')];
     const reveal = gsap.timeline({ scrollTrigger: { trigger: stage, start: 'top 85%', end: 'top 8%', scrub: .65 } });
     cards.forEach((card, index) => reveal.fromTo(card,
-      { y: 150 + index * 24, x: (index - 1.5) * -65, rotation: (index - 1.5) * 16, scale: .88 },
-      { y: 0, x: 0, rotation: (index - 1.5) * 4, scale: 1, duration: .85, ease: 'power3.out' }, index * .07));
+      { y: 70 + index * 12, x: (index - 1.5) * -18, rotation: (index - 1.5) * 3, scale: .98 },
+      { y: 0, x: 0, rotation: 0, scale: 1, duration: 1, ease: 'power3.out' }, index * .05));
     reveal.fromTo(stage.querySelector('.finale-heading'), { y: 60, rotationX: 18 }, { y: 0, rotationX: 0, duration: .7, ease: 'power3.out' }, .18);
     return;
   }
@@ -586,14 +588,7 @@ function finale(root, gsap, { mobile }) {
     timeline.fromTo(shoe, { scale: .9, yPercent: 4, rotationZ: -2, autoAlpha: 1 },
       { scale: 1, yPercent: 0, rotationZ: 0, autoAlpha: 1, duration: .5, ease: 'none' }, .02);
   }
-  // After the landing the shoe keeps breathing — a slow float with a hint of
-  // sway that holds the stage alive while the reader decides. Independent of
-  // the scrub, so it also runs at the resting end-state. One tween, two
-  // properties — separate same-element tweens can silently no-op.
-  const floatTarget = shoe?.querySelector('[data-finale-float]') || shoe?.querySelector('img') || shoe;
-  if (floatTarget && !liveModel) gsap.to(floatTarget, {
-    yPercent: -2.1, rotation: 1.15, duration: 2.9, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: .8,
-  });
+  // The product rests after its arrival; only the authored scroll pose moves it.
   // The monumental word never fully settles either: a long lateral drift
   // keeps the dark stage moving after the reveal completes.
   if (word) gsap.to(word, {

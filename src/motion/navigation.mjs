@@ -55,7 +55,7 @@ export function mountNavigation({ document, environment = window, getScroller, o
     if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || link.hasAttribute('download') || link.target === '_blank') return;
     // A logo on the homepage is a return to the opening composition, not a
     // document reload. Cross-page logo navigation remains a normal native link.
-    if (link.matches('.wordmark') && document.querySelector('[data-hero]')) {
+    if (link.matches('.wordmark, .signature-wordmark') && document.querySelector('[data-hero]')) {
       const current = new URL(environment.location.href), home = new URL(link.href, current);
       if (home.origin === current.origin && home.pathname === current.pathname) {
         event.preventDefault();

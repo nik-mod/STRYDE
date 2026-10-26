@@ -17,13 +17,13 @@ export function mountCollectionHover(scene, gsap, environment = window) {
   const options = { signal: listeners.signal };
   scene.addEventListener('pointerenter', () => {
     bounds = scene.getBoundingClientRect();
-    pose(1.04, -10);
+    pose(1.018, -4);
   }, options);
   scene.addEventListener('pointermove', event => {
     if (!bounds?.width || !bounds.height) return;
     const clamp = value => Math.max(-.5, Math.min(.5, value));
-    xTo(clamp((event.clientX - bounds.left) / bounds.width - .5) * 10);
-    yTo(clamp((event.clientY - bounds.top) / bounds.height - .5) * 8);
+    xTo(clamp((event.clientX - bounds.left) / bounds.width - .5) * 6);
+    yTo(clamp((event.clientY - bounds.top) / bounds.height - .5) * 4);
   }, options);
   scene.addEventListener('pointerleave', reset, options);
   environment.addEventListener('resize', () => { bounds = null; }, options);

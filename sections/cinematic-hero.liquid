@@ -23,7 +23,6 @@
       <div class="hero-foot" data-hero-foot>
         {% if bundled_tn %}
           <div class="hero-actions"><a class="hero-cart" data-magnetic href="{{ collection_url }}"><span data-magnetic-content>{{ section.settings.cta | escape }}</span>{% render 'icon', name: 'arrow' %}</a></div>
-          <p class="hero-model-credit">{{ section.settings.concept_name | escape }} <span>· {{ 'hero.model_preview' | t }}</span></p>
         {% else %}
           <div class="hero-product-info">
         {% if featured_product != blank %}
@@ -54,7 +53,7 @@
           {% if presentation_image != blank %}
             {{ presentation_image | image_url: width: 1800 | image_tag: class: 'hero-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 46vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
           {% elsif bundled_tn %}
-            <img class="hero-image" src="{{ 'tn-angle-1400.webp' | asset_url }}" width="1400" height="1050" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager">
+            <img class="hero-image" src="{{ 'tn-profile-1400.webp' | asset_url }}" width="1400" height="1050" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager">
           {% elsif featured_product != blank %}
             <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
           {% elsif model_url == blank %}

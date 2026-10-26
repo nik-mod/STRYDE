@@ -28,16 +28,17 @@ test('the original opening stays blue and the new model occupies the existing ch
   assert.deepEqual(config.order, ['hero','deconstruction','materials','technology','collection','featured','brand','finale']);
   assert.match(html, /data-model-url="\/assets\/nike-tn-blue-white\.glb"/);
   const intro = html.slice(html.indexOf('data-site-intro'), html.indexOf('<a class="skip-link"'));
-  assert.match(intro, /tn-angle-1400\.webp/);
-  assert.match(intro, /data-intro-macros/);
-  assert.match(intro, /tn-mono-profile-1400\.webp/);
-  assert.match(intro, /intro-tn-white-cyan\.webp/);
-  assert.doesNotMatch(intro, /intro-tn-orange|tn-mono-detail/);
+  for (const marker of ['move-glyph', 'different-glyph', 'glyph', 'curtain', 'macros', 'skip']) {
+    assert.match(intro, new RegExp(`data-intro-${marker}`));
+  }
+  assert.match(intro, /tn-angle-1400.webp/);
+  assert.doesNotMatch(intro, /<canvas|data-model-url=/, 'the recovered film adds no second live sneaker renderer');
   assert.doesNotMatch(html, /model-spotlight|drift-spotlight|spotlight-model/);
   assert.equal((html.match(/data-model-url=/g) || []).length, 1);
   assert.equal((html.match(/data-journey-model="\/assets\/nike-tn-monochrome.glb"/g) || []).length, 2);
   const anatomy = html.slice(html.indexOf('id="chapter-deconstruction"'), html.indexOf('id="chapter-materials"'));
   assert.match(anatomy, /Air Max Plus Drift/);
+  assert.doesNotMatch(anatomy, /data-journey-from-primary/, 'Anatomy starts with its own product instead of borrowing the Hero model');
   assert.match(anatomy, /White \/ Black \/ Silver/);
   assert.match(anatomy, /tn-mono-profile-2800.webp/);
   assert.match(anatomy, /tn-mono-top-2800.webp/);

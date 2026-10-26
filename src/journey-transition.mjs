@@ -4,7 +4,7 @@ import { journeyPose } from './journey-poses.mjs';
 import { fittedCameraZ } from './scene-framing.mjs';
 
 const clamp = value => Math.min(1, Math.max(0, value));
-export function studyTransition(specs, progress, radius = .105) {
+export function studyTransition(specs, progress, radius = .065) {
   for (let index = 1; index < specs.length; index++) {
     if (journeyModelKey(specs[index - 1]) === journeyModelKey(specs[index])) continue;
     const boundary = index / specs.length;
@@ -31,7 +31,9 @@ export function exchangeModelSpec(spec, exchange = null) {
 // The model returns along the same arc instead of making a full revolution.
 export function modelExchangePose(authored, progress = null) {
   if (progress === null) return { ...authored };
-  const p = clamp(progress), envelope = Math.sin(Math.PI * p) ** 2;
+  const p = clamp(progress);
+  const ramp = Math.min(p, 1 - p) * 2;
+  const envelope = ramp * ramp * ramp * (ramp * (ramp * 6 - 15) + 10);
   return { ...authored,
     rotationX: authored.rotationX * (1 - envelope) + .12 * envelope,
     rotationY: authored.rotationY * (1 - envelope) + Math.PI / 2 * envelope,

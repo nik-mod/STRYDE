@@ -63,7 +63,7 @@ test('collection hover clamps cached pointer offsets and releases event-created 
   const pointer = (type, x=1000, y=-1000) => {const e=new Event(type);Object.assign(e,{clientX:x,clientY:y});scene.dispatchEvent(e);};
   const dispose = mountCollectionHover(scene,gsap,environment);
   pointer('pointerenter');for(let i=0;i<50;i++)pointer('pointermove');
-  assert.equal(reads,1);assert.deepEqual(calls.slice(-2),[['x',5],['y',-4]]);
+  assert.equal(reads,1);assert.deepEqual(calls.slice(-2),[['x',3],['y',-2]]);
   pointer('pointerleave');assert.deepEqual(calls.slice(-2),[['x',0],['y',0]]);
   dispose();dispose();assert.equal(killed,4);assert.equal(cleared,1);
   const count=calls.length;pointer('pointerenter');pointer('pointermove');environment.dispatchEvent(new Event('resize'));

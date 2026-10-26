@@ -1,5 +1,5 @@
 const clamp = value => Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0));
-const smooth = value => { const p = clamp(value); return p * p * (3 - 2 * p); };
+const smooth = value => { const p = clamp(value); return p * p * p * (p * (p * 6 - 15) + 10); };
 const mix = (a, b, p) => a + (b - a) * p;
 
 export function interpolateJourneyPose(from, to, progress) {
@@ -23,42 +23,48 @@ const pose = (rotationX, rotationY, rotationZ, fill = .94, cameraY = .04, exposu
 // so X tilts reveal the actual top/outsole rather than rolling a side image.
 const TRACKS = {
   hero: [
-    [0, pose(.16, -.34, -.018, .88)],
-    [.48, pose(.22, .08, .015, .88)],
-    [1, pose(.22, .08, .015, .88)],
+    [0, pose(.18, -.26, -.018, .88)],
+    [.25, pose(.32, -.08, -.008, .88)],
+    [.52, pose(.62, .32, .012, .88)],
+    [.76, pose(.38, .16, 0, .88)],
+    [1, pose(.18, -.10, 0, .88)],
   ],
   deconstruction: [
-    [0, pose(.24, -.36, -.05, .88)],
-    [.38, pose(.14, -.06, 0, .88)],
-    [.72, pose(.46, .42, .055, .88)],
-    [1, pose(.18, -.12, -.015, .88)],
+    [0, pose(.18, -.10, 0, .88)],
+    [.38, pose(.34, .06, 0, .88)],
+    [.68, pose(.56, .20, 0, .88)],
+    [.84, pose(.56, .20, 0, .88)],
+    [1, pose(.22, -.06, 0, .88)],
   ],
   materials: [
-    [0, pose(.3, -.38, -.05, .88)],
-    [.18, pose(.5, .25, .04, .88)],
+    [0, pose(.3, -.28, -.02, .88)],
+    [.18, pose(.43, .18, .015, .88)],
     [.3, pose(.16, -.06, 0, .88)],
-    [.43, pose(.22, -.28, -.04, .88)],
-    [.53, pose(.44, .4, .05, .88)],
+    [.43, pose(.22, -.2, -.015, .88)],
+    [.53, pose(.4, .28, .02, .88)],
     [.63, pose(.14, -.04, 0, .88)],
-    [.78, pose(.26, -.38, -.04, .88)],
-    [.92, pose(.44, .24, .035, .88)],
+    [.78, pose(.26, -.26, -.015, .88)],
+    [.92, pose(.4, .18, .015, .88)],
     [1, pose(.18, -.1, 0, .88)],
   ],
   technology: [
-    [0, pose(.16, -.34, -.035, .88)],
-    [.48, pose(.44, .28, .035, .88)],
-    [1, pose(.22, -.1, 0, .88)],
+    [0, pose(.12, -.18, 0, .88)],
+    [.45, pose(-.28, .12, 0, .88)],
+    [.72, pose(.34, .10, 0, .88)],
+    [1, pose(.44, -.06, 0, .88)],
   ],
   featured: [
     [0, pose(.14, -.14, -.012, .88)],
-    [.72, pose(.2, .1, .012, .88)],
+    [.62, pose(.34, .18, .012, .88)],
     [1, pose(.16, -.04, 0, .88)],
   ],
   brand: [
-    [0, pose(.1, -.08, 0, .88)],
-    [.32, pose(.62, -.08, 0, .88)],
-    [.72, pose(-.62, -.08, 0, .88)],
-    [1, pose(-.62, -.08, 0, .88)],
+    [0, pose(.10, -.08, 0, .88)],
+    [.24, pose(.56, -.08, 0, .88)],
+    [.36, pose(.56, -.08, 0, .88)],
+    [.50, pose(.10, -.08, 0, .88)],
+    [.64, pose(-.56, -.08, 0, .88)],
+    [1, pose(-.56, -.08, 0, .88)],
   ],
   finale: [
     [0, pose(.12, -.08, 0, .88)],
@@ -71,6 +77,18 @@ export const JOURNEY_CHAPTERS = Object.freeze(Object.keys(TRACKS));
 
 export function journeyPose(chapter, progress) {
   return through(TRACKS[chapter] || TRACKS.hero, progress);
+}
+
+// Shared editorial beats. The environment, actual camera and HTML timeline
+// all consume the existing Hero progress; there is no additional scroll clock.
+export function heroDirection(progress) {
+  return through([
+    [0, { dolly: 1, truck: 0, lift: 0, world: 0, strength: 1, light: 0 }],
+    [.25, { dolly: .98, truck: .24, lift: .04, world: .26, strength: 1.12, light: .24 }],
+    [.52, { dolly: .96, truck: .62, lift: .07, world: .64, strength: 1.22, light: .56 }],
+    [.76, { dolly: .98, truck: .88, lift: .04, world: 1.04, strength: .94, light: .82 }],
+    [1, { dolly: 1.02, truck: 1.0, lift: 0, world: 1.40, strength: .68, light: 1 }],
+  ], progress);
 }
 
 export function brandStudyPhase(progress) {

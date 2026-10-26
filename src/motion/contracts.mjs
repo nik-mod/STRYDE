@@ -27,12 +27,12 @@ export function heroPose(progress) {
     + (values[2] - values[1]) * span(p, .18, .46)
     + (values[3] - values[2]) * span(p, .46, .72)
     + (values[4] - values[3]) * span(p, .72, .9);
-  const rotationY = track([-.4, -.72, .28, .1, .02]);
-  const rotationZ = track([.56, .4, .12, -.07, .02]);
-  const rotationX = track([.26, .42, .1, .22, 0]);
-  const cameraZ = track([4.8, 4.45, 4.1, 3.5, 4.5]);
+  const rotationY = track([-.28, -.32, .1, .04, .02]);
+  const rotationZ = track([.08, .06, .02, -.02, 0]);
+  const rotationX = track([.23, .28, .32, .22, .16]);
+  const cameraZ = track([4.8, 4.7, 4.6, 4.45, 4.8]);
   const cameraY = track([.1, .12, .08, .17, .08]);
-  const fov = track([32, 32, 33, 36, 32.4]);
+  const fov = track([32, 32, 32, 33, 32]);
   const keyIntensity = track([3.4, 3.6, 3.8, 4.6, 3.4]);
   const rimIntensity = track([2, 2.3, 2.5, 2.8, 2]);
   return { rotationX, rotationY, rotationZ, cameraZ, cameraY, fov, keyIntensity, rimIntensity };

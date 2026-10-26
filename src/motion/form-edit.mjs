@@ -23,7 +23,7 @@ export function mountFormEdit(root, gsap, { mobile }) {
   const timeline = gsap.timeline({
     scrollTrigger: {
       trigger: root, start: 'top top',
-      end: () => `+=${Math.round(window.innerHeight * 3.2)}`,
+      end: () => `+=${Math.round(window.innerHeight * 2.6)}`,
       pin: true, scrub: .45, invalidateOnRefresh: true,
     },
   });
@@ -36,13 +36,13 @@ export function mountFormEdit(root, gsap, { mobile }) {
     gsap.set(look, { zIndex: index + 1, clipPath: index ? closed : full });
     if (index) {
       timeline.to(look, { clipPath: full, duration: .42, ease: 'power2.inOut' }, at)
-        .fromTo(art, { xPercent: 44, yPercent: 12, rotation: -13, scale: .9 },
+        .fromTo(art, { xPercent: 18, yPercent: 4, rotation: -3, scale: 1 },
           { xPercent: 0, yPercent: 0, rotation: 0, scale: 1, duration: .62, ease: 'power3.out' }, at)
         .fromTo(type, { xPercent: 65 }, { xPercent: 0, stagger: .05, duration: .6, ease: 'power3.out' }, at + .04)
         .fromTo(copy, { y: 40, clipPath: 'inset(100% 0% 0% 0%)' },
           { y: 0, clipPath: 'inset(0% 0% 0% 0%)', stagger: .035, duration: .35, ease: 'power3.out' }, at + .24);
       const previous = looks[index - 1];
-      timeline.to(previous.querySelector('.form-look-art'), { xPercent: -32, yPercent: -9, rotation: 9, scale: .94, duration: .55, ease: 'power2.inOut' }, at)
+      timeline.to(previous.querySelector('.form-look-art'), { xPercent: -18, yPercent: -3, rotation: 3, scale: 1, duration: .55, ease: 'power2.inOut' }, at)
         .to(previous.querySelectorAll('.form-look-type > span'), { xPercent: -24, duration: .45, ease: 'power2.inOut' }, at);
     } else {
       timeline.fromTo(art, { rotation: -4, yPercent: 6, scale: .96 }, { rotation: 0, yPercent: 0, scale: 1, duration: .65, ease: 'power2.out' }, 0);

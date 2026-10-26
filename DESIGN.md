@@ -15,6 +15,14 @@ colors:
   action-text: "#f3f7f8"
   action-hover: "#256580"
   finale-action: "#e4f2f8"
+  closing-ocean: "#0b354c"
+  closing-cyan: "#88d9ee"
+  closing-copy: "#bdd7e4"
+  closing-silver: "#cbdfe8"
+  closing-rule: "#7895a7"
+  signature-ink: "#dcecf2"
+  signature-rule: "#315064"
+  signature-edge: "#48768c"
   film-rule: "color-mix(in srgb, var(--ink) 24%, transparent)"
 typography:
   display:
@@ -51,6 +59,35 @@ typography:
     fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
     fontSize: "clamp(11px, 0.8vw, 17px)"
     letterSpacing: "0.13em"
+  closing-heading:
+    fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
+    fontSize: "clamp(64px, 6.1vw, 150px)"
+    fontWeight: 850
+    lineHeight: 0.96
+    letterSpacing: "-0.035em"
+    fontVariation: "'wght' 850, 'wdth' 78"
+  closing-body:
+    fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
+    fontSize: "clamp(15px, 1.15vw, 22px)"
+    lineHeight: 1.55
+  closing-product-title:
+    fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
+    fontSize: "clamp(20px, 1.8vw, 36px)"
+    fontWeight: 650
+    letterSpacing: "-0.015em"
+  signature-wordmark:
+    fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
+    fontSize: "calc((100vw - 2 * var(--gutter)) / (var(--brand-characters) * .60))"
+    fontWeight: 900
+    lineHeight: 1.04
+    letterSpacing: "-0.04em"
+    fontVariation: "'wght' 900, 'wdth' 80"
+  signature-statement:
+    fontFamily: 'Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif'
+    fontSize: "clamp(28px, 3vw, 52px)"
+    fontWeight: 550
+    lineHeight: 1.08
+    letterSpacing: "-0.03em"
 rounded:
   square: "0px"
   action: "2px"
@@ -60,6 +97,12 @@ spacing:
   detail-gap: "8px"
   ledger-gap: "18px 32px"
   action-gap: "28px"
+  closing-photo-inset: "14px"
+  closing-focus-inset: "24px"
+  closing-actions-gap: "18px 24px"
+  signature-gap: "30px"
+  signature-directory-gap: "28px"
+  signature-padding: "42px var(--gutter) 24px"
 components:
   button-primary:
     backgroundColor: "{colors.ink}"
@@ -97,6 +140,20 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
     rounded: "{rounded.square}"
+  closing-collection-action:
+    backgroundColor: "{colors.finale-action}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.square}"
+    padding: "16px 22px"
+  closing-focus-print:
+    backgroundColor: "{colors.closing-silver}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.square}"
+    padding: "{spacing.closing-focus-inset}"
+  signature-footer:
+    backgroundColor: "{colors.ocean-deep}"
+    textColor: "{colors.signature-ink}"
+    padding: "{spacing.signature-padding}"
 ---
 
 # Design System: STRYDE
@@ -128,6 +185,8 @@ The palette moves from airy blue exhibition fields to deep ocean, always retaini
 - **Film Cobalt** emphasizes the secondary display line, active material anchors, selection and the fixed progress line.
 - **Ocean** and **Ocean Deep** form the technology and finale environments.
 
+The current homepage closing adds Closing Ocean and Closing Cyan for the photographic stage, then resolves into Ocean Deep. Closing Silver is the dimensional print field; Closing Copy and Closing Rule support captions. Signature Ink, Signature Rule and Signature Edge belong to the homepage footer. These scoped additions do not replace the shared brand palette.
+
 ### Neutral
 
 - **Ink** carries body text, ledgers, navigation and the opening collection action.
@@ -153,6 +212,8 @@ The display is compressed, assertive and tightly spaced; captions and prose rema
 - **Body:** Responsive editorial prose with line height around 1.5–1.55; text measures generally run 33–39 characters. Native commerce retains its own denser hierarchy.
 - **Label:** Uppercase chapter kickers and indexing; tracking changes by role, including 0.1em on ledger labels and 0.07em on specification chips.
 
+The closing-specific frontmatter roles describe its heading, copy and featured photograph caption. The signature wordmark is italic Archivo with a width calculated from the actual merchant brand character count; its statement uses the lighter signature role. These roles are local to the homepage ending.
+
 **The Readable Scale Rule.** Scale prose as well as display type on wide screens; retain the explicit compact-screen overrides instead of shrinking a desktop composition uniformly.
 
 ## Layout
@@ -165,6 +226,8 @@ Short desktop viewports (minimum width 1181px, maximum height 820px) tighten her
 
 ## Elevation & Depth
 
+The current closing uses a silver photographic print with perspective rather than a substitute 3D shoe. Its desktop shadow is `0 24px 44px #03131e55`; the flowing compact layout uses `0 14px 24px #03131e33`. The footer wordmark adds only a restrained `0 2px 0 #48768c` text edge. Earlier Finale renderer descriptions below describe prior iterations, superseded by this photographic ending.
+
 The product supplies the primary depth. Pale and dark environmental fields, ghost outline numbers and fine rules organize the remaining surface. Material insets use a diffuse shadow; credited reference plates have a stronger photographic shadow. Buttons lift slightly on hover. Broad content areas and the brand image stay flat and square.
 
 **The Product Window Rule.** The fixed canvas owns the currently active disclosed model study, or both visible chapter windows during a handoff. Keep credited reference photography separate and retain the image fallback until the scene successfully owns its host.
@@ -176,6 +239,14 @@ One renderer follows hero, anatomy, materials, technology, featured, Brand and f
 Square media, straight hairlines and rectangular ledgers establish the form language. Homepage action buttons and specification chips use the small action corner token. Do not generalize retained bag-control or legacy pill styling into new homepage cards. The hero and materials spreads use open composition rather than a grid of rounded containers.
 
 ## Components
+
+### Homepage closing and signature footer — 26 October 2026
+
+One complete genuine Nike Air Max Plus Celestine Blue photograph dominates a silver print; three smaller genuine photographs recede during a short, reversible desktop sequence. The stage darkens from Closing Ocean to Ocean Deep as the print settles. The only monumental STRYDE mark is the real linked footer identity, which rises into place in normal document flow. Collection/search actions remain native links. The existing configured menu, policies, payment icons and back-to-top control remain available; empty configuration does not create support, policy or social claims.
+
+The desktop stage is one viewport high with a 660px minimum and .9 viewport of pin travel. At widths up to 900px, copy, the large print, three supporting prints and actions flow vertically without a pin. The heading becomes `clamp(48px, 12.5vw, 92px)`, body copy becomes 14px, and the featured title becomes 21px. Footer minimum height is `min(880px, 100svh)` on desktop and `min(680px, 100svh)` on compact layouts; the directory keeps two columns. Compact footer spacing uses a 28px gap and 38px top padding. Its statement becomes `clamp(29px, 5.5vw, 42px)`.
+
+The existing GSAP lifecycle owns absolute forward/reverse samples and section teardown. Reduced motion and no JavaScript retain a complete static composition, and the photographic ending works without WebGL. No matching GLB is substituted; no new raster, dependency or renderer is introduced. The Intro and Hero are preserved. This accepted closing supersedes earlier Finale composition notes only; it does not redefine other chapters or commerce routes.
 
 - **Primary collection action:** Ink fill and pale text in the opening field; a pale fill and Ink text in the finale. Desktop padding and the small corner are in the frontmatter. Preserve hover, active, disabled and visible-focus states.
 - **Secondary action:** A quiet inline arrow link in light chapters; an outlined ghost action in the finale. Links remain native anchors.
@@ -242,7 +313,7 @@ GSAP scrubs a deliberate profile → gentle upper → gentle foundation inspecti
 
 ### Hero focus and motion refinement
 
-The bundled hero uses a left-aligned two-line headline and a separate complete shoe on desktop; phones stack the headline above the shoe. Its only supporting elements are a collection action and a quiet model credit. Edition labels, thumbnail controls, ticker and duplicate actions are removed. Masked staggered glyphs reveal only after the existing site intro releases the page. On scroll the two lines separate by a few pixels while the shoe makes a restrained inspection turn inside a fixed frame. Reverse scroll and interrupted entrances settle deterministically. Merchant product information and forms remain native. Intro replay rules and all other section layouts are unchanged by this refinement.
+The bundled hero uses a left-aligned two-line headline and a separate complete shoe on desktop; phones stack the headline above the shoe. Its only supporting action is the collection link; the preview credit has been removed. Edition labels, thumbnail controls, ticker and duplicate actions are removed. Masked staggered glyphs reveal only after the existing site intro releases the page. On scroll the two lines separate by a few pixels while the shoe makes a restrained inspection turn inside a fixed frame. Reverse scroll and interrupted entrances settle deterministically. Merchant product information and forms remain native. Intro replay rules and all other section layouts are unchanged by this refinement.
 
 Desktop travel is 1.4 viewport heights. Taller phones use a shorter .95 viewport pin; viewports below 740px high use normal flow. The active labels and rendered pose share the timeline progress, including seeks and reverse scrolling. Three view buttons seek the actual timeline when pinned. They are hidden in static or unavailable-WebGL states, leaving genuine navigation links and a full-shoe high-resolution fallback. Generic chapter arrival transforms do not compete with the pinned studio. The brand-specific media condition remounts its context when the height mode changes and restores the same viewed phase. Studio top spacing includes the fixed header and local preview banner.
 
@@ -259,3 +330,37 @@ Chapter 01 retains its typography, layout, palette and imagery. Its existing ent
 The existing intro and hero composition stay intact. The hero entrance uses staggered type and a longer product settle, with a shorter scroll hold. Chapters 02–03 use compact copy, a sticky anatomy window and larger product stages. Model exchanges use a reversible quarter-turn and return; chapter 06 holds its own navy product with a small inspection sway. Chapter 07 becomes a split editorial studio with a three-frame contact sheet. The finale fans four real product photographs into an ocean-blue collection invitation.
 
 The local collection combines 889 existing photo groups with 19 StockX references. `tools/fixtures/stockx-edit.json` records product URLs, image URLs, style codes, authored descriptions and SHA-256 provenance. Original downloaded photographs live in `assets/stockx-edit/`. References are separated by a StockX edit filter and remain purchase-disabled until connected to actual merchant inventory. Collection headers remain visible during scrolling; numeric anchor destinations prevent Lenis from tripling CSS header clearances.
+
+
+## Living Hero environment — 26 October 2026
+
+The Hero uses a continuous wind-folded blue/white landscape in the existing Three.js journey scene. The former CSS plinth and moving light planes are removed. One GPU-deformed terrain mesh forms three layered crests and a low foreground fold. Its height and exact analytic normals update from ambient time and the existing hero progress bus. An authored basin keeps the complete sneaker clear as the folds advance and lift through the scroll sequence. The original headline, strong product frame, collection action, intro and unrelated chapters are preserved.
+
+The product and landscape share the existing perspective camera, renderer, lighting, scheduler and scene. Expanding the product camera's view offset reveals the environment without moving the shoe out of its authored DOM frame. A restrained camera truck and perspective change provide true parallax; the product counters only the camera translation. Moving key/rim light changes both satin highlights and the shoe's real cast shadow. The scene rests behind the intro and pauses when offscreen or hidden. Shader displacement avoids per-frame vertex uploads. The terrain uses 43,008 triangles on desktop and 14,336 on mobile, with a 1.2-million-pixel hero buffer budget and 512/256px shadow maps. Shadow updates are bounded by time and pose changes. The sneaker retains its original geometry and PBR materials.
+
+During the Hero, the shared canvas sits absolutely inside its pinned stage, below the accessible HTML. At chapter boundaries the same renderer draws the Hero environment and next authored product window with section scissoring. Later chapters restore the fixed canvas, original camera projection, fog-free scene and original product lighting. There is no second renderer, animation loop or ScrollTrigger controller. Geometry, materials, shadows and pointer listeners are released through the existing section/media lifecycle.
+
+Phone layouts retain the complete product and shopping action with lighter environmental geometry. Reduced-motion, unavailable WebGL and no-JavaScript paths retain the static profile image and native navigation. No dependencies, unrelated section designs, commerce logic or publication behavior are changed. Browser evidence and a short GPU-rendered screen recording live in the chat's visualization directory.
+
+
+## Cinematic recovery — 26 October 2026
+
+The opening is now a 0.55-second veil over the actual Hero, followed by its own short entrance. Duplicate shoes, macro triptych, orbital shapes and disorganized display lettering are removed from the intro. Replay/skip rules, Escape, focus restoration and reduced-motion handling remain in the original lifecycle. The Hero's existing pose bus now coordinates establish → upper reveal → light traverse → canonical exit across one viewport of desktop pin travel (.75 on phones). A gentle optical dolly and camera truck follow the same absolute progress as product pitch, typography and environmental lift. The foreground fold is removed; the landscape opens and settles to a low field late in the sequence.
+
+The blue Hero fades through the existing section handoff before reaching the viewport edge. Anatomy starts with its own white/black Drift asset, matching its content and static fallback; it never borrows the blue shoe. Materials exchanges have shorter bounded turns, Technology studies the lower sidewall, and Brand holds useful upper/foundation views with a profile reset between them. No catalog, navigation, checkout, photography or unrelated section composition changes are made.
+
+The blue GLB remains byte-identical: 327,498 triangles, one fused material, three original 2048px source maps, original UVs and framing hull. The previous procedural sine weave/random grain are removed. Original source normal relief is moderated; source ORM variation remains, with estimated finish families for pale upper, pale lower surface, blue upper and dark rubber. These are broad height/color-based material estimates rather than authenticated component masks. Surfaces are treated as dielectrics, with better separation between key light, ambient fill and environment reflection. Hero rendering is bounded to 2M pixels on desktop and 650k on phones, with existing DPR caps and demand rendering outside live ambient scenes.
+
+The generated Tripo mesh has a puffy/fused toe, laces and cage, limited seam relief and opaque Air-unit surfaces. Its atlas has baked shading and lacks an authenticated textile micro-normal/displacement map or independently modeled transparent Air-unit interior. These cannot become a verified digital twin through shaders. A substantial further realism increase needs an accurate authorized multi-component model and measured PBR maps. No source geometry, UVs or texture files are invented or represented as a 1:1 match.
+
+## Intro restoration and homepage correction — 26 October 2026
+
+The user explicitly requires restoration of the original opening film. This supersedes the earlier short-veil recovery direction above. The original MOVE / DIFFERENT / STRYDE typography, three product panels, suspended product sequence and five-shutter exit were recovered selectively from commit 1d88509; the rest of the repository was not reverted. The film now lasts about 5.6 seconds, offers a visible keyboard-accessible Skip control and Escape, preserves the existing internal-navigation/reduced-motion skip rules, and releases the existing Hero entrance during the shutters. It uses raster product views and the existing GSAP lifecycle, with no additional Three.js renderer.
+
+The Hero's continuous GPU-deformed wind valley has stronger depth separation, independent ambient crest movement, a wider camera truck and a moving key light. Scroll opens and passes through the valley rather than flattening it away. The coordinated headline separation, upper reveal and return to profile share the canonical Hero bus. The existing scissored boundary pass now draws the departing Hero world and incoming Drift in their own windows, avoiding the previous early fade to empty space.
+
+Homepage refinements preserve content and commerce: compact Anatomy visual/ledger spacing, stronger upper inspection, shorter Materials pin, larger Technology and Featured windows, more restrained photograph transitions and shorter Collection holds, actual cropped Brand detail views, and an ice-blue product wall for the Finale with four approved photographs, a complete closing heading and native collection/search controls. Merchant-assigned products and imagery keep precedence. Reduced-motion, no-JS and no-WebGL paths keep static product imagery and shopping actions.
+
+The source blue GLB is unchanged. Finish refinements use its existing roughness variation and normal map, with softer pale overlays and stronger relief only on the original blue upper. No invented weave or replacement texture is introduced. Source geometry and texture limitations remain as documented in docs/MODEL-DETAIL.md. No commit, push, reset or deployment is part of this pass.
+
+Campaign palette additions: the closing product wall uses ice #c8e2ed, blue emphasis #275eaa, secondary ink #365366, rule #7895a7 and hover ice #d9eaf1. Brand macro plates use deep blue #163a50 and light captions #d3e5ef. The restored intro retains its historical colors; its Skip control uses border #53758a. These are intentional extensions of the existing blue/ice/navy palette, scoped to the homepage.

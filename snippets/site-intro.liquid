@@ -1,4 +1,5 @@
 <div class="site-intro" data-site-intro role="dialog" aria-label="STRYDE introduction" aria-hidden="true" tabindex="-1" hidden>
+  <button class="site-intro-skip" data-intro-skip type="button">Skip intro {% render 'icon', name: 'arrow' %}</button>
   <div class="site-intro-curtains" aria-hidden="true">
     {% for i in (1..5) %}<div class="site-intro-curtain" data-intro-curtain></div>{% endfor %}
   </div>

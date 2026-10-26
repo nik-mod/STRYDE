@@ -136,7 +136,7 @@ function mount(scope = document) {
   ScrollTrigger.refresh();
   const progress = document.querySelector('[data-story-progress]');
   if (progress && !progressTween) progressTween = gsap.fromTo(progress, { scaleX: 0 }, {
-    scaleX: 1, ease: 'none', scrollTrigger: { id: 'story-progress', trigger: '#MainContent', start: 'top top', end: 'bottom bottom', scrub: true },
+    scaleX: 1, ease: 'none', scrollTrigger: { id: 'story-progress', trigger: '#MainContent', start: 'top top', endTrigger: document.querySelector('[data-signature-footer]') || '#MainContent', end: 'bottom bottom', scrub: true },
   });
 }
 function unmount(scope) { for (const [root, dispose] of instances) if (scope === root || scope.contains(root)) { dispose(); instances.delete(root); } }

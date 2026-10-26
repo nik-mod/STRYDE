@@ -119,7 +119,7 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
         }
         if (root.dataset.modelYaw) {
           if (material.normalMap && material.normalScale) material.normalScale.set(1.3, 1.3);
-          refinePreviewMaterial(material, THREE.ShaderChunk.normal_fragment_maps);
+          refinePreviewMaterial(material, node.geometry);
         }
       }
     });
@@ -157,9 +157,8 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
     const mobileFit = innerWidth <= 700 ? .82 : 1;
     const scale = ((Number(root.dataset.modelSize) || 2.2) * mobileFit) / Math.max(size.x, size.y, size.z);
     rig.scale.setScalar(scale);
-    // Idle life lives on its own inner group: the authored pose (and the
-    // chapter handoff) keep driving the rig unchanged, while this group adds
-    // a time-based float that fades out the moment scrolling takes over.
+    // A separate inner group owns the short arrival and then rests. The
+    // scroll-derived rig and chapter handoff retain sole pose ownership.
     floatRig = new THREE.Group();
     floatRig.add(model);
     rig.add(floatRig);
@@ -250,21 +249,18 @@ export async function mountScene({ root, url, bus, scheduler, signal }) {
       if (document.hidden || contextLost || disposed) return;
       const handoff = bridge?.update();
       if (handoff?.changed) dirty = true;
-      // Idle float: a slow breath on the resting hero. Amplitude dies out as
-      // soon as scrolling begins and during the chapter handoff, so the pose
-      // contract and the profile alignment stay pixel-exact when they matter.
+      // One small arrival settles into the authored pose. No repeating rock
+      // competes with the studio light or the scroll-controlled inspection.
       if (floatRig && (visible || handoff?.active)) {
         const local = bus.state?.local || 0;
         if (local > 0 || handoff?.active) arrivalFinished = true;
         const elapsed = Math.max(0, (performance.now() - revealStart) / 1500);
         const arrival = arrivalFinished ? 0 : Math.pow(1 - Math.min(1, elapsed), 3);
-        const rest = (1 - smoothstep(local / .16)) * (1 - (handoff?.mix || 0));
-        const t = performance.now() / 1000;
         // Reset even at zero amplitude: otherwise the last idle frame persists
         // inside the profile handoff and introduces an alignment discontinuity.
-        floatRig.position.y = Math.sin(t * 1.05) * .022 * rest + .22 * arrival;
-        floatRig.rotation.set(.12 * arrival, -.5 * arrival, Math.sin(t * .62 + 1.2) * .016 * rest - .18 * arrival);
-        if (rest > 0 || arrival > 0) dirty = true;
+        floatRig.position.y = .06 * arrival;
+        floatRig.rotation.set(.04 * arrival, -.08 * arrival, 0);
+        if (!arrivalFinished) { dirty = true; if (elapsed >= 1) arrivalFinished = true; }
       }
       if (!dirty || (!visible && !handoff?.active)) return;
       if (camera.view?.enabled) camera.clearViewOffset();

@@ -1,5 +1,8 @@
 /* A self-contained opening film; the storefront keeps its existing layout. */
 .site-intro { display: none; }
+.site-intro-skip { position: absolute; z-index: 20; right: max(26px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; gap: 28px; min-height: 44px; padding: 8px 16px; border: 1px solid #53758a; background: #dceff8; color: #102b3c; font: 600 12px Archivo, sans-serif; cursor: pointer; }
+.site-intro-skip:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.site-intro-skip svg { width: 16px; height: 16px; }
 .site-intro-pending,
 .site-intro-playing { overflow: hidden; overscroll-behavior: none; }
 .site-intro-pending .site-intro,
@@ -22,6 +25,10 @@
 .site-intro-move > span,
 .site-intro-different > span { display: inline-block; transform-origin: 50% 65%; backface-visibility: hidden; }
 .site-intro-period { color: #8bcfff; }
+/* Keep future typography beats hidden before the animation bundle arrives. */
+.site-intro-move > span,
+.site-intro-different > span,
+.site-intro-word > span { opacity: 0; }
 .site-intro-speedlines { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-evenly; transform: rotate(-18deg) scale(1.4); opacity: .22; }
 .site-intro-speedlines i { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, #8fcfe9, transparent); transform-origin: 0 50%; }
 .site-intro-iris { position: absolute; z-index: 2; left: 50%; top: 50%; width: 150vmax; height: 150vmax; margin: -75vmax; border-radius: 50%; transform: scale(0); background: radial-gradient(circle, #eaf7fc 10%, #b9dff3 50%, #69afe1 100%); }

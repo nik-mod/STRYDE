@@ -61,9 +61,11 @@ test('home stages the eight cinematic chapters with honest temporary assets', as
   for (const chapter of ['deconstruction', 'materials', 'technology', 'collection', 'featured', 'brand', 'finale']) {
     assert.match(html, new RegExp(`data-chapter="${chapter}"`));
   }
-  assert.match(html, /3D model preview/); assert.match(html, /NIKE AIR MAX PLUS \/ TN/);
+  const hero = html.match(/<section class="hero[\s\S]*?<\/section>/)[0];
+  assert.doesNotMatch(hero, /hero-model-credit|3D model preview|NIKE AIR MAX PLUS \/ TN/);
+  assert.match(hero, /alt="Blue and white Nike TN sneaker"/);
   assert.match(html, /LOCAL PREVIEW/); assert.match(html, /\/assets\/theme\.js/);
-  assert.match(html, /tn-angle-1400\.webp/); assert.match(html, /href="\/account"/);
+  assert.match(html, /tn-profile-1400\.webp/); assert.match(html, /href="\/account"/);
   assert.equal((html.match(/data-model-url=/g)||[]).length,1);
   assert.match(html, /data-model-url="\/assets\/nike-tn-blue-white\.glb"/); assert.doesNotMatch(html, /\$180|\$195/); assert.doesNotMatch(html, /name="add"/);
 });

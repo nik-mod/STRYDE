@@ -2,8 +2,15 @@
   assign product = section.settings.product
   assign selected_variant = product.selected_or_first_available_variant
   assign presentation_image = section.settings.image | default: product.featured_image
+  assign closing_campaign = false
+  if section.settings.use_tn_model and presentation_image == blank and product == blank
+    assign closing_campaign = true
+  endif
 %}
-<section id="chapter-finale" class="chapter chapter-finale" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="finale" data-env="finale" data-section-id="{{ section.id }}" aria-labelledby="FinaleHeading-{{ section.id }}">
+<section id="chapter-finale" class="chapter {% if closing_campaign %}chapter-closing{% else %}chapter-finale{% endif %}" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %}{% if closing_campaign %} data-closing-campaign{% endif %} data-chapter="finale" data-env="finale" data-section-id="{{ section.id }}" aria-labelledby="FinaleHeading-{{ section.id }}">
+  {% if closing_campaign %}
+    {% render 'closing-campaign', section: section, routes: routes %}
+  {% else %}
   <div class="finale-stage" data-finale-stage{% if section.settings.use_tn_model and presentation_image == blank and product == blank %} data-finale-edit{% endif %}>
     <div class="finale-spot" aria-hidden="true" data-finale-spot></div>
     <p class="finale-word" aria-hidden="true" data-finale-word>{{ settings.brand_name | default: shop.name | escape }}<span class="finale-sheen" data-finale-sheen aria-hidden="true"></span></p>
@@ -54,6 +61,7 @@
       </nav>
     </div>
   </div>
+  {% endif %}
 </section>
 {% schema %}
 {

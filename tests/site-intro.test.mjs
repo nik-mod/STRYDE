@@ -66,15 +66,17 @@ function harness({ skip = false, broken = false } = {}) {
   const alreadyInert = { inert: true };
   document.body = {}; document.activeElement = document.body;
   const attributes = new Map();
+  const skipControl = new EventTarget();
+  skipControl.focus = () => { document.activeElement = skipControl; };
   const root = {
     hidden: true,
     parentElement: { children: [] },
-    querySelector: () => ({}),
+    querySelector: selector => selector === '[data-intro-skip]' ? skipControl : ({}),
     focus() { document.activeElement = root; },
     querySelectorAll: () => [{}, {}],
     setAttribute: (key, value) => attributes.set(key, value),
     removeAttribute: key => attributes.delete(key),
-    contains: element => element === root,
+    contains: element => element === root || element === skipControl,
   };
   root.parentElement.children = [root, header, main, alreadyInert];
   document.querySelector = selector => selector === '[data-site-intro]' ? root : selector === '#MainContent' ? main : null;
@@ -86,7 +88,7 @@ function harness({ skip = false, broken = false } = {}) {
   const timeline = { fromTo() { return this; }, to() { return this; }, play() {}, kill() { kills++; } };
   const gsap = { timeline(options) { if (broken) throw new Error('Unavailable animation engine'); completion = options.onComplete; return timeline; } };
   const controller = mountSiteIntro({ gsap, document, environment, skip, onChange() { changes++; } });
-  return { controller, root, header, main, alreadyInert, document, classes, timers, attributes,
+  return { controller, root, header, main, alreadyInert, document, classes, timers, attributes, skipControl,
     complete() { completion(); }, changes: () => changes, kills: () => kills };
 }
 
@@ -100,7 +102,7 @@ test('completion reveals the homepage, restores existing inert states and releas
   const tab = new Event('keydown', { cancelable: true });
   Object.assign(tab, { key: 'Tab' }); h.document.dispatchEvent(tab);
   assert.equal(tab.defaultPrevented, true);
-  assert.equal(h.document.activeElement, h.root);
+  assert.equal(h.document.activeElement, h.skipControl);
   h.complete();
   assert.equal(h.root.hidden, true);
   assert.equal(h.header.inert, false);
@@ -114,14 +116,15 @@ test('completion reveals the homepage, restores existing inert states and releas
   assert.equal(h.kills(), 1);
 });
 
-test('Escape and the watchdog release the intro without visible controls', () => {
-  for (const exit of ['escape', 'watchdog']) {
+test('the visible Skip control, Escape and watchdog all release the recovered film', () => {
+  for (const exit of ['skip', 'escape', 'watchdog']) {
     const h = harness();
     if (exit === 'escape') {
       const event = new Event('keydown', { cancelable: true });
       Object.assign(event, { key: 'Escape' }); h.document.dispatchEvent(event);
       assert.equal(event.defaultPrevented, true);
-    } else [...h.timers.values()][0]();
+    } else if (exit === 'skip') h.skipControl.dispatchEvent(new Event('click'));
+    else [...h.timers.values()][0]();
     assert.equal(h.root.hidden, true, exit);
     assert.equal(h.main.inert, false, exit);
     assert.equal(h.timers.size, 0, exit);

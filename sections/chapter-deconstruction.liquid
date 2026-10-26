@@ -40,7 +40,7 @@
     </div>
     <div class="decon-visual">
       <span class="decon-ghost" aria-hidden="true">02</span>
-      <div class="frame decon-frame"{% if section.settings.use_tn_model and section.settings.use_drift_model %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift" data-journey-from-primary data-journey-change-start="0.02" data-journey-change-end="0.26"{% endif %}>
+      <div class="frame decon-frame"{% if section.settings.use_tn_model and section.settings.use_drift_model %} data-journey-model="{{ 'nike-tn-monochrome.glb' | asset_url }}" data-journey-yaw="0" data-journey-variant="drift"{% endif %}>
         <div class="decon-crop is-active" style="--zoom: {% if section.settings.use_tn_model %}1.06{% else %}1.25{% endif %}; --tx: 0%; --ty: 0%;">
           {% if section.settings.use_tn_model %}<img data-model-fullshot src="{{ model_prefix | append: '-profile-2800.webp' | asset_url }}" srcset="{{ model_prefix | append: '-profile-1000.webp' | asset_url }} 1000w, {{ model_prefix | append: '-profile-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 55vw" width="2800" height="2100" loading="lazy" alt="{{ model_label }} — profile view rendered from the 3D model">{% else %}<img src="{{ 'stryde-concept-v2.png' | asset_url }}" width="1375" height="1144" loading="lazy" alt="{{ 'assets.concept_alt' | t | escape }}">{% endif %}
         </div>
