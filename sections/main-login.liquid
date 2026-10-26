@@ -1,0 +1,44 @@
+{% comment %}
+  Classic customer sign-in with an accessible password-recovery toggle.
+  Passwords go to Shopify only; the theme never touches or stores them.
+  If the merchant enables new (hosted) customer accounts, Shopify routes
+  sign-in there automatically and this template simply stops being used.
+{% endcomment %}
+<section class="page-shell auth-page" data-account-login>
+  <div class="auth-panel">
+    <header class="page-heading"><span class="micro">{{ shop.name | escape }}</span><h1>{{ 'customer.sign_in_title' | t }}</h1></header>
+    <p class="auth-intro">{{ 'customer.sign_in_description' | t }}</p>
+    <details class="auth-recover-toggle" data-recover-toggle>
+      <summary>{{ 'customer.sign_in_forgot' | t }}</summary>
+      <div class="auth-form-block">
+        <h2>{{ 'customer.login_recover_title' | t }}</h2>
+        <p class="auth-intro micro">{{ 'customer.login_recover_description' | t }}</p>
+        {% form 'recover_customer_password' %}
+          {{ form.errors | default_errors }}
+          {% if form.posted_successfully? %}<p class="auth-notice micro" role="status">{{ 'customer.login_recover_sent' | t }}</p>{% endif %}
+          <label for="RecoverEmail">{{ 'customer.sign_in_email' | t }}</label>
+          <input type="email" id="RecoverEmail" name="email" autocomplete="email" required>
+          <button class="button button-dark" type="submit">{{ 'customer.login_recover_submit' | t }}</button>
+          <button class="text-link" type="button" data-recover-close>{{ 'customer.login_recover_cancel' | t }}</button>
+        {% endform %}
+      </div>
+    </details>
+    {% form 'customer_login', novalidate: 'novalidate' %}
+      {{ form.errors | default_errors }}
+      <label for="CustomerEmail">{{ 'customer.sign_in_email' | t }}</label>
+      <input type="email" id="CustomerEmail" name="customer[email]" autocomplete="email" required>
+      <label for="CustomerPassword">{{ 'customer.sign_in_password' | t }}</label>
+      <input type="password" id="CustomerPassword" name="customer[password]" autocomplete="current-password" required>
+      <button class="button button-dark button-full" type="submit">{{ 'customer.sign_in_submit' | t }}</button>
+    {% endform %}
+    <p class="auth-switch micro">{{ 'customer.sign_in_no_account' | t }} <a href="{{ routes.account_register_url }}">{{ 'customer.sign_in_create' | t }}</a></p>
+    <p class="auth-guest micro">{{ 'customer.sign_in_guest_note' | t }}</p>
+  </div>
+</section>
+<script>
+  (() => {
+    const toggle = document.querySelector('[data-recover-toggle]');
+    document.querySelector('[data-recover-close]')?.addEventListener('click', () => { if (toggle) toggle.open = false; });
+  })();
+</script>
+{% schema %}{"name":"Customer login","settings":[]}{% endschema %}

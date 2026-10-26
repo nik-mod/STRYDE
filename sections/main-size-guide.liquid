@@ -1,0 +1,32 @@
+{% comment %}
+  Footwear size guide (assign as page.size-guide, then select the page in the
+  product section's "Size guide page" setting). Rows are merchant-entered
+  measurements — the theme never invents sizing conversions. Page content
+  renders above the table for fitting guidance.
+{% endcomment %}
+<article class="page-shell editorial-page size-guide-page">
+  <div class="page-heading"><span class="micro">{{ shop.name | escape }}</span><h1>{{ 'products.size_guide' | t | upcase }}</h1></div>
+  {% if page.content != blank %}<div class="rte size-guide-content">{{ page.content }}</div>{% endif %}
+  {% if section.blocks.size > 0 %}
+    <div class="size-table-wrap">
+      <table class="size-table">
+        <thead><tr><th scope="col">EU</th><th scope="col">US</th><th scope="col">UK</th><th scope="col">CM</th></tr></thead>
+        <tbody>
+          {% for block in section.blocks %}
+            <tr {{ block.shopify_attributes }}>
+              <td>{{ block.settings.eu | escape }}</td>
+              <td>{{ block.settings.us | escape }}</td>
+              <td>{{ block.settings.uk | escape }}</td>
+              <td>{{ block.settings.cm | escape }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state"><p>{{ 'general.in_preparation' | t }}</p></div>
+  {% endif %}
+</article>
+{% schema %}
+{"name":"Size guide","settings":[],"blocks":[{"type":"size_row","name":"Size row","settings":[{"type":"text","id":"eu","label":"EU size"},{"type":"text","id":"us","label":"US size"},{"type":"text","id":"uk","label":"UK size"},{"type":"text","id":"cm","label":"Foot length (cm)"}]}],"presets":[{"name":"Size guide"}]}
+{% endschema %}

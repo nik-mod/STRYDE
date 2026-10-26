@@ -37,4 +37,12 @@ const homepage = ['cinematic-hero', 'chapter-deconstruction', 'chapter-materials
 assert.equal(index.order.length, homepage.length, 'Homepage must stage the eight cinematic chapters');
 homepage.forEach((type, position) => assert.equal(index.sections[index.order[position]].type, type, `Homepage chapter ${position + 1} must be ${type}`));
 for (const template of ['product', 'collection', 'cart', 'search', 'page', '404']) assert.ok(files.includes(`templates/${template}.json`), `Missing commerce template ${template}`);
-console.log(`Validated ${files.length} theme files, JSON schemas, section/snippet references, bundled chunks and the eight-chapter homepage.`);
+for (const template of ['page.contact', 'page.faq', 'page.size-guide']) assert.ok(files.includes(`templates/${template}.json`), `Missing content template ${template}`);
+for (const template of ['login', 'register', 'account', 'order', 'addresses', 'activate_account', 'reset_password']) assert.ok(files.includes(`templates/customers/${template}.json`), `Missing customer template ${template}`);
+for (const section of ['cart-drawer', 'predictive-search', 'product-recommendations', 'main-contact', 'main-faq', 'main-size-guide']) assert.ok(files.includes(`sections/${section}.liquid`), `Missing commerce section ${section}`);
+const english = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
+const georgian = JSON.parse(await readFile('locales/ka.json', 'utf8'));
+const localeKeys = (node, prefix = '') => Object.entries(node).flatMap(([key, value]) => typeof value === 'object' && value !== null ? localeKeys(value, `${prefix}${key}.`) : [`${prefix}${key}`]);
+const missingGeorgian = localeKeys(english).filter(key => !localeKeys(georgian).includes(key));
+assert.deepEqual(missingGeorgian, [], `locales/ka.json is missing keys: ${missingGeorgian.join(', ')}`);
+console.log(`Validated ${files.length} theme files, JSON schemas, section/snippet references, bundled chunks, commerce templates and the eight-chapter homepage.`);

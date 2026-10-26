@@ -18,7 +18,8 @@
   <div class="page-heading listing-heading studio-heading" data-listing-heading><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
   {% paginate collection.products by 12 %}
     <form method="get" action="{{ collection.url }}" class="collection-controls">
-      <div class="filter-groups">
+      <button type="button" class="filters-toggle" data-filters-toggle aria-expanded="false" aria-controls="FilterGroups-{{ section.id }}" data-open-label="{{ 'collection.filters' | t | escape }}" data-close-label="{{ 'collection.filters_hide' | t | escape }}">{{ 'collection.filters' | t }}{% assign active_filter_count = 0 %}{% for filter in collection.filters %}{% assign active_filter_count = active_filter_count | plus: filter.active_values.size %}{% endfor %}{% if active_filter_count > 0 %} ({{ active_filter_count }}){% endif %}</button>
+      <div class="filter-groups" id="FilterGroups-{{ section.id }}">
         {% for filter in collection.filters %}
           <details class="filter"><summary>{{ filter.label | escape }}{% if filter.active_values.size > 0 %} ({{ filter.active_values.size }}){% endif %}</summary><div class="filter-panel">
             {% case filter.type %}
@@ -36,6 +37,18 @@
     {% render 'pagination', paginate: paginate %}
   {% endpaginate %}
   {% endif %}
+  <script>
+    (() => {
+      const toggle = document.querySelector('[data-filters-toggle]');
+      const form = toggle?.closest('form');
+      if (!toggle || !form) return;
+      toggle.addEventListener('click', () => {
+        const open = form.classList.toggle('filters-open');
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.textContent = open ? toggle.dataset.closeLabel : toggle.dataset.openLabel;
+      });
+    })();
+  </script>
 </section>
 {% schema %}
 {"name":"Collection","settings":[]}

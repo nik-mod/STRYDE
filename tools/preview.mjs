@@ -40,6 +40,89 @@ function prepare(source) {
     .replace(/{%\s*endform\s*%}/g, '</form>')
     .replace(/{%\s*paginate[^%]*%}|{%\s*endpaginate\s*%}/g, '');
 }
+
+// Deterministic fixture merchandise: one two-option shoe (colour × EU size).
+// Never a real product — the preview labels everything it renders.
+const fixtureVariants = Object.freeze([
+  Object.freeze({ id: 101, title: 'Chalk / 40', available: true, price: 18000, compare_at_price: 0, options: ['Chalk', '40'] }),
+  Object.freeze({ id: 102, title: 'Graphite / 41', available: true, price: 19500, compare_at_price: 22000, options: ['Graphite', '41'] }),
+  Object.freeze({ id: 103, title: 'Graphite / 42', available: false, price: 19500, compare_at_price: 0, options: ['Graphite', '42'] }),
+]);
+const fixtureOptions = Object.freeze([
+  Object.freeze({ name: 'Colour', position: 1, values: Object.freeze(['Chalk', 'Graphite']) }),
+  Object.freeze({ name: 'Size', position: 2, values: Object.freeze(['40', '41', '42']) }),
+]);
+
+// Development-only mock cart. In-memory, per preview server process, reset on
+// restart — the same Cart Ajax API surface Shopify serves in production, so
+// the storefront JavaScript runs one code path everywhere. No payment, order
+// or checkout exists here; those stay honestly labeled as unavailable.
+function createMockCart() { return { items: [] }; }
+let mockCart = createMockCart();
+export function resetMockCart() { mockCart = createMockCart(); return mockCart; }
+
+function mockCartJson() {
+  const items = mockCart.items.map((line, index) => {
+    const variant = fixtureVariants.find(entry => entry.id === line.variantId);
+    return {
+      id: line.variantId, variant_id: line.variantId, key: line.key, title: `Preview fixture / Footwear — ${variant.title}`,
+      quantity: line.quantity, price: variant.price, final_price: variant.price, final_line_price: variant.price * line.quantity,
+      properties: null, url: '/products/preview-product', url_to_remove: '/cart', image: null,
+      product: { title: 'Preview fixture / Footwear', has_only_default_variant: false }, variant,
+      line_level_discount_allocations: [], index,
+    };
+  });
+  return {
+    token: 'dev-mock-cart', note: null, attributes: {}, original_total_price: items.reduce((sum, item) => sum + item.final_line_price, 0),
+    total_price: items.reduce((sum, item) => sum + item.final_line_price, 0), item_count: items.reduce((sum, item) => sum + item.quantity, 0),
+    items, currency: 'USD', cart_level_discount_applications: [],
+  };
+}
+
+function mockCartContext() {
+  return { ...mockCartJson(), currency: { iso_code: 'USD' } };
+}
+
+function mockCartFailure(response, message, status = 422) {
+  response.writeHead(status, { 'Content-Type': 'application/json' });
+  response.end(JSON.stringify({ status: 422, message }));
+}
+
+async function readJsonBody(request) {
+  const chunks = [];
+  for await (const chunk of request) chunks.push(chunk);
+  try { return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); } catch { return null; }
+}
+
+// Returns true when the request was a mock commerce endpoint.
+async function handleMockCommerce(request, response, url) {
+  const sendCart = () => { response.writeHead(200, { 'Content-Type': 'application/json' }); response.end(JSON.stringify(mockCartJson())); };
+  if (url.pathname === '/cart.js' && request.method === 'GET') { sendCart(); return true; }
+  if (url.pathname === '/cart/add.js' && request.method === 'POST') {
+    const body = await readJsonBody(request);
+    const item = Array.isArray(body?.items) ? body.items[0] : null;
+    const variant = fixtureVariants.find(entry => Number(entry.id) === Number(item?.id));
+    if (!variant) { mockCartFailure(response, 'Local preview: unknown fixture variant.'); return true; }
+    if (!variant.available) { mockCartFailure(response, 'Local preview: this fixture variant is sold out.'); return true; }
+    const quantity = Math.min(99, Math.max(1, Math.floor(Number(item?.quantity) || 1)));
+    const existing = mockCart.items.find(line => line.variantId === variant.id);
+    if (existing) existing.quantity = Math.min(99, existing.quantity + quantity);
+    else mockCart.items.push({ variantId: variant.id, key: `dev-${variant.id}`, quantity });
+    sendCart(); return true;
+  }
+  if (url.pathname === '/cart/change.js' && request.method === 'POST') {
+    const body = await readJsonBody(request);
+    const line = mockCart.items.find(entry => entry.key === String(body?.id ?? ''));
+    if (!line) { mockCartFailure(response, 'Local preview: that bag line does not exist.'); return true; }
+    const quantity = Math.floor(Number(body?.quantity));
+    if (!Number.isFinite(quantity) || quantity < 0) { mockCartFailure(response, 'Local preview: invalid quantity.'); return true; }
+    if (quantity === 0) mockCart.items = mockCart.items.filter(entry => entry !== line);
+    else line.quantity = Math.min(99, quantity);
+    sendCart(); return true;
+  }
+  return false;
+}
+
 export async function renderPreview(pathname, query = new URLSearchParams()) {
   locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
   try { photoShopCatalog = JSON.parse(await readFile('tools/fixtures/photo-shop.json', 'utf8')); }
@@ -50,23 +133,23 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
   const fixture = {
     id: 1, title: 'Preview fixture / Footwear', handle: 'preview-product', url: '/products/preview-product', vendor: 'Preview data', available: true, price: 18000, price_varies: true,
     description: '<p>This is local fixture data for checking the product form. Connect a Shopify store for real merchandise and transactions.</p>', images: [], has_only_default_variant: false,
-    variants: [
-      { id: 101, title: 'Chalk / 40', available: true, price: 18000, compare_at_price: 0 },
-      { id: 102, title: 'Graphite / 41', available: true, price: 19500, compare_at_price: 22000 },
-      { id: 103, title: 'Graphite / 42', available: false, price: 19500, compare_at_price: 0 }
-    ]
+    options_with_values: fixtureOptions, variants: fixtureVariants,
   };
   fixture.selected_or_first_available_variant = fixture.variants.find(variant => String(variant.id) === query.get('variant')) || fixture.variants[0];
+  fixture.options_with_values = fixtureOptions.map(option => ({ name: option.name, position: option.position, values: option.values, selected_value: fixture.selected_or_first_available_variant.options[option.position - 1] ?? null }));
   if (query.get('image') === '1') fixture.featured_image = { url: '/preview-fixture.svg', alt: 'Local test image — fixture data only' };
   const populated = query.get('fixtures') === '1';
+  // ?fixtures=1 resets the mock bag to one deterministic line so renders and
+  // tests always see the same starting state.
+  if (populated) { resetMockCart(); mockCart.items.push({ variantId: 101, key: 'dev-101', quantity: 1 }); }
   const photoProduct = photoShopCatalog.find(item => item.url === pathname);
   const template = pathname === '/' ? 'index' : pathname.startsWith('/products/') ? 'product' : pathname.startsWith('/collections/') ? 'collection' : pathname === '/cart' ? 'cart' : pathname === '/search' ? 'search' : (pathname === '/account' || pathname.startsWith('/pages/')) ? 'page' : '404';
+  const cart = pathname === '/cart' || query.get('sections') ? mockCartContext() : (() => { const state = mockCartJson(); return { item_count: state.item_count, items: [], total_price: state.total_price, currency: { iso_code: 'USD' } }; })();
   const context = {
-    settings, shop: { name: settings.brand_name, policies: [], customer_accounts_enabled: true }, request: { locale: { iso_code: 'en' }, page_type: template }, page_title: template === 'index' ? settings.brand_name : template, current_page: 1, canonical_url: `http://localhost:${process.env.PORT || 9292}${pathname}`,
-    routes: { root_url: '/', all_products_collection_url: '/collections/all', search_url: '/search', cart_url: '/cart', account_url: '/account' },
-    cart: { item_count: populated && template === 'cart' ? 1 : 0, items: populated && template === 'cart' ? [{ product: fixture, variant: fixture.variants[0], quantity: 1, index: 0, final_price: 18000, final_line_price: 18000, url: fixture.url, url_to_remove: '/cart', properties: [] }] : [], total_price: 18000, currency: { iso_code: 'USD' } },
-    product: fixture, collection: { title: 'The collection', url: '/collections/all', products: populated ? [fixture] : [], products_count: populated ? 1 : 0, filters: [], sort_options: [{ name: 'Featured', value: 'manual' }, { name: 'Price, low to high', value: 'price-ascending' }], default_sort_by: 'manual' },
-    search: { performed: Boolean(query.get('q')), terms: query.get('q') || '', results: populated ? [{ ...fixture, object_type: 'product' }] : [], results_count: populated ? 1 : 0 }, page: { title: pathname === '/account' ? 'Your account' : 'Preview page', content: pathname === '/account' ? '<p>Customer sign-in will be available when the Shopify store is connected.</p><p>You can explore the collection and the product experience in this preview.</p><a class="button button-dark" href="/collections/all">Explore the collection</a>' : '<p>Merchant content will appear here.</p>' }, paginate: { pages: 1, current_page: 1, parts: [] }, form: {}
+    settings, shop: { name: settings.brand_name, policies: [], customer_accounts_enabled: true, enabled_payment_types: [] }, request: { locale: { iso_code: 'en' }, page_type: template }, page_title: template === 'index' ? settings.brand_name : template, current_page: 1, canonical_url: `http://localhost:${process.env.PORT || 9292}${pathname}`,
+    routes: { root_url: '/', all_products_collection_url: '/collections/all', search_url: '/search', predictive_search_url: '/search/suggest', cart_url: '/cart', cart_add_url: '/cart/add', cart_change_url: '/cart/change', checkout_url: '/checkout', account_url: '/account', product_recommendations_url: '/recommendations/products' },
+    cart, product: fixture, collection: { title: 'The collection', url: '/collections/all', products: populated ? [fixture] : [], products_count: populated ? 1 : 0, filters: [], sort_options: [{ name: 'Featured', value: 'manual' }, { name: 'Price, low to high', value: 'price-ascending' }], default_sort_by: 'manual' },
+    search: { performed: Boolean(query.get('q')), terms: query.get('q') || '', results: populated ? [{ ...fixture, object_type: 'product' }] : [], results_count: populated ? 1 : 0 }, page: { title: pathname === '/account' ? 'Your account' : 'Preview page', content: pathname === '/account' ? '<p>Customer sign-in will be available when the Shopify store is connected.</p><p>You can explore the collection and the product experience in this preview.</p><a class="button button-dark" href="/collections/all">Explore the collection</a>' : '<p>Merchant content will appear here.</p>' }, paginate: { pages: 1, current_page: 1, parts: [] }, form: {}, recommendations: { performed: false, products_count: 0, products: [] },
   };
   async function section(type, id, supplied = {}) {
     const source = await readFile(`sections/${type}.liquid`, 'utf8');
@@ -104,14 +187,25 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
     const preview_photo_payload = preview_photo_entries ? JSON.stringify(preview_photo_entries).replaceAll('<', '\\u003c') : '';
     return engine.parseAndRender(prepare(source), { ...context, section: { id, settings: sectionSettings, preview_reference_mode, preview_photography, preview_search_photography, preview_photo_shop, preview_photo_state, preview_photo_payload } });
   }
+  // Section Rendering API emulation for the storefront commerce JavaScript:
+  // /?sections=cart-drawer returns the drawer rendered against the mock cart.
+  const sectionIds = query.get('sections');
+  if (sectionIds) {
+    const rendered = {};
+    for (const id of sectionIds.split(',').map(value => value.trim()).filter(Boolean)) {
+      if (!/^[\w-]+$/.test(id)) continue;
+      try { rendered[id] = await section(id, id); } catch { rendered[id] = ''; }
+    }
+    return JSON.stringify(rendered);
+  }
   const templateConfig = JSON.parse(await readFile(`templates/${template}.json`, 'utf8'));
   let content = '';
   for (const id of templateConfig.order) { const definition = templateConfig.sections[id]; content += await section(definition.type, id, definition.settings); }
-  const layout = prepare(await readFile('layout/theme.liquid', 'utf8')).replace(/{%\s*sections 'header-group'\s*%}/, '{{ preview_header }}').replace(/{%\s*sections 'footer-group'\s*%}/, '{{ preview_footer }}');
-  let result = await engine.parseAndRender(layout, { ...context, content_for_layout: content, content_for_header: '', preview_header: await section('header', 'header'), preview_footer: await section('footer', 'footer') });
+  const layout = prepare(await readFile('layout/theme.liquid', 'utf8')).replace(/{%\s*sections 'header-group'\s*%}/, '{{ preview_header }}').replace(/{%\s*sections 'footer-group'\s*%}/, '{{ preview_footer }}').replace(/{%\s*section 'cart-drawer'\s*%}/, '{{ preview_cart_drawer }}');
+  let result = await engine.parseAndRender(layout, { ...context, content_for_layout: content, content_for_header: '', preview_header: await section('header', 'header'), preview_footer: await section('footer', 'footer'), preview_cart_drawer: await section('cart-drawer', 'cart-drawer') });
   result = result.replace(/<form([^>]*method="post"[^>]*)>/g, '<form$1 data-preview-commerce>');
-  result = result.replace(/<body([^>]*)>/, '<body$1 data-local-preview><aside class="preview-notice" role="note">LOCAL PREVIEW · FIXTURE DATA · COMMERCE DISABLED</aside>');
-  result = result.replace('</body>', '<script>document.addEventListener("submit",e=>{if(e.target.method.toLowerCase()==="post"){e.preventDefault();alert("Local preview: connect a Shopify store to use commerce.")}});document.querySelectorAll("[name=checkout],[name=add]").forEach(b=>{b.disabled=true;b.setAttribute("title","Commerce disabled in local preview")});</script></body>');
+  result = result.replace(/<body([^>]*)>/, '<body$1 data-local-preview><aside class="preview-notice" role="note">LOCAL PREVIEW · FIXTURE DATA · SIMULATED COMMERCE · NO PAYMENTS OR ORDERS</aside>');
+  result = result.replace('</body>', '<div class="dev-commerce-notice" id="DevCommerceNotice" role="alert" hidden>LOCAL PREVIEW · CHECKOUT UNAVAILABLE — connect a Shopify development store for real checkout. Nothing was ordered and no payment can happen here.</div><script>document.addEventListener("submit",e=>{if(e.target.method.toLowerCase()==="post"&&!e.defaultPrevented){e.preventDefault();const n=document.getElementById("DevCommerceNotice");if(n)n.hidden=false;}});</script></body>');
   return result;
 }
 export function createPreviewServer({ handleRequest, transformHTML = html => html } = {}) {
@@ -119,7 +213,8 @@ export function createPreviewServer({ handleRequest, transformHTML = html => htm
     try {
       const url = new URL(req.url, 'http://localhost');
       if (handleRequest?.(req, res, url)) return;
-      if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('Local preview: commerce disabled.'); }
+      if (await handleMockCommerce(req, res, url)) return;
+      if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('Local preview: commerce form posts are disabled. Use the simulated Cart API endpoints.'); }
       if (url.pathname === '/preview-fixture.svg') { res.writeHead(200, { 'Content-Type': 'image/svg+xml' }); return res.end('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700"><rect width="900" height="700" fill="#effaff"/><text x="450" y="330" text-anchor="middle" fill="#073653" font-family="sans-serif" font-size="42">LOCAL TEST IMAGE</text><text x="450" y="390" text-anchor="middle" fill="#073653" font-family="sans-serif" font-size="24">Fixture only · No merchandise</text></svg>'); }
       if (url.pathname.startsWith('/assets/')) {
         const path = resolve(root, `.${decodeURIComponent(url.pathname)}`);
@@ -129,10 +224,14 @@ export function createPreviewServer({ handleRequest, transformHTML = html => htm
       }
       const html = await renderPreview(url.pathname, url.searchParams);
       const known = /^\/$|^\/products\/[^/]+$|^\/collections\/[^/]+$|^\/cart$|^\/search$|^\/account$|^\/pages\/[^/]+$/.test(url.pathname);
+      if (url.searchParams.has('sections')) {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+        return res.end(transformHTML(html));
+      }
       res.writeHead(known ? 200 : 404, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(transformHTML(html));
     } catch (error) { console.error(error); res.writeHead(error.code === 'ENOENT' ? 404 : 500); res.end(`Preview rendering failed: ${error.message}`); }
   });
 }
 if (process.argv[1] && resolve(process.argv[1]) === resolve('tools/preview.mjs')) {
-  createPreviewServer().listen(Number(process.env.PORT || 9292), '127.0.0.1', () => console.log(`Same-Liquid preview: http://127.0.0.1:${process.env.PORT || 9292} (commerce disabled)`));
+  createPreviewServer().listen(Number(process.env.PORT || 9292), '127.0.0.1', () => console.log(`Same-Liquid preview: http://127.0.0.1:${process.env.PORT || 9292} (simulated commerce, no payments)`));
 }

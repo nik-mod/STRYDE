@@ -59,6 +59,7 @@
     <main id="MainContent" tabindex="-1">{{ content_for_layout }}</main>
     {% if request.page_type == 'index' %}{% render 'journey-nav' %}{% endif %}
     {% sections 'footer-group' %}
+    {% section 'cart-drawer' %}
     <div class="sr-only" id="CartStatus" role="status" aria-live="polite"></div>
   </body>
 </html>

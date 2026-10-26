@@ -1,0 +1,21 @@
+{% comment %}
+  FAQ template (assign as page.faq). Questions are theme-editor blocks so the
+  merchant writes real answers; nothing ships until they do. Page content
+  renders above the question list for a merchant-editable introduction.
+{% endcomment %}
+<article class="page-shell editorial-page faq-page">
+  <div class="page-heading"><span class="micro">{{ shop.name | escape }}</span><h1>{{ 'faq.title' | t | upcase }}</h1></div>
+  <p class="faq-intro">{{ 'faq.intro' | t }}</p>
+  {% if page.content != blank %}<div class="rte faq-content">{{ page.content }}</div>{% endif %}
+  <div class="faq-list">
+    {% for block in section.blocks %}
+      <details class="faq-item" {{ block.shopify_attributes }}>
+        <summary><span>{{ block.settings.question | escape }}</span>{% render 'icon', name: 'plus' %}</summary>
+        <div class="rte faq-answer">{{ block.settings.answer }}</div>
+      </details>
+    {% endfor %}
+  </div>
+</article>
+{% schema %}
+{"name":"FAQ","settings":[],"blocks":[{"type":"question","name":"Question","settings":[{"type":"text","id":"question","label":"Question"},{"type":"richtext","id":"answer","label":"Answer"}]}],"presets":[{"name":"FAQ"}]}
+{% endschema %}

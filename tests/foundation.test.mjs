@@ -75,7 +75,7 @@ test('native empty routes render useful content and fixture commerce stays label
   assert.equal((collection.match(/data-photo-card /g) || []).length, 12);
   assert.match(await renderPreview('/search', new URLSearchParams('q=test')), /No results/);
   const fixture = await renderPreview('/cart', new URLSearchParams('fixtures=1'));
-  assert.match(fixture, /name="updates\[\]"/); assert.match(fixture, /name="checkout"/); assert.match(fixture, /COMMERCE DISABLED/);
+  assert.match(fixture, /name="updates\[\]"/); assert.match(fixture, /name="checkout"/); assert.match(fixture, /SIMULATED COMMERCE/);
 });
 
 test('hero product title, selected price and native add-to-cart use the selected Shopify product', async () => {

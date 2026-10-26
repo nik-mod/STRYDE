@@ -2,7 +2,10 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { createProgressBus } from './motion/contracts.mjs';
-import { mountProduct } from './commerce.mjs';
+import { mountProduct, mountRecommendations } from './commerce.mjs';
+import { mountCartDrawer } from './cart-drawer.mjs';
+import { mountCartPage } from './cart-page.mjs';
+import { mountPredictiveSearch } from './predictive-search.mjs';
 import { createScope, createScheduler } from './motion/lifecycle.mjs';
 import { mountHero } from './motion/hero.mjs';
 import { mountChapter } from './motion/chapters.mjs';
@@ -124,11 +127,11 @@ function mount(scope = document) {
   ensureEnvironments(scope);
   const header = scope.matches?.('.site-header') ? scope : scope.querySelector?.('.site-header');
   if (header && !instances.has(header)) instances.set(header, mountHeader(header));
-  const roots = [...scope.querySelectorAll('[data-hero], [data-chapter], [data-product-section], [data-listing-section]')];
-  if (scope.matches?.('[data-hero], [data-chapter], [data-product-section], [data-listing-section]')) roots.push(scope);
+  const roots = [...scope.querySelectorAll('[data-hero], [data-chapter], [data-product-section], [data-listing-section], [data-cart-page], [data-recommendations-url], [data-predictive-root]')];
+  if (scope.matches?.('[data-hero], [data-chapter], [data-product-section], [data-listing-section], [data-cart-page], [data-recommendations-url], [data-predictive-root]')) roots.push(scope);
   for (const root of roots) {
     if (instances.has(root)) continue;
-    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : root.matches('[data-listing-section]') ? mountListing(root, { gsap }) : mountProduct(root));
+    instances.set(root, root.matches('[data-hero]') ? mountHeroSection(root) : root.matches('[data-chapter]') ? mountChapterSection(root) : root.matches('[data-predictive-root]') ? mountPredictiveSearch(root) : root.matches('[data-listing-section]') ? mountListing(root, { gsap }) : root.matches('[data-cart-page]') ? mountCartPage(root) : root.matches('[data-recommendations-url]') ? mountRecommendations(root) : mountProduct(root));
   }
   ScrollTrigger.refresh();
   const progress = document.querySelector('[data-story-progress]');
@@ -141,7 +144,9 @@ const siteIntro = mountSiteIntro({
   gsap, document, environment: window, onChange: () => { syncScroll(); ScrollTrigger.refresh(); },
   skip: !shouldPlaySiteIntro({ reduced: reduceQuery.matches, restoredY: reloadScroll?.y || window.scrollY, hash: location.hash, navigationType: performance.getEntriesByType('navigation')[0]?.type }),
 });
-syncScroll(); mount();
+syncScroll();
+let disposeCartDrawer = mountCartDrawer({ document });
+mount();
 let disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll });
 let disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location });
 document.addEventListener('shopify:section:load', event => { mount(event.target); syncScroll(); });
@@ -158,11 +163,12 @@ window.addEventListener('pagehide', () => {
   disposeInspection();
   progressTween?.scrollTrigger?.kill(); progressTween?.revert(); progressTween = null;
   disposeNavigation();
+  disposeCartDrawer();
   unmount(document); environmentDispose?.(); environmentDispose = null; lenis?.destroy(); lenis = null; scheduler.setLenis(null); modalObserver.disconnect();
 });
 window.addEventListener('pageshow', event => {
   pageActive = true;
-  if (event.persisted) { syncScroll(); mount(); disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll }); disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location }); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
+  if (event.persisted) { syncScroll(); disposeCartDrawer = mountCartDrawer({ document }); mount(); disposeNavigation = mountNavigation({ document, getScroller: () => lenis, onMenuChange: syncScroll }); disposeInspection = mountTriggerInspection({ ScrollTrigger, scheduler, document, location }); modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open', 'aria-modal', 'hidden'] }); }
   restoreScroll(event.persisted ? exitScroll : reloadScroll);
   reloadScroll = null;
 });

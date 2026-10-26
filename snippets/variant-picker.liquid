@@ -1,0 +1,28 @@
+{% comment %}
+  Footwear option picker: one group per product option — EU size grid, colour
+  swatches or plain values. The native <select name="id"> in main-product.liquid
+  stays the submitted input and the no-JS path; commerce.mjs keeps both in sync
+  and recalculates which combinations exist as the selection changes.
+{% endcomment %}
+<div class="variant-picker" data-variant-picker>
+  {% for option in product.options_with_values %}
+    {% liquid
+      assign option_name = option.name | downcase
+      assign option_kind = 'plain'
+      if option_name contains 'size' or option_name contains 'ზომა'
+        assign option_kind = 'size'
+      elsif option_name contains 'color' or option_name contains 'colour' or option_name contains 'ფერი'
+        assign option_kind = 'color'
+      endif
+    %}
+    <fieldset class="variant-group variant-group-{{ option_kind }}" data-variant-group data-option-position="{{ option.position }}">
+      <legend class="micro"><span data-option-name>{{ option.name | escape }}</span><span data-option-selected aria-live="polite">{% if option.selected_value %} — {{ option.selected_value | escape }}{% endif %}</span></legend>
+      <div class="variant-values" role="group" aria-label="{{ option.name | escape }}">
+        {% for value in option.values %}
+          <button type="button" class="variant-value" data-variant-value="{{ value | escape }}" aria-pressed="{% if value == option.selected_value %}true{% else %}false{% endif %}"><span>{{ value | escape }}</span></button>
+        {% endfor %}
+      </div>
+    </fieldset>
+  {% endfor %}
+  <p class="variant-status micro" data-variant-status role="status" aria-live="polite"></p>
+</div>

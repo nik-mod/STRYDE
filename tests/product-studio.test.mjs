@@ -28,7 +28,8 @@ test('native studio retains product forms and sold-out variant selection', async
   assert.match(html, /data-product-gallery/);
   assert.match(html, /name="id"/);
   assert.match(html, /name="quantity"/);
-  assert.match(html, /data-variant-options/);
+  assert.match(html, /data-variant-picker/);
+  assert.match(html, /data-variant-value="42"/);
   assert.match(html, /data-variant-select/);
   assert.match(html, /data-product-availability/);
   assert.match(html, /data-add-to-cart/);
