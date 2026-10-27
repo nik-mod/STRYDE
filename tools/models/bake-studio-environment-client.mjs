@@ -1,0 +1,10 @@
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const renderer = new THREE.WebGLRenderer();
+const pmrem = new THREE.PMREMGenerator(renderer), room = new RoomEnvironment();
+const target = pmrem.fromScene(room, .04, .1, 100, { size: 128 });
+const pixels = new Uint16Array(target.width * target.height * 4);
+await renderer.readRenderTargetPixelsAsync(target, 0, 0, target.width, target.height, pixels);
+await fetch(`/capture?width=${target.width}&height=${target.height}`, { method: 'POST', body: pixels });
+target.dispose(); room.dispose(); pmrem.dispose(); renderer.dispose();
+document.body.textContent = 'Studio environment baked.';

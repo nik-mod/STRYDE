@@ -1,7 +1,6 @@
 import { journeyModelKey } from './journey-models.mjs';
-import { Euler, Vector3 } from 'three';
+import { Euler, Matrix4 } from 'three';
 import { journeyPose } from './journey-poses.mjs';
-import { fittedCameraZ } from './scene-framing.mjs';
 
 const clamp = value => Math.min(1, Math.max(0, value));
 export const STUDY_EXCHANGE_RADIUS = .11;
@@ -48,8 +47,8 @@ export function modelExchangePose(authored, progress = null) {
 export function chapterCameraDistance(pointSets, chapter, { aspect, fov = 32, includeExchange = false, exchangeRanges = [[0, 1]] }) {
   if (!(aspect > 0) || !pointSets.length) return 0;
   const points = pointSets.flat();
-  const world = points.map(() => new Vector3());
   const rotation = new Euler(0, 0, 0, 'XYZ');
+  const matrix = new Matrix4();
   let distance = 0;
   const poses = Array.from({ length: 81 }, (_, index) => journeyPose(chapter, index / 80));
   if (includeExchange) for (const [start, end] of exchangeRanges) {
@@ -57,8 +56,17 @@ export function chapterCameraDistance(pointSets, chapter, { aspect, fov = 32, in
   }
   for (const pose of poses) {
     rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
-    points.forEach((point, i) => world[i].copy(point).applyEuler(rotation));
-    distance = Math.max(distance, fittedCameraZ(world, { fov, aspect, y: pose.cameraY, fill: pose.fill }));
+    // Build the rotation once per pose, rather than evaluating trigonometry
+    // for every hull vertex. Accumulate the exact same camera constraints
+    // directly, with no temporary vectors or second pass over the hull.
+    matrix.makeRotationFromEuler(rotation);
+    const e = matrix.elements, tangent = Math.tan(fov * Math.PI / 360) * pose.fill;
+    for (const point of points) {
+      const x = e[0] * point.x + e[4] * point.y + e[8] * point.z;
+      const y = e[1] * point.x + e[5] * point.y + e[9] * point.z;
+      const z = e[2] * point.x + e[6] * point.y + e[10] * point.z;
+      distance = Math.max(distance, z + Math.abs(x) / (tangent * aspect), z + Math.abs(y - pose.cameraY) / tangent);
+    }
   }
   return distance * 1.015;
 }

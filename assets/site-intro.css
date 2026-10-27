@@ -49,7 +49,8 @@
 .site-intro-word { display: flex; }
 .site-intro-word > span { display: inline-block; backface-visibility: hidden; transform-origin: 50% 100%; }
 .site-intro-echo { color: transparent; -webkit-text-stroke: 1px rgba(21,52,72,.3); opacity: 0; }
-.site-intro-product { position: absolute; z-index: 4; left: 50%; top: 45%; transform: translate(-50%, -50%); width: min(101vw, 1640px); height: min(100svh, 1100px); pointer-events: none; }
+.site-intro-product { position: absolute; z-index: 4; left: 50%; top: 45%; transform: translate(-50%, -50%); width: min(72vw, 1100px); height: min(70svh, 780px); pointer-events: none; }
+.site-intro-shoe-frame { display: block; width: 100%; height: 100%; }
 .site-intro-shoe { position: relative; z-index: 1; display: block; width: 100%; height: 100%; object-fit: contain; will-change: transform, opacity; filter: drop-shadow(0 42px 28px rgba(11,46,67,.18)); }
 .site-intro-shadow { position: absolute; width: 48%; height: 5%; bottom: 8%; left: 28%; border-radius: 50%; background: rgba(8,40,58,.18); filter: blur(20px); }
 .site-intro-trail { position: absolute; z-index: 3; width: 42vw; height: 70svh; top: 13%; opacity: 0; }
@@ -77,7 +78,7 @@
   .site-intro-different { font-size: 17.5vw; }
   .site-intro-word,
   .site-intro-echo { font-size: 26.5vw; font-variation-settings: 'wght' 900, 'wdth' 70; }
-  .site-intro-product { top: 45%; width: 140vw; height: 72svh; }
+  .site-intro-product { top: 45%; width: 112vw; height: 55svh; }
   .site-intro-orbits { top: 45%; width: 168vw; height: 84svh; }
   .site-intro-halo { top: 44%; width: 115vw; }
   .site-intro-signoff { bottom: 20%; font-size: clamp(21px, 5.6vw, 30px); }

@@ -1,4 +1,17 @@
 /* Campaign rhythm: compact reading, complete products, restrained rotations. */
+.template-index .chapter-materials.is-material-orbit .mat-orbit { position:absolute; inset:0 33% 0 0; overflow:hidden; }
+.template-index .chapter-materials.is-material-orbit .mat-orbit-item { position:absolute; left:0; top:0; max-height:none; will-change:transform; }
+.template-index .chapter-materials.is-material-orbit .mat-orbit-item .mat-frame { height:100%; width:100%; max-height:none; aspect-ratio:auto; overflow:visible; }
+.template-index .chapter-materials.is-material-orbit .mat-orbit-item .mat-frame > img { width:100%; height:100%; object-fit:contain; transform:none; filter:none; }
+.template-index .chapter-materials.is-material-orbit .mat-orbit-item .mat-ghost,
+.template-index .chapter-materials.is-material-orbit[data-orbit-bundled] .mat-orbit-item .asset-tag { display:none; }
+.template-index .chapter-materials.is-material-orbit .mat-orbit-disclosure { position:absolute; left:0; bottom:10px; z-index:500; opacity:.7; font-size:8px; }
+.template-index .chapter-materials.is-material-orbit .mat-panel { opacity:1; visibility:visible; display:block; pointer-events:none; }
+.template-index .chapter-materials.is-material-orbit .mat-copy { position:absolute; left:70%; top:50%; width:30%; transform:translateY(calc(-50% + var(--orbit-copy-y,0px))); padding:0; pointer-events:auto; }
+.template-index .chapter-materials.is-material-orbit .mat-copy h3 { font-size:clamp(32px,3.2vw,70px); }
+.template-index .chapter-materials.is-material-orbit .mat-specs { gap:6px; }
+.template-index .chapter-materials.is-material-orbit .mat-specs li { font-size:10px; }
+.template-index .chapter-materials.is-material-orbit .mat-rule { margin-top:20px; }
 .template-index .chapter-deconstruction {overflow:clip;padding-block:clamp(50px,5vw,100px)}
 .template-index .chapter-deconstruction .decon-grid {align-items:start;grid-template-columns:minmax(0,.85fr) minmax(0,1.35fr);gap:4vw}
 .template-index .chapter-deconstruction .decon-visual {position:sticky;top:calc(var(--header-height) + var(--preview-height) + 24px);margin-top:30px}
@@ -11,7 +24,7 @@
 .template-index .decon-notes {display:none}
 .template-index .chapter-deconstruction.is-anatomy-pinned { height: 100svh; min-height: 720px; padding-block: 42px; display: grid; align-items: center; }
 .template-index .is-anatomy-pinned .decon-grid { align-items: center; }
-.template-index .chapter-deconstruction.is-anatomy-pinned .decon-visual { position: relative; top: auto; align-self: center; margin-top: 0; }
+.template-index .chapter-deconstruction.is-anatomy-pinned .decon-visual { position: relative; top: auto; align-self: start; margin-top: 0; }
 .template-index .chapter-deconstruction.is-anatomy-pinned .chapter-heading { font-size: clamp(36px,3.25vw,56px); }
 .template-index .is-anatomy-pinned .decon-introduction { margin-bottom: 16px; }
 .template-index .chapter-deconstruction.is-anatomy-pinned .decon-item { padding-block: 12px; }
@@ -57,6 +70,25 @@
  .template-index .brand-edition{display:none}
 }
 .template-index .brand-studio-head h2{max-width:12ch}
+
+/* One exposure-matched surface spans the real chapter boundary. This changes
+   no section height, pin or content opacity, and adds no overlay over images. */
+.template-index.has-chapter-continuity,
+.template-index.has-chapter-continuity section[data-env],
+.template-index.has-chapter-continuity .hero-stage,
+.template-index.has-chapter-continuity .hero-atmo,
+.template-index.has-chapter-continuity .form-look,
+.template-index.has-chapter-continuity .closing-stage,
+.template-index.has-chapter-continuity .site-footer[data-signature-footer] {
+  background: var(--journey-surface);
+}
+.template-index.has-chapter-continuity section[data-env] { color: var(--journey-ink); }
+.template-index.has-chapter-continuity .hero-atmo { background: var(--journey-surface) url('hero-atmosphere.png') center / cover no-repeat; opacity: calc(1 - var(--hero-surface-exit, 0)); }
+.template-index.has-chapter-continuity :is(.chapter-heading,.chapter-kicker,.chapter-intro,.decon-item,.decon-ledger,.mat-copy,.study-switcher,.tech-heading,.tech-brief,.tech-row,.tech-summary,.coll-head,.coll-summary,.form-look-copy,.feat-copy,.brand-studio-head,.brand-studio-foot,.brand-editor-note,.brand-edition,.brand-studio-caption,.closing-editorial) { color: var(--journey-ink); }
+.template-index.has-chapter-continuity :is(.mat-copy p,.tech-row p,.feat-story,.feat-notes li,.brand-studio-caption,.brand-editor-note,.closing-editorial > p) { color: inherit; }
+.template-index.has-chapter-continuity .brand-studio { color: var(--journey-ink); background: radial-gradient(ellipse at 75% 38%,var(--journey-studio-light),transparent 58%); }
+.template-index.has-chapter-continuity :is(.brand-studio-actions a,.brand-studio-stops button,.chapter-summary a) { color: inherit; }
+.template-index .tech-heading .heading-word { padding-top: .08em; margin-top: -.08em; padding-inline: .05em; margin-inline: -.05em; }
 
 /* Restored campaign: tighter reading spreads and a product-led closing wall. */
 .template-index .chapter-deconstruction .decon-visual { margin-top: 12px; }

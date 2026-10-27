@@ -26,7 +26,7 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
       .to(copy, { yPercent: -18, opacity: .82, duration: .6 }, .1)
       .to(actions, { y: -8, duration: .7 }, .15);
   }
-  sequence.fromTo(stage, { backgroundColor: '#0b354c' }, { backgroundColor: '#061e30', duration: 1 }, 0);
+  // Chapter exposure matching owns surface color through the footer handoff.
 
   let footer = null, footerContext = null;
   const connectFooter = () => {
@@ -39,7 +39,7 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
       const letters = [...(word?.querySelectorAll?.('[data-footer-letter]') || [])];
       const commerce = footer.querySelector('.signature-commerce');
       const identity = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        trigger: footer, start: 'top 110%', end: 'top 20%', scrub: .35, invalidateOnRefresh: true,
+        trigger: footer, start: 'top 140%', end: 'top 50%', scrub: .35, invalidateOnRefresh: true,
       } });
       // The only monumental STRYDE mark is the real, linked footer wordmark.
       // It rises as the photographic stage releases, then stays fully readable.
@@ -54,12 +54,9 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
           { yPercent: 0, rotationX: 0, color: '#dcecf2', opacity: 1, duration: .78 }, 0);
       }
       identity.fromTo(commerce, { y: 20, opacity: .65 }, { y: 0, opacity: 1, duration: .5 }, .45);
-      if (!compact) {
-        // Continue the same print's path AFTER the existing pin releases. Its
-        // upward peel and the rising linked wordmark form one counter-movement.
-        identity.fromTo(focus, { xPercent: -5, yPercent: -6, scale: 1.04, rotationY: 0 },
-          { xPercent: -14, yPercent: -24, scale: .88, rotationY: 14, duration: .72, immediateRender: false }, .12);
-      }
+      // The campaign timeline alone owns the photograph. It travels out with
+      // the document while the wordmark rises; a second focus tween used to
+      // overwrite its pinned pose on direct reverse seeks.
       return () => word?.classList?.remove('is-letter-revealing');
     }, footer);
   };

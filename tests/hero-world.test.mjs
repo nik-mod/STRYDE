@@ -34,6 +34,8 @@ test('the world uses the supplied scene, animates camera/light, and releases its
   assert.equal(scene.children.length, 1);
   assert.equal(world.group.children.length, 1, 'one continuous landscape mesh');
   const mesh = world.group.children[0];
+  const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <beginnormal_vertex>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>\n#include <roughnessmap_fragment>' };
+  mesh.material.onBeforeCompile(shader);
   let geometryDisposed = 0, materialDisposed = 0;
   mesh.geometry.addEventListener('dispose', () => geometryDisposed++);
   mesh.material.addEventListener('dispose', () => materialDisposed++);
@@ -44,6 +46,11 @@ test('the world uses the supplied scene, animates camera/light, and releases its
     return { camera: camera.position.toArray(), light: key.position.toArray(), perspective: camera.rotation.toArray(), surface: world.group.position.toArray() };
   };
   const rest = update(0, 0), ambient = update(3, 0), scrolled = update(3, .7);
+  for (const progress of [0, .25, .5, .75, 1, .5, 0]) {
+    update(3, progress);
+    assert.equal(shader.uniforms.worldProductCenter.value.x, rig.position.x - world.group.position.x);
+    assert.equal(shader.uniforms.worldProductCenter.value.y, rig.position.z - world.group.position.z, 'terrain clearance follows the product instead of independently crossing it');
+  }
   assert.notDeepEqual(ambient.camera, rest.camera);
   assert.notDeepEqual(ambient.light, rest.light);
   assert.notDeepEqual(scrolled.surface, ambient.surface);

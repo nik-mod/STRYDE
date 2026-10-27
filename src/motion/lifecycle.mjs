@@ -9,6 +9,22 @@ export function createScope() {
     dispose() { if (controller.signal.aborted) return; controller.abort(); for (const cleanup of cleanups) cleanup(); cleanups.clear(); },
   };
 }
+
+// Noncritical standalone viewers stay deferred. The homepage's critical shared
+// Hero scene now prepares beneath the film so its first frame is ready to reveal.
+export function waitForIntroCompletion(document, signal) {
+  const html = document.documentElement;
+  const blocked = () => html.classList.contains('site-intro-playing') || html.classList.contains('site-intro-pending');
+  if (signal.aborted) return Promise.resolve(false);
+  if (!blocked()) return Promise.resolve(true);
+  return new Promise(resolve => {
+    const finish = () => { observer.disconnect(); signal.removeEventListener('abort', abort); resolve(!signal.aborted); };
+    const abort = () => finish();
+    const observer = new document.defaultView.MutationObserver(() => { if (!blocked()) finish(); });
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+    signal.addEventListener('abort', abort, { once: true });
+  });
+}
 export function createScheduler(ticker) {
   const frames = new Set(); let lenis = null; let ticking = false;
   const tick = time => { lenis?.raf(time * 1000); for (const frame of frames) frame(time); };

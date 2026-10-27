@@ -145,7 +145,7 @@ test('first hero scroll takes over an unfinished entrance and reverses to the es
   }
 });
 
-test('hero field and commerce restore after a full seek and an interrupted entrance', () => {
+test('hero yields surface ownership to the chapter grade and keeps its CTA through the handoff', () => {
   const previousWindow = globalThis.window;
   globalThis.window = Object.assign(new EventTarget(), { scrollY: 0 });
   let harness;
@@ -153,8 +153,8 @@ test('hero field and commerce restore after a full seek and an interrupted entra
     harness = heroHarness();
     harness.intro.time(.05, true);
     harness.seek(1);
-    assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [239, 250, 255]);
-    assert.equal(harness.targets.foot.opacity, 0, 'commerce yields before the shared product bridge');
+    assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [185, 213, 230], 'the Hero timeline must not compete with the measured chapter surface');
+    assert.equal(harness.targets.foot.opacity, 1, 'the outgoing CTA remains visible while the next chapter enters');
     harness.seek(0);
     assert.deepEqual(gsap.utils.splitColor(harness.targets.stage.backgroundColor).slice(0, 3), [185, 213, 230]);
     assert.equal(harness.targets.foot.opacity, 1);

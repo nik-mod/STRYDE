@@ -29,7 +29,7 @@ export function refinePreviewMaterial(material, geometry = null) {
         // Retain variation from the supplied roughness map, with believable
         // dielectric finishes instead of treating every region as the same shell.
         float finish = roughnessFactor;
-        finish = mix(finish, clamp(roughnessFactor * 0.76, 0.42, 0.62), pale * (1.0 - lower));
+        finish = mix(finish, clamp(roughnessFactor * 0.82, 0.48, 0.68), pale * (1.0 - lower));
         finish = mix(finish, clamp(roughnessFactor * 0.96, 0.66, 0.84), pale * lower);
         finish = mix(finish, clamp(roughnessFactor, 0.65, 0.88), textile * (1.0 - lower));
         finish = mix(finish, clamp(roughnessFactor * 0.62, 0.30, 0.45), textile * lower);
@@ -39,7 +39,12 @@ export function refinePreviewMaterial(material, geometry = null) {
         'mapN.xy *= normalScale;',
         // Amplify only relief already present in the original textile map;
         // keep pale overlays softer, instead of sharpening the entire mesh.
-        'mapN.xy *= normalScale * mix(0.80, 1.18, textile * (1.0 - lower));',
+        `mapN.xy *= normalScale * mix(0.80, 1.18, textile * (1.0 - lower));
+        // Filter unresolved relief from the supplied normal atlas into the
+        // specular lobe. Distant weave should read as fabric, not shimmer.
+        vec3 normalDx = dFdx(mapN), normalDy = dFdy(mapN);
+        float normalVariance = min(0.12, 0.5 * (dot(normalDx, normalDx) + dot(normalDy, normalDy)));
+        roughnessFactor = sqrt(min(1.0, roughnessFactor * roughnessFactor + normalVariance));`,
       ))
       .replace('#include <metalnessmap_fragment>', `
         #include <metalnessmap_fragment>
@@ -48,6 +53,6 @@ export function refinePreviewMaterial(material, geometry = null) {
     // The source normal map supplies seam and cage relief. No invented sine
     // weave, random grain, sharpening, geometry or transparent Air unit is added.
   };
-  material.customProgramCacheKey = () => 'stryde-preview-material-finish-v4';
+  material.customProgramCacheKey = () => 'stryde-preview-material-finish-v5';
   material.needsUpdate = true;
 }

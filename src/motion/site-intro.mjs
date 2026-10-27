@@ -41,6 +41,7 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
   const trails = all('trail');
   const skipButton = one('skip');
   const heroFrame = () => document.querySelector('[data-hero-art]')?.getBoundingClientRect?.() || { left: 0, top: 0, width: 1440, height: 900 };
+  const landingFrame = () => document.querySelector('[data-hero-poster] img')?.getBoundingClientRect?.() || { left: heroFrame().left + heroFrame().width * .08, top: heroFrame().top + heroFrame().height * .08, width: heroFrame().width * .84, height: heroFrame().height * .84 };
   let timeline, watchdog, done = false;
 
   const finish = ({ restoreFocus = true } = {}) => {
@@ -128,7 +129,7 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
       .fromTo(one('orbits'), { rotation: -20, scale: .7 }, { rotation: 12, scale: 1.06, duration: 2.5, ease: 'power2.out' }, 3.06)
       .fromTo(one('echo'), { y: 0, opacity: 0, scale: 1 }, { y: 38, opacity: .6, scale: 1.03, duration: 1.1, ease: 'power3.out' }, 3.61)
       .fromTo(all('edge'), { scaleX: 0 }, { scaleX: 1, duration: 1.3, stagger: .12, ease: 'expo.out' }, 3.66)
-      .to(shoe, { yPercent: -5, rotation: 4, scale: 1.06, duration: 1.2, ease: 'sine.inOut' }, 4.21)
+      .to(shoe, { yPercent: -5, rotation: 4, scale: 1.06, duration: .45, ease: 'sine.inOut' }, 4.21)
       .to(one('word'), { scale: 1.035, duration: 1.5, ease: 'sine.inOut' }, 4.01)
       .fromTo(all('signoff-word'), { yPercent: 120, rotation: 5, opacity: 0 }, { yPercent: 0, rotation: 0, opacity: 1, duration: .75, stagger: .09, ease: 'expo.out' }, 4.11)
       .fromTo(one('light'), { xPercent: -100, opacity: 0 }, { xPercent: 100, opacity: .65, duration: 1.2, ease: 'power2.inOut' }, 4.31)
@@ -137,13 +138,13 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
       // The film, shutters and live Hero overlap in time, so there is no empty beat.
       .to(one('echo'), { y: 80, opacity: 0, duration: .45 }, 5.41)
       .to(one('product'), {
-        left: () => heroFrame().left + heroFrame().width / 2,
-        top: () => heroFrame().top + heroFrame().height / 2,
-        width: () => heroFrame().width * 1.4,
-        height: () => heroFrame().height * 1.4,
-        duration: .95, ease: 'power3.inOut',
-      }, 5.15)
-      .to(shoe, { xPercent: 0, yPercent: 0, rotation: 0, scale: 1, opacity: 0, duration: .75, ease: 'power2.inOut' }, 5.55)
+        left: () => landingFrame().left + landingFrame().width / 2,
+        top: () => landingFrame().top + landingFrame().height / 2,
+        width: () => landingFrame().width,
+        height: () => landingFrame().height,
+        duration: .7, ease: 'power3.inOut',
+      }, 4.75)
+      .to(shoe, { xPercent: 0, yPercent: 0, rotation: 0, scale: 1, opacity: 1, duration: .65, ease: 'power2.inOut' }, 4.75)
       .to(one('shadow'), { scaleX: .4, opacity: 0, duration: .35 }, 5.54)
       .to(glyphs, { yPercent: -28, rotation: 0,
         opacity: 0, duration: .5, stagger: .015, ease: 'power2.in',
@@ -159,7 +160,7 @@ export function mountSiteIntro({ gsap, document, environment, skip = false, onCh
     timeline.call?.(() => {
       html.setAttribute?.('data-intro-revealing', '');
       document.dispatchEvent(new environment.Event('stryde:intro-reveal'));
-    }, [], 5.55);
+    }, [], 5.05);
     timeline.timeScale?.(1.35);
     timeline.play();
   } catch {

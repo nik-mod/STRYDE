@@ -4,6 +4,8 @@
 // production GLB exists — as the lighting/exposure preset for the shared scene.
 // Deterministic and data-driven: no invented products or inventories here.
 
+import { mountChapterContinuity } from './chapter-continuity.mjs';
+
 export const ENVIRONMENTS = Object.freeze({
   hero: Object.freeze({ key: 3.4, rim: 2.0, exposure: 1.0 }),
   deconstruction: Object.freeze({ key: 3.0, rim: 1.8, exposure: 1.0 }),
@@ -19,7 +21,7 @@ export function environmentFor(name) {
   return ENVIRONMENTS[name] ?? ENVIRONMENTS.hero;
 }
 
-export function mountEnvironments(scope = document, { onChange } = {}) {
+export function mountEnvironments(scope = document, { onChange, scheduler } = {}) {
   const targets = [...scope.querySelectorAll('[data-env]')];
   if (!targets.length) return () => {};
   const apply = name => {
@@ -41,7 +43,9 @@ export function mountEnvironments(scope = document, { onChange } = {}) {
     return rect.top <= midline && rect.bottom >= midline;
   });
   if (current) apply(current.dataset.env);
+  const disposeContinuity = scheduler ? mountChapterContinuity({ document: scope.ownerDocument || scope, scheduler }) : () => {};
   return () => {
+    disposeContinuity();
     observer.disconnect();
     delete document.documentElement.dataset.env;
   };

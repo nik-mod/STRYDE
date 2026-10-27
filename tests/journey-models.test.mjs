@@ -31,7 +31,8 @@ test('the original opening stays blue and the new model occupies the existing ch
   for (const marker of ['move-glyph', 'different-glyph', 'glyph', 'curtain', 'macros', 'skip']) {
     assert.match(intro, new RegExp(`data-intro-${marker}`));
   }
-  assert.match(intro, /tn-angle-1400.webp/);
+  assert.match(intro, /hero-product-desktop.webp/);
+  assert.match(intro, /hero-product-mobile.webp/);
   assert.doesNotMatch(intro, /<canvas|data-model-url=/, 'the recovered film adds no second live sneaker renderer');
   assert.doesNotMatch(html, /model-spotlight|drift-spotlight|spotlight-model/);
   assert.equal((html.match(/data-model-url=/g) || []).length, 1);

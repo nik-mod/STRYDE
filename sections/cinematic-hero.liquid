@@ -10,9 +10,10 @@
   endif
   assign collection_url = section.settings.collection.url | default: routes.all_products_collection_url
 %}
-<section class="hero{% if featured_product != blank %} hero-has-product{% endif %}{% if bundled_tn %} hero-editorial-model{% endif %}" data-hero data-env="hero" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} {% if bundled_tn %} data-model-yaw="90" data-model-size="3.1"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
+<section class="hero{% if featured_product != blank %} hero-has-product{% endif %}{% if bundled_tn %} hero-editorial-model{% endif %}" data-hero data-env="hero" data-environment-url="{{ 'studio-environment.hdr' | asset_url }}" data-section-id="{{ section.id }}" data-loading-label="{{ 'hero.model_loading' | t | escape }}" data-error-label="{{ 'hero.model_error' | t | escape }}" data-context-lost-label="{{ 'hero.model_interrupted' | t | escape }}"{% if model_url != blank %} data-model-url="{{ model_url | escape }}"{% endif %} {% if bundled_tn %} data-model-yaw="90" data-model-size="3.1"{% endif %} aria-labelledby="HeroTitle-{{ section.id }}">
   <div class="hero-stage" data-hero-stage>
     <div class="hero-atmo" aria-hidden="true"></div>
+    {% if bundled_tn %}<picture class="hero-world-poster" aria-hidden="true"><source media="(max-width: 700px)" srcset="{{ 'hero-world-mobile.webp' | asset_url }}"><img src="{{ 'hero-world-desktop.webp' | asset_url }}" width="1440" height="900" alt="" loading="eager" fetchpriority="high"></picture>{% endif %}
     <h1 class="sr-only" id="HeroTitle-{{ section.id }}">{{ section.settings.headline_first | escape }} {{ section.settings.headline_second | escape }}</h1>
     <div class="hero-editorial">
       <div class="hero-type" aria-hidden="true" data-hero-type>
@@ -53,7 +54,7 @@
           {% if presentation_image != blank %}
             {{ presentation_image | image_url: width: 1800 | image_tag: class: 'hero-image', widths: '400, 600, 900, 1200, 1800', sizes: '(min-width: 900px) 46vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: presentation_image.alt }}
           {% elsif bundled_tn %}
-            <img class="hero-image" src="{{ 'tn-profile-1400.webp' | asset_url }}" width="1400" height="1050" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager">
+            <picture class="hero-product-poster" data-hero-poster><source media="(max-width: 700px)" srcset="{{ 'hero-product-mobile.webp' | asset_url }}"><img class="hero-image" src="{{ 'hero-product-desktop.webp' | asset_url }}" width="635" height="301" alt="Blue and white Nike TN sneaker" fetchpriority="high" loading="eager"></picture>
           {% elsif featured_product != blank %}
             <div class="model-fallback"><p>{{ 'hero.asset_pending' | t }}</p></div>
           {% elsif model_url == blank %}

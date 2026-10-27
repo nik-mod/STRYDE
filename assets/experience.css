@@ -489,12 +489,18 @@
 
 /* Hero correction: one readable statement beside one calm product window. */
 .template-index .hero[data-hero] .hero-stage { height: calc(100svh - var(--preview-height)); min-height: 620px; padding: 0; }
+/* Its pin retains this same notice offset, keeping the floor at viewport bottom. */
+.hero-world-poster { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: calc(1 - var(--hero-surface-exit, 0)); }
+.hero-world-poster img { display: block; width: 100%; height: 100%; object-fit: fill; }
+[data-hero-live] .hero-world-poster { opacity: calc((1 - var(--hero-live-blend, 0)) * (1 - var(--hero-surface-exit, 0))); }
+.hero-product-poster { position: absolute; inset: 0; display: block; }
+.template-index .has-journey-scene > .hero-product-poster { visibility: hidden; }
 .template-index .hero[data-hero] .hero-editorial { position: absolute; top: 51%; left: var(--gutter); width: 43%; transform: translateY(-50%); z-index: 8; display: flex; flex-direction: column; align-items: flex-start; gap: clamp(30px,3.2vw,64px); }
 .template-index .hero[data-hero] .hero-type { position: relative; inset: auto; width: 100%; margin: 0; font-size: clamp(64px,8.65vw,220px); line-height: .92; letter-spacing: -.035em; font-stretch: normal; gap: .08em; perspective: none; }
 .template-index .hero[data-hero] .hero-line { align-self: flex-start; margin: -.1em -.08em; padding: .1em .08em; transform: none; overflow: hidden; font-size: 1em; }
 .template-index .hero[data-hero] .hero-line-inner { background: none; color: var(--ink); -webkit-text-fill-color: currentColor; letter-spacing: -.035em; }
 .template-index .hero[data-hero] .hero-type .hero-line-1 .hero-line-inner { font-variation-settings: 'wght' 900, 'wdth' 76; }
-.template-index .hero[data-hero] .hero-type .hero-line-2 .hero-line-inner { color: var(--film-cobalt); font-style: italic; font-variation-settings: 'wght' 720, 'wdth' 76; }
+.template-index .hero[data-hero] .hero-type .hero-line-2 .hero-line-inner { color: #2053a4; font-style: italic; font-variation-settings: 'wght' 720, 'wdth' 76; }
 .template-index .hero[data-hero] .hero-line-2 .hero-glyph { color: inherit; -webkit-text-stroke: 0; }
 .template-index .hero[data-hero] .hero-glyph::after { display: none; }
 .template-index .hero[data-hero] .hero-art { position: absolute; left: 46%; right: 1.5%; top: 18%; bottom: 17%; width: auto; height: auto; min-height: 0; margin: 0; transform: none; }
@@ -534,4 +540,4 @@
 
 /* The static poster shares the live shoe's profile and framing. Legacy
    image transforms must not turn the loading or reduced-motion view. */
-.template-index .hero[data-hero].hero-editorial-model .hero-image { position: absolute; left: -13%; top: -5%; transform: none !important; object-fit: contain; width: 126%; height: 126%; max-width: none; }
+.template-index .hero[data-hero].hero-editorial-model .hero-product-poster .hero-image { position: absolute; left: var(--hero-poster-left,8%); top: var(--hero-poster-top,8%); transform: none !important; object-fit: contain; width: var(--hero-poster-width,84%); height: var(--hero-poster-height,84%); max-width: 100%; max-height: 100%; filter: none !important; }

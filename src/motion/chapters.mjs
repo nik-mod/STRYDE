@@ -2,6 +2,7 @@ import { mountFormEdit } from './form-edit.mjs';
 import { mountCollectionHover } from './collection-hover.mjs';
 import { brandStudyPhase } from '../journey-poses.mjs';
 import { mountClosingCampaign } from './closing.mjs';
+import { mountMaterialOrbit } from './material-orbit.mjs';
 
 const brandResizeCheckpoints = new WeakMap();
 
@@ -114,6 +115,7 @@ function materials(root, gsap, { mobile }) {
     });
   };
   select(0);
+  if (!mobile && panels.length === 3 && root.ownerDocument) return mountMaterialOrbit(root, gsap, panels, select);
   if (!mobile && panels.length > 1) {
     root.classList.add('is-journey-host');
     const timeline = gsap.timeline({ scrollTrigger: {
@@ -380,8 +382,8 @@ function featured(root, gsap, { mobile }) {
     if (image) timeline.fromTo(image, { scale: 1.3, yPercent: -3 },
       { scale: 1.08, yPercent: 0, duration: .72, ease: 'none' }, 0);
     copy.forEach((part, index) => {
-      timeline.fromTo(part, { y: 44, autoAlpha: 0 },
-        { y: 0, autoAlpha: 1, duration: .3, ease: 'none' }, .3 + index * .09);
+      timeline.fromTo(part, { y: 24 },
+        { y: 0, duration: .3, ease: 'none' }, .12 + index * .06);
     });
     // The studio set drifts against the scroll after the reveal — a quiet
     // parallax that keeps the frame alive between chapters.
@@ -618,7 +620,7 @@ const CONTROLLERS = { deconstruction, materials, technology, collection, feature
 /* ------------------------------------------------------ boundary continuity */
 
 // Scene flow: every chapter arrives already in motion — a perspective dolly
-// or a depth settle on its stage — and keeps drifting as it leaves, so the
+// or a depth settle on its stage — before natural document travel takes over. The
 // boundary between two chapters reads as one continuous camera move instead
 // of a slide cut. Headings rise through their existing line masks in the
 // same pass. Pinned chapters animate only inner stage wrappers inside the
@@ -626,12 +628,12 @@ const CONTROLLERS = { deconstruction, materials, technology, collection, feature
 // Everything is scrubbed, therefore reversible, and lives inside the
 // chapter's own motion context.
 const FLOW = {
-  deconstruction: { stage: '.decon-introduction', arrive: { yPercent: 5 }, depart: 0 },
+  deconstruction: { stage: '.decon-introduction', arrive: { yPercent: 5 } },
   materials: { stage: '[data-mat-panels]', arrive: { yPercent: 7, scale: .985 }, pin: true },
-  technology: { stage: '.tech-stage', arrive: { rotationX: 3, yPercent: 8, scale: .98 }, depart: -5 },
+  technology: { stage: '.tech-stage', arrive: { rotationX: 3, yPercent: 8, scale: .98 } },
   collection: { stage: '[data-coll-stage]', arrive: { yPercent: 7, scale: .985 }, pin: true },
-  featured: { stage: '.feat-grid', arrive: { rotationX: 3.5, yPercent: 8, scale: .975 }, depart: -5 },
-  brand: { stage: '[data-brand-stage]', arrive: { rotationX: 5, yPercent: 10, scale: .96 }, depart: -6 },
+  featured: { stage: '.feat-grid', arrive: { rotationX: 3.5, yPercent: 8, scale: .975 } },
+  brand: { stage: '[data-brand-stage]', arrive: { rotationX: 5, yPercent: 10, scale: .96 } },
   // The pin owns the outer stage's transform, including its exit translation.
   // Animate the content so a direct seek cannot overwrite that translation.
   finale: { stage: '.finale-inner', arrive: { yPercent: 6, scale: .99 }, pin: true },
@@ -649,7 +651,10 @@ function sceneFlow(root, gsap) {
     });
   }
   const stage = plan.stage ? root.querySelector(plan.stage) : null;
-  if (stage) {
+  const liveProduct = stage?.querySelector('[data-macro-image], [data-tech-model], [data-featured-model]');
+  // The Three.js camera owns a live product's perspective. Warping/scaling its
+  // HTML measurement window as well changes the fit underneath that camera.
+  if (stage && !liveProduct) {
     gsap.set(stage, { transformPerspective: 1200, transformOrigin: '50% 0%' });
     gsap.fromTo(stage, { ...plan.arrive }, {
       rotationX: 0, yPercent: 0, scale: 1, ease: 'none',
@@ -660,12 +665,8 @@ function sceneFlow(root, gsap) {
         scrub: true,
       },
     });
-    if (plan.depart) {
-      gsap.fromTo(stage, { yPercent: 0 }, {
-        yPercent: plan.depart, ease: 'none', immediateRender: false,
-        scrollTrigger: { trigger: root, start: 'bottom 96%', end: 'bottom 4%', scrub: true },
-      });
-    }
+    // Natural document travel owns the exit. A second fromTo on yPercent
+    // used to reset this entrance when a reverse jump skipped both ranges.
   }
 }
 

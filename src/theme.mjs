@@ -6,7 +6,7 @@ import { mountProduct, mountRecommendations } from './commerce.mjs';
 import { mountCartDrawer } from './cart-drawer.mjs';
 import { mountCartPage } from './cart-page.mjs';
 import { mountPredictiveSearch } from './predictive-search.mjs';
-import { createScope, createScheduler } from './motion/lifecycle.mjs';
+import { createScope, createScheduler, waitForIntroCompletion } from './motion/lifecycle.mjs';
 import { mountHero } from './motion/hero.mjs';
 import { mountChapter } from './motion/chapters.mjs';
 import { mountHeader } from './motion/header.mjs';
@@ -93,6 +93,9 @@ function mountHeroSection(root) {
           if (!entries.some(entry => entry.isIntersecting)) return;
           observer.disconnect();
           scope.run(async signal => {
+            // The shared Hero world is critical to the reveal. Prepare it
+            // beneath the existing film; unrelated model viewers stay deferred.
+            if (!journey && !await waitForIntroCompletion(document, signal)) return;
             const { mountScene } = journey ? { mountScene: (await import('./journey-scene.mjs')).mountJourneyScene } : await import('./scene.mjs');
             if (signal.aborted || reduceQuery.matches) return;
             return mountScene({ root, url: new URL(root.dataset.modelUrl, location.href).href, bus, scheduler, signal, gsap, ScrollTrigger });
@@ -131,7 +134,7 @@ let progressTween = null;
 function ensureEnvironments(scope) {
   if (environmentDispose) return;
   if (scope !== document && !scope.querySelector?.('[data-env]')) return;
-  environmentDispose = mountEnvironments(scope === document ? document : scope);
+  environmentDispose = mountEnvironments(scope === document ? document : scope, { scheduler });
 }
 
 function mount(scope = document) {
