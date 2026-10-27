@@ -8,7 +8,7 @@
     assign middle_view = 'top'
   endif
 %}
-<section id="chapter-deconstruction" class="chapter chapter-surface chapter-deconstruction" {% if section.settings.use_tn_model %} data-tn-editorial{% endif %} data-chapter="deconstruction" data-env="deconstruction" data-section-id="{{ section.id }}" aria-labelledby="DeconHeading-{{ section.id }}">
+<section id="chapter-deconstruction" class="chapter chapter-surface chapter-deconstruction" {% if section.settings.use_tn_model %} data-tn-editorial{% if section.settings.use_drift_model %} data-anatomy{% endif %}{% endif %} data-chapter="deconstruction" data-env="deconstruction" data-section-id="{{ section.id }}" aria-labelledby="DeconHeading-{{ section.id }}">
   <div class="decon-grid">
     <div class="decon-list">
       <div class="decon-introduction">
@@ -29,8 +29,12 @@
         {% endcase %}
         {% if title != blank %}
           <div class="decon-item" id="Anatomy-{{ section.id }}-{{ index }}">
+            {% if section.settings.use_tn_model and section.settings.use_drift_model %}
+              {% case index %}{% when 1 %}{% assign anatomy_view = 'detail' %}{% when 2 %}{% assign anatomy_view = 'profile' %}{% when 3 %}{% assign anatomy_view = 'heel' %}{% when 4 %}{% assign anatomy_view = 'sole' %}{% when 5 %}{% assign anatomy_view = 'top' %}{% endcase %}
+              <figure class="anatomy-detail-image"><img src="{{ 'tn-mono-' | append: anatomy_view | append: '-1000.webp' | asset_url }}" srcset="{{ 'tn-mono-' | append: anatomy_view | append: '-1000.webp' | asset_url }} 1000w, {{ 'tn-mono-' | append: anatomy_view | append: '-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 800px" width="2800" height="2100" loading="lazy" alt="{{ model_label }} — {{ title | escape }}, view rendered from the 3D model"></figure>
+            {% endif %}
             <span class="decon-num" aria-hidden="true">0{{ index }}</span>
-            <div>
+            <div class="decon-item-copy">
               <h3>{{ title | escape }}</h3>
               <p>{{ body | escape }}</p>
             </div>
@@ -55,6 +59,11 @@
           <span class="decon-note" data-decon-note><i>02</i>{% if section.settings.use_drift_model %}Upper and black lacing{% else %}Heel geometry and cage{% endif %}</span>
           <span class="decon-note" data-decon-note><i>03</i>Outsole and cushioning</span>
         </div>
+        {% if section.settings.use_tn_model and section.settings.use_drift_model %}
+          {% assign anatomy_extra_views = 'detail,heel' | split: ',' %}{% for anatomy_view in anatomy_extra_views %}
+          <div class="decon-crop"><img data-model-fullshot src="{{ 'tn-mono-' | append: anatomy_view | append: '-1000.webp' | asset_url }}" srcset="{{ 'tn-mono-' | append: anatomy_view | append: '-1000.webp' | asset_url }} 1000w, {{ 'tn-mono-' | append: anatomy_view | append: '-2800.webp' | asset_url }} 2800w" sizes="(max-width: 700px) 92vw, 85vw" width="2800" height="2100" loading="lazy" alt="{{ model_label }} — {{ anatomy_view }} view rendered from the 3D model"></div>
+          {% endfor %}
+        {% endif %}
         <span class="decon-tick" aria-hidden="true"></span>
         <span class="asset-tag">{% if section.settings.use_tn_model %}{{ 'hero.model_preview' | t }}{% else %}{{ 'assets.concept_tag' | t }}{% endif %}</span>
       </div>
@@ -67,6 +76,11 @@
       {% endif %}
     </div>
   </div>
+  {% if section.settings.use_tn_model and section.settings.use_drift_model %}
+  <nav class="anatomy-nav" aria-label="Explore five sneaker details">
+    <ol>{% for index in (1..5) %}{% case index %}{% when 1 %}{% assign anatomy_title = section.settings.part_1_title %}{% when 2 %}{% assign anatomy_title = section.settings.part_2_title %}{% when 3 %}{% assign anatomy_title = section.settings.part_3_title %}{% when 4 %}{% assign anatomy_title = section.settings.part_4_title %}{% when 5 %}{% assign anatomy_title = section.settings.part_5_title %}{% endcase %}<li><a href="#Anatomy-{{ section.id }}-{{ index }}" data-anatomy-step="{{ index | minus: 1 }}" aria-controls="Anatomy-{{ section.id }}-{{ index }}"><span>0{{ index }}</span>{{ anatomy_title | escape }}</a></li>{% endfor %}</ol>
+  </nav>
+  {% endif %}
 </section>
 {% schema %}
 {

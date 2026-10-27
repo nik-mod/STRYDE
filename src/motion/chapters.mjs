@@ -3,6 +3,7 @@ import { mountCollectionHover } from './collection-hover.mjs';
 import { brandStudyPhase } from '../journey-poses.mjs';
 import { mountClosingCampaign } from './closing.mjs';
 import { mountMaterialOrbit } from './material-orbit.mjs';
+import { mountAnatomy } from './anatomy.mjs';
 
 const brandResizeCheckpoints = new WeakMap();
 
@@ -24,6 +25,10 @@ function readCrop(element) {
 /* ------------------------------------------------- 02 — deconstruction */
 
 function deconstruction(root, gsap, { mobile }) {
+  if (root.hasAttribute('data-anatomy')) {
+    if (!mobile && window.innerWidth > 1000 && window.innerHeight >= 720) return mountAnatomy(root, gsap);
+    return () => {};
+  }
   const crops = [...root.querySelectorAll('.decon-crop')];
   const items = [...root.querySelectorAll('.decon-item')];
   const hold = !mobile && window.innerWidth > 1000 && window.innerHeight >= 720 && root.hasAttribute('data-tn-editorial');

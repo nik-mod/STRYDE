@@ -10,6 +10,7 @@ import { journeyPose, journeyProgress, flowingMaterialSample, brandLighting, her
 import { createHeroWorld, expandHeroCamera } from './hero-world.mjs';
 import { bundledJourneyCamera } from './journey-cameras.mjs';
 import { materialOrbit, materialOrbitCamera, MATERIAL_ORBIT_CAMERA } from './material-orbit.mjs';
+import { anatomyTour, anatomyCamera } from './anatomy-tour.mjs';
 
 const clamp = value => Math.min(1, Math.max(0, value));
 const bundledChapterModels = {
@@ -97,6 +98,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   const setStatus = message => { if (status) { status.hidden = !message; status.textContent = message; } };
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, .01, 100);
+  const anatomyFocus = new THREE.Vector3();
   const rig = new THREE.Group();
   rig.rotation.order = 'XYZ';
   scene.add(rig);
@@ -248,12 +250,19 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       from: primary, to: modelSpec,
       start: Number(modelOwner.dataset.journeyChangeStart), end: Number(modelOwner.dataset.journeyChangeEnd),
     } : null;
-    return { ...target, progress, visual, modelSpec, modelSpecs, exchangeWindow, pinned: Boolean(pin),
+    const anatomy = target.chapter === 'deconstruction' && target.section.classList.contains('is-anatomy-exploration');
+    const anatomyOverview = target.chapter === 'deconstruction' && target.section.hasAttribute('data-anatomy') && !anatomy;
+    return { ...target, progress, visual, modelSpec, modelSpecs, exchangeWindow, anatomy, anatomyOverview, pinned: Boolean(pin),
       modelBlend: null, rect: visual.getBoundingClientRect(), sectionRect, pose: journeyPose(target.chapter, progress) };
   }
 
   function motionFor(view, dt) {
     if (view.orbit) return view;
+    if (view.anatomy) {
+      const tour = anatomyTour(view.progress);
+      return { ...view, tour, pose: { ...journeyPose('deconstruction', 0), rotationX: tour.rotationX, rotationY: tour.rotationY, rotationZ: tour.rotationZ } };
+    }
+    if (view.anatomyOverview) return { ...view, progress: 0, pose: journeyPose('deconstruction', 0) };
     // A single clock owns both the camera and the identity cut. Smoothing
     // panel-specific clocks used to reset the pose when the caption changed.
     // Lenis and the owning GSAP timeline already smooth the gesture. A second
@@ -386,6 +395,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   }
 
   function cameraDistanceFor(view) {
+    if (view.anatomy) return anatomyCamera(view.rect.width / view.rect.height, view.tour.zoom);
     const target = targets.find(candidate => candidate.chapter === view.chapter);
     const specs = (target?.visuals || [view.visual]).map(visual => journeyModelSpec(visual.closest('[data-journey-model]')?.dataset, primary));
     if ((target?.visuals || []).some(visual => visual.closest('[data-journey-from-primary]'))) specs.push(primary);
@@ -520,6 +530,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       camera.aspect = rect.width / rect.height; camera.updateProjectionMatrix();
       rig.position.set(0, 0, 0);
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
+      if (view.anatomy) {
+        anatomyFocus.set(view.tour.focusX, view.tour.focusY, view.tour.focusZ).applyEuler(rig.rotation);
+        rig.position.copy(anatomyFocus).multiplyScalar(-1);
+      }
       rig.updateMatrixWorld(true);
       let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
@@ -531,14 +545,27 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
       camera.position.set(0, pose.cameraY, cameraZ);
       const light = lightFor(view.chapter, view.progress, view.modelBlend);
+      if (view.anatomy) {
+        key.position.set(view.tour.keyX, view.tour.keyY, view.tour.keyZ);
+        key.intensity = 3.15; rim.position.set(3, 2.6, -2); rim.intensity = 1.8;
+      }
       renderer.toneMappingExposure = pose.exposure * light.exposure;
-      heroWorld.group.visible = isHero; scene.fog = isHero ? heroWorld.fog : null; shadowPlane.visible = !isHero;
+      heroWorld.group.visible = isHero; scene.fog = isHero ? heroWorld.fog : null; shadowPlane.visible = !isHero && !view.anatomy;
       if (isHero) {
         expandHeroCamera(camera, heroProductGate(rect, view.progress, environment.innerWidth <= 700), worldRect);
         heroWorld.update(worldTime, view.progress, dt, camera, rig, key, rim);
         updateHeroShadow(view.progress);
       }
       renderer.render(scene, camera);
+      if (inspectMotion && view.anatomy) {
+        const projected = selectedAssets.flatMap(asset => asset.points.map(point => point.clone().applyMatrix4(rig.matrixWorld).project(camera)));
+        const focus = new THREE.Vector3(view.tour.focusX, view.tour.focusY, view.tour.focusZ).applyMatrix4(rig.matrixWorld).project(camera);
+        overlay.dataset.anatomyCamera = JSON.stringify({ progress: view.progress, active: view.tour.active,
+          zoom: view.tour.zoom, focus: [view.tour.focusX, view.tour.focusY, view.tour.focusZ], focalScreen: focus.toArray(),
+          bounds: { left: Math.min(...projected.map(p => p.x)), right: Math.max(...projected.map(p => p.x)), top: Math.max(...projected.map(p => p.y)), bottom: Math.min(...projected.map(p => p.y)) },
+          position: rig.position.toArray(), rotation: rig.rotation.toArray(), camera: camera.position.toArray(),
+          calls: renderer.info.render.calls, triangles: renderer.info.render.triangles });
+      }
       if (inspectMotion) motion.push({ chapter: view.chapter, model: overlay.dataset.model, pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() });
       visible.push(...(view.chapter === 'materials' && view.pinned ? view.visuals : [view.visual]));
     }
