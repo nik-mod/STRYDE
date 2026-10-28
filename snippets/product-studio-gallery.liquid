@@ -16,7 +16,7 @@
   <figure class="studio-gallery-stage" data-product-media>
     {% if gallery_count > 0 %}
       <a class="studio-gallery-open" href="{{ first_src }}" data-gallery-open aria-label="Enlarge product image">
-        <img src="{{ first_src }}" alt="{{ first_alt | escape }}" data-gallery-image loading="eager" fetchpriority="high" width="1200" height="1200">
+        <span class="studio-gallery-photo" data-product-transition-frame><img src="{{ first_src }}" alt="{{ first_alt | escape }}" data-gallery-image loading="eager" fetchpriority="high" width="1200" height="1200"></span>
         <span class="studio-gallery-zoom">{% render 'icon', name: 'plus' %}<span>Enlarge</span></span>
       </a>
       <figcaption class="studio-gallery-caption"><span data-gallery-caption>View 01</span><span class="studio-gallery-count" data-gallery-count aria-live="polite">01 / {{ gallery_count | prepend: '0' }}</span></figcaption>

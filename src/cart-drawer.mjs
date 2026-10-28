@@ -15,21 +15,23 @@ function readConfig(document) {
   try { return JSON.parse(node.textContent); } catch { return null; }
 }
 
-function announce(message) {
-  const region = document.getElementById('CartStatus');
-  if (region) region.textContent = message;
-}
-
 export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch(...arguments_) } = {}) {
   const dialog = document.querySelector('dialog[data-cart-drawer]');
   const config = readConfig(document);
   if (!dialog || !config?.routes) return () => {};
   const { routes } = config;
-  const client = createCartClient({ routes, fetchImpl });
+  const client = createCartClient({ routes, fetchImpl, target: document });
   if (!client) return () => {};
   const devPreview = document.body.hasAttribute('data-local-preview');
   let refreshToken = 0;
   let disposed = false;
+  const listeners = new AbortController();
+  const options = { signal: listeners.signal };
+  const announce = message => {
+    if (disposed) return;
+    const region = document.getElementById('CartStatus');
+    if (region) region.textContent = message;
+  };
 
   function content() { return dialog.querySelector('[data-cart-drawer-content]'); }
 
@@ -48,18 +50,21 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
   }
 
   function restoreFocus(signature) {
-    if (!signature?.key) return;
+    if (!signature?.key || !dialog.open) return;
     if (signature.action === 'remove') {
-      dialog.querySelector(`[data-cart-remove][data-key="${CSS.escape(signature.key)}"]`)?.focus();
+      (dialog.querySelector(`[data-cart-remove][data-key="${CSS.escape(signature.key)}"]`)
+        || dialog.querySelector('[data-cart-remove]') || dialog.querySelector('[data-cart-close]'))?.focus();
       return;
     }
     if (signature.action !== 'quantity') return;
     const item = dialog.querySelector(`[data-cart-item][data-key="${CSS.escape(signature.key)}"]`);
     const current = Number(item?.querySelector('[data-cart-quantity-value]')?.textContent) || 0;
-    item?.querySelector(`[data-cart-quantity][data-quantity="${current + signature.delta}"]`)?.focus();
+    (item?.querySelector(`[data-cart-quantity][data-quantity="${current + signature.delta}"]`)
+      || dialog.querySelector('[data-cart-remove]') || dialog.querySelector('[data-cart-close]'))?.focus();
   }
 
   async function refresh() {
+    if (disposed) return;
     const token = ++refreshToken;
     const signature = focusSignature();
     dialog.dataset.busy = 'true';
@@ -74,12 +79,12 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
     } catch (error) {
       announce(error.message);
     } finally {
-      if (token === refreshToken) delete dialog.dataset.busy;
+      if (!disposed && token === refreshToken) delete dialog.dataset.busy;
     }
   }
 
   function open() {
-    if (dialog.open) return;
+    if (disposed || dialog.open) return;
     dialog.showModal();
     dialog.querySelector('[data-cart-close]')?.focus();
     void refresh();
@@ -101,7 +106,7 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
       dialog.dataset.busy = 'true';
       client.change({ key, quantity })
         .then(() => refresh())
-        .catch(error => { announce(error.message); delete dialog.dataset.busy; });
+        .catch(error => { announce(error.message); if (!disposed) delete dialog.dataset.busy; });
       return;
     }
     const removeButton = event.target.closest('[data-cart-remove]');
@@ -112,7 +117,7 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
       dialog.dataset.busy = 'true';
       client.change({ key: removeButton.dataset.key, quantity: 0 })
         .then(() => { if (title) announce(title + ' — removed'); return refresh(); })
-        .catch(error => { announce(error.message); delete dialog.dataset.busy; });
+        .catch(error => { announce(error.message); if (!disposed) delete dialog.dataset.busy; });
       return;
     }
     const checkout = event.target.closest('[data-cart-checkout]');
@@ -125,26 +130,26 @@ export function mountCartDrawer({ document, fetchImpl = (...arguments_) => fetch
         if (notice) notice.hidden = false;
       }
     }
-  });
+  }, options);
 
   document.addEventListener('stryde:cart:change', event => {
     const count = event.detail?.cart?.item_count;
     if (!Number.isFinite(count)) return;
     for (const element of document.querySelectorAll('[data-cart-count]')) element.textContent = String(count);
-  });
+  }, options);
 
   document.addEventListener('stryde:cart:error', event => {
     announce(event.detail?.message || 'Cart error');
-  });
+  }, options);
 
   document.addEventListener('click', event => {
     const opener = event.target.closest('[data-cart-open]');
     if (!opener) return;
     event.preventDefault();
     open();
-  });
+  }, options);
 
   controller = { client, open, close, refresh, get openState() { return dialog.open; } };
 
-  return () => { close(); disposed = true; if (controller && controller.client === client) controller = null; };
+  return () => { disposed = true; listeners.abort(); close(); delete dialog.dataset.busy; if (controller && controller.client === client) controller = null; };
 }

@@ -517,7 +517,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       const { pose } = view;
       const { rect } = view;
       if (rect.width < 2 || rect.height < 2) continue;
-      const cameraZ = cameraDistanceFor(view);
+      let cameraZ = cameraDistanceFor(view);
       if (cameraZ === null) continue;
       const isHero = view.chapter === 'hero';
       const worldRect = isHero ? heroStage.getBoundingClientRect() : rect;
@@ -532,15 +532,25 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
       if (view.anatomy) {
         anatomyFocus.set(view.tour.focusX, view.tour.focusY, view.tour.focusZ).applyEuler(rig.rotation);
-        rig.position.copy(anatomyFocus).multiplyScalar(-1);
+        rig.position.copy(anatomyFocus).multiplyScalar(-.15);
       }
       rig.updateMatrixWorld(true);
-      let bottom = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+      let bottom = Infinity, top = -Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
       selectedAssets.forEach(asset => asset.points.forEach((point, index) => {
         const world = asset.worldPoints[index].copy(point).applyMatrix4(rig.matrixWorld);
-        bottom = Math.min(bottom, world.y); minX = Math.min(minX, world.x); maxX = Math.max(maxX, world.x);
+        bottom = Math.min(bottom, world.y); top = Math.max(top, world.y); minX = Math.min(minX, world.x); maxX = Math.max(maxX, world.x);
         minZ = Math.min(minZ, world.z); maxZ = Math.max(maxZ, world.z);
       }));
+      if (view.anatomy) {
+        // Center the rotated silhouette in its own window. Its upper/sole poses
+        // have different hull centers; a fixed model origin made them hang low.
+        const shiftY = pose.cameraY - (bottom + top) / 2;
+        rig.position.y += shiftY; rig.updateMatrixWorld(true);
+        selectedAssets.forEach(asset => {
+          asset.worldPoints.forEach(point => { point.y += shiftY; });
+          cameraZ = Math.max(cameraZ, anatomyCamera(camera.aspect, view.tour.zoom, asset.worldPoints, pose.cameraY, camera.fov));
+        });
+      }
       shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
       shadowPlane.scale.set(Math.max(.4, (maxX - minX) * 1.16), Math.max(.35, (maxZ - minZ) * 1.18), 1);
       camera.position.set(0, pose.cameraY, cameraZ);
@@ -550,6 +560,9 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
         key.intensity = 3.15; rim.position.set(3, 2.6, -2); rim.intensity = 1.8;
       }
       renderer.toneMappingExposure = pose.exposure * light.exposure;
+      // Only the Hero uses the directional shadow map. A direct chapter entry
+      // can otherwise bind an uninitialized shadow sampler before Hero renders.
+      key.castShadow = isHero;
       heroWorld.group.visible = isHero; scene.fog = isHero ? heroWorld.fog : null; shadowPlane.visible = !isHero && !view.anatomy;
       if (isHero) {
         expandHeroCamera(camera, heroProductGate(rect, view.progress, environment.innerWidth <= 700), worldRect);
@@ -613,7 +626,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     camera.position.set(0, MATERIAL_ORBIT_CAMERA.y, materialOrbitCamera(camera.aspect));
     camera.updateProjectionMatrix(); camera.updateMatrixWorld(true);
     heroWorld.group.visible = false; scene.fog = null; shadowPlane.visible = false;
+    key.castShadow = false;
     lightFor('materials', view.progress);
+    key.position.set(3 + Math.sin(state.angle) * 1.2, 4.5, 5);
+    rim.position.set(-3, 2.5, -3);
     renderer.toneMappingExposure = .94 * environmentFor('materials').exposure;
     renderer.setViewport(...window.viewport); renderer.setScissor(...window.scissor);
     renderer.setScissorTest(true); renderer.clearDepth(); renderer.render(scene, camera);
@@ -671,6 +687,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     camera.position.set(0, pose.cameraY, cameraZ);
     expandHeroCamera(camera, heroProductGate(current.rect, current.progress, environment.innerWidth <= 700), stageRect);
     rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
+    key.castShadow = true;
     lightFor('hero', current.progress);
     heroWorld.group.visible = true; scene.fog = heroWorld.fog; shadowPlane.visible = false;
     heroWorld.update(worldTime, current.progress, dt, camera, rig, key, rim, matchingPoster ? 1 : (bus?.state?.entrance ?? 1), renderer.domElement.height, waveLight, liveBlend);

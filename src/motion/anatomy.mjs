@@ -7,7 +7,6 @@ export function mountAnatomy(root, gsap) {
   const images = crops.map(crop => crop.querySelector('img')).filter(Boolean).map(image => ({ image, loading: image.getAttribute('loading') }));
   const links = [...root.querySelectorAll('[data-anatomy-step]')];
   const cursor = { progress: 0 };
-  const viewFor = [3, 0, 4, 2, 1];
   root.classList.add('is-anatomy-exploration');
   const render = () => {
     const state = anatomyTour(cursor.progress);
@@ -22,7 +21,7 @@ export function mountAnatomy(root, gsap) {
     links.forEach((link, index) => {
       if (index === state.active) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current');
     });
-    const requested = cursor.progress < .08 || cursor.progress > .92 ? 0 : viewFor[state.active];
+    const requested = 0; // Keep the complete silhouette until the live model is ready.
     const image = crops[requested]?.querySelector('img');
     const activeView = image?.complete && image.naturalWidth ? requested : 0;
     crops.forEach((crop, index) => { crop.style.opacity = index === activeView ? '1' : '0'; });

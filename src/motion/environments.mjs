@@ -4,7 +4,7 @@
 // production GLB exists — as the lighting/exposure preset for the shared scene.
 // Deterministic and data-driven: no invented products or inventories here.
 
-import { mountChapterContinuity } from './chapter-continuity.mjs';
+import { mountChapterContinuity, chapterAtMidpoint } from './chapter-continuity.mjs';
 
 export const ENVIRONMENTS = Object.freeze({
   hero: Object.freeze({ key: 3.4, rim: 2.0, exposure: 1.0 }),
@@ -33,20 +33,15 @@ export function mountEnvironments(scope = document, { onChange, scheduler } = {}
     });
     onChange?.(name);
   };
-  const observer = new IntersectionObserver(entries => {
-    for (const entry of entries) if (entry.isIntersecting) apply(entry.target.dataset.env);
-  }, { rootMargin: '-45% 0px -45% 0px' });
-  targets.forEach(target => observer.observe(target));
-  const midline = window.innerHeight / 2;
-  const current = targets.find(target => {
-    const rect = target.getBoundingClientRect();
-    return rect.top <= midline && rect.bottom >= midline;
-  });
-  if (current) apply(current.dataset.env);
-  const disposeContinuity = scheduler ? mountChapterContinuity({ document: scope.ownerDocument || scope, scheduler }) : () => {};
+  // The shared scroll clock already measures chapter boundaries for the grade.
+  // Use those same measurements for navigation rather than observer delivery order.
+  const disposeContinuity = scheduler ? mountChapterContinuity({ document: scope.ownerDocument || scope, scheduler, onActive: apply }) : () => {};
+  const read = () => apply(chapterAtMidpoint(targets.map(target => ({ name: target.dataset.env, top: target.getBoundingClientRect().top })), window.innerHeight));
+  const observer = !scheduler ? new IntersectionObserver(read, { rootMargin: '-45% 0px -45% 0px' }) : null;
+  if (observer) { targets.forEach(target => observer.observe(target)); read(); }
   return () => {
     disposeContinuity();
-    observer.disconnect();
+    observer?.disconnect();
     delete document.documentElement.dataset.env;
   };
 }

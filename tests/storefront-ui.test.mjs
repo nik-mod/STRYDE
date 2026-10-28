@@ -23,6 +23,21 @@ test('preview search returns only matching photographs and leaves real fixture p
   assert.doesNotMatch(fixture, /data-reference-catalog/);
 });
 
+test('search entry uses the collection field while native Shopify search still submits queries', async () => {
+  const collection = await renderPreview('/collections/all');
+  assert.match(collection, /id="CollectionSearch" type="search" name="q" data-photo-search/);
+  const home = await renderPreview('/');
+  assert.match(home, /class="header-search-link" href="\/collections\/all#CollectionSearch">Search<\/a>/);
+  const search = await renderPreview('/search', new URLSearchParams('q=Nike&fixtures=1'));
+  assert.match(search, /action="\/search"[^>]+data-predictive-form/);
+  assert.match(search, /id="SearchInput" type="search" name="q" value="Nike"/);
+  assert.match(search, /placeholder="Search a brand or model"/);
+  assert.doesNotMatch(search, /<button class="button button-dark" type="submit">Search/);
+  const native = await renderPreview('/collections/all', new URLSearchParams('fixtures=1'));
+  assert.match(native, /collection-native-search/);
+  assert.match(native, /id="CollectionSearch" type="search" name="q"/);
+});
+
 test('account preview uses the storefront layout without presenting an inactive sign-in form', async () => {
   const html = await renderPreview('/account');
   assert.match(html, /class="site-header"/);

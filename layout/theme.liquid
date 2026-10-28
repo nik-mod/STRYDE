@@ -9,8 +9,11 @@
     {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
     {% render 'social-meta' %}
     {{ content_for_header }}
-    {{ 'archivo-var.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2' }}
-    {{ 'archivo-var-italic.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2' }}
+    {% comment %}Explicit font attributes keep Shopify and the local Liquid renderer consistent.{% endcomment %}
+    {% # theme-check-disable AssetPreload %}
+    <link rel="preload" href="{{ 'archivo-var.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ 'archivo-var-italic.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+    {% # theme-check-enable AssetPreload %}
     <style>
       :root { --paper: {{ settings.background | default: '#41b4f0' }}; --ink: {{ settings.foreground | default: '#073653' }}; --accent: {{ settings.accent | default: '#adfff5' }}; --surface: {{ settings.surface | default: '#effaff' }}; --hero-type: {{ settings.hero_type | default: '#c1fff8' }}; }
     </style>
@@ -24,6 +27,10 @@
     {% if request.page_type == 'index' %}{{ 'campaign-refinement.css' | asset_url | stylesheet_tag }}{{ 'closing.css' | asset_url | stylesheet_tag }}{% endif %}
     {% if request.page_type == 'collection' %}{{ 'collection-studio.css' | asset_url | stylesheet_tag }}{% endif %}
     {% if request.page_type == 'product' %}{{ 'product-studio.css' | asset_url | stylesheet_tag }}{% endif %}
+    {% if request.page_type == 'collection' or request.page_type == 'product' %}
+      {{ 'commerce-transitions.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'commerce-transitions.js' | asset_url }}" defer blocking="render"></script>
+    {% endif %}
     {% if request.page_type == 'index' %}
       {{ 'site-intro.css' | asset_url | stylesheet_tag }}
       {% unless request.design_mode %}
@@ -50,7 +57,7 @@
       {% endunless %}
     {% endif %}
     <script>document.documentElement.classList.replace('no-js','js');</script>
-    <script type="module" src="{{ 'theme.js' | asset_url }}"></script>
+    <script type="module" src="{{ 'theme.js' | asset_url }}"{% if request.page_type == 'collection' or request.page_type == 'product' %} blocking="render"{% endif %}></script>
   </head>
   <body class="template-{{ request.page_type | handle }}">
     {% if request.page_type == 'index' %}{% render 'site-intro' %}{% endif %}

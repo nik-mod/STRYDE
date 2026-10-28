@@ -30,7 +30,7 @@ export function mountMaterialOrbit(root, gsap, panels, select) {
   const render = () => {
     const state = materialOrbit(cursor.progress);
     root.dataset.orbitProgress = String(cursor.progress);
-    root.style.setProperty('--orbit-copy-y', `${state.items[state.active].x * 6}px`);
+    root.style.setProperty('--orbit-copy-y', `${Math.sin(state.angle * 3) * 8}px`);
     select(state.active);
     moved.forEach(({ media, copy }, index) => {
       const point = state.items[index], projected = projectMaterialOrbit(point, width, height);

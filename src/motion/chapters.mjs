@@ -649,7 +649,14 @@ function sceneFlow(root, gsap) {
   // Test doubles may stub only the controller's own queries.
   if (!plan || typeof root.querySelector !== 'function' || typeof root.querySelectorAll !== 'function') return;
   const heading = root.querySelectorAll('.chapter-heading .heading-line > span, .tech-heading .heading-word-inner, .feat-title .heading-line > span');
-  if (heading.length) {
+  if (heading.length && (root.hasAttribute?.('data-anatomy') || root.classList?.contains('is-material-orbit'))) {
+    // These two directed studies arrive as complete compositions. Move the
+    // whole heading instead of cropping its letters while the product hands off.
+    gsap.fromTo(root.querySelector('.chapter-heading'), { y: 14 }, {
+      y: 0, ease: 'none',
+      scrollTrigger: { trigger: root, start: 'top 95%', end: 'top 55%', scrub: true },
+    });
+  } else if (heading.length) {
     gsap.fromTo(heading, { yPercent: 114 }, {
       yPercent: 0, ease: 'none', stagger: .05,
       scrollTrigger: { trigger: root, start: 'top 86%', end: 'top 44%', scrub: true },

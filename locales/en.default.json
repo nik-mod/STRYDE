@@ -132,7 +132,7 @@
   },
   "search": {
     "label": "Search the store",
-    "placeholder": "Search products",
+    "placeholder": "Search a brand or model",
     "results_for": "results for",
     "empty": "No results.",
     "empty_description": "Try another product name or search term.",

@@ -16,6 +16,10 @@
     {% render 'photography-catalog', catalog: section.preview_photography %}
   {% else %}
   <div id="CollectionHeading" class="page-heading listing-heading studio-heading" data-listing-heading><h1>{{ collection.title | escape }}</h1>{% if collection.description != blank %}<div class="rte collection-description">{{ collection.description }}</div>{% endif %}</div>
+  <form method="get" action="{{ routes.search_url }}" role="search" class="search-form collection-native-search">
+    {% render 'collection-search-field', search_id: 'CollectionSearch' %}
+    <input type="hidden" name="type" value="product">
+  </form>
   {% paginate collection.products by 12 %}
     <form method="get" action="{{ collection.url }}" class="collection-controls">
       <button type="button" class="filters-toggle" data-filters-toggle aria-expanded="false" aria-controls="FilterGroups-{{ section.id }}" data-open-label="{{ 'collection.filters' | t | escape }}" data-close-label="{{ 'collection.filters_hide' | t | escape }}">{{ 'collection.filters' | t }}{% assign active_filter_count = 0 %}{% for filter in collection.filters %}{% assign active_filter_count = active_filter_count | plus: filter.active_values.size %}{% endfor %}{% if active_filter_count > 0 %} ({{ active_filter_count }}){% endif %}</button>

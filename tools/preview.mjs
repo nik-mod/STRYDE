@@ -17,7 +17,10 @@ engine.registerFilter('t', (key, ...args) => {
 });
 engine.registerFilter('asset_url', name => `/assets/${name}`);
 engine.registerFilter('stylesheet_tag', url => `<link rel="stylesheet" href="${url}">`);
-engine.registerFilter('preload_tag', (url, options = {}) => `<link rel="preload" href="${url}"${options.as ? ` as="${options.as}"` : ''}${options.type ? ` type="${options.type}"` : ''}${options.as === 'font' ? ' crossorigin' : ''}>`);
+engine.registerFilter('preload_tag', (url, ...args) => {
+  const options = Object.fromEntries(args.filter(arg => Array.isArray(arg) && arg.length === 2));
+  return `<link rel="preload" href="${url}"${options.as ? ` as="${options.as}"` : ''}${options.type ? ` type="${options.type}"` : ''}${options.as === 'font' ? ' crossorigin' : ''}>`;
+});
 engine.registerFilter('json', value => JSON.stringify(value ?? null));
 engine.registerFilter('money', value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0) / 100));
 engine.registerFilter('money_with_currency', value => `${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0) / 100)} USD`);

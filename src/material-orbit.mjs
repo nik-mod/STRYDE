@@ -1,5 +1,5 @@
 const clamp = value => Math.max(0, Math.min(1, value));
-const smooth = value => { const p = clamp(value); return p * p * (3 - 2 * p); };
+const smooth = value => { const p = clamp(value); return p * p * p * (p * (p * 6 - 15) + 10); };
 export const MATERIAL_ORBIT_CAMERA = { z: 6.15, y: .08, fov: 32 };
 
 // One ring, two 120-degree advances, three reading holds. This same projection
@@ -11,9 +11,9 @@ export function materialOrbit(progress) {
   const items = Array.from({ length: 3 }, (_, index) => {
     const theta = angle + index * Math.PI * 2 / 3;
     const front = Math.cos(theta);
-    return { index, x: Math.sin(theta) * 1.95, y: -.34 * front,
-      z: (front - 1) * 1.85, rotationX: .23,
-      rotationY: -.18 + Math.sin(theta) * .18, rotationZ: -.025 + Math.sin(theta) * .035,
+    return { index, x: Math.sin(theta) * 1.95, y: Math.sin(theta) * .78 - .42 * front,
+      z: (front - 1) * 2.35, rotationX: .18 + (1 - front) * .10,
+      rotationY: -.18 + Math.sin(theta) * .42, rotationZ: -.025 + Math.sin(theta) * .06,
       emphasis: (front + 1) / 2 };
   });
   const active = items.reduce((a, b) => a.z >= b.z ? a : b).index;

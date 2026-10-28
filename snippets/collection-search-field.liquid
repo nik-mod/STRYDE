@@ -1,0 +1,5 @@
+<label class="collection-search">
+  {% render 'icon', name: 'search' %}
+  <span class="sr-only">{{ 'search.label' | t }}</span>
+  <input id="{{ search_id | escape }}" type="search" name="q"{% if catalog_search %} data-photo-search{% endif %} value="{{ search_value | escape }}" placeholder="{{ 'search.placeholder' | t | escape }}" autocomplete="off" enterkeyhint="search">
+</label>

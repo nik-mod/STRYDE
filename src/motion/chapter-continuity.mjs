@@ -31,7 +31,11 @@ export function chapterGrade(chapters, height) {
   return { from, to, progress: blend, surface: css(surface), ink: css(ink), light: l <= .179 };
 }
 
-export function mountChapterContinuity({ document, scheduler }) {
+export function chapterAtMidpoint(chapters, height) {
+  return chapters.filter(chapter => chapter.top <= height / 2).at(-1)?.name || chapters[0]?.name || 'hero';
+}
+
+export function mountChapterContinuity({ document, scheduler, onActive }) {
   const environment = document.defaultView, body = document.body;
   if (!body.classList.contains('template-index')) return () => {};
   let targets = [], previous = '';
@@ -39,7 +43,10 @@ export function mountChapterContinuity({ document, scheduler }) {
     targets = [...document.querySelectorAll('section[data-env], [data-signature-footer]')];
   };
   const read = () => {
-    const state = chapterGrade(targets.map(e => ({ name: e.dataset.env || 'footer', top: e.getBoundingClientRect().top })), environment.innerHeight);
+    const chapters = targets.map(e => ({ name: e.dataset.env || 'footer', top: e.getBoundingClientRect().top }));
+    const state = chapterGrade(chapters, environment.innerHeight);
+    const active = chapterAtMidpoint(chapters, environment.innerHeight);
+    onActive?.(active === 'footer' ? 'finale' : active);
     const signature = `${state.surface}:${state.ink}:${state.from}:${state.to}:${state.progress.toFixed(4)}`;
     if (signature === previous) return;
     previous = signature;

@@ -1,5 +1,6 @@
 import { photoContentBounds, fitPhotoContent } from './product-gallery.mjs';
 import { rememberCollectionProduct } from './collection-return.mjs';
+import { createCatalogTransition, prepareCatalogImages } from './catalog-transition.mjs';
 
 const MANAGED = ['q', 'brand', 'color', 'edit', 'sort', 'page'];
 const clean = value => String(value || '').trim();
@@ -93,7 +94,7 @@ export function catalogPage(entries, params = new URLSearchParams(), pathname = 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>';
 function cardMarkup(item, index) {
-  return `<article class="photo-shop-card" data-photo-card data-product-id="${escapeHTML(item.id)}" style="--card-order:${index}"><a class="photo-shop-image" data-product-open href="${escapeHTML(item.url)}" aria-label="View ${escapeHTML(item.title)}"><span class="photo-shop-card-top"><span>${escapeHTML(item.brand || 'THE PHOTO ARCHIVE')}</span><span>${escapeHTML(item.id.replace('pair-', 'Nº '))}</span></span><img data-product-cover src="${escapeHTML(item.cover)}" width="1000" height="1000" loading="${index < 3 ? 'eager' : 'lazy'}" alt="${escapeHTML(item.title)}">${item.alternate ? `<img class="photo-shop-alternate" src="${escapeHTML(item.alternate)}" width="1000" height="1000" loading="lazy" alt="">` : ''}<span class="photo-shop-count">${item.count} ${item.count === 1 ? 'perspective' : 'perspectives'}</span><span class="photo-shop-open" aria-hidden="true">${arrow}</span><span class="photo-shop-discover" aria-hidden="true">Explore the pair</span></a><div class="photo-shop-info"><div><h2><a data-product-open href="${escapeHTML(item.url)}">${escapeHTML(item.title)}</a></h2><p class="photo-shop-colorway">${escapeHTML(item.colorway || (item.identified ? item.brand : 'Photo study'))}</p></div><span class="photo-shop-card-index">${String(index + 1).padStart(2, '0')}</span></div></article>`;
+  return `<article class="photo-shop-card" data-photo-card data-product-id="${escapeHTML(item.id)}" style="--card-order:${index}"><a class="photo-shop-image" data-product-open href="${escapeHTML(item.url)}" aria-label="View ${escapeHTML(item.title)}"><span class="photo-shop-card-top"><span>${escapeHTML(item.brand || 'THE PHOTO ARCHIVE')}</span><span>${escapeHTML(item.id.replace('pair-', 'Nº '))}</span></span><span class="photo-shop-photo" data-product-transition-frame><img data-product-cover src="${escapeHTML(item.cover)}" width="1000" height="1000" loading="${index < 3 ? 'eager' : 'lazy'}" alt="${escapeHTML(item.title)}">${item.alternate ? `<img class="photo-shop-alternate" src="${escapeHTML(item.alternate)}" width="1000" height="1000" loading="lazy" alt="">` : ''}</span><span class="photo-shop-count">${item.count} ${item.count === 1 ? 'perspective' : 'perspectives'}</span><span class="photo-shop-open" aria-hidden="true">${arrow}</span><span class="photo-shop-discover" aria-hidden="true">Explore the pair</span></a><div class="photo-shop-info"><div><h2><a data-product-open href="${escapeHTML(item.url)}">${escapeHTML(item.title)}</a></h2><p class="photo-shop-colorway">${escapeHTML(item.colorway || (item.identified ? item.brand : 'Photo study'))}</p></div><span class="photo-shop-card-index">${String(index + 1).padStart(2, '0')}</span></div></article>`;
 }
 function paginationMarkup(state) {
   if (state.pages <= 1) return '';
@@ -105,9 +106,34 @@ function mountProductContinuity(section, captureScroll) {
   if (!environment || !section.addEventListener) return () => {};
   const listeners = new AbortController();
   let activation = null;
+  let intentTimer;
+  const prefetched = new Set();
+  const prefetch = link => {
+    const target = new URL(link.href, environment.location.href);
+    if (target.origin !== environment.location.origin || !/\/products\//.test(target.pathname) ||
+        environment.navigator.connection?.saveData || prefetched.has(target.href) || prefetched.size >= 3) return;
+    prefetched.add(target.href);
+    const hint = section.ownerDocument.createElement('link');
+    hint.rel = 'prefetch'; hint.href = target.href;
+    section.ownerDocument.head.append(hint);
+  };
+  section.addEventListener('pointerover', event => {
+    const link = event.target.closest('[data-product-open]');
+    if (!link || link.contains(event.relatedTarget)) return;
+    clearTimeout(intentTimer); intentTimer = setTimeout(() => prefetch(link), 120);
+  }, { signal: listeners.signal });
+  section.addEventListener('pointerout', event => {
+    const link = event.target.closest('[data-product-open]');
+    if (link && !link.contains(event.relatedTarget)) clearTimeout(intentTimer);
+  }, { signal: listeners.signal });
+  section.addEventListener('focusin', event => {
+    const link = event.target.closest('[data-product-open]');
+    if (link) prefetch(link);
+  }, { signal: listeners.signal });
   const clear = () => {
+    if (section.ownerDocument.documentElement.dataset.commerceTransition === 'product') return;
     section.querySelectorAll('[data-product-cover], .product-card-cover').forEach(image => image.style.removeProperty('view-transition-name'));
-    section.querySelectorAll('.is-opening').forEach(card => card.classList.remove('is-opening'));
+    section.querySelectorAll('.is-opening').forEach(card => { card.classList.remove('is-opening'); delete card.dataset.openingView; });
   };
   // Focus a pointer-selected card without the browser scrolling its oversized
   // framed photograph into view before the outgoing history snapshot.
@@ -129,12 +155,14 @@ function mountProductContinuity(section, captureScroll) {
     clear();
     const image = link.closest('[data-product-id]')?.querySelector('[data-product-cover], .product-card-cover');
     if (image) {
-      image.style.viewTransitionName = 'stryde-product-media';
-      image.closest('[data-product-id]')?.classList.add('is-opening');
+      const card = image.closest('[data-product-id]');
+      const alternate = card.querySelector('.photo-shop-alternate, .product-card-alternate');
+      card.dataset.openingView = alternate && Number(environment.getComputedStyle(alternate).opacity) > .5 ? 'alternate' : 'cover';
+      card.classList.add('is-opening');
     }
   }, { signal: listeners.signal });
   environment.addEventListener('pageshow', clear, { signal: listeners.signal });
-  return () => { listeners.abort(); clear(); };
+  return () => { listeners.abort(); clearTimeout(intentTimer); clear(); };
 }
 
 function mountCatalogFraming(root) {
@@ -167,7 +195,7 @@ function mountCatalogFraming(root) {
     image.classList.add('has-content-framing');
     Object.assign(image.style, { inset: 'auto', maxWidth: 'none', padding: '0', ...Object.fromEntries(Object.entries(geometry).map(([key, value]) => [key, `${value}px`])) });
   };
-  const images = '.photo-shop-image > img, [data-catalog-hero-image]';
+  const images = '.photo-shop-image img, [data-catalog-hero-image]';
   const fitAll = () => root.querySelectorAll(images).forEach(fit);
   root.addEventListener('load', event => { if (event.target.matches?.(images)) fit(event.target); }, { capture: true, signal: listeners.signal });
   const observer = doc.defaultView.ResizeObserver ? new doc.defaultView.ResizeObserver(fitAll) : null;
@@ -194,18 +222,20 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
   const listeners = new AbortController();
   const media = environment.matchMedia('(prefers-reduced-motion: reduce)');
   const framing = mountCatalogFraming(section);
+  const transition = createCatalogTransition({ document: doc, root, grid, environment });
   const masthead = section.querySelector('[data-collection-masthead]');
   const galleryStart = root.querySelector('#CollectionGallery') || root;
   const activeFilters = root.querySelector('[data-catalog-active]');
-  if (masthead && !media.matches) masthead.classList.add('is-collection-entering');
-  const cardObserver = !media.matches && environment.IntersectionObserver ? new environment.IntersectionObserver(records => {
+  const restoring = Boolean(environment.history.state?.strydeCollectionScroll) || environment.performance?.getEntriesByType('navigation')[0]?.type === 'back_forward';
+  if (masthead && !media.matches && !restoring) masthead.classList.add('is-collection-entering');
+  const cardObserver = !media.matches && !restoring && environment.IntersectionObserver ? new environment.IntersectionObserver(records => {
     for (const record of records) if (record.isIntersecting) {
       record.target.classList.add('is-card-revealing'); cardObserver.unobserve(record.target);
     }
   }, { threshold: .06 }) : null;
-  const revealCards = () => {
+  const revealCards = (observe = true) => {
     cardObserver?.disconnect();
-    grid.querySelectorAll('[data-photo-card]').forEach(card => cardObserver?.observe(card));
+    if (observe) grid.querySelectorAll('[data-photo-card]').forEach(card => cardObserver?.observe(card));
   };
   const setDensity = density => {
     grid.dataset.gridDensity = density === 'compact' ? 'compact' : 'comfortable';
@@ -231,18 +261,23 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
       activeFilters.innerHTML = state.activeFilters.map(filter => `<a href="${escapeHTML(filter.url)}" data-catalog-remove>${escapeHTML(filter.label)} <span aria-hidden="true">×</span><span class="sr-only">Remove filter</span></a>`).join('');
     }
   };
-  const render = (url, { history = 'push', scroll = false, focus = false } = {}) => {
+  const render = (url, { history = 'push', scroll = false, focus = false, scrollTarget = galleryStart } = {}) => {
     const state = catalogPage(entries, url.searchParams, url.pathname);
     // Out-of-range URLs and unknown sorts resolve to the same canonical state.
     const canonical = new URL(collectionHref(url.searchParams, { page: state.page, sort: state.sort }, url.pathname), url.origin);
-    if (history !== 'none') {
-      if (history === 'push') environment.history.replaceState({ ...environment.history.state, strydeCollectionScroll: captureScroll?.() }, '');
-      environment.history[history === 'replace' ? 'replaceState' : 'pushState'](history === 'replace' ? environment.history.state : {}, '', canonical);
-    }
+    const checkpoint = captureScroll?.();
+    const oldPage = Number(new URL(environment.location.href).searchParams.get('page')) || 1;
     const update = () => {
+      if (history !== 'none') {
+        if (history === 'push') environment.history.replaceState({ ...environment.history.state, strydeCollectionScroll: checkpoint }, '');
+        environment.history[history === 'replace' ? 'replaceState' : 'pushState'](history === 'replace' ? environment.history.state : {}, '', canonical);
+      }
       grid.innerHTML = state.items.map(cardMarkup).join('');
+      root.classList.add('is-catalog-settling');
       framing.refresh();
-      revealCards();
+      // One page dissolve owns this update. Replaying twelve entrance masks
+      // beneath it used to make the incoming edit feel staggered and unfinished.
+      revealCards(false);
       result.textContent = `${state.rangeStart}–${state.rangeEnd} of ${state.total} ${state.total === 1 ? 'design' : 'designs'}`;
       pagination.innerHTML = paginationMarkup(state);
       empty.hidden = state.total > 0;
@@ -250,13 +285,16 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
       root.querySelectorAll('[data-catalog-reset]').forEach(link => { link.href = state.clearUrl; });
       setControls(state);
       if (scroll) {
-        if (scrollToGallery) scrollToGallery(galleryStart);
-        else galleryStart.scrollIntoView({ behavior: 'instant', block: 'start' });
+        if (scrollToGallery) scrollToGallery(scrollTarget);
+        else scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
       }
       if (history === 'none') restoreScroll?.(environment.history.state?.strydeCollectionScroll);
       if (focus) { result.tabIndex = -1; result.focus({ preventScroll: true }); }
     };
-    update();
+    return transition.run({
+      prepare: signal => prepareCatalogImages(state.items, environment, signal),
+      update, animate: history !== 'none', direction: state.page < oldPage ? -1 : 1,
+    });
   };
   const apply = (history = 'push') => {
     const url = new URL(environment.location.href);
@@ -270,16 +308,21 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
   root.addEventListener('submit', event => { if (event.target === form) { event.preventDefault(); clearTimeout(timer); apply(); } }, { signal: listeners.signal });
   root.addEventListener('input', event => { if (event.target.name === 'q') { clearTimeout(timer); timer = setTimeout(() => apply('replace'), 180); } }, { signal: listeners.signal });
   root.addEventListener('change', event => { if (form.contains(event.target) && event.target.name !== 'q') { clearTimeout(timer); apply(); } }, { signal: listeners.signal });
+  // The pointer is still over the old pagination coordinates after the page
+  // moves. Wait for a deliberate move before previewing another shoe angle.
+  root.addEventListener('pointermove', () => { if (!root.hasAttribute('aria-busy')) root.classList.remove('is-catalog-settling'); }, { signal: listeners.signal });
   root.addEventListener('click', event => {
     const density = event.target.closest('[data-catalog-density]');
     if (density) { setDensity(density.dataset.catalogDensity); return; }
     const link = event.target.closest('[data-catalog-page], [data-catalog-edit], [data-catalog-reset], [data-catalog-brand], [data-catalog-remove]');
     if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault(); clearTimeout(timer);
-    render(new URL(link.href, environment.location.href), { scroll: link.hasAttribute('data-catalog-page') || link.hasAttribute('data-catalog-brand'), focus: link.hasAttribute('data-catalog-page') && event.detail === 0 });
+    if (link.getAttribute('aria-current') === 'page') { transition.cancel(); return; }
+    const pageLink = link.hasAttribute('data-catalog-page');
+    render(new URL(link.href, environment.location.href), { scroll: pageLink || link.hasAttribute('data-catalog-brand'), scrollTarget: pageLink ? result : galleryStart, focus: pageLink && event.detail === 0 });
   }, { signal: listeners.signal });
-  environment.addEventListener('popstate', () => render(new URL(environment.location.href), { history: 'none' }), { signal: listeners.signal });
+  environment.addEventListener('popstate', () => { clearTimeout(timer); render(new URL(environment.location.href), { history: 'none' }); }, { signal: listeners.signal });
   root.classList.add('is-studio-ready');
-  return () => { listeners.abort(); disposeContinuity(); framing.dispose(); cardObserver?.disconnect(); masthead?.classList.remove('is-collection-entering'); clearTimeout(timer); root.classList.remove('is-studio-ready'); };
+  return () => { transition.dispose(); listeners.abort(); disposeContinuity(); framing.dispose(); cardObserver?.disconnect(); masthead?.classList.remove('is-collection-entering'); clearTimeout(timer); root.classList.remove('is-studio-ready', 'is-catalog-settling'); };
 }
 

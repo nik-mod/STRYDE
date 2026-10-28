@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chapterGrade, CHAPTER_SURFACES } from '../src/motion/chapter-continuity.mjs';
+import { chapterGrade, chapterAtMidpoint, CHAPTER_SURFACES } from '../src/motion/chapter-continuity.mjs';
 import { bundledJourneyCamera } from '../src/journey-cameras.mjs';
 import { readFile } from 'node:fs/promises';
 import { Vector3, Euler } from 'three';
@@ -38,6 +38,14 @@ test('measured chapter boundaries match exposure continuously in both directions
     }
     assert.equal(state(-2000).to, names[index], 'a fast jump derives the current destination without callbacks');
   }
+});
+
+test('chapter navigation follows the viewport midpoint after jumps and resizing', () => {
+  const chapters = [{name:'hero',top:-6000},{name:'featured',top:-120},{name:'brand',top:620},{name:'finale',top:1800}];
+  assert.equal(chapterAtMidpoint(chapters,900),'featured');
+  assert.equal(chapterAtMidpoint(chapters,1440),'brand');
+  assert.equal(chapterAtMidpoint(chapters.map(c=>({...c,top:c.top-1700})),900),'finale');
+  assert.equal(chapterAtMidpoint(chapters,900),'featured','reversing a skipped interval restores its owner');
 });
 
 test('baked cameras contain the original hulls throughout every authored inspection', async () => {

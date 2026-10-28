@@ -1,0 +1,27 @@
+/* A product grows out of its collection photograph; the shop chrome stays put. */
+@view-transition { navigation: auto; }
+html[data-commerce-transition] .site-header { view-transition-name: stryde-shop-header; }
+html[data-commerce-transition] .preview-notice { view-transition-name: stryde-shop-notice; }
+::view-transition { pointer-events: none; }
+::view-transition-group(stryde-shop-header),
+::view-transition-group(stryde-shop-notice) { animation-duration: 0s; z-index: 3; }
+::view-transition-old(stryde-shop-header),
+::view-transition-old(stryde-shop-notice) { display: none; }
+::view-transition-new(stryde-shop-header),
+::view-transition-new(stryde-shop-notice) { animation: none; }
+html[data-commerce-transition]::view-transition-old(root) { animation: commerce-out 180ms ease-out both; }
+html[data-commerce-transition]::view-transition-new(root) { animation: commerce-in 340ms cubic-bezier(.16,1,.3,1) both; }
+::view-transition-group(stryde-product-media) { animation-duration: 520ms; animation-timing-function: cubic-bezier(.22,.75,.2,1); z-index: 2; overflow: hidden; }
+::view-transition-image-pair(stryde-product-media) { isolation: isolate; }
+::view-transition-old(stryde-product-media),
+::view-transition-new(stryde-product-media) { mix-blend-mode: normal; width: 100%; height: 100%; object-fit: contain; }
+::view-transition-old(stryde-product-media) { animation: commerce-out 100ms ease-out both; }
+::view-transition-new(stryde-product-media) { animation: commerce-in 140ms ease-out both; }
+html[data-commerce-transition='catalog']::view-transition-new(root) { animation: catalog-in 320ms cubic-bezier(.16,1,.3,1) both; }
+@keyframes commerce-out { to { opacity: 0; } }
+@keyframes commerce-in { from { opacity: 0; } }
+@keyframes catalog-in { from { opacity: 0; transform: translateX(calc(12px * var(--catalog-direction, 1))); } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*) { animation-duration: 0s !important; }
+}

@@ -11,8 +11,15 @@ test('the same three shoes advance through a coherent ring and reverse to identi
     assert.equal(state.items.length, 3);
     const front = state.items[state.active];
     assert(state.items.every(item => front.z >= item.z - 1e-10));
-    for (const item of state.items) assert(Math.abs((item.x / 1.95) ** 2 + ((item.z + 1.85) / 1.85) ** 2 - 1) < 1e-10);
+    for (const item of state.items) assert(Math.abs((item.x / 1.95) ** 2 + ((item.z + 2.35) / 2.35) ** 2 - 1) < 1e-10);
   }
+});
+
+test('orbit carries products through distinct upper and lower routes at equal depth', () => {
+  const state = materialOrbit(.27);
+  const pairs = state.items.filter(item => item.z > -1.5);
+  assert.equal(pairs.length, 2);
+  assert(Math.abs(pairs[0].y - pairs[1].y) > 1, 'foreground handoff has a visible inclined orbital arc');
 });
 
 test('orbit holds are stable, transitions are continuous and photographs retain a recognizable size', () => {

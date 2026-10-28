@@ -51,6 +51,7 @@ test('storefront pages carry the drawer, config routes and honest preview labels
   assert.match(html, /"cartChange":"\/cart\/change\.js"/);
   assert.match(html, /"checkout":"\/checkout"/);
   assert.match(html, /SIMULATED COMMERCE/);
+  assert.match(html, /rel="preload"[^>]+archivo-var\.woff2[^>]+as="font"[^>]+type="font\/woff2"[^>]+crossorigin/);
   assert.doesNotMatch(html, /api\.|secret|token=|password/i);
   // No third-party gateway or card collection anywhere in the preview output.
   assert.doesNotMatch(html, /<input[^>]+card|stripe|paypal|flitt/i);
