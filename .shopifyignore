@@ -10,3 +10,5 @@ package-lock.json
 README.md
 .gitignore
 .shopifyignore
+assets/shop-products/**
+assets/stockx-edit/**
