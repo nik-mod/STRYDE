@@ -1,0 +1,32 @@
+[
+  {
+    "key": "ball-star-gray-green-lettering",
+    "productIds": ["pair-0005"],
+    "model": "Golden Goose Ball Star",
+    "sku": "GMF00117.F005179.11663",
+    "sourceUrl": "https://www.goldengoose.com/us/en/ball-star-in-nappa-leather-with-gray-suede-star-and-heel-tab-cod-GMF00117.F005179.11663.html",
+    "sourceImageUrl": "https://static2.goldengoose.com/public/Style/ECOMM/GMF00117.F005179-11663.jpg?imWidth=1200",
+    "bounds": [0.075, 0.54, 0.85, 0.28],
+    "matchNotes": "Off-white nappa upper, gray suede star and heel tab, off-white laces, green side and heel lettering, cream distressed sole. Compared against all five original views; current original cover is a low-resolution copy of this brand photograph."
+  },
+  {
+    "key": "ball-star-burgundy-mesh",
+    "productIds": ["pair-0008", "pair-0302", "pair-0303", "pair-0304"],
+    "model": "Golden Goose Ball Star",
+    "sku": "GMF00117.F005165.15520",
+    "sourceUrl": "https://www.goldengoose.com/us/en/men-s-ball-star-in-beige-nappa-with-burgundy-mesh-star-and-heel-tab-cod-GMF00117.F005165.15520.html",
+    "sourceImageUrl": "https://static2.goldengoose.com/public/Style/ECOMM/GMF00117.F005165-15520.jpg?imWidth=1200",
+    "bounds": [0.075, 0.54, 0.85, 0.28],
+    "matchNotes": "Exact original brand photograph: beige nappa, burgundy mesh star and heel, white nylon tongue, beige laces and cream crackle foxing. Four archive entries repeat the original side, pair and outsole views."
+  },
+  {
+    "key": "super-star-black-glitter-silver-foxing",
+    "productIds": ["pair-0070"],
+    "model": "Golden Goose Super-Star",
+    "sku": "GWF00587.F004683.90401",
+    "sourceUrl": "https://www.goldengoose.com/us/en/super-star-in-black-glitter-with-cream-star-and-suede-inserts-cod-GWF00587.F004683.90401.html",
+    "sourceImageUrl": "https://static2.goldengoose.com/public/Style/ECOMM/GWF00587.F004683-90401.jpg?imWidth=1200",
+    "bounds": [0.075, 0.54, 0.85, 0.28],
+    "matchNotes": "Black glitter upper, cream leather star and heel tab, dove-gray suede tongue/toe/back strip, cream laces and silver multi-foxing. Compared original side, three-quarter and rear views; all distinctive trim matches."
+  }
+]

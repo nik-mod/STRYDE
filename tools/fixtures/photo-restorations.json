@@ -1,0 +1,398 @@
+[
+  {
+    "replacesProductId": "pair-0030",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0030-01.webp",
+        "source": "Internet_20240209_234739_1.jpeg",
+        "sha256": "6eab1cb9b8d2571c8ccc77e95130cf87fcf61e8be6f5e455c50b751433402906",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0030-02.webp",
+        "source": "Internet_20240209_234739_2.jpeg",
+        "sha256": "0c712979141b4b896d5a60dc2ff0114d539f5ebd0b6f5fbe1ebd0a80527ee2c4",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0030-03.webp",
+        "source": "Internet_20240209_234739_3.jpeg",
+        "sha256": "0c5a68a79359bca6198ba56ddeee6adac06351112a6a76ff51e24f9ff1f7c73a",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0030-04-white.webp",
+        "source": "Internet_20240209_234739_4.jpeg",
+        "sha256": "d3f624c22d3bce0cabb6f232080f75f696f6bd7022895db22d15de2a38f43cbb",
+        "imageTreatment": "shoe-cutout"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0031",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0031-01-white.webp",
+        "source": "Internet_20240209_234833_1.jpeg",
+        "sha256": "397dfcb87cb5e0b1ec733e29b78d08e1d7bc7e4bbaa410b5640f472f5512833b",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0031-02-white.webp",
+        "source": "Internet_20240209_234833_2.jpeg",
+        "sha256": "ad936045fefceb011ddb0de25febc75319f936d318cef6f7b18c118aaefad381",
+        "imageTreatment": "scene-preserved"
+      },
+      {
+        "src": "/assets/shop-products/pair-0031-03-white.webp",
+        "source": "Internet_20240209_234833_3.jpeg",
+        "sha256": "dccff5ad0e57b23c347e84df2fd684a6eb514ae456e84aae024d8bf523100818",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0031-04-white.webp",
+        "source": "Internet_20240209_234833_4.jpeg",
+        "sha256": "3654e0e8932b20c0d20710e42e9d00e718bbb3c1c346a1dfd5f8181441c680a5",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0031-05-white.webp",
+        "source": "Internet_20240209_234833_5.jpeg",
+        "sha256": "3df1500c202b2b72879ebcab0b0d68921b0ae9d5548461576e6b8ec451bc4bf1",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0031-06.webp",
+        "source": "Internet_20240209_234833_6.jpeg",
+        "sha256": "e0dd8c1597c7c766fea15eacc20d2ce90feee9bc3beb955d4cf47e98e6851918",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0031-07-white.webp",
+        "source": "Internet_20240209_234833_7.jpeg",
+        "sha256": "97fce2ac30171bf8e163360079ca0aa6943f6b7d2ae31af1c62d195d261f7648",
+        "imageTreatment": "shoe-cutout"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0046",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0046-01.webp",
+        "source": "Internet_20240215_053634_4.jpeg",
+        "sha256": "9093a2f24e2ff3dda5ae3345e55aaf53817d0443287d0a2fde7c1b35f0681c5b",
+        "imageTreatment": "original-restored",
+        "bounds": [
+          0,
+          0.205,
+          1,
+          0.665
+        ],
+        "studioGround": "warm"
+      },
+      {
+        "src": "/assets/shop-products/pair-0046-02.webp",
+        "source": "Internet_20240215_053634_5.jpeg",
+        "sha256": "eaa97b23359ac5fbef4161a7bbbbd3441408020713706f75850f64bb52f98d48",
+        "imageTreatment": "original-restored",
+        "bounds": [
+          0,
+          0.22,
+          0.96,
+          0.62
+        ],
+        "studioGround": "warm"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0057",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0057-01-white.webp",
+        "source": "Internet_20240512_002452_1.jpeg",
+        "sha256": "1a36d816002850d8f1349f5aeb153214172f0b2982c386f189f917f349348ed1",
+        "imageTreatment": "shoe-cutout-refined"
+      },
+      {
+        "src": "/assets/shop-products/pair-0057-02-white.webp",
+        "source": "Internet_20240512_002452_2.jpeg",
+        "sha256": "6f0a50edf35df7ea8b617dc85a533a2ec9eae76681aef1ff696fece9547991a3",
+        "imageTreatment": "shoe-cutout-refined"
+      },
+      {
+        "src": "/assets/shop-products/pair-0057-03-white.webp",
+        "source": "Internet_20240512_002452_3.jpeg",
+        "sha256": "23548882a24e8cccf1713c975cd031dd1b852a2c8e8cc7290484aeafc27ad311",
+        "imageTreatment": "shoe-cutout-refined"
+      },
+      {
+        "src": "/assets/shop-products/pair-0057-04-white.webp",
+        "source": "Internet_20240512_002452_4.jpeg",
+        "sha256": "e4f765930a5c8634916ccae95e547067fa2bc5a1ac0bca80baff42bf43255208",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0057-05.webp",
+        "source": "Internet_20240512_002452_5.jpeg",
+        "sha256": "14ae713d5e3da1496fe6b8364de8034e8a7ea57cd9922a70720cd07cba1fc42b",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0057-06-white.webp",
+        "source": "Internet_20240512_002452_6.jpeg",
+        "sha256": "15663c90fe012d70841e0823d86fc01ae892926e7b4c716663b8de27ad9855b9",
+        "imageTreatment": "shoe-cutout"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0066",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0066-01-white.webp",
+        "source": "Internet_20241119_003212_1.jpeg",
+        "sha256": "d10ba691860b0c238ac8a4061f3416aa41fc3b19843510c1fcf9663da3201dad",
+        "imageTreatment": "shoe-cutout-refined"
+      },
+      {
+        "src": "/assets/shop-products/pair-0066-02-white.webp",
+        "source": "Internet_20241119_003212_2.jpeg",
+        "sha256": "8f9d64524645e6e78998dd53c3f59dfa7d59fc275b1d29dd85ddd90b25169d10",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0066-03.webp",
+        "source": "Internet_20241119_003212_3.jpeg",
+        "sha256": "6da10a221850d0ba61279c5db5c9a97a453fff58ec7ed1d2efede3bd4b4f4d21",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0066-04-white.webp",
+        "source": "Internet_20241119_003212_4.jpeg",
+        "sha256": "d3c06a2d51383e1d0b9d38695011ccfaec66f20e1c97877fc468a65b85bb8ad0",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0066-05-white.webp",
+        "source": "Internet_20241119_003212_5.jpeg",
+        "sha256": "1e3372bb696e79ac47afd5f5716514cf8b9fc328a0428614fc4595320b570d34",
+        "imageTreatment": "scene-preserved"
+      },
+      {
+        "src": "/assets/shop-products/pair-0066-06-white.webp",
+        "source": "Internet_20241119_003212_6.jpeg",
+        "sha256": "b9d6a5aa8417cfe051b5bcfdc2fccab1ce83bd769398b0987418f594fe8979f6",
+        "imageTreatment": "shoe-cutout"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0068",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0068-01-white.webp",
+        "source": "Internet_20241119_092348_1.jpeg",
+        "sha256": "eff17746a00e5a6ef864e5642e5892f804bbc6dc4b9bd1d083db9b915d281fb5",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-02-white.webp",
+        "source": "Internet_20241119_092348_2.jpeg",
+        "sha256": "8bd722f8b16e4a235ec315d659cdfea97c85dd666dfaf3774def93d0f0c62d43",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-03-white.webp",
+        "source": "Internet_20241119_092348_3.jpeg",
+        "sha256": "42fe3e59d711f99743256f7f32118fe9fe4594f5882423a845156fe661b4f134",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-04.webp",
+        "source": "Internet_20241119_092348_4.jpeg",
+        "sha256": "491bec3181d7f0364cc45c717e70c8626f89e0158d0c9c79fd59fe143b0214b8",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-05-white.webp",
+        "source": "Internet_20241119_092348_5.jpeg",
+        "sha256": "53af4eec49f90c18ebe78d5520581222fe04632528ea5e4d85f939b0b34f7dcf",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-06-white.webp",
+        "source": "Internet_20241119_092348_6.jpeg",
+        "sha256": "f7ea2de53eb34a0330cb3f95710b0ec2fe3e9df5b5465d90cab420224f2de8f0",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-07-white.webp",
+        "source": "Internet_20241119_092348_7.jpeg",
+        "sha256": "11e5f15ed6da13a4083e9a400e31326707b3ae290b63b3ea952b2b79f946c2f1",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-08.webp",
+        "source": "Internet_20241119_092348_8.jpeg",
+        "sha256": "0a5583d3532660301597c7285f65dc4613ff1b1176dbff1fc1998156cd3c8bcf",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-09-white.webp",
+        "source": "Internet_20241119_092348_9.jpeg",
+        "sha256": "53837746b099768bf46d60283e4cd7362a517920fd32218f9f7e7b778fd6e86a",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0068-10-white.webp",
+        "source": "Internet_20241119_092348_10.jpeg",
+        "sha256": "43f883fa41f10b831aa3d3713c8a154bdfc09e1d23b52d362e077f8ac09bcad8",
+        "imageTreatment": "shoe-cutout"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0087",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0087-01.webp",
+        "source": "Internet_20260306_235500_1.webp",
+        "sha256": "0870ab344e3fbb94bd78bf594a813b789c5dfbd6010de200a086756df3cfd250",
+        "imageTreatment": "original-restored"
+      },
+      {
+        "src": "/assets/shop-products/pair-0087-02-white.webp",
+        "source": "Internet_20260306_235500_2.webp",
+        "sha256": "40f88d60c8c3ed7f65176bab2a38ab951d51ddb5a83a3b7325cb63e05e156d11",
+        "imageTreatment": "shoe-cutout"
+      },
+      {
+        "src": "/assets/shop-products/pair-0087-03-white.webp",
+        "source": "Internet_20260306_235500_3.webp",
+        "sha256": "16944b344f56a696aca1fd86eda10cf9233e26a0deb330fb1c6b2887e38a9e2b",
+        "imageTreatment": "scene-trimmed"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0320",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0320-01.webp",
+        "source": "IMG_20240206_093405_295.jpg",
+        "sha256": "73f130e0c93b6eaba443808dff26b46ede229dc73b965f1400abcd9556237b97",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0369",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0369-01.webp",
+        "source": "IMG_20240208_200112_726.jpg",
+        "sha256": "5eefd32595894cfb043356ca6b9a357b51bdbce4f3155bfb250f0909543e3d70",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0387",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0387-01.webp",
+        "source": "IMG_20240208_202454_122.jpg",
+        "sha256": "6592eef8ed17c4765d059b80b86371730b4937b69887e6690e17aa61d312686e",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0410",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0410-01.webp",
+        "source": "IMG_20240210_100240_195.jpg",
+        "sha256": "aacfe662b14cc8716bc7dd9192fa4d5760a4a44b58ba31e5c3ccb830b9fa41fe",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0444",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0444-01.webp",
+        "source": "IMG_20240210_101450_026.jpg",
+        "sha256": "f9cc8112e45daf41eb3aee0092bb44cd6b5f8b95b1ef42040f6cacffb51102c6",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0638",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0638-01.webp",
+        "source": "Screenshot_20240207_233007_Instagram.jpg",
+        "sha256": "569b6ecbed9cb421bac3c1140e307954eee42f35f1b53bb6d93c806114998ea1",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  },
+  {
+    "replacesProductId": "pair-0640",
+    "photoSourceName": "Original photography",
+    "matchNotes": "Manual comparisons of untouched source photographs against damaged cutouts. Restore genuine photo bytes where segmentation erased parts of the shoe. This is an interim repair, not an assertion of a StockX match. Product identities, colorways and counts remain untouched. Scene, shelf and handheld photos are excluded.",
+    "photographyStatus": "original-restored",
+    "photos": [
+      {
+        "src": "/assets/shop-products/pair-0640-01.webp",
+        "source": "Screenshot_20240207_233023_Instagram.jpg",
+        "sha256": "b793bf71ce63ef400cdca6c52c2758078e8456098877239298b55072b6188546",
+        "imageTreatment": "original-restored"
+      }
+    ]
+  }
+]

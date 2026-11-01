@@ -21,7 +21,7 @@ test('studio pagination keeps every supplied photo group reachable without flood
   assert.equal(catalogPage(entries, new URLSearchParams('page=-7')).page, 1);
 });
 
-test('brand, color, name and edit filters combine and pagination preserves their URLs', () => {
+test('brand, color and name filters combine while obsolete edit URLs resolve to all footwear', () => {
   const state = catalogPage(entries, new URLSearchParams('brand=Golden+Goose&color=White&q=star&edit=identified&sort=views'));
   assert(state.total > 0);
   assert(state.items.every(item => item.brand === 'Golden Goose' && item.colors.includes('White') && item.query.includes('star') && item.identified));
@@ -34,6 +34,8 @@ test('brand, color, name and edit filters combine and pagination preserves their
     assert.equal(url.searchParams.get('page'), '2');
   }
   assert.equal(new URL(state.clearUrl, 'http://localhost').search, '');
+  assert.equal(catalogPage(entries, new URLSearchParams('edit=stockx')).total, entries.length);
+  assert.equal(collectionHref(new URLSearchParams('edit=identified&brand=Nike')), '/collections/all?brand=Nike');
 });
 
 test('empty searches, unknown filter values and page requests remain safe and useful', () => {

@@ -4,10 +4,19 @@ import { resolve, extname, sep } from 'node:path';
 import { Liquid } from 'liquidjs';
 import { photographyCatalog } from './fixtures/photography-catalog.mjs';
 import { prepareCatalog, catalogPage } from '../src/collection-studio.mjs';
+import { mergeCatalogPhotography } from './fixtures/catalog-photography.mjs';
 let photoShopCatalog = [];
 
 const root = process.cwd();
 const engine = new Liquid({ root: [resolve('snippets')], extname: '.liquid', strictFilters: false });
+// LiquidDoc is metadata for Shopify tooling and never renders into the page.
+engine.registerTag('doc', {
+  parse(token, tokens) {
+    while (tokens.length) if (tokens.shift().name === 'enddoc') return;
+    throw new Error('Unclosed LiquidDoc block');
+  },
+  render() { return ''; },
+});
 let locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
 engine.registerFilter('t', (key, ...args) => {
   const options = Object.fromEntries(args.filter(arg => Array.isArray(arg) && arg.length === 2));
@@ -130,8 +139,12 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
   locale = JSON.parse(await readFile('locales/en.default.json', 'utf8'));
   try { photoShopCatalog = JSON.parse(await readFile('tools/fixtures/photo-shop.json', 'utf8')); }
   catch { photoShopCatalog = []; /* The local photo catalog is optional until a Takeout archive is imported. */ }
-  try { photoShopCatalog = [...JSON.parse(await readFile('tools/fixtures/stockx-edit.json', 'utf8')), ...photoShopCatalog]; }
+  try { photoShopCatalog = mergeCatalogPhotography(photoShopCatalog, JSON.parse(await readFile('tools/fixtures/photo-restorations.json', 'utf8'))); }
+  catch { /* Original photos stay available if no reviewed restorations exist. */ }
+  try { photoShopCatalog = mergeCatalogPhotography(photoShopCatalog, JSON.parse(await readFile('tools/fixtures/stockx-edit.json', 'utf8'))); }
   catch { /* Curated references are optional in local preview. */ }
+  try { photoShopCatalog = mergeCatalogPhotography(photoShopCatalog, JSON.parse(await readFile('tools/fixtures/photo-replacements.json', 'utf8'))); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
   const settings = JSON.parse(await readFile('config/settings_data.json', 'utf8')).current;
   const fixture = {
     id: 1, title: 'Preview fixture / Footwear', handle: 'preview-product', url: '/products/preview-product', vendor: 'Preview data', available: true, price: 18000, price_varies: true,
@@ -184,6 +197,7 @@ export async function renderPreview(pathname, query = new URLSearchParams()) {
       query.get('artwork') !== 'concept' && query.get('photography') !== '0' ? photographyCatalog : undefined;
     const preview_search_photography = type === 'main-search' && !populated && context.search.performed
       ? photographyCatalog.filter(photo => context.search.terms.toLowerCase().trim().split(/\s+/).every(word => photo.name.toLowerCase().includes(word))) : undefined;
+    // Photography quality must never remove products from All footwear.
     const preview_photo_shop = type === 'main-collection' && pathname === '/collections/all' && !populated ? photoShopCatalog : undefined;
     const preview_photo_entries = preview_photo_shop ? prepareCatalog(preview_photo_shop) : undefined;
     const preview_photo_state = preview_photo_entries ? catalogPage(preview_photo_entries, query, pathname) : undefined;

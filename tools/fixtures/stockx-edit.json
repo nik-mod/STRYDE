@@ -397,5 +397,27 @@
         "sha256": "001476ce3e99c386c2bac6f602d9a32111ffe93287521fea8c6b968308931e78"
       }
     ]
+  },
+  {
+    "id": "stockx-0020",
+    "replacesProductId": "pair-0018",
+    "title": "Onitsuka Tiger Mexico 66",
+    "brand": "Onitsuka Tiger",
+    "colorway": "Yellow / Black",
+    "description": "A low-profile yellow sneaker with black side stripes and a slim sole.",
+    "sku": "DL408-0490/1183C102-751",
+    "sourceUrl": "https://stockx.com/onitsuka-tiger-mexico-66-kill-bill-2022",
+    "sourceImageUrl": "https://images.stockx.com/360/Onitsuka-Tiger-Mexico-66-Kill-Bill-2022/Images/Onitsuka-Tiger-Mexico-66-Kill-Bill-2022/Lv2/img01.jpg?dpr=1&h=857&q=90&updated_at=1787924806&w=1200",
+    "sourceSet": "StockX editorial edit",
+    "identityStatus": "source-verified",
+    "count": 1,
+    "url": "/products/stockx-0020",
+    "photos": [
+      {
+        "src": "/assets/stockx-edit/stockx-0020.jpg",
+        "source": "https://stockx.com/onitsuka-tiger-mexico-66-kill-bill-2022",
+        "sha256": "291ad55c9e4e658a4a92c626b14496862124ca3a63f48c140e9880afaab86aa3"
+      }
+    ]
   }
 ]

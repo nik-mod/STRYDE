@@ -8,7 +8,7 @@ import { renderPreview } from '../tools/preview.mjs';
 
 function listing(html) {return html.match(/<section\b[^>]*\bcollection-page\b[\s\S]*?<\/section>/)?.[0] || '';}
 
-test('local all-products page paginates the imported photo groups and keeps commerce disabled',async()=>{
+test('local all-products page preserves every imported product while replacing matched photography',async()=>{
   const html=listing(await renderPreview('/collections/all'));
   assert(html,'Collection section missing');
   const catalog=JSON.parse(await readFile('tools/fixtures/photo-shop.json','utf8'));
@@ -30,7 +30,7 @@ test('local all-products page paginates the imported photo groups and keeps comm
   for(const item of catalog){
     assert(item.description);
     assert(item.identityStatus);
-    assert(payload.some(entry=>entry.id===item.id));
+    assert(payload.some(entry=>entry.id===item.id), `Missing original product ${item.id}`);
     for(const photo of item.photos){
       await access(`.${photo.src}`);
       assert((await stat(`.${photo.src}`)).size>1000);
@@ -40,7 +40,7 @@ test('local all-products page paginates the imported photo groups and keeps comm
   assert.match(html,/Photo studies · Purchases unavailable/);
   const second=listing(await renderPreview('/collections/all',new URLSearchParams('page=2')));
   assert.equal((second.match(/class="photo-shop-card" data-photo-card/g)||[]).length,12);
-  assert.match(second,/13–24 of 908 designs/);
+  assert.match(second,/13–24 of 908 pairs/);
 });
 
 test('the imported catalog remains on the local all-products route and yields to native fixtures',async()=>{
@@ -49,7 +49,7 @@ test('the imported catalog remains on the local all-products route and yields to
     assert.doesNotMatch(html,/data-concept-entry|Arc Study|Tide Study/);
     if(query.includes('fixtures')){assert.match(html,/href="\/products\/preview-product"/);assert.match(html,/\$180\.00 USD/);assert.match(html,/preview-fixture.svg/);assert.match(html,/name="sort_by"/);}
     else if(path==='/collections/other')assert.match(html,/No products found/);
-    else assert.match(html,/1–12 of 908 designs/);
+    else assert.match(html,/1–12 of 908 pairs/);
   }
   assert.doesNotMatch(await renderPreview('/'),/data-concept-entry/);
 });

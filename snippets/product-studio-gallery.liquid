@@ -16,7 +16,7 @@
   <figure class="studio-gallery-stage" data-product-media>
     {% if gallery_count > 0 %}
       <a class="studio-gallery-open" href="{{ first_src }}" data-gallery-open aria-label="Enlarge product image">
-        <span class="studio-gallery-photo" data-product-transition-frame><img src="{{ first_src }}" alt="{{ first_alt | escape }}" data-gallery-image loading="eager" fetchpriority="high" width="1200" height="1200"></span>
+        <span class="studio-gallery-photo" data-product-transition-frame><img src="{{ first_src }}" alt="{{ first_alt | escape }}" data-studio-ground="{{ first_photo.studioGround | escape }}" data-photo-bounds="{{ first_photo.bounds | join: ',' | escape }}" data-gallery-image loading="eager" fetchpriority="high" width="1200" height="1200"></span>
         <span class="studio-gallery-zoom">{% render 'icon', name: 'plus' %}<span>Enlarge</span></span>
       </a>
       <figcaption class="studio-gallery-caption"><span data-gallery-caption>View 01</span><span class="studio-gallery-count" data-gallery-count aria-live="polite">01 / {{ gallery_count | prepend: '0' }}</span></figcaption>
@@ -37,8 +37,8 @@
           assign photo_alt = title | append: ' — view ' | append: forloop.index
         endif
       %}
-      <a class="studio-gallery-thumbnail" href="{{ image_src }}" data-product-thumbnail data-image-url="{{ image_src }}" data-image-alt="{{ photo_alt | escape }}" aria-label="View product image {{ forloop.index }}"{% if forloop.first %} aria-current="true"{% endif %}>
-        <img src="{{ thumb_src }}" width="120" height="120" loading="lazy" alt=""><span>{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+      <a class="studio-gallery-thumbnail" href="{{ image_src }}" data-product-thumbnail data-image-url="{{ image_src }}" data-image-alt="{{ photo_alt | escape }}" data-photo-bounds="{{ photo.bounds | join: ',' | escape }}" aria-label="View product image {{ forloop.index }}"{% if forloop.first %} aria-current="true"{% endif %}>
+        <img src="{{ thumb_src }}" data-studio-ground="{{ photo.studioGround | escape }}" data-photo-bounds="{{ photo.bounds | join: ',' | escape }}" width="120" height="120" loading="lazy" alt=""><span>{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
       </a>
     {% endfor %}
   </div>
@@ -46,7 +46,7 @@
   <p class="studio-gallery-help">{% if gallery_count > 1 %}{{ gallery_count }} views{% else %}One view{% endif %}<span>Click to explore the details</span></p>
   <dialog class="studio-lightbox" data-gallery-dialog aria-label="Product image viewer">
     <div class="studio-lightbox-toolbar"><span data-lightbox-count></span><button type="button" data-lightbox-zoom aria-label="Zoom image" aria-pressed="false">{% render 'icon', name: 'plus' %}<span>Zoom</span></button><button type="button" data-lightbox-close aria-label="Close image viewer">{% render 'icon', name: 'close' %}</button></div>
-    <div class="studio-lightbox-canvas" data-lightbox-canvas>{% if gallery_count > 0 %}<img src="{{ first_src }}" data-lightbox-image width="1200" height="1200" alt="{{ first_alt | escape }}" draggable="false">{% endif %}</div>
+    <div class="studio-lightbox-canvas" data-lightbox-canvas>{% if gallery_count > 0 %}<img src="{{ first_src }}" data-studio-ground="{{ first_photo.studioGround | escape }}" data-photo-bounds="{{ first_photo.bounds | join: ',' | escape }}" data-lightbox-image width="1200" height="1200" alt="{{ first_alt | escape }}" draggable="false">{% endif %}</div>
     <div class="studio-lightbox-navigation"><button type="button" data-lightbox-prev aria-label="Previous image">{% render 'icon', name: 'arrow' %}</button><span>Use arrow keys to browse</span><button type="button" data-lightbox-next aria-label="Next image">{% render 'icon', name: 'arrow' %}</button></div>
   </dialog>
 </div>

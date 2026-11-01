@@ -20,6 +20,16 @@ export function fitPhotoContent(bounds, sourceWidth, sourceHeight, frameWidth, f
   return { width: sourceWidth * scale, height: sourceHeight * scale, left: (frameWidth - bounds.width * scale) / 2 - bounds.left * scale, top: (frameHeight - bounds.height * scale) / 2 - bounds.top * scale };
 }
 
+// Reviewed product extents let original studio photos with generous colored
+// margins share the same framing as the white-background catalog photographs.
+export function reviewedPhotoBounds(value, width, height) {
+  const parts = String(value || '').split(',').map(Number);
+  if (parts.length !== 4 || !parts.every(Number.isFinite)) return null;
+  const [left, top, frameWidth, frameHeight] = parts;
+  if (left < 0 || top < 0 || frameWidth <= 0 || frameHeight <= 0 || left + frameWidth > 1 || top + frameHeight > 1) return null;
+  return { left: left * width, top: top * height, width: frameWidth * width, height: frameHeight * height, sourceWidth: width, sourceHeight: height };
+}
+
 /** One DOM gallery serves native products and editorial preview photo sets. */
 export function galleryIndex(index, length) {
   return length > 0 ? ((Math.trunc(index) % length) + length) % length : 0;
@@ -33,7 +43,7 @@ export function mountProductGallery(root) {
   const abort = new AbortController();
   const on = (node, type, callback, options = {}) => node?.addEventListener(type, callback, { ...options, signal: abort.signal });
   const thumbs = [...gallery.querySelectorAll('[data-product-thumbnail]')];
-  const sources = thumbs.length ? thumbs.map(thumb => ({ src: thumb.dataset.imageUrl, alt: thumb.dataset.imageAlt || '' })) : [{ src: image.src, alt: image.alt }];
+  const sources = thumbs.length ? thumbs.map(thumb => ({ src: thumb.dataset.imageUrl, alt: thumb.dataset.imageAlt || '', bounds: thumb.dataset.photoBounds || '' })) : [{ src: image.src, alt: image.alt, bounds: image.dataset.photoBounds || '' }];
   const dialog = gallery.querySelector('[data-gallery-dialog]');
   const largeImage = dialog?.querySelector('[data-lightbox-image]');
   const largeCanvas = dialog?.querySelector('[data-lightbox-canvas]');
@@ -52,6 +62,8 @@ export function mountProductGallery(root) {
   gallery.querySelector('.studio-gallery-stage').append(loading);
   const boundsFor = picture => {
     if (!picture.complete || !picture.naturalWidth) return null;
+    const reviewed = reviewedPhotoBounds(picture.dataset.photoBounds, picture.naturalWidth, picture.naturalHeight);
+    if (reviewed) return reviewed;
     const source = picture.currentSrc || picture.src;
     if (boundsCache.has(source)) return boundsCache.get(source);
     try {
@@ -67,7 +79,7 @@ export function mountProductGallery(root) {
   };
   const fit = (picture, frame, fill = .84, cachedOnly = false) => {
     if (!normalize || !picture || !frame) return;
-    if (cachedOnly && !boundsCache.has(picture.currentSrc || picture.src)) return;
+    if (cachedOnly && !picture.dataset.photoBounds && !boundsCache.has(picture.currentSrc || picture.src)) return;
     const bounds = boundsFor(picture);
     if (!bounds) return;
     const rect = frame.getBoundingClientRect();
@@ -118,6 +130,7 @@ export function mountProductGallery(root) {
     image.classList.remove('has-content-framing'); image.removeAttribute('style');
     image.removeAttribute('srcset');
     image.src = source.src;
+    image.dataset.photoBounds = source.bounds || '';
     image.alt = source.alt;
     gallery.querySelector('[data-gallery-open]').href = source.src;
     thumbs.forEach((thumb, position) => {
@@ -127,7 +140,7 @@ export function mountProductGallery(root) {
     const count = external ? 'Variant view' : `${number(index + 1)} / ${number(sources.length)}`;
     gallery.querySelector('[data-gallery-count]').textContent = count;
     gallery.querySelector('[data-gallery-caption]').textContent = external ? 'Variant view' : `View ${number(index + 1)}`;
-    if (largeImage) { largeImage.src = source.src; largeImage.alt = source.alt; }
+    if (largeImage) { largeImage.src = source.src; largeImage.alt = source.alt; largeImage.dataset.photoBounds = source.bounds || ''; }
     if (dialog) dialog.querySelector('[data-lightbox-count]').textContent = count;
     resetZoom();
     fitAll();
