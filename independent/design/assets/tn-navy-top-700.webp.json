@@ -1,0 +1,9 @@
+{
+  "model": "nike-tn-deep-blue.glb",
+  "sha256": "b30f479bf6967790d92b9c70b92529f5390276718fa871426fe8a28858c90bc1",
+  "method": "Three.js render of supplied model geometry and embedded textures",
+  "generated": false,
+  "width": 700,
+  "transparent": true,
+  "source": "User supplied New Project 10_25_2026.glb"
+}

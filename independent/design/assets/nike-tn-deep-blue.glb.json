@@ -1,0 +1,12 @@
+{
+  "source": "/Users/lukatyemaladze/Downloads/New Project 10_25_2026.glb",
+  "originalSha256": "c4a520b28c82e36a019507daad6f7146f9cf28b0fd622ff1c0dca0178a0ac6af",
+  "processedFile": "nike-tn-deep-blue.glb",
+  "process": "UV- and normal-aware delivery mesh; original texture maps, materials and node transforms preserved; source framing hull retained.",
+  "originalTriangles": 1499988,
+  "triangles": 180000,
+  "measuredSimplificationError": 0.0004882730427198112,
+  "baseYaw": 0,
+  "matchingRenders": "tn-navy-*",
+  "productReference": "Nike Air Max Plus, blue / navy / white; supplied 3D model."
+}

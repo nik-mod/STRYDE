@@ -1,0 +1,723 @@
+{
+  "generated_at": "2026-11-02T17:00:58.267Z",
+  "products": [
+    {
+      "id": "prod_01M6EGSNYJ87K0M1ESGCQ0W2GF",
+      "title": "TEST / Footwear 02",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJDMHA12CW83NW1DH2",
+      "title": "TEST / Footwear 01",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJESNXC14W5BGCWAF4",
+      "title": "TEST / Footwear 06",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJG4R23V4CEDZ1YX8V",
+      "title": "TEST / Footwear 05",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJGAD1ZM97E0QJ8SN3",
+      "title": "TEST / Footwear 07",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJJSS62SSAS8QC4HJX",
+      "title": "TEST / Footwear 08",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJMSZX72CGFEX350MX",
+      "title": "TEST / Footwear 04",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJQB4B5DXAYSMG30YD",
+      "title": "TEST / Footwear 10",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJTCC3VR9JYKF57790",
+      "title": "TEST / Footwear 03",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYJVKS3EKVRBT2TDF60",
+      "title": "TEST / Footwear 09",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYK17T7XBPWCNS4JGPV",
+      "title": "TEST / Footwear 12",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYK1CMGCZS7Z4JEXKEN",
+      "title": "TEST / Footwear 11",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYK2J2NNHZM1ZZ73RH5",
+      "title": "TEST / Footwear 14",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    },
+    {
+      "id": "prod_01M6EGSNYK7CYGG1Y8Y95P0R6C",
+      "title": "TEST / Footwear 13",
+      "status": "published",
+      "development_fixture": true,
+      "brand": null,
+      "model": null,
+      "style_code": null,
+      "colorway": null,
+      "current_images": [
+        {
+          "url": "/assets/stryde-concept-side-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-rear-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+          "low_resolution": false
+        },
+        {
+          "url": "/assets/stryde-concept-detail-v1.webp",
+          "source": "development concept artwork",
+          "dimensions": [
+            1254,
+            1254
+          ],
+          "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+          "low_resolution": false
+        }
+      ],
+      "verified_stockx_match": null,
+      "replacement_available": false,
+      "license_status": "not supplied",
+      "model_colorway_assessment": "Cannot verify from generic fixture identity; no visual guess made.",
+      "proposed_action": "Retain only as a labeled development fixture; never convert to merchandise. Create a separate accurate draft with licensed StockX media."
+    }
+  ],
+  "duplicates": [
+    {
+      "sha256": "6dd65a12e90497b4cb57d1715909031ae8c8d1267eebb74b21b0e16b14267f18",
+      "product_ids": [
+        "prod_01M6EGSNYJ87K0M1ESGCQ0W2GF",
+        "prod_01M6EGSNYJDMHA12CW83NW1DH2",
+        "prod_01M6EGSNYJESNXC14W5BGCWAF4",
+        "prod_01M6EGSNYJG4R23V4CEDZ1YX8V",
+        "prod_01M6EGSNYJGAD1ZM97E0QJ8SN3",
+        "prod_01M6EGSNYJJSS62SSAS8QC4HJX",
+        "prod_01M6EGSNYJMSZX72CGFEX350MX",
+        "prod_01M6EGSNYJQB4B5DXAYSMG30YD",
+        "prod_01M6EGSNYJTCC3VR9JYKF57790",
+        "prod_01M6EGSNYJVKS3EKVRBT2TDF60",
+        "prod_01M6EGSNYK17T7XBPWCNS4JGPV",
+        "prod_01M6EGSNYK1CMGCZS7Z4JEXKEN",
+        "prod_01M6EGSNYK2J2NNHZM1ZZ73RH5",
+        "prod_01M6EGSNYK7CYGG1Y8Y95P0R6C"
+      ]
+    },
+    {
+      "sha256": "98371eb40e65579cea9f518690b895e96abe16f3f8b4f750d04aa37268c4c0b6",
+      "product_ids": [
+        "prod_01M6EGSNYJ87K0M1ESGCQ0W2GF",
+        "prod_01M6EGSNYJDMHA12CW83NW1DH2",
+        "prod_01M6EGSNYJESNXC14W5BGCWAF4",
+        "prod_01M6EGSNYJG4R23V4CEDZ1YX8V",
+        "prod_01M6EGSNYJGAD1ZM97E0QJ8SN3",
+        "prod_01M6EGSNYJJSS62SSAS8QC4HJX",
+        "prod_01M6EGSNYJMSZX72CGFEX350MX",
+        "prod_01M6EGSNYJQB4B5DXAYSMG30YD",
+        "prod_01M6EGSNYJTCC3VR9JYKF57790",
+        "prod_01M6EGSNYJVKS3EKVRBT2TDF60",
+        "prod_01M6EGSNYK17T7XBPWCNS4JGPV",
+        "prod_01M6EGSNYK1CMGCZS7Z4JEXKEN",
+        "prod_01M6EGSNYK2J2NNHZM1ZZ73RH5",
+        "prod_01M6EGSNYK7CYGG1Y8Y95P0R6C"
+      ]
+    },
+    {
+      "sha256": "8beed53545efe7fde65ec7731db739ca1f427a2e30608c3f73d990e59f77f62b",
+      "product_ids": [
+        "prod_01M6EGSNYJ87K0M1ESGCQ0W2GF",
+        "prod_01M6EGSNYJDMHA12CW83NW1DH2",
+        "prod_01M6EGSNYJESNXC14W5BGCWAF4",
+        "prod_01M6EGSNYJG4R23V4CEDZ1YX8V",
+        "prod_01M6EGSNYJGAD1ZM97E0QJ8SN3",
+        "prod_01M6EGSNYJJSS62SSAS8QC4HJX",
+        "prod_01M6EGSNYJMSZX72CGFEX350MX",
+        "prod_01M6EGSNYJQB4B5DXAYSMG30YD",
+        "prod_01M6EGSNYJTCC3VR9JYKF57790",
+        "prod_01M6EGSNYJVKS3EKVRBT2TDF60",
+        "prod_01M6EGSNYK17T7XBPWCNS4JGPV",
+        "prod_01M6EGSNYK1CMGCZS7Z4JEXKEN",
+        "prod_01M6EGSNYK2J2NNHZM1ZZ73RH5",
+        "prod_01M6EGSNYK7CYGG1Y8Y95P0R6C"
+      ]
+    }
+  ],
+  "note": "No remote images fetched, no source watermark altered and no product or image replaced."
+}

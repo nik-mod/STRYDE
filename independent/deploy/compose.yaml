@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_USER: stryde
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a strong database password}
+      POSTGRES_DB: stryde
+    volumes: ["postgres:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stryde"]
+      interval: 10s
+      retries: 10
+    restart: unless-stopped
+  redis:
+    image: redis:8-bookworm
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redis:/data"]
+    restart: unless-stopped
+  backend:
+    build: { context: .., dockerfile: deploy/backend.Dockerfile }
+    env_file: ./backend.env
+    environment:
+      DATABASE_URL: postgresql://stryde:${POSTGRES_PASSWORD}@postgres:5432/stryde
+      DATABASE_SSL: "false"
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+      STRYDE_TEST_MODE: "false"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+    volumes: ["uploads:/app/static"]
+    # Admin stays private; access through an SSH tunnel to the host.
+    ports: ["127.0.0.1:9000:9000"]
+    restart: unless-stopped
+  storefront:
+    build: { context: .., dockerfile: deploy/storefront.Dockerfile }
+    env_file: ./storefront.env
+    environment:
+      MEDUSA_BACKEND_URL: http://backend:9000
+      NODE_ENV: production
+      STRYDE_TEST_MODE: "false"
+    depends_on: [backend]
+    restart: unless-stopped
+  edge:
+    # nginx applies shared IP limits, Caddy terminates HTTPS and renews certificates.
+    image: nginx:stable-bookworm
+    volumes: ["./nginx.conf:/etc/nginx/conf.d/default.conf:ro"]
+    depends_on: [storefront]
+    restart: unless-stopped
+  https:
+    image: caddy:2
+    environment:
+      STORE_DOMAIN: ${STORE_DOMAIN:?Choose your domain before deployment}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile:ro", "caddy_data:/data", "caddy_config:/config"]
+    depends_on: [edge]
+    restart: unless-stopped
+volumes:
+  postgres:
+  redis:
+  uploads:
+  caddy_data:
+  caddy_config:

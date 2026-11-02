@@ -1,0 +1,951 @@
+/* Bounded product presentation. Photography is never tinted or sold as inventory. */
+.hero .hero-type { top: 27%; width: 49%; font-size: clamp(80px, 9vw, 174px); line-height: .88; letter-spacing: -.058em; }
+.hero .hero-line { transform: none; overflow: hidden; }
+.hero .hero-type .hero-line-1 .hero-line-inner { font-style: normal; color: var(--ink); opacity: 1; font-variation-settings: 'wght' 880, 'wdth' 80; }
+.hero .hero-type .hero-line-2 .hero-line-inner { font-style: italic; color: var(--hero-type); opacity: 1; font-variation-settings: 'wght' 620, 'wdth' 84; }
+.hero .hero-line-2 { margin-top: .05em; }
+.js .hero .hero-art { left: 43%; right: 6%; top: 21%; bottom: 23%; }
+.hero .hero-copy { top: auto; bottom: 25%; width: min(320px, 26vw); font-size: 14px; }
+.hero .hero-edition { top: calc(var(--header-height) + var(--preview-height) + 18px); }
+.chapter-collection .coll-scene-num { display: none; }
+.chapter-collection .coll-scene-price { max-width: 34ch; font-size: 14px; line-height: 1.55; }
+.chapter-collection.is-sequenced .coll-scene-figure { width: 62%; height: 84%; align-self: center; }
+.chapter-collection.is-sequenced .coll-scene:nth-of-type(2) .coll-scene-figure { width: 62%; height: 84%; margin-right: 0; }
+.chapter-collection.is-sequenced .coll-scene:nth-of-type(3) .coll-scene-figure { width: 62%; height: 84%; margin-left: 0; }
+.chapter-collection .coll-scene-visual img[data-reference-photo] { object-fit: contain; filter: none; transform: none; }
+.chapter-collection .photo-reference-credit { font-size: 11px; line-height: 1.5; margin-top: 14px; }
+.chapter-collection .photo-reference-credit a { text-decoration: underline; text-underline-offset: 3px; }
+.chapter-brand { padding: 70px var(--gutter); background: var(--ink-deep); color: var(--surface); }
+.brand-stage { display: grid; grid-template-columns: 1.15fr 1fr; gap: 5%; align-items: center; min-height: 0; padding: 0; overflow: visible; }
+.brand-visual { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 4 / 3; margin: 0; background: #a9d5e7; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, .35); }
+.brand-visual > img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.brand-visual > img[data-brand-model] { transform: scale(1.02); }
+.brand-visual .asset-tag { left: 12px; bottom: 12px; color: var(--ink-deep); background: var(--paper); }
+.brand-editorial { position: relative; width: 100%; margin: 0; padding: 0; color: inherit; }
+.brand-line-quiet { font-size: clamp(64px, 7.4vw, 116px); line-height: 1; }
+.brand-line-loud { font-size: clamp(40px, 4.6vw, 70px); max-width: 12ch; line-height: 1.05; margin: .12em 0 0; }
+.brand-line > span { font-variation-settings: 'wght' var(--brand-wght, 550), 'wdth' 87; }
+.brand-line-loud > span { font-variation-settings: 'wght' 700, 'wdth' 87; }
+.brand-manifesto { max-width: 32ch; width: 100%; margin: 26px 0 0; font-size: 18px; line-height: 1.55; }
+.chapter-finale { padding-inline: 0; }
+/* The stage grid otherwise sizes its implicit track to the widest child's
+   max-content (the action row), which overflows the viewport to the right
+   and shoves the whole composition off-center. Cap the track; the overflow
+   stays hidden on the stage as before. */
+.finale-stage { overflow: hidden; grid-template-columns: minmax(0, 1fr); justify-items: center; }
+.finale-inner { width: 100%; max-width: 100%; box-sizing: border-box; }
+.finale-shoe { transform-origin: center; }
+.chapter-finale .finale-heading { position: relative; z-index: 2; gap: .22em; font-size: clamp(42px, 4.8vw, 72px); }
+.chapter-finale .finale-heading .heading-line { overflow: visible; }
+.chapter-finale .finale-heading .heading-line > span { font-variation-settings: 'wght' 700, 'wdth' 88; }
+.finale-sub, .finale-actions, .finale-price, .finale-kicker { position: relative; z-index: 2; }
+.collection-page-photography .listing-heading { margin-bottom: 30px; }
+.collection-page-photography .listing-heading h1 { margin: 0; font-size: clamp(38px, 4.8vw, 68px); font-weight: 550; letter-spacing: -.03em; line-height: 1.05; }
+.photography-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 36px 24px; }
+.photography-reference { margin: 0; min-width: 0; }
+.photography-reference img { display: block; width: 100%; height: auto; aspect-ratio: 1.2; object-fit: contain; background: var(--surface); filter: none; }
+.photography-reference figcaption { padding-top: 15px; }
+.photography-reference h2 { font-size: 20px; font-weight: 550; line-height: 1.3; margin: 0 0 9px; }
+.photography-reference p, .photography-reference summary, .photography-reference details { font-size: 12px; line-height: 1.6; }
+.photography-reference summary { cursor: pointer; padding-block: 6px; }
+.photography-reference a { text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width:701px) {
+ .chapter-finale .finale-shoe[data-finale-model] { width:min(1000px,86vw,90svh)!important; }
+}
+@media (min-width:701px) and (max-height:820px) {
+ .chapter-finale .finale-shoe[data-finale-model] { width:min(1000px,86vw,80svh)!important; }
+}
+@media (min-width:701px) and (max-width:1000px) and (orientation:portrait) {
+ .hero .hero-type { top:16%; width:90%; font-size:10vw; }
+ .hero .hero-copy { top:34%; width:78%; }
+ .js .hero .hero-art { left:5%;right:5%;top:43%;bottom:18%; }
+ .brand-stage { grid-template-columns:1fr; gap:30px; }
+ .brand-visual { aspect-ratio:1.5; }
+ .brand-editorial { max-width:600px; }
+ .brand-manifesto { max-width:48ch; }
+ .photography-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:700px) {
+ .hero .hero-edition { top: calc(var(--header-height) + 20px); }
+ .hero .hero-type { top:16%;width:88%;font-size:13vw; }
+ .hero .hero-copy { top:auto;bottom:21%;width:83%; }
+ .js .hero .hero-art { left:3%;right:3%;top:31%;bottom:37%; }
+ .js .hero.hero-has-product .hero-art { top:30%;bottom:43%; }
+ .hero.hero-has-product .hero-copy { bottom:30%; }
+ .chapter-brand { padding:50px var(--gutter); }
+ .brand-stage { grid-template-columns:1fr; gap:28px;min-height:0;padding:0; }
+ .brand-visual { position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1.15; }
+ .brand-editorial { margin:0;padding:0; }
+ .brand-line-quiet { font-size:19vw; }
+ .brand-line-loud { font-size:12vw; }
+ .brand-manifesto { font-size:17px; }
+ .chapter-finale .finale-heading { font-size:12vw; }
+ .finale-actions { max-width:88vw; }
+ .photography-grid { grid-template-columns:1fr 1fr;gap:28px 15px; }
+ .photography-reference h2 { font-size:16px; }
+ .listing-introduction { display:block; }
+ .listing-preview-note { margin-top:10px!important; }
+}
+@media (max-width:420px) { .photography-grid { grid-template-columns:1fr; } }
+@media (max-width:700px) and (max-height:740px) {
+ .hero .hero-type { top:17%;font-size:12.5vw; }
+ .js .hero .hero-art,.js .hero.hero-has-product .hero-art { top:34%; }
+}
+@media (max-width:700px) and (max-height:620px) and (min-aspect-ratio:1/1) {
+ .hero .hero-type { top:28%;left:5%;width:43%;font-size:7vw; }
+ .hero .hero-copy,.hero.hero-has-product .hero-copy { top:52%;bottom:auto;left:5%;width:40%;font-size:13px; }
+ .js .hero .hero-art,.js .hero.hero-has-product .hero-art { left:48%;right:2%;top:23%;bottom:25%; }
+ .hero .hero-foot { bottom:4%;grid-template-columns:1fr auto;align-items:end; }
+ .hero .hero-actions .hero-cart { min-height:44px;padding-inline:18px; }
+ .hero .hero-name { font-size:18px; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .hero .hero-edition { inset: auto; }
+ .hero .hero-type,.hero .hero-copy { position:relative;inset:auto;width:100%; }
+ .js .hero .hero-art { position:relative;inset:auto;height:50vw;min-height:260px; }
+}
+.no-js .hero .hero-edition { inset: auto; }
+
+/* ----------------------------------------------------------------
+   Campaign art direction pass — directed product experience.
+   Hero: tonal field, monumental type interlocked with the product,
+   grounded contact shadow. Chapters: deeper field progression. */
+
+/* Hero: directional light — deep sky overhead, light pooling at the
+   product. Restrained: two gradients, no glows or ornaments. */
+.hero-stage {
+  background: linear-gradient(197deg, #5d9cc6 0%, #7fb6da 20%, #a5d0ea 44%, #cde8f6 70%, #eef8fd 100%);
+}
+.hero-atmo {
+  background:
+    radial-gradient(48% 40% at 67% 44%, rgba(255, 255, 255, .5), transparent 72%),
+    radial-gradient(56% 26% at 18% 102%, rgba(16, 43, 59, .14), transparent 75%);
+}
+.hero .hero-model-shadow {
+  display: block;
+  left: 38%;
+  top: 77%;
+  width: 46%;
+  height: 7%;
+  background: radial-gradient(ellipse, rgba(10, 34, 52, .3), transparent 66%);
+  filter: blur(16px);
+}
+.hero-cue { left: 50%; transform: translateX(-50%); bottom: 4.8%; }
+
+/* Featured: the full shoe stays in frame — no accidental macro crop. */
+[data-tn-editorial] .feat-frame { transform: none; }
+
+/* Finale: one consistent, gentle profile crop — the complete silhouette
+   stays inside the window (recovery.css left it overflow:visible). */
+.finale-profile-window { aspect-ratio: 2; overflow: hidden; }
+.finale-profile-window img { width: 111.1111%; left: -3.9683%; top: -36.5079%; }
+
+/* Materials sits on the paper field — images at their native 4:3 ratio sit
+   directly on it. No filled frame box: contain fills exactly, edge to edge. */
+.mat-frame { background: transparent; }
+
+/* Collection sequence: licensed photography presented as consistent
+   studio cards — never tinted, never sold as inventory. */
+.chapter-collection.is-sequenced .coll-scene-figure { width: 56%; height: 88%; }
+.chapter-collection.is-sequenced .coll-scene:nth-of-type(odd) .coll-scene-figure { margin-left: 5%; }
+.chapter-collection.is-sequenced .coll-scene:nth-of-type(even) .coll-scene-figure { margin-right: 5%; }
+.chapter-collection .coll-scene-visual img.photo-card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: var(--surface);
+  filter: none;
+  transform: none;
+}
+.chapter-collection .coll-scene-copy .photo-reference-credit { margin-top: 12px; }
+.chapter-collection .coll-scene-copy .photo-reference-credit p { font-size: 11px; line-height: 1.5; }
+.chapter-collection .coll-scene-copy .photo-reference-credit a { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width:700px) {
+  .hero .hero-type { width: 92%; font-size: 15vw; }
+  .hero .hero-model-shadow { left: 14%; width: 72%; top: 66%; }
+  .hero-cue { display: none; }
+  .chapter-collection .coll-scene { padding-block: 26px; }
+  .chapter-collection .coll-scene-copy .coll-scene-name { margin-top: 4px; }
+  .finale-ghost { border-color: rgba(239, 250, 255, .78); }
+}
+
+
+/* When the live 3D scene renders its own real-time contact shadow, the
+   painted CSS ellipse is retired so the two never double up. */
+.hero.has-scene .hero-model-shadow { display: none; }
+
+
+/* ----------------------------------------------------------------
+   Materials — cinematic editorial detail spreads (campaign pass).
+   Layered over refinements/recovery: authored frame ratios, ghost
+   numerals, companion inset cards, hairline rules, alternating
+   alignment. One detail study per phase of the pinned journey. */
+
+.chapter-materials .mat-panel { grid-template-columns: minmax(0, 1.14fr) minmax(0, .86fr); gap: clamp(28px, 3.6vw, 72px); }
+.chapter-materials .mat-panel-cage .mat-media { order: 2; }
+.chapter-materials .mat-panel-cage .mat-copy { order: 1; }
+.chapter-materials .mat-media { position: relative; min-width: 0; }
+.chapter-materials .mat-copy { min-width: 0; max-width: min(100%, 30rem); background: transparent; }
+/* The numeral straddles the frame's outer corner ABOVE the image — fully
+   readable, never clipped by the frame or buried behind the photo. */
+.chapter-materials .mat-ghost {
+  position: absolute;
+  top: -.34em;
+  left: -.12em;
+  z-index: 4;
+  font-size: clamp(112px, 12.5vw, 208px);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 118%;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(7, 54, 83, .6);
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-materials .mat-panel-cage .mat-ghost { left: auto; right: -.08em; }
+/* All studies render at the source photography's native 4:3 — contain fills
+   the frame exactly, so the shoe reads at full scale with no letterbox. */
+.chapter-materials .mat-frame { width: 100%; height: auto; aspect-ratio: 4 / 3; background: transparent; }
+.chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: min(100%, 74vh); }
+.chapter-materials .mat-panel-cage .mat-media { display: flex; justify-content: flex-end; }
+.chapter-materials .mat-inset {
+  position: absolute;
+  right: -4%;
+  bottom: -6%;
+  z-index: 2;
+  width: clamp(150px, 30%, 300px);
+  margin: 0;
+  padding: 8px;
+  background: var(--surface);
+  box-shadow: 0 24px 48px rgba(7, 34, 52, .22);
+  transform: rotate(2.2deg);
+}
+.chapter-materials .mat-panel-cage .mat-inset { right: auto; left: -5%; transform: rotate(-2.6deg); }
+.chapter-materials .mat-inset img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.chapter-materials .mat-rule { width: 44px; height: 2px; background: var(--ink); margin-top: 26px; transform-origin: left center; }
+.chapter-materials .mat-copy h3 { font-size: clamp(28px, 2.9vw, 52px); letter-spacing: -.016em; line-height: 1.06; }
+/* Caption presence: the reading column carries real weight — darker ink,
+   larger body, and material chips that index what the frame shows. */
+.chapter-materials .mat-copy .mat-index { font-size: 12px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; opacity: .82; }
+.chapter-materials .mat-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chapter-materials .mat-specs li {
+  padding: 7px 13px;
+  border: 1px solid rgba(7, 54, 83, .5);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .55);
+}
+/* The study index sits below the spread, clear of captions and chapter links. */
+.chapter-materials .mat-rail {
+  position: absolute;
+  right: auto;
+  left: var(--gutter);
+  bottom: 24px;
+  top: auto;
+  display: none;
+  flex-direction: row;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 5;
+}
+.chapter-materials .mat-rail li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: .38;
+  transition: opacity .45s ease;
+}
+.chapter-materials .mat-rail li.is-active { opacity: 1; }
+.chapter-materials .mat-rail i {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+.chapter-materials .mat-rail em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-left: 1px solid rgba(7, 54, 83, .3);
+  padding-left: 10px;
+}
+@media (min-width: 1181px) {
+  .chapter-materials .mat-rail { display: flex; }
+}
+/* The caption is part of the spread, not a card beside it: no panel
+   background, and it locks to the frame's top line instead of floating
+   mid-column. */
+.chapter-materials.is-journey-host .mat-copy { background: none; justify-content: flex-start; padding-top: clamp(10px, 3vh, 34px); }
+
+/* Pinned journey: frame owns its ratio inside the pin box. */
+.chapter-materials.is-journey-host .mat-panels { margin-top: clamp(52px, 7vh, 72px); }
+.chapter-materials.is-journey-host .mat-media { width: min(100%, calc((100svh - 370px) * 4 / 3)); }
+.chapter-materials:not(.is-journey-host) .mat-rail { display: none; }
+.chapter-materials.is-journey-host .mat-frame { height: auto; max-height: 66vh; aspect-ratio: 4 / 3; }
+.chapter-materials.is-journey-host .mat-panel-cage .mat-frame { width: min(100%, 62vh); aspect-ratio: 4 / 3; }
+.chapter-materials.is-journey-host .mat-ghost { font-size: clamp(104px, 12vw, 200px); }
+
+/* Mid-size hardening: keep the spread two-column down to 1180px without the
+   caption ever touching the viewport edge. */
+@media (max-width: 1440px) {
+  .chapter-materials .mat-copy { max-width: min(100%, 26rem); }
+  .chapter-materials .mat-copy p { max-width: 30ch; }
+}
+@media (max-width: 1180px) {
+  .chapter-materials .mat-panel { display: grid; grid-template-columns: 1fr; gap: 36px; min-height: 0; padding-block: 30px 54px; background: transparent; }
+  .chapter-materials .mat-media { width: 100%; }
+  .chapter-materials .mat-frame { height: auto; aspect-ratio: 4 / 3 !important; }
+  .chapter-materials .mat-copy { max-width: 100%; padding: 0; }
+  .chapter-materials .mat-panel-cage .mat-media { order: 0; }
+  .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
+  .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: 100%; }
+  .chapter-materials .mat-ghost { font-size: 104px; top: -.36em; }
+  .chapter-materials .mat-inset { width: 38%; bottom: -9%; right: 0; }
+  .chapter-materials .mat-panel-cage .mat-inset { left: 0; }
+}
+
+/* Mobile flow: stacked spread, quieter ghost, inset tucked in. */
+@media (max-width: 700px) {
+  .chapter-materials .mat-panel { grid-template-columns: 1fr; gap: 36px; }
+  .chapter-materials .mat-panel-cage .mat-media { order: 0; }
+  .chapter-materials .mat-panel-cage .mat-copy { order: 1; }
+  .chapter-materials .mat-panel-cage .mat-frame { aspect-ratio: 4 / 3; width: 100%; }
+  .chapter-materials .mat-ghost { font-size: 84px; top: -.38em; }
+  .chapter-materials .mat-inset { width: 38%; bottom: -9%; right: 0; }
+  .chapter-materials .mat-panel-cage .mat-inset { left: 0; }
+  .chapter-materials .mat-rail { display: none; }
+}
+
+
+/* Finale — the campaign climax (campaign pass). The stage gains a soft
+   vignette for depth; the monumental outlined word, light pool and floor
+   line are performed by the finale controller during the pinned reveal. */
+.chapter-finale .finale-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(72% 62% at 50% 42%, rgba(126, 200, 255, 0) 46%, rgba(4, 16, 28, .5) 100%);
+  pointer-events: none;
+}
+.chapter-finale .finale-word {
+  top: 40%;
+  -webkit-text-stroke: 1px rgba(239, 250, 255, .3);
+  z-index: 0;
+}
+.chapter-finale .finale-spot { top: 40%; }
+.chapter-finale .finale-floor { z-index: 0; bottom: 24px; }
+.chapter-finale .finale-inner { z-index: 2; }
+
+/* Brand — the last frame joins the engineering system: corner marks and a
+   contact shadow ground the study the same way anatomy and featured are
+   grounded. The collaborator's composition is untouched. */
+.chapter-brand .brand-line { overflow: hidden; padding: .05em 0; margin: -.05em 0; }
+.chapter-brand .brand-visual {
+  background: radial-gradient(56% 12% at 50% 88%, rgba(3, 14, 24, .4), transparent 74%), #a9d5e7;
+}
+.chapter-brand .brand-visual::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 26px;
+  height: 26px;
+  border-top: 2px solid var(--surface);
+  border-left: 2px solid var(--surface);
+  pointer-events: none;
+  z-index: 2;
+}
+.chapter-brand .brand-visual::before {
+  content: "";
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 26px;
+  height: 26px;
+  border-right: 2px solid var(--surface);
+  border-bottom: 2px solid var(--surface);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Materials copy carries more presence: a touch larger, a touch wider. */
+.chapter-materials .mat-copy p { font-size: clamp(15px, 1.22vw, 19px); line-height: 1.55; max-width: 34ch; color: var(--ink); opacity: .92; }
+
+/* Featured study responds to the pointer: a controlled lift, never a crop. */
+@media (hover: hover) and (pointer: fine) {
+  .chapter-featured .feat-frame { transition: transform .5s cubic-bezier(.22, 1, .36, 1), box-shadow .5s cubic-bezier(.22, 1, .36, 1); }
+  .chapter-featured .feat-frame:hover { transform: translateY(-6px); box-shadow: 0 34px 60px rgba(7, 34, 52, .18); }
+}
+
+
+/* ----------------------------------------------------------------
+   Defect pass — anatomy presence, technology dominance, collection
+   plates, featured lockup. All layered over the campaign pass above. */
+
+/* Anatomy — the study owns its half of the spread: a wider visual column,
+   a landscape-leaning frame (no portrait letterbox), tighter reading rows,
+   and a soft contact shadow that grounds whichever crop is active. */
+.chapter-deconstruction .decon-grid {
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: clamp(36px, 4.5vw, 72px);
+  margin-top: clamp(28px, 4.5vh, 56px);
+}
+.chapter-deconstruction .decon-frame {
+  aspect-ratio: 1.08;
+  background: radial-gradient(56% 11% at 50% 84%, rgba(10, 34, 52, .16), transparent 72%);
+}
+.chapter-deconstruction .decon-item { padding: clamp(16px, 2.4vh, 24px) 0; }
+.chapter-deconstruction .decon-introduction .chapter-intro { max-width: 40ch; }
+
+/* Technology — the product is the chapter: a taller visual stage, denser
+   soft light pooling, and body copy held readable on the deep field. */
+/* The stage wrapper carries both the visual and the rows, but the section
+   grid only names cells for the old sibling layout — the unplaced wrapper
+   broke auto-placement and pushed the kicker/heading to the section's
+   bottom, leaving the entry zone an empty dark band. Name the wrapper's
+   cell explicitly so the authored top-down order renders as designed. */
+.chapter-technology {
+  grid-template-areas: 'kicker kicker' 'heading heading' 'stage stage';
+  grid-template-rows: auto auto 1fr;
+}
+/* The visual/rows pair carries grid-area names from the old sibling
+   layout; give the stage its own matching areas so the names resolve
+   inside it instead of minting phantom tracks. */
+.chapter-technology .tech-stage {
+  grid-area: stage;
+  min-width: 0;
+  grid-template-areas: 'visual rows';
+  grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr);
+}
+/* The intro brief fills the heading's right side so the entry band carries
+   copy instead of dead space. */
+.chapter-technology {
+  grid-template-areas: 'kicker kicker' 'heading brief' 'stage stage';
+  grid-template-rows: auto auto 1fr;
+}
+.chapter-technology .tech-brief {
+  grid-area: brief;
+  align-self: end;
+  max-width: 34ch;
+  margin: 0 0 clamp(8px, 1.6vh, 18px);
+  font-size: clamp(14px, 1.1vw, 16.5px);
+  line-height: 1.6;
+  color: rgba(233, 244, 252, .82);
+}
+/* View stack: the three studies share one stage; rows drive the crossfade. */
+.chapter-technology .tech-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.chapter-technology .tech-stack .tech-view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity .8s cubic-bezier(.4, 0, .2, 1);
+}
+.chapter-technology .tech-stack .tech-view.is-active { opacity: 1; }
+@media (max-width: 1180px) {
+  .chapter-technology { grid-template-areas: 'kicker' 'heading' 'brief' 'stage'; grid-template-columns: minmax(0, 1fr); }
+  .chapter-technology .tech-brief { max-width: 52ch; }
+}
+.chapter-technology .tech-visual { height: clamp(320px, 36vw, 500px); }
+.chapter-technology .tech-visual::before {
+  inset: -14% -12%;
+  background: radial-gradient(58% 50% at 50% 48%, rgba(150, 214, 255, .2), rgba(150, 214, 255, 0) 74%);
+}
+.chapter-technology .tech-row p { opacity: .92; font-size: clamp(14.5px, 1.08vw, 17px); line-height: 1.6; color: rgba(233, 244, 252, .88); }
+.chapter-technology .tech-row h3 { letter-spacing: .01em; }
+.chapter-technology .tech-word { opacity: .14; }
+.chapter-technology .tech-stage { align-items: center; gap: clamp(28px, 4vw, 64px); }
+
+/* Collection — photographic editorial plates. The licensed references read
+   as magazine plates: full-bleed photography, one deep shadow, big italic
+   naming, quiet meta. No mats, no borders, no clinical rules. */
+.chapter-collection .coll-scene-visual {
+  position: relative;
+  background: transparent;
+  box-shadow: none;
+}
+.chapter-collection .coll-scene-visual::after { display: none; }
+.chapter-collection .coll-scene-visual img.photo-card {
+  background: transparent;
+  filter: none;
+}
+/* Pinned sequence: each reference is a tall photographic plate with real
+   presence — cover-cropped, floating in the field color, casting depth. */
+.chapter-collection.is-sequenced .coll-scene-figure {
+  width: 52%;
+  height: min(100%, 76svh);
+  align-self: center;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 44px 90px rgba(6, 30, 48, .34), 0 12px 28px rgba(6, 30, 48, .2);
+}
+.chapter-collection.is-sequenced .coll-scene-visual { height: 100%; }
+.chapter-collection.is-sequenced .coll-scene-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+/* Flow layout (touch/mobile): full-width plates instead of small stamps. */
+.chapter-collection:not(.is-sequenced) .coll-scene-visual {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(7, 34, 52, .18);
+}
+.chapter-collection:not(.is-sequenced) .coll-scene-visual img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  object-position: center 42%;
+}
+/* Naming carries the page: big italic with a quiet meta row beneath. */
+.chapter-collection .coll-scene-name { font-size: clamp(44px, 4.8vw, 88px); }
+.chapter-collection .coll-scene-price {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .78;
+}
+.chapter-collection .coll-scene-link { font-size: 12px; letter-spacing: .14em; }
+@media (max-width: 700px) {
+  .chapter-collection .coll-scene-name { font-size: 34px; }
+}
+
+/* Featured — the study sits in a lit studio set instead of a white void:
+   soft radial light field, contact shadow floor, spec chips under the
+   story, and a slow parallax drift so the frame never feels pasted. */
+[data-tn-editorial] .feat-frame, .feat-frame {
+  aspect-ratio: 4 / 3;
+  background: radial-gradient(118% 94% at 50% 24%, #ffffff 0%, #f0f5f9 58%, #e6eef4 100%);
+  box-shadow: 0 34px 74px rgba(7, 34, 52, .16);
+  border-radius: 2px;
+}
+.feat-frame::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 7%;
+  height: 12%;
+  background: radial-gradient(52% 100% at 50% 100%, rgba(10, 34, 52, .2), transparent 72%);
+  pointer-events: none;
+}
+.feat-grid { grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); gap: clamp(36px, 5vw, 84px); }
+.feat-frame img { width: 100%; height: 100%; object-fit: contain; }
+.chapter-featured .feat-story { font-size: clamp(15px, 1.24vw, 19px); line-height: 1.6; max-width: 40ch; }
+.chapter-featured .feat-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chapter-featured .feat-specs li {
+  padding: 7px 13px;
+  border: 1px solid rgba(7, 54, 83, .5);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .6);
+}
+/* Detail ledger: numbered hairline rows that give the right column real
+   editorial weight instead of ending at the chips. */
+.chapter-featured .feat-notes {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(7, 54, 83, .18);
+}
+.chapter-featured .feat-notes li {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 2px;
+  border-bottom: 1px solid rgba(7, 54, 83, .18);
+  font-size: 13.5px;
+  letter-spacing: .01em;
+  color: var(--ink);
+}
+.chapter-featured .feat-notes i {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  opacity: .55;
+  font-variant-numeric: tabular-nums;
+}
+.chapter-featured .feat-notes b {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chapter-featured .feat-notes span {
+  opacity: .78;
+}
+
+
+/* ----------------------------------------------------------------
+   Scene-flow pass — boundary continuity, anatomy annotations,
+   featured campaign frame. The numeral language (outlined ghost
+   index) now runs 02 → 03; every chapter arrives in motion. */
+
+/* Anatomy: the outlined numeral joins the system started by the
+   materials ghosts, so chapters 02 and 03 share one voice. */
+.chapter-deconstruction .decon-visual { position: sticky; }
+.chapter-deconstruction .decon-ghost {
+  position: absolute;
+  top: -.3em;
+  right: -.05em;
+  z-index: 0;
+  font-size: clamp(170px, 21vw, 330px);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 118%;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(7, 54, 83, .3);
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-deconstruction .decon-frame { position: relative; z-index: 1; }
+
+/* Technical annotations on the anatomy frame: an engineering tag that
+   swaps with the active study. The index and hairline tie the label to
+   the imagery; hidden with the flow layout on small screens. */
+.chapter-deconstruction .decon-notes {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 3;
+  display: grid;
+}
+.chapter-deconstruction .decon-note {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 9px;
+  background: rgba(244, 249, 252, .88);
+  border: 1px solid rgba(7, 54, 83, .22);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.chapter-deconstruction .decon-note::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--ink);
+  opacity: .6;
+}
+.chapter-deconstruction .decon-note i {
+  font-style: normal;
+  font-size: 9px;
+  opacity: .55;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Featured: monumental outlined word behind the campaign frame, floor
+   shadow under the study, engineering corner marks — the same visual
+   grammar as the anatomy frame, so the two read as one system. */
+.chapter-featured { position: relative; }
+.chapter-featured .feat-word {
+  position: absolute;
+  z-index: 0;
+  left: -7%;
+  top: 34%;
+  margin: 0;
+  font-size: clamp(110px, 14vw, 250px);
+  font-style: italic;
+  font-weight: 300;
+  font-stretch: 116%;
+  line-height: 1;
+  letter-spacing: -.045em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(7, 54, 83, .26);
+  pointer-events: none;
+  user-select: none;
+}
+.chapter-featured .feat-grid { position: relative; z-index: 1; }
+/* One soft grounding shadow only: the lit-studio radial from the base rule
+   stays, the ::after contact ellipse does the grounding — no dark floor
+   smudge painted over the light field. */
+.chapter-featured .feat-frame::after {
+  left: 22%;
+  right: 22%;
+  bottom: 5.5%;
+  height: 8%;
+  background: radial-gradient(50% 100% at 50% 100%, rgba(10, 34, 52, .13), transparent 70%);
+}
+/* Mask for the featured heading rise (chapter headings already have one). */
+.feat-title .heading-line {
+  display: block;
+  overflow: hidden;
+  padding: .05em 0;
+  margin: -.05em 0;
+}
+
+@media (max-width: 700px) {
+  .chapter-deconstruction .decon-ghost { font-size: 120px; top: -.4em; }
+  .chapter-deconstruction .decon-notes { display: none; }
+  .chapter-featured .feat-word { font-size: 24vw; left: 2%; top: 30%; }
+  .chapter-technology .tech-stage {
+    display: grid;
+    grid-template-areas: 'visual' 'rows';
+    grid-template-columns: 1fr;
+  }
+  .chapter-technology .tech-visual { height: clamp(240px, 64vw, 340px); }
+}
+
+/* ----------------------------------------------------------------
+   Brand rebuild (owner pass 6): the manifesto becomes display type
+   that reads with the scroll; the study and the value stack share an
+   editorial row; the authored line pair closes through masks. The
+   chapter keeps its deep-ink stage. */
+.chapter-brand .brand-stage {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(34px, 6vh, 64px);
+}
+.chapter-brand .brand-manifesto {
+  max-width: 26ch;
+  width: auto;
+  margin: 0;
+  font-size: clamp(34px, 4.6vw, 74px);
+  font-style: italic;
+  font-weight: 480;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  color: var(--surface);
+}
+.chapter-brand .brand-word { display: inline-block; will-change: opacity; }
+.chapter-brand .brand-editorial {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: clamp(30px, 4.5vw, 72px);
+  align-items: start;
+}
+.chapter-brand .brand-values {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.6vh, 30px);
+  padding-top: clamp(6px, 1.4vh, 18px);
+}
+.chapter-brand .brand-value {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 14px;
+  padding: clamp(16px, 2.2vh, 24px) 0;
+  border-top: 1px solid rgba(233, 244, 252, .22);
+}
+.chapter-brand .brand-value i {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  color: rgba(233, 244, 252, .6);
+  padding-top: 4px;
+}
+.chapter-brand .brand-value h3 {
+  font-size: clamp(19px, 1.6vw, 25px);
+  letter-spacing: -.01em;
+  margin-bottom: 8px;
+  color: var(--surface);
+}
+.chapter-brand .brand-value p {
+  font-size: clamp(14.5px, 1.08vw, 17px);
+  line-height: 1.6;
+  max-width: 40ch;
+  color: rgba(233, 244, 252, .84);
+}
+.chapter-brand .brand-lines {
+  display: flex;
+  flex-direction: column;
+  gap: .02em;
+  margin: 0;
+}
+.chapter-brand .brand-line { overflow: hidden; padding: .06em 0; margin: -.06em 0; }
+.chapter-brand .brand-line span { display: inline-block; will-change: transform; }
+.chapter-brand .brand-line-quiet { font-size: clamp(26px, 2.6vw, 42px); font-style: italic; font-weight: 420; color: rgba(233, 244, 252, .8); }
+.chapter-brand .brand-line-loud { font-size: clamp(64px, 7.4vw, 128px); font-weight: 840; letter-spacing: -.025em; }
+@media (max-width: 900px) {
+  .chapter-brand .brand-editorial { grid-template-columns: 1fr; }
+  .chapter-brand .brand-manifesto { max-width: 100%; }
+}
+
+/* Finale sheen: a light bar that sweeps across the monumental word as it
+   crests. Oversized and clipped by the word's own overflow, so the sweep
+   reads as a highlight passing over the letterforms. */
+.finale-word { position: absolute; }
+.finale-sheen {
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  left: 0;
+  width: 26%;
+  background: linear-gradient(100deg, rgba(239, 250, 255, 0) 0%, rgba(239, 250, 255, .16) 45%, rgba(239, 250, 255, .3) 52%, rgba(239, 250, 255, .16) 60%, rgba(239, 250, 255, 0) 100%);
+  transform: skewX(-14deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Owner pass 7 — the campaign study renders are clean cutouts now, so the
+   brand study shows the whole render (contain) instead of cropping it, and
+   the chapter rail gains breathing room from the viewport edge. */
+.chapter-brand .brand-visual > img { object-fit: contain; object-position: center; }
+.journey-nav { right: clamp(14px, 2vw, 36px); }
+
+/* Hero motion composition. The arrival wrapper is deliberately separate from
+   the scroll and pointer layers so an early scroll cannot strand the shoe. */
+.hero-arrival { width: 100%; height: 100%; display: grid; place-items: center; }
+.hero .hero-foot { bottom: 8%; }
+.hero .hero-cue { bottom: 7%; }
+.hero-study { position: absolute; right: 7%; bottom: 24%; z-index: 4; width: 170px; pointer-events: none; }
+.hero-study-label { display: block; font-size: 9px; font-weight: 650; letter-spacing: .14em; }
+.hero-study-track { display: block; height: 1px; margin: 12px 0 9px; background: rgba(7,54,83,.2); }
+.hero-study-track i { display: block; width: 100%; height: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; }
+.hero-study-note { font-size: 11px; opacity: .6; }
+.hero.has-scene .hero-media canvas { animation: heroSceneArrival .65s ease-out both; }
+@keyframes heroSceneArrival { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 701px) and (max-height: 760px) {
+  .hero .hero-type { top: 26%; font-size: clamp(76px, 8.6vw, 150px); }
+  .hero .hero-copy { bottom: 26%; font-size: 13px; }
+  .hero-study { bottom: 25%; }
+}
+@media (min-width: 701px) and (max-width: 1000px) and (orientation: portrait) {
+  .hero .hero-type { top: 19%; width: 88%; font-size: 10vw; }
+  .js .hero .hero-art { left: 12%; right: 8%; top: 39%; bottom: 23%; }
+  .hero .hero-copy { top: auto; bottom: 19%; width: 40%; font-size: 13px; }
+  .hero-study { bottom: 19%; }
+}
+@media (max-width: 700px) {
+  .hero .hero-type { top: 22%; width: 88%; font-size: 13vw; }
+  .hero .hero-edition { top: calc(var(--header-height) + var(--preview-height) + 20px); }
+  .js .hero .hero-art { left: 4%; right: 4%; top: 37%; bottom: 31%; }
+  .hero .hero-copy { bottom: 22%; font-size: 13px; width: 84%; }
+  .hero .hero-foot { bottom: 4%; }
+  .hero-study { display: none; }
+  .js .hero.hero-has-product .hero-art { top: 35%; bottom: 41%; }
+  .hero.hero-has-product .hero-copy { bottom: 31%; }
+}
+@media (max-width: 700px) and (max-height: 620px) and (min-aspect-ratio: 1/1) {
+  .hero .hero-type { top: 29%; left: 5%; width: 43%; font-size: 7vw; }
+  .js .hero .hero-art, .js .hero.hero-has-product .hero-art { left: 48%; right: 5%; top: 25%; bottom: 25%; }
+  .hero .hero-copy, .hero.hero-has-product .hero-copy { top: 54%; bottom: auto; width: 40%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero.has-scene .hero-media canvas { animation: none; }
+  .hero-study { display: none; }
+  .hero .hero-type, .hero .hero-copy, .hero .hero-foot { position: relative; inset: auto; width: 100%; }
+  .js .hero .hero-art, .js .hero.hero-has-product .hero-art { position: relative; inset: auto; }
+}
+
+/* Product launch: type sets the stage; the silhouette breaks its plane. */
+.hero .hero-type { top: 21%; left: 5%; width: 89%; font-size: clamp(104px, 13.4vw, 244px); line-height: .82; perspective: 1100px; }
+.hero .hero-type .hero-line-1 .hero-line-inner { font-variation-settings: 'wght' 920, 'wdth' 80; letter-spacing: -.065em; }
+.hero .hero-line-2 { align-self: flex-start; margin-top: .04em; margin-left: 2vw; font-size: .88em; }
+.hero-glyph { position: relative; display: inline-block; white-space: pre; backface-visibility: hidden; transform-style: preserve-3d; }
+.hero-line-2 .hero-glyph { color: transparent; -webkit-text-stroke: 1px rgba(16,43,59,.55); }
+.hero-line-2 .hero-glyph::after { content: attr(data-glyph); position: absolute; inset: 0; color: var(--hero-type); -webkit-text-stroke: 0; opacity: var(--glyph-fill, 1); }
+.js .hero .hero-art { left: 29%; right: 5%; top: 11%; bottom: 16%; }
+.hero .hero-copy { bottom: 23%; width: min(430px, 32vw); max-width: none; }
+.hero .hero-statement { font-size: clamp(18px, 1.5vw, 25px); font-weight: 650; letter-spacing: -.035em; line-height: 1.2; margin: 0 0 10px; }
+.hero .hero-description { max-width: 43ch; font-size: 13px; line-height: 1.6; margin: 0; opacity: .8; }
+.hero .hero-foot { z-index: 6; align-items: center; padding-top: 19px; }
+.hero .hero-name { font-size: clamp(20px, 2vw, 30px); }
+.hero .hero-actions { gap: 25px; }
+.hero .hero-cart { display: inline-flex; align-items: center; justify-content: space-between; gap: 30px; min-height: 62px; padding: 10px 13px 10px 25px; font-size: 13px; border: 1px solid var(--ink-deep); transition: background .25s ease, box-shadow .25s ease; }
+.hero .hero-cart:hover { background: #174b64; box-shadow: 0 10px 30px rgba(7,54,83,.16); }
+.hero-cta-arrow { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.3); border-radius: 50%; font-size: 22px; font-weight: 400; transition: transform .3s ease, background .3s ease; }
+.hero-cart:hover .hero-cta-arrow { transform: rotate(45deg); background: rgba(255,255,255,.12); }
+.hero .hero-editorial-link { gap: 12px; }
+.hero .hero-editorial-link span { transition: transform .3s ease; }
+.hero .hero-editorial-link:hover span { transform: translate(3px,3px); }
+.hero-study { right: 7%; bottom: 27%; width: 150px; }
+.hero-study-note { display: none; }
+.hero-launch-light { position: absolute; inset: -30% -10%; z-index: 1; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.1) 43%, rgba(255,255,255,.8) 49%, rgba(255,255,255,.15) 55%, transparent 63%); pointer-events: none; opacity: 0; mix-blend-mode: soft-light; }
+@media (min-width: 701px) and (max-height: 760px) {
+  .hero .hero-type { top: 22%; font-size: clamp(100px, 12.3vw, 200px); }
+  .hero .hero-copy { bottom: 23%; }
+  .hero .hero-statement { font-size: 19px; }
+  .hero .hero-description { font-size: 12px; }
+  .hero-study { bottom: 28%; }
+}
+@media (min-width: 701px) and (max-width: 1000px) and (orientation: portrait) {
+  .hero .hero-type { top: 19%; width: 89%; font-size: 14vw; }
+  .js .hero .hero-art { left: 15%; right: 2%; top: 32%; bottom: 23%; }
+  .hero .hero-copy { bottom: 20%; width: 49%; }
+  .hero .hero-description { font-size: 13px; }
+  .hero-study { display: none; }
+}
+@media (max-width: 700px) {
+  .hero .hero-type { top: 21%; left: 6%; width: 88%; font-size: 19vw; line-height: .82; }
+  .hero .hero-line-2 { margin-left: 0; font-size: .96em; }
+  .js .hero .hero-art { left: 12%; right: 0; top: 33%; bottom: 30%; }
+  .hero .hero-copy { left: 6%; width: 83%; bottom: 23%; }
+  .hero .hero-statement { font-size: 19px; margin-bottom: 7px; }
+  .hero .hero-description { font-size: 12px; max-width: 38ch; }
+  .hero .hero-foot { bottom: 3%; padding-top: 13px; gap: 12px; }
+  .hero .hero-name { font-size: 19px; }
+  .hero .hero-actions .hero-cart { min-height: 49px; padding: 7px 10px 7px 19px; }
+  .hero-cta-arrow { width: 32px; height: 32px; font-size: 20px; }
+  .js .hero.hero-has-product .hero-art { top: 33%; bottom: 41%; }
+  .hero.hero-has-product .hero-copy { bottom: 31%; }
+}
+@media (max-width: 700px) and (max-height: 700px) {
+  .hero .hero-type { top: 23%; font-size: 17vw; }
+  .hero .hero-statement { font-size: 16px; }
+  .hero .hero-description { font-size: 11px; }
+  .hero .hero-copy { bottom: 24%; }
+  .js .hero .hero-art { top: 35%; bottom: 34%; }
+}
+@media (max-width: 700px) and (max-height: 620px) and (min-aspect-ratio: 1/1) {
+  .hero .hero-type { top: 30%; width: 44%; font-size: 8vw; left: 5%; }
+  .hero .hero-copy, .hero.hero-has-product .hero-copy { top: 63%; bottom: auto; width: 43%; }
+  .hero .hero-description { display: none; }
+  .js .hero .hero-art, .js .hero.hero-has-product .hero-art { left: 47%; right: 5%; top: 26%; bottom: 25%; }
+  .hero .hero-foot { bottom: 4%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .hero-type, .hero .hero-copy, .hero .hero-foot { position: relative; inset: auto; width: 100%; }
+  .js .hero .hero-art, .js .hero.hero-has-product .hero-art { position: relative; inset: auto; }
+  .hero .hero-cart, .hero-cta-arrow { transition: none; }
+  .hero-launch-light { display: none; }
+}

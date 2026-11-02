@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { Liquid } from 'liquidjs';
@@ -229,6 +230,18 @@ export function createPreviewServer({ handleRequest, transformHTML = html => htm
   return http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url, 'http://localhost');
+      // Retired archive links in the old development preview must open the
+      // independent collection, rather than exposing unreviewed Takeout cutouts.
+      if (req.socket.localPort === 9292 && (req.method === 'GET' || req.method === 'HEAD') &&
+          existsSync(resolve(root, 'independent/storefront/package.json')) &&
+          (url.pathname.startsWith('/collections/') || url.pathname === '/search' ||
+           /^\/products\/(?:pair-\d+|stockx-[a-z0-9-]+)$/.test(url.pathname))) {
+        const target = new URL('http://localhost:3000');
+        target.pathname = /^\/products\/pair-\d+$/.test(url.pathname) ? '/collections/all' : url.pathname;
+        target.search = url.search;
+        res.writeHead(307, { Location: target.href, 'Cache-Control': 'no-store' });
+        return res.end();
+      }
       if (handleRequest?.(req, res, url)) return;
       if (await handleMockCommerce(req, res, url)) return;
       if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('Local preview: commerce form posts are disabled. Use the simulated Cart API endpoints.'); }
