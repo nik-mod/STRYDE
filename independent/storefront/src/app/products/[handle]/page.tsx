@@ -38,12 +38,14 @@ export default async function ProductPage({
   searchParams: Promise<{ variant?: string }>;
 }) {
   const handle = (await params).handle;
-  if (isTestMode() && editorialProduct(handle))
+  if (isTestMode() && /^stockx-/.test(handle)) {
+    if (!editorialProduct(handle)) notFound();
     return (
       <Shell>
         <EditorialProduct handle={handle} />
       </Shell>
     );
+  }
   let item;
   let error = "";
   try {

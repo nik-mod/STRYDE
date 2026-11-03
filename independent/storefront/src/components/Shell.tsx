@@ -6,6 +6,10 @@ export async function Shell({
   children: React.ReactNode;
   home?: boolean;
 }) {
+  const header = await design("header.html");
+  const navigation = home
+    ? header
+    : header.replace(/<a data-home-only\b[^>]*>[\s\S]*?<\/a>/g, "");
   return (
     <div className="document-shell">
       {home && (
@@ -19,7 +23,7 @@ export async function Shell({
       </a>
       <div
         className="markup-fragment"
-        dangerouslySetInnerHTML={{ __html: await design("header.html") }}
+        dangerouslySetInnerHTML={{ __html: navigation }}
       />
       <main id="MainContent" tabIndex={-1}>
         {children}

@@ -11,7 +11,7 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
   const compact = mobile || document.defaultView.innerWidth <= 900;
   const sequence = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
     trigger: root, start: compact ? 'top 65%' : 'top top',
-    end: compact ? 'bottom 25%' : () => `+=${Math.round(document.defaultView.innerHeight * .9)}`,
+    end: compact ? 'bottom 25%' : () => `+=${Math.round(document.defaultView.innerHeight * .6)}`,
     pin: compact ? false : stage, pinSpacing: true, scrub: true, invalidateOnRefresh: true,
   } });
   if (compact) {
@@ -39,7 +39,7 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
       const letters = [...(word?.querySelectorAll?.('[data-footer-letter]') || [])];
       const commerce = footer.querySelector('.signature-commerce');
       const identity = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        trigger: footer, start: 'top 140%', end: 'top 50%', scrub: .35, invalidateOnRefresh: true,
+        trigger: footer, start: 'top 115%', end: 'top 65%', scrub: true, invalidateOnRefresh: true,
       } });
       // The only monumental STRYDE mark is the real, linked footer wordmark.
       // It rises as the photographic stage releases, then stays fully readable.
@@ -54,6 +54,11 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
           { yPercent: 0, rotationX: 0, color: '#dcecf2', opacity: 1, duration: .78 }, 0);
       }
       identity.fromTo(commerce, { y: 20, opacity: .65 }, { y: 0, opacity: 1, duration: .5 }, .45);
+      gsap.fromTo(footer.querySelectorAll('.signature-directory nav, .footer-meta'),
+        { y: 18, opacity: .5 }, {
+          y: 0, opacity: 1, duration: .9, stagger: .09, ease: 'power3.out',
+          scrollTrigger: { trigger: footer.querySelector('.signature-directory'), start: 'top 95%', once: true },
+        });
       // The campaign timeline alone owns the photograph. It travels out with
       // the document while the wordmark rises; a second focus tween used to
       // overwrite its pinned pose on direct reverse seeks.

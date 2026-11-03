@@ -6,6 +6,6 @@
   <a href="#chapter-collection" data-chapter-link="collection">05<span>{{ 'general.perspectives' | t }}</span></a>
   <a href="#chapter-featured" data-chapter-link="featured">06<span>{{ 'general.in_focus' | t }}</span></a>
   <a href="#chapter-brand" data-chapter-link="brand">07<span>{{ 'general.our_perspective' | t }}</span></a>
-  <a href="#chapter-finale" data-chapter-link="finale">08<span>{{ 'general.collection' | t }}</span></a>
+  <a href="{{ routes.all_products_collection_url | default: '/collections/all' }}">08<span>{{ 'general.collection' | t }}</span></a>
 </nav>
 <div class="journey-progress" aria-hidden="true"><span data-story-progress></span></div>

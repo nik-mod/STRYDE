@@ -296,7 +296,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     const task = loadQueue.then(async () => {
       if (disposed || signal.aborted) return null;
       const modelURL = new URL(spec.url, url).href;
-      const response = await fetch(modelURL, { signal, credentials: 'omit' });
+      const response = await fetch(modelURL, { signal, credentials: 'same-origin' });
       if (!response.ok) throw new Error(`Model response ${response.status}`);
       const bytes = await response.arrayBuffer();
       if (disposed || signal.aborted) return null;
@@ -532,7 +532,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
       if (view.anatomy) {
         anatomyFocus.set(view.tour.focusX, view.tour.focusY, view.tour.focusZ).applyEuler(rig.rotation);
-        rig.position.copy(anatomyFocus).multiplyScalar(-.15);
+        rig.position.copy(anatomyFocus).multiplyScalar(-1);
       }
       rig.updateMatrixWorld(true);
       let bottom = Infinity, top = -Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
@@ -542,13 +542,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
         minZ = Math.min(minZ, world.z); maxZ = Math.max(maxZ, world.z);
       }));
       if (view.anatomy) {
-        // Center the rotated silhouette in its own window. Its upper/sole poses
-        // have different hull centers; a fixed model origin made them hang low.
-        const shiftY = pose.cameraY - (bottom + top) / 2;
-        rig.position.y += shiftY; rig.updateMatrixWorld(true);
+        // Keep the authored feature at the lens center. Re-centering the full
+        // silhouette here erased the mesh/Air/collar focal moves.
         selectedAssets.forEach(asset => {
-          asset.worldPoints.forEach(point => { point.y += shiftY; });
-          cameraZ = Math.max(cameraZ, anatomyCamera(camera.aspect, view.tour.zoom, asset.worldPoints, pose.cameraY, camera.fov));
+          cameraZ = anatomyCamera(camera.aspect, view.tour.zoom, asset.worldPoints, pose.cameraY, camera.fov);
         });
       }
       shadowPlane.position.set((minX + maxX) / 2, bottom - .045, (minZ + maxZ) / 2);
@@ -736,7 +733,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     renderer.domElement.addEventListener('webglcontextrestored', onRestored);
     overlay.append(renderer.domElement);
     trace('renderer');
-    const reflectionTask = fetch(new URL(root.dataset.environmentUrl || 'studio-environment.hdr', url), { signal, credentials: 'omit' })
+    const reflectionTask = fetch(new URL(root.dataset.environmentUrl || 'studio-environment.hdr', url), { signal, credentials: 'same-origin' })
       .then(async response => {
         if (!response.ok) throw new Error(`Studio response ${response.status}`);
         const bytes = await response.arrayBuffer();

@@ -8,7 +8,10 @@ function splitDisplayLine(line) {
   const text = line.textContent;
   const glyphs = Array.from(text).map(character => {
     const glyph = line.ownerDocument.createElement('span');
-    glyph.className = 'hero-glyph'; glyph.textContent = character; glyph.dataset.glyph = character;
+    glyph.className = 'hero-glyph'; glyph.dataset.glyph = character;
+    const ink = line.ownerDocument.createElement('span');
+    ink.className = 'hero-glyph-motion'; ink.textContent = character;
+    glyph.append(ink);
     return glyph;
   });
   line.replaceChildren(...glyphs);
@@ -76,22 +79,13 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
       },
     },
   });
-  // The line containers own restrained scroll separation; the glyphs own the
-  // entrance. The product frame never scales, rolls or flies under HTML motion.
+  // Counter-travel in the two lines opens space for the shoe's inspection turn.
   timeline
-    .fromTo(firstFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' }, { xPercent: 0, y: mobile ? -22 : -64, scale: .84, duration: .46, immediateRender: false }, 0)
-    .fromTo(secondFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' }, { xPercent: mobile ? 2 : 3, y: mobile ? -22 : -64, scale: .84, duration: .46, immediateRender: false }, .06)
-    .to(firstFrame, { xPercent: 0, y: mobile ? -12 : -28, scale: .94, duration: .48 }, .52)
-    .to(secondFrame, { xPercent: 1, y: mobile ? -12 : -28, scale: .94, duration: .48 }, .52)
-    .fromTo(foot, { opacity: 1, y: 0 }, { opacity: 1, y: 0, duration: .84, immediateRender: false }, 0)
-    .to(foot, { opacity: 1, y: -10, duration: .16 }, .84);
-  for (const [index, glyphs] of [first.glyphs, second.glyphs].entries()) if (glyphs.length) {
-    // The complete words stay solid and readable. A shallow, ordered type fold
-    // follows the same scroll beat as the upper reveal and resolves at exit.
-    timeline.fromTo(glyphs, { yPercent: 0, rotationX: 0 },
-      { yPercent: index ? -12 : -16, rotationX: index ? 14 : 18, duration: .28, stagger: .022, immediateRender: false, force3D: true }, .07)
-      .to(glyphs, { yPercent: 0, rotationX: 0, duration: .3, stagger: .012 }, .56);
-  }
+    .fromTo(firstFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' },
+      { xPercent: mobile ? -3 : -8, y: mobile ? -22 : -70, rotation: -3, scale: .9, duration: 1, immediateRender: false }, 0)
+    .fromTo(secondFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' },
+      { xPercent: mobile ? 3 : 8, y: mobile ? 8 : 16, rotation: 2, scale: .94, duration: 1, immediateRender: false }, 0)
+    .fromTo(foot, { opacity: 1, y: 0 }, { opacity: .85, y: -12, duration: 1, immediateRender: false }, 0);
   if (copy) timeline.fromTo(copy, { opacity: 1, y: 0 }, { opacity: .8, y: -4, duration: .84, immediateRender: false }, 0);
   // The same blue ink deepens as recessed wave faces travel behind the word.
   // This preserves its legibility without a panel, halo or new scroll owner.
@@ -100,6 +94,17 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
     .to(line2, { color: '#153e78', duration: .25, ease: 'none' }, .75);
   // The atmosphere is a full-bleed reference surface. Moving its rectangle
   // upward exposed a flat strip at the bottom of the Hero.
+
+  // Inner ink owns the repeating wave; outer glyphs own the opening reveal.
+  // Offscreen timelines pause, and the parent matchMedia disables all motion
+  // for reduced-motion visitors. No second animation clock is introduced.
+  const ink = [...root.querySelectorAll('.hero-glyph-motion')];
+  const letterWave = gsap.timeline({ repeat: -1, repeatDelay: 1.2, scrollTrigger: {
+    trigger: root, start: 'top bottom', end: 'bottom top', toggleActions: 'play pause resume pause',
+  } });
+  letterWave.to(ink, { yPercent: -9, rotation: -2, scaleY: 1.06, duration: .65,
+    stagger: .055, ease: 'sine.inOut' })
+    .to(ink, { yPercent: 0, rotation: 0, scaleY: 1, duration: .8, stagger: .055, ease: 'sine.inOut' }, .7);
 
   if ((environment.scrollY || 0) <= 24) {
     // Create inside the caller's GSAP context, but keep it paused until the
@@ -111,15 +116,20 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
     const letters = (glyphs, fallback, at) => {
       if (glyphs.length) {
         intro.fromTo(glyphs,
-          { yPercent: 112, opacity: 1, rotationX: 28, rotationZ: 0, '--glyph-fill': 1 },
+          { yPercent: 125, opacity: 0, rotationX: 65, rotationZ: -7, '--glyph-fill': 1 },
           { yPercent: 0, opacity: 1, rotationX: 0, rotationZ: 0, '--glyph-fill': 1,
-            duration: .75, stagger: { each: .018, from: 'start' }, ease: 'expo.out' }, at);
+            duration: 1.05, stagger: { each: .045, from: 'start' }, ease: 'expo.out' }, at);
       } else intro.fromTo(fallback, { yPercent: 110 }, { yPercent: 0, duration: .95, ease: 'expo.out' }, at);
     };
     letters(first.glyphs, line1, 0);
-    letters(second.glyphs, line2, .16);
+    letters(second.glyphs, line2, .28);
     if (arrival && !hasModel) intro.fromTo(arrival, { opacity: 1, scale: .98, xPercent: 0, y: 12, rotation: 0 }, { opacity: 1, scale: 1, xPercent: 0, y: 0, rotation: 0, duration: 1.4, ease: 'power3.out' }, 0);
     if (copy) intro.fromTo(copy, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, .35);
+    const caption = root.querySelector('[data-hero-caption]');
+    if (caption) {
+      intro.fromTo(caption.querySelector('.hero-caption-rule'), { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power3.out' }, .4);
+      intro.fromTo(caption.querySelectorAll('p, a'), { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .8, stagger: .08, ease: 'power3.out' }, .6);
+    }
     if (foot) intro.fromTo(foot, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .65, ease: 'power3.out' }, .45);
     cancelOpening = waitForHeroOpening(document, environment, () => {
       if (!intro) return;

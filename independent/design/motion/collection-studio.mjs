@@ -167,13 +167,27 @@ function mountProductContinuity(section, captureScroll) {
   return () => { listeners.abort(); clearTimeout(intentTimer); clear(); };
 }
 
-function mountCatalogFraming(root) {
+export function mountPhotoFraming(root, { images = '.photo-shop-image img, [data-catalog-hero-image]', hostSelector = '.photo-shop-image, .collection-hero-media', fill = .8 } = {}) {
   const doc = root.ownerDocument, cache = new Map();
   const listeners = new AbortController();
+  const pending = image => {
+    const host = image.closest(hostSelector);
+    if (!host) return;
+    image.hidden = true;
+    if (!host.querySelector('.photo-media-pending')) {
+      const status = doc.createElement('span');
+      status.className = 'photo-media-pending'; status.textContent = 'Image pending';
+      host.append(status);
+    }
+  };
   const fit = image => {
-    if (!image.complete || !image.naturalWidth) return;
+    if (!image.complete) return;
+    if (!image.naturalWidth) { pending(image); return; }
+    image.hidden = false;
+    image.closest(hostSelector)?.querySelector('.photo-media-pending')?.remove();
     const source = image.currentSrc || image.src;
-    if (!cache.has(source)) {
+    const reviewed = reviewedPhotoBounds(image.dataset.photoBounds, image.naturalWidth, image.naturalHeight);
+    if (!reviewed && !cache.has(source)) {
       try {
         const canvas = doc.createElement('canvas');
         const ratio = Math.min(1, 192 / Math.max(image.naturalWidth, image.naturalHeight));
@@ -185,23 +199,23 @@ function mountCatalogFraming(root) {
         if (cache.size > 128) cache.delete(cache.keys().next().value);
       } catch { cache.set(source, null); }
     }
-    const bounds = reviewedPhotoBounds(image.dataset.photoBounds, image.naturalWidth, image.naturalHeight) || cache.get(source);
+    const bounds = reviewed || cache.get(source);
     if (!bounds) return;
-    const host = image.closest('.photo-shop-image, .collection-hero-media');
+    const host = image.closest(hostSelector);
     if (!host) return;
     // Fit in the media's own coordinates; rotated editorial links have larger
     // viewport bounds, which must not inflate or crop the photograph.
     const frame = { width: host.clientWidth, height: host.clientHeight };
     if (frame.width < 1 || frame.height < 1) return;
-    const geometry = fitPhotoContent(bounds, bounds.sourceWidth, bounds.sourceHeight, frame.width, frame.height, image.hasAttribute('data-catalog-hero-image') ? .91 : .8);
+    const geometry = fitPhotoContent(bounds, bounds.sourceWidth, bounds.sourceHeight, frame.width, frame.height, image.hasAttribute('data-catalog-hero-image') ? .91 : fill);
     image.classList.add('has-content-framing');
     Object.assign(image.style, { inset: 'auto', maxWidth: 'none', padding: '0', ...Object.fromEntries(Object.entries(geometry).map(([key, value]) => [key, `${value}px`])) });
   };
-  const images = '.photo-shop-image img, [data-catalog-hero-image]';
   const fitAll = () => root.querySelectorAll(images).forEach(fit);
   root.addEventListener('load', event => { if (event.target.matches?.(images)) fit(event.target); }, { capture: true, signal: listeners.signal });
+  root.addEventListener('error', event => { if (event.target.matches?.(images)) pending(event.target); }, { capture: true, signal: listeners.signal });
   const observer = doc.defaultView.ResizeObserver ? new doc.defaultView.ResizeObserver(fitAll) : null;
-  observer?.observe(root.querySelector('[data-catalog-grid]'));
+  observer?.observe(root.querySelector('[data-catalog-grid]') || root);
   const masthead = root.querySelector('.collection-masthead-art');
   if (masthead) observer?.observe(masthead);
   fitAll();
@@ -225,7 +239,7 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
   const reset = root.querySelector('[data-catalog-reset]');
   const listeners = new AbortController();
   const media = environment.matchMedia('(prefers-reduced-motion: reduce)');
-  const framing = mountCatalogFraming(section);
+  const framing = mountPhotoFraming(section);
   const transition = createCatalogTransition({ document: doc, root, grid, environment });
   const masthead = section.querySelector('[data-collection-masthead]');
   const galleryStart = root.querySelector('#CollectionGallery') || root;

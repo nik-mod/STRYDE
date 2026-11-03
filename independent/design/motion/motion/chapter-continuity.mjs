@@ -2,7 +2,7 @@
 // transition timer: skipped frames, reverse seeks and pins give the same grade.
 export const CHAPTER_SURFACES = Object.freeze({
   hero: '#b9dced', deconstruction: '#eef5f7', materials: '#bfdfea',
-  technology: '#092e46', collection: '#d9e9f1', featured: '#eef5f7',
+  technology: '#092e46', collection: '#d5e1e7', featured: '#eef5f7',
   brand: '#061e30', finale: '#0b354c', footer: '#061e30',
 });
 const clamp = p => Math.max(0, Math.min(1, p));

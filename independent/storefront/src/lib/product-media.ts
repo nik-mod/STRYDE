@@ -18,5 +18,6 @@ export function mediaFor(
       ? variants.map((v: any) => `${v.url} ${v.width}w`).join(", ")
       : undefined,
     attribution: media?.attribution || "",
+    bounds: Array.isArray(media?.bounds) ? media.bounds.join(",") : undefined,
   };
 }

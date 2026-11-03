@@ -150,23 +150,23 @@ export function createHeroWorld({ scene, root, compact }) {
         // Volume sampling gives the steep faces the same tactile detail as
         // the floor instead of stretching a flat XZ texture into vertical lines.
         vec3 mineralSpace = vTerrain * vec3(1.0, .85, 1.0);
-        float reliefBody = waveVolume(mineralSpace * 7.5 + vec3(5.3, 2.7, 9.1));
-        float grain = waveVolume(mineralSpace * 31.0);
-        float pore = filteredWaveNoise(vTerrain.xz * 92.0 + vec2(13.4, 5.7));
+        float reliefBody = waveNoise(vTerrain.xz * 2.4 + vec2(5.3, 9.1));
+        float grain = filteredWaveNoise(vTerrain.xz * 12.0);
+        float pore = .5;
         vec3 sculpturalNormal = normalize(vWaveNormal);
         float orientation = dot(sculpturalNormal, normalize(vec3(-.4, .7, .55)));
         float recess = (1.0 - smoothstep(-.05, .72, orientation)) * (1.0 - crest * .5);
         // Silver-blue ceramic in the midtones, ocean-blue only on turned-away
         // faces, icy neutral light confined to the highest upward crests.
         vec3 powder = mix(vec3(.40, .57, .73), vec3(.64, .78, .90), smoothstep(-.8, 2.8, vTerrain.y));
-        powder = mix(powder, vec3(.16, .34, .54), recess * .62);
+        powder = mix(powder, vec3(.10, .25, .43), recess * .72);
         powder = mix(powder, vec3(.20, .39, .57), vWaveOcclusion * .36);
         float crestLight = crest * smoothstep(.35, .95, orientation);
-        powder = mix(powder, vec3(.98, 1.0, 1.015), crestLight);
+        powder = mix(powder, vec3(.82, .91, .97), crestLight * .85);
         vec3 tonal = mix(vec3(.94, .97, 1.015), vec3(1.025, 1.015, .99), mineral);
         float slopeShade = .93 + .07 * abs(sculpturalNormal.y);
         diffuseColor.rgb *= powder * tonal * slopeShade
-          * (1.0 + (reliefBody - .5) * .07 + (grain - .5) * .035);
+          * (1.0 + (reliefBody - .5) * .025 + (grain - .5) * .012);
         // Smooth satin, with no engraved stripes. Fade the finite mesh before
         // its physical edge and feather the viewport floor into the blue set.
         float domain = max(abs(vTerrain.x) / 13.0, abs(vTerrain.z) / 12.0);
@@ -184,7 +184,7 @@ export function createHeroWorld({ scene, root, compact }) {
         #include <normal_fragment_maps>
         // Sub-pixel filtered microrelief affects light only; the original
         // vertices, animated crests and silhouette remain exactly intact.
-        float relief = ((reliefBody - .5) * .0045 + (grain - .5) * .0018 + (pore - .5) * .00035)
+        float relief = ((reliefBody - .5) * .0012 + (grain - .5) * .0004)
           * mix(.5, 1.0, smoothstep(-.8, .8, vTerrain.y))
           * mix(.3, 1.0, abs(sculpturalNormal.y));
         vec3 sigmaX = dFdx(-vViewPosition), sigmaY = dFdy(-vViewPosition);
@@ -199,7 +199,7 @@ export function createHeroWorld({ scene, root, compact }) {
         reflectedLight.indirectSpecular *= 1.0 - vWaveOcclusion * .25;
       `);
   };
-  material.customProgramCacheKey = () => 'stryde-silver-ceramic-v12';
+  material.customProgramCacheKey = () => 'stryde-silver-ceramic-v13';
   const terrain = new THREE.Mesh(geometry, material);
   terrain.name = 'Continuous animated satin terrain'; terrain.receiveShadow = true;
   // The plane's undeformed bounds do not include the high crests.
@@ -232,29 +232,30 @@ export function createHeroWorld({ scene, root, compact }) {
       uniforms.worldExit.value = exit;
       uniforms.worldViewportHeight.value = viewportHeight;
       const direction = heroDirection(progress);
-      uniforms.worldTime.value = time;
+      uniforms.worldTime.value = time * 2.1;
       uniforms.worldProgress.value = direction.world;
-      uniforms.worldStrength.value = direction.strength;
-      const damping = 1 - Math.exp(-dt * 3);
+      uniforms.worldStrength.value = direction.strength * 1.12;
+      const damping = 1 - Math.exp(-dt * 4.5);
       pointerX += (targetX - pointerX) * damping; pointerY += (targetY - pointerY) * damping;
-      const truck = Math.sin(time * .20) * .055 + direction.truck + pointerX * .09;
-      const lift = Math.sin(time * .22) * .008 + direction.lift - pointerY * .012;
+      const truck = Math.sin(time * .32) * .16 + direction.truck + pointerX * .22;
+      const lift = Math.sin(time * .40) * .025 + direction.lift - pointerY * .035;
       camera.position.x = truck; camera.position.y += lift;
       camera.position.z *= direction.dolly * (1 + (1 - entrance) * .04);
       camera.rotation.set(Math.sin(progress * Math.PI) * .016 - pointerY * .004,
         -Math.sin(progress * Math.PI) * .055 + pointerX * .008, 0);
-      // The world has real parallax, but the subject's frame and original scale
-      // stay protected. One small 3D arrival resolves into the first scroll pose.
+      // A floating product reacts independently of the landscape. Fade that
+      // freedom out before the authored transition to the next model.
       rig.position.set(truck, lift + .035 * (1 - entrance), 0);
-      const breathe = Math.max(0, Math.min(1, (1 - progress) / .18)) * entrance;
-      rig.position.y += Math.sin(time * .48) * .016 * breathe;
-      rig.rotation.x += (Math.sin(time * .36) * .010 - pointerY * .012) * breathe;
-      rig.rotation.y += (Math.sin(time * .32) * .016 + pointerX * .025) * breathe;
-      rig.rotation.z += Math.sin(time * .38) * .003 * breathe;
+      const breathe = Math.max(0, Math.min(1, (1 - progress) / .35)) * entrance * surfaceBlend;
+      rig.position.y += Math.sin(time * 1.1) * .085 * breathe;
+      rig.position.y += Math.sin(Math.PI * progress) ** 2 * .12;
+      rig.rotation.x += (Math.sin(time * .68) * .065 - pointerY * .10) * breathe;
+      rig.rotation.y += (Math.sin(time * .55) * .14 + pointerX * .22) * breathe;
+      rig.rotation.z += (Math.sin(time * .75) * .025 - pointerX * .018) * breathe;
       rig.rotation.x += .30 * (1 - entrance);
       rig.rotation.y += .56 * (1 - entrance);
       rig.rotation.z -= .025 * (1 - entrance);
-      group.position.set(truck * .5, 0, direction.world * .42);
+      group.position.set(truck * .5 + Math.sin(time * .35) * .14, 0, direction.world * .42);
       // The clearance follows the actual product in terrain-local space.
       // The old independent Z drift let a crest pass through the sneaker
       // late in the Hero, which looked like the product fading/disappearing.

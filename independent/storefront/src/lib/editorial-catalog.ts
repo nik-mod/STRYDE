@@ -2,6 +2,7 @@ import "server-only";
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { prepareCatalog } from "./reference-catalog.mjs";
+import { hasSharpSneakerPhoto } from "./sneaker-selection.mjs";
 
 export type EditorialReference = {
   id: string;
@@ -12,9 +13,10 @@ export type EditorialReference = {
   sku: string;
   sourceUrl: string;
   url: string;
-  photos: { src: string }[];
+  photos: { src: string; bounds?: number[]; width?: number; height?: number }[];
   archiveSource?: string;
   resolution?: string;
+  imageQuality?: { status: string; width: number; height: number };
 };
 const filename = join(process.cwd(), "src/data/stockx-editorial.json");
 let stamp = "";
@@ -33,6 +35,7 @@ function load() {
   products = source.filter(
     (p) =>
       /^stockx-(?:\d{4}|archive-[a-f0-9]{16})$/.test(p.id) &&
+      hasSharpSneakerPhoto(p) &&
       p.photos.length > 0 &&
       p.photos.every((photo) =>
         /^\/assets\/(?:stockx-edit|stockx-archive|replacement-photos)\/[a-zA-Z0-9-]+\.(?:webp|jpg|png)$/.test(

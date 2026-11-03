@@ -4,6 +4,7 @@ import { brandStudyPhase } from '../journey-poses.mjs';
 import { mountClosingCampaign } from './closing.mjs';
 import { mountMaterialOrbit } from './material-orbit.mjs';
 import { mountAnatomy } from './anatomy.mjs';
+import { mountEditorialDetails } from './editorial-details.mjs';
 
 const brandResizeCheckpoints = new WeakMap();
 
@@ -686,6 +687,7 @@ export function mountChapter(root, { gsap, mobile, fine }) {
   const controller = CONTROLLERS[root.dataset.chapter];
   if (!controller) return undefined;
   const dispose = controller(root, gsap, { mobile, fine }) || undefined;
+  mountEditorialDetails(root, gsap);
   if (!mobile && !root.hasAttribute?.('data-brand-live')) {
     sceneFlow(root, gsap);
 

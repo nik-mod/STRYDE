@@ -42,9 +42,9 @@ const pose = (rotationX, rotationY, rotationZ, fill = .94, cameraY = .04, exposu
 const TRACKS = {
   hero: [
     [0, pose(.18, -.26, -.018, .88)],
-    [.25, pose(.28, -.06, -.012, .88)],
-    [.52, pose(.50, .22, .012, .88)],
-    [.76, pose(.32, .12, .006, .88)],
+    [.25, pose(.30, -.04, -.025, .88)],
+    [.52, pose(.55, .50, .04, .88)],
+    [.76, pose(.32, .22, .018, .88)],
     [1, pose(.18, -.10, 0, .88)],
   ],
   deconstruction: [

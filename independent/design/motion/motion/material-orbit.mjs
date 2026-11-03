@@ -37,7 +37,7 @@ export function mountMaterialOrbit(root, gsap, panels, select) {
       // These are honest 2.5D photographs until all genuine GLBs are ready.
       // Apparent size and stacking derive from the exact same orbital depth.
       media.style.transform = `translate3d(${projected.x}px,${projected.y}px,0) translate(-50%,-50%) rotate(${point.rotationZ * 180 / Math.PI}deg) scale(${projected.width * 1.15 / baseWidth})`;
-      media.style.zIndex = String(Math.round((point.z + 4) * 100));
+      media.style.zIndex = String(100 + state.items.filter(other => other.z < point.z || (other.z === point.z && other.index < index)).length);
       if (copy) { copy.style.visibility = index === state.active ? 'visible' : 'hidden'; copy.setAttribute('aria-hidden', String(index !== state.active)); }
     });
   };

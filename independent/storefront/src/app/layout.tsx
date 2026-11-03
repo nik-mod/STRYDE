@@ -39,7 +39,7 @@ export default async function RootLayout({
     "storefront",
     "navigation",
     ...(template === "index"
-      ? ["campaign-refinement", "closing", "site-intro"]
+      ? ["campaign-refinement", "closing", "site-intro", "editorial-finish"]
       : []),
     ...(template === "collection" ? ["collection-studio"] : []),
     ...(template === "product" ? ["product-studio"] : []),
@@ -57,6 +57,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className="js" suppressHydrationWarning>
       <head>
+        {template === "index" && <>
+          <link rel="preload" as="fetch" href="/assets/nike-tn-blue-white.glb" crossOrigin="anonymous" />
+          <link rel="preload" as="fetch" href="/assets/studio-environment.hdr" crossOrigin="anonymous" />
+        </>}
         <link
           rel="preload"
           href="/assets/archivo-var.woff2"

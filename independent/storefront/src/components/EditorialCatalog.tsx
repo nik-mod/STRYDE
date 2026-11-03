@@ -95,7 +95,7 @@ export function EditorialCatalog({
         </div>
         <div className="collection-masthead-foot">
           <span>
-            <b>{state.all}</b> footwear studies. Endless ways to wear them.
+            <b>{state.all}</b> sneakers. Find your next pair.
           </span>
           <span>Photo studies · Purchases unavailable</span>
         </div>
@@ -103,7 +103,7 @@ export function EditorialCatalog({
       <div className="photo-shop collection-browser" data-photo-shop>
         <div className="collection-gallery-heading" id="CollectionGallery">
           <h2>
-            All footwear<span>.</span>
+            All sneakers<span>.</span>
           </h2>
           <span>{state.all} pairs</span>
         </div>
@@ -134,7 +134,7 @@ export function EditorialCatalog({
                 name="q"
                 data-photo-search
                 defaultValue={state.q}
-                placeholder="Search footwear"
+                placeholder="Search sneakers"
                 autoComplete="off"
                 enterKeyHint="search"
               />

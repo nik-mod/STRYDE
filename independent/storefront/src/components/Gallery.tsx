@@ -15,7 +15,7 @@ export function Gallery({ product }: { product: Product }) {
       </div>
     );
   return (
-    <div className="studio-gallery" data-product-gallery>
+    <div className="studio-gallery" data-product-gallery data-gallery-normalize={product.metadata?.editorial_reference ? "" : undefined}>
       <figure className="studio-gallery-stage">
         <a
           className="studio-gallery-open"
@@ -27,6 +27,7 @@ export function Gallery({ product }: { product: Product }) {
             <img
               data-gallery-image
               data-product-cover
+              data-photo-bounds={mediaFor(product, images[0].url).bounds}
               src={images[0].url}
               alt={product.title}
               width={1200}
@@ -61,6 +62,7 @@ export function Gallery({ product }: { product: Product }) {
               href={image.url}
               data-product-thumbnail
               data-image-url={image.url}
+              data-photo-bounds={mediaFor(product, image.url).bounds}
               data-image-alt={`${product.title} — view ${index + 1}`}
               aria-label={`View product image ${index + 1}`}
               aria-current={index === 0 ? "true" : undefined}
@@ -68,6 +70,7 @@ export function Gallery({ product }: { product: Product }) {
             >
               <img
                 src={mediaFor(product, image.url, 360).src}
+                data-photo-bounds={mediaFor(product, image.url).bounds}
                 width={120}
                 height={120}
                 alt=""

@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { createProgressBus } from './motion/contracts.mjs';
 import { mountProductGallery } from './product-gallery.mjs';
+import { mountPhotoFraming } from './collection-studio.mjs';
 const mountProduct = root => { const gallery = mountProductGallery(root); return () => gallery.dispose(); };
 const mountRecommendations = () => () => {};
 const mountCartDrawer = () => () => {};
@@ -120,6 +121,7 @@ function mountHeroSection(root) {
 }
 
 function mountChapterSection(root) {
+  const photographs = root.matches('[data-form-edit]') ? mountPhotoFraming(root, { images: '.form-look-art img', hostSelector: '.form-look-art', fill: .86 }) : null;
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
     media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)', ...(root.dataset.chapter === 'brand' ? { brandFit: '(min-height: 740px)' } : {}), ...(root.dataset.chapter === 'deconstruction' ? { anatomyFit: '(min-width: 1001px) and (min-height: 720px)' } : {}) }, ({ conditions }) => {
@@ -128,7 +130,7 @@ function mountChapterSection(root) {
       return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });
     });
   }, root);
-  return () => { media.revert(); context.revert(); };
+  return () => { media.revert(); context.revert(); photographs?.dispose(); };
 }
 
 let environmentDispose = null;

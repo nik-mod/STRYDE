@@ -15,7 +15,7 @@ export function EditorialProduct({ handle }: { handle: string }) {
       id: `${item.id}-${index}`,
       url: p.src,
     })),
-    metadata: { editorial_reference: true },
+    metadata: { editorial_reference: true, stryde_media: { images: item.photos.map(p => ({ url: p.src, bounds: p.bounds })) } },
     options: [],
     variants: [],
   };
