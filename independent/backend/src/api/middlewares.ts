@@ -70,6 +70,11 @@ export default defineMiddlewares({
       ],
     },
     {
+      matcher: "/store/stryde/order-track",
+      method: ["POST"],
+      bodyParser: { sizeLimit: "1kb" },
+    },
+    {
       matcher: "/store/carts/:id/complete",
       method: ["POST"],
       middlewares: [

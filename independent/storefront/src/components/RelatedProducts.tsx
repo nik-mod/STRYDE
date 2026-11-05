@@ -1,16 +1,10 @@
-import { catalog } from "@/lib/medusa";
+import { relatedProducts } from "@/lib/medusa";
 import { mediaFor } from "@/lib/product-media";
 import type { Product } from "@/lib/types";
 export async function RelatedProducts({ product }: { product: Product }) {
-  let products: Product[] = [];
+  let products: Awaited<ReturnType<typeof relatedProducts>> = [];
   try {
-    products = (await catalog())
-      .filter(
-        (p) =>
-          p.id !== product.id &&
-          (!product.collection || p.collection?.id === product.collection.id),
-      )
-      .slice(0, 3);
+    products = await relatedProducts(product);
   } catch {
     return null;
   }

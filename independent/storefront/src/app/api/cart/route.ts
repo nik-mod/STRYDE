@@ -2,6 +2,7 @@ import { z } from "zod";
 import { NextResponse } from "next/server";
 import { medusa, getCart, CommerceError } from "@/lib/medusa";
 import { readSession, writeSession } from "@/lib/session";
+import { customerToken } from "@/lib/customer";
 import { body, guardMutation, idSchema, RequestError } from "@/lib/security";
 import { permitted } from "@/lib/policy";
 import type { Cart, Product } from "@/lib/types";
@@ -20,6 +21,18 @@ const input = z.discriminatedUnion("action", [
       quantity: z.number().int().min(0).max(20),
     })
     .strict(),
+  z
+    .object({
+      action: z.literal("promo"),
+      code: z.string().trim().min(3).max(40).regex(/^[A-Za-z0-9_-]+$/),
+    })
+    .strict(),
+  z
+    .object({
+      action: z.literal("promo-remove"),
+      code: z.string().trim().min(3).max(40).regex(/^[A-Za-z0-9_-]+$/),
+    })
+    .strict(),
 ]);
 export async function GET() {
   try {
@@ -34,6 +47,9 @@ export async function POST(request: Request) {
     guardMutation(request);
     const value = await body(request, input);
     let id = await readSession();
+    // With a signed-in customer, Medusa attaches the cart (and later the
+    // order) to the customer so order history works.
+    const token = await customerToken();
     if (value.action === "add") {
       const params = new URLSearchParams({
         "variants[id]": value.variant_id,
@@ -45,10 +61,22 @@ export async function POST(request: Request) {
       );
       if (!result.products[0] || !permitted(result.products[0]))
         throw new RequestError("This product is not available for sale.", 403);
+      if (id) {
+        // A session can outlive its cart (expired backend cart, database
+        // switch). Detect a dead cart once and start fresh transparently.
+        const existing = await getCart(id).catch(() => null);
+        if (!existing) {
+          await writeSession("");
+          id = null;
+        }
+      }
       if (!id) {
-        const created = await medusa<{ cart: Cart }>("/carts", {
-          region_id: process.env.MEDUSA_REGION_ID,
-        });
+        const created = await medusa<{ cart: Cart }>(
+          "/carts",
+          { region_id: process.env.MEDUSA_REGION_ID },
+          "POST",
+          token,
+        );
         id = created.cart.id;
         await writeSession(id);
       }
@@ -56,6 +84,8 @@ export async function POST(request: Request) {
       const resultCart = await medusa<{ cart: Cart }>(
         `/carts/${id}/line-items`,
         { variant_id: value.variant_id, quantity: value.quantity },
+        "POST",
+        token,
       );
       return NextResponse.json(resultCart);
     }
@@ -64,6 +94,23 @@ export async function POST(request: Request) {
         "Your bag has expired. Please add your items again.",
         404,
       );
+    if (value.action === "promo" || value.action === "promo-remove") {
+      try {
+        await medusa(
+          `/carts/${id}/promotions`,
+          { promo_codes: [value.code.toUpperCase()] },
+          value.action === "promo" ? "POST" : "DELETE",
+        );
+      } catch {
+        throw new RequestError(
+          value.action === "promo"
+            ? "That promo code is not valid."
+            : "That promo code was not applied to your bag.",
+          400,
+        );
+      }
+      return NextResponse.json({ cart: await getCart(id) });
+    }
     const cart = await getCart(id);
     if (!cart.items.some((line) => line.id === value.line_id))
       throw new RequestError("This item is not in your bag.", 404);

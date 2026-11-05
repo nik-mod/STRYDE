@@ -210,7 +210,13 @@ export function Commerce({ testMode }: { testMode: boolean }) {
         {!!cart?.items.length && (
           <footer className="cart-drawer-footer">
             <p className="cart-drawer-subtotal">
-              Subtotal <span>{money(cart.subtotal, cart.currency_code)}</span>
+              Subtotal{" "}
+              <span>
+                {money(
+                  cart.item_subtotal ?? cart.subtotal,
+                  cart.currency_code,
+                )}
+              </span>
             </p>
             <p className="micro">
               Shipping and applicable taxes are calculated at checkout.

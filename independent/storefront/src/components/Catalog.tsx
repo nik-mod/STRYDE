@@ -1,4 +1,4 @@
-import { catalog } from "@/lib/medusa";
+import { catalogPage, CATALOG_PAGE_SIZE } from "@/lib/medusa";
 import { money, type Product } from "@/lib/types";
 import { mediaFor } from "@/lib/product-media";
 import { isTestMode } from "@/lib/policy";
@@ -16,61 +16,43 @@ export async function Catalog({
     ),
   );
   const query = params.q?.slice(0, 100) || "";
-  let all: Product[] = [];
+  const page = Math.max(1, Number.parseInt(params.page || "1") || 1);
+  let result: Awaited<ReturnType<typeof catalogPage>> | null = null;
   let error = "";
   try {
-    all = await catalog(query);
+    result = await catalogPage({
+      query,
+      collection,
+      category: params.category,
+      page,
+    });
   } catch (cause) {
     error = (cause as Error).message;
   }
-  if (params.fixtures !== "1") {
-    all = all.filter((p) => p.metadata?.development_fixture !== true);
-    if (isTestMode() && !all.length && (!collection || collection === "all"))
-      return <EditorialCatalog params={params} />;
-  }
-  const collections = [
-    ...new Map(
-      all
-        .filter((p) => p.collection)
-        .map((p) => [p.collection!.handle, p.collection!]),
-    ).values(),
-  ];
-  const categories = [
-    ...new Map(
-      all.flatMap((p) => p.categories || []).map((c) => [c.handle, c]),
-    ).values(),
-  ];
-  const price = (p: Product) =>
-    Math.min(
-      ...p.variants.map(
-        (v) => v.calculated_price?.calculated_amount ?? Infinity,
-      ),
-    );
-  let filtered = all.filter(
-    (p) =>
-      (!collection ||
-        collection === "all" ||
-        p.collection?.handle === collection) &&
-      (!params.category ||
-        p.categories?.some((c) => c.handle === params.category)) &&
-      (!params.collection || p.collection?.handle === params.collection),
-  );
+  const all = result?.products ?? [];
+  if (
+    isTestMode() &&
+    !error &&
+    !result?.total &&
+    (!collection || collection === "all")
+  )
+    return <EditorialCatalog params={params} />;
   const sort = ["price-asc", "price-desc", "title"].includes(params.sort || "")
     ? params.sort
     : "title";
-  filtered.sort((a, b) =>
-    sort === "price-asc"
-      ? price(a) - price(b)
-      : sort === "price-desc"
-        ? price(b) - price(a)
-        : a.title.localeCompare(b.title),
-  );
-  const pages = Math.max(1, Math.ceil(filtered.length / 12));
-  const page = Math.min(
-    pages,
-    Math.max(1, Number.parseInt(params.page || "1") || 1),
-  );
-  const shown = filtered.slice((page - 1) * 12, page * 12);
+  // The uniform $140 catalog makes a client price re-sort a no-op; title order
+  // comes from the backend. Kept for when price variation returns.
+  const sorted = [...all];
+  if (sort === "price-asc")
+    sorted.sort(
+      (a, b) => variantPrice(a) - variantPrice(b) || a.title.localeCompare(b.title),
+    );
+  else if (sort === "price-desc")
+    sorted.sort(
+      (a, b) => variantPrice(b) - variantPrice(a) || a.title.localeCompare(b.title),
+    );
+  const pages = Math.max(1, Math.ceil((result?.count ?? 0) / CATALOG_PAGE_SIZE));
+  const shown = sorted;
   const pageUrl = (number: number) => {
     const search = new URLSearchParams(
       Object.entries(params).filter(
@@ -113,17 +95,14 @@ export async function Catalog({
             </a>
           </div>
         </div>
-        <div
-          className="collection-masthead-art"
-          aria-label="From the collection"
-        >
+        <div className="collection-masthead-art" aria-label="From the collection">
           <div className="collection-orbit" aria-hidden="true">
             <span>EVERYDAY / ANYWHERE</span>
           </div>
           <span className="collection-art-mark" aria-hidden="true">
             S/
           </span>
-          {all.slice(0, 2).map((item, index) => (
+          {(result?.featured ?? []).map((item, index) => (
             <a
               href={`/products/${item.handle}`}
               className={`collection-hero-piece collection-hero-piece-${index + 1}`}
@@ -151,7 +130,7 @@ export async function Catalog({
         </div>
         <div className="collection-masthead-foot">
           <span>
-            <b>{all.length}</b> pairs in the edit.
+            <b>{result?.total ?? 0}</b> pairs in the edit.
           </span>
           <span>Find your next move.</span>
         </div>
@@ -178,9 +157,9 @@ export async function Catalog({
             Collection
             <select name="collection" defaultValue={params.collection || ""}>
               <option value="">All collections</option>
-              {collections.map((c) => (
+              {(result?.collections ?? []).map((c) => (
                 <option key={c.id} value={c.handle}>
-                  {c.title}
+                  {c.title || c.handle}
                 </option>
               ))}
             </select>
@@ -189,9 +168,9 @@ export async function Catalog({
             Category
             <select name="category" defaultValue={params.category || ""}>
               <option value="">All categories</option>
-              {categories.map((c) => (
+              {(result?.categories ?? []).map((c) => (
                 <option key={c.id} value={c.handle}>
-                  {c.name}
+                  {c.name || c.handle}
                 </option>
               ))}
             </select>
@@ -210,8 +189,8 @@ export async function Catalog({
         </form>
         <div className="collection-browser-meta">
           <p role="status">
-            {filtered.length
-              ? `${(page - 1) * 12 + 1}–${Math.min(page * 12, filtered.length)} of ${filtered.length} pairs`
+            {result?.count
+              ? `${(page - 1) * CATALOG_PAGE_SIZE + 1}–${Math.min(page * CATALOG_PAGE_SIZE, result.count)} of ${result.count} pairs`
               : "No products available"}
           </p>
           <a href="?">Clear filters</a>
@@ -279,9 +258,9 @@ export async function Catalog({
                     <p className="fixture-label">Development fixture</p>
                   )}
                   <p className="photo-shop-price">
-                    {Number.isFinite(price(item))
+                    {Number.isFinite(variantPrice(item))
                       ? money(
-                          price(item),
+                          variantPrice(item),
                           item.variants.find((v) => v.calculated_price)
                             ?.calculated_price?.currency_code,
                         )
@@ -302,15 +281,19 @@ export async function Catalog({
           <nav className="collection-pagination" aria-label="Collection pages">
             {page > 1 && <a href={pageUrl(page - 1)}>← Previous</a>}
             <div className="collection-page-numbers">
-              {Array.from({ length: pages }, (_, i) => (
-                <a
-                  href={pageUrl(i + 1)}
-                  key={i}
-                  aria-current={page === i + 1 ? "page" : undefined}
-                >
-                  {i + 1}
-                </a>
-              ))}
+              {pageWindow(page, pages).map((number) =>
+                number === null ? (
+                  <span key={`gap-${number}`}>…</span>
+                ) : (
+                  <a
+                    href={pageUrl(number)}
+                    key={number}
+                    aria-current={page === number ? "page" : undefined}
+                  >
+                    {number}
+                  </a>
+                ),
+              )}
             </div>
             {page < pages && <a href={pageUrl(page + 1)}>Next →</a>}
           </nav>
@@ -318,4 +301,28 @@ export async function Catalog({
       </div>
     </section>
   );
+}
+function variantPrice(product: Product) {
+  return Math.min(
+    ...product.variants.map(
+      (v) => v.calculated_price?.calculated_amount ?? Infinity,
+    ),
+  );
+}
+// 285 pages cannot all be listed; show first, last and the local window.
+function pageWindow(page: number, pages: number): (number | null)[] {
+  if (pages <= 7)
+    return Array.from({ length: pages }, (_, i) => i + 1);
+  const windowed = new Set<number>([1, 2, pages - 1, pages]);
+  for (let n = page - 1; n <= page + 1; n += 1)
+    if (n >= 1 && n <= pages) windowed.add(n);
+  const ordered = [...windowed].sort((a, b) => a - b);
+  const output: (number | null)[] = [];
+  let previous = 0;
+  for (const number of ordered) {
+    if (number - previous > 1) output.push(null);
+    output.push(number);
+    previous = number;
+  }
+  return output;
 }

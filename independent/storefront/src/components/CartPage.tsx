@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { BagLines, commerceRequest } from "./Commerce";
+import { PromoForm } from "./PromoForm";
 import type { Cart } from "@/lib/types";
 import { money } from "@/lib/types";
 export function CartPage({ testMode }: { testMode: boolean }) {
@@ -41,8 +42,18 @@ export function CartPage({ testMode }: { testMode: boolean }) {
         <>
           <BagLines cart={cart} update={update} busy={busy} />
           <p className="bag-summary">
-            Subtotal <span>{money(cart.subtotal, cart.currency_code)}</span>
+            Subtotal{" "}
+            <span>
+              {money(cart.item_subtotal ?? cart.subtotal, cart.currency_code)}
+            </span>
           </p>
+          <PromoForm cart={cart} onUpdate={(updated) => setCart(updated)} />
+          {typeof cart.discount_total === "number" && cart.discount_total > 0 && (
+            <p className="bag-summary">
+              Discount{" "}
+              <span>−{money(cart.discount_total, cart.currency_code)}</span>
+            </p>
+          )}
           <p>Shipping and applicable taxes are calculated at checkout.</p>
           {testMode && (
             <p className="fixture-label">Test checkout · No real payment</p>
