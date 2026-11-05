@@ -41,10 +41,10 @@ const pose = (rotationX, rotationY, rotationZ, fill = .94, cameraY = .04, exposu
 // so X tilts reveal the actual top/outsole rather than rolling a side image.
 const TRACKS = {
   hero: [
-    [0, pose(.18, -.26, -.018, .88)],
-    [.25, pose(.30, -.04, -.025, .88)],
-    [.52, pose(.55, .50, .04, .88)],
-    [.76, pose(.32, .22, .018, .88)],
+    [0, pose(.14, -.38, -.045, .82)],
+    [.25, pose(.32, .72, .025, .86)],
+    [.50, pose(.78, .16, -.035, .94, .10)],
+    [.75, pose(.12, -.78, -.105, .92, .05, .98)],
     [1, pose(.18, -.10, 0, .88)],
   ],
   deconstruction: [
@@ -68,10 +68,12 @@ const TRACKS = {
     [1, pose(.18, -.1, 0, .88)],
   ],
   technology: [
-    [0, pose(.12, -.18, 0, .88)],
-    [.45, pose(-.28, .12, 0, .88)],
-    [.72, pose(.34, .10, 0, .88)],
-    [1, pose(.44, -.06, 0, .88)],
+    [0, pose(.12, -.35, -.01, .88)],
+    [.22, pose(.12, -.20, 0, .88)],
+    [.46, pose(.26, .52, .02, .88)],
+    [.59, pose(.30, .52, .02, .88)],
+    [.83, pose(.64, -.18, -.04, .88)],
+    [1, pose(.60, -.08, 0, .88)],
   ],
   featured: [
     [0, pose(.14, -.14, -.012, .88)],
@@ -87,10 +89,11 @@ const TRACKS = {
     [1, pose(-.56, -.08, 0, .88)],
   ],
   finale: [
-    [0, pose(.12, -.08, 0, .88)],
-    [.6, pose(.12, 0, 0, .88)],
-    [1, pose(.12, 0, 0, .88)],
+    [0, pose(.20, -.50, -.035, .88)],
+    [.5, pose(.40, .32, .025, .88)],
+    [1, pose(.18, -.08, 0, .88)],
   ],
+
 };
 
 export const JOURNEY_CHAPTERS = Object.freeze(Object.keys(TRACKS));
@@ -103,11 +106,11 @@ export function journeyPose(chapter, progress) {
 // all consume the existing Hero progress; there is no additional scroll clock.
 export function heroDirection(progress) {
   return tourThrough([
-    [0, { dolly: 1, truck: 0, lift: 0, world: 0, strength: 1, light: 0 }],
-    [.25, { dolly: .98, truck: .40, lift: .04, world: .62, strength: .95, light: .24 }],
-    [.52, { dolly: .95, truck: 1.10, lift: .08, world: 1.40, strength: .72, light: .56 }],
-    [.76, { dolly: .98, truck: 1.45, lift: .04, world: 1.85, strength: .86, light: .82 }],
-    [1, { dolly: 1.02, truck: 1.60, lift: 0, world: 2.20, strength: .68, light: 1 }],
+    [0, { dolly: 1, truck: 0, lift: 0, world: 0, strength: .85, light: 0, frame: 0, typeScale: 1, typeY: 0, sculpture: -.20 }],
+    [.25, { dolly: 1, truck: .55, lift: .03, world: .50, strength: .72, light: .28, frame: .35, typeScale: .88, typeY: -15, sculpture: -.58 }],
+    [.50, { dolly: 1, truck: -.18, lift: .06, world: 1.12, strength: .48, light: .60, frame: 1, typeScale: .70, typeY: -42, sculpture: -.85 }],
+    [.75, { dolly: 1, truck: -.40, lift: .08, world: 1.70, strength: .62, light: .84, frame: .65, typeScale: .85, typeY: -18, sculpture: .18 }],
+    [1, { dolly: 1, truck: 0, lift: 0, world: 2.20, strength: .40, light: 1, frame: 0, typeScale: .94, typeY: -10, sculpture: .34 }],
   ], progress);
 }
 
@@ -116,10 +119,10 @@ export function heroDirection(progress) {
 export function heroProductGate(rect, progress, compact = false) {
   const p = clamp(progress);
   if (p === 0 || p === 1) return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
-  if (compact) return { left: rect.left, top: rect.top - rect.height * .035 * Math.sin(Math.PI * p) ** 2, width: rect.width, height: rect.height };
-  const swell = Math.sin(Math.PI * p) ** 2 * .08;
-  return { ...rect, left: rect.left - rect.width * swell, top: rect.top - rect.height * swell,
-    width: rect.width * (1 + swell), height: rect.height * (1 + swell) };
+  const { frame } = heroDirection(p);
+  if (compact) return { left: rect.left, top: rect.top - rect.height * .06 * frame, width: rect.width, height: rect.height * (1 + .12 * frame) };
+  return { ...rect, left: rect.left - rect.width * .22 * frame, top: rect.top - rect.height * .06 * frame,
+    width: rect.width * (1 + .22 * frame), height: rect.height * (1 + .12 * frame) };
 }
 
 export function brandStudyPhase(progress) {

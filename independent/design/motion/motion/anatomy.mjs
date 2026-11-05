@@ -21,7 +21,7 @@ export function mountAnatomy(root, gsap) {
     links.forEach((link, index) => {
       if (index === state.active) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current');
     });
-    const requested = [3, 0, 4, 2, 1][state.active]; // Matching authored photographs while the GLB loads.
+    const requested = [0, 0, 0, 2, 1][state.active]; // Matching authored photographs while the GLB loads.
     const image = crops[requested]?.querySelector('img');
     const activeView = image?.complete && image.naturalWidth ? requested : 0;
     crops.forEach((crop, index) => { crop.style.opacity = index === activeView ? '1' : '0'; });

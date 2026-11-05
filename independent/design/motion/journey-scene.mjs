@@ -8,6 +8,7 @@ import { studyTransition, windowTransition, exchangeModelSpec, modelExchangePose
 import { environmentFor } from './motion/environments.mjs';
 import { journeyPose, journeyProgress, flowingMaterialSample, brandLighting, heroProductGate } from './journey-poses.mjs';
 import { createHeroWorld, expandHeroCamera } from './hero-world.mjs';
+import { widestCameraZ } from './scene-framing.mjs';
 import { bundledJourneyCamera } from './journey-cameras.mjs';
 import { materialOrbit, materialOrbitCamera, MATERIAL_ORBIT_CAMERA } from './material-orbit.mjs';
 import { anatomyTour, anatomyCamera } from './anatomy-tour.mjs';
@@ -113,7 +114,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   const heroStage = root.querySelector('[data-hero-stage]');
   const matchingPoster = Boolean(root.querySelector('[data-hero-poster]'));
   let worldTime = 0;
-  let heroReadyTime = null;
+  let heroReadyTime = null, heroShowcaseStart = null;
   let shadowTime = -1, shadowProgress = -1;
   const updateHeroShadow = progress => {
     if (worldTime - shadowTime >= 1 / 30 || Math.abs(progress - shadowProgress) > .002) {
@@ -193,7 +194,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     const brand = document.querySelector('[data-chapter="brand"][data-brand-live]');
     add('brand', brand, brand ? [brand.querySelector('[data-brand-window]')] : []);
     const finale = document.querySelector('[data-chapter="finale"]');
-    add('finale', finale, finale?.querySelector('[data-finale-model]') ? [finale.querySelector('.finale-profile-window')] : []);
+    add('finale', finale, finale?.querySelector('[data-finale-model]') ? [finale.querySelector('.closing-product-window, .finale-profile-window')] : []);
     targets = result; targetsDirty = false;
   }
 
@@ -258,6 +259,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
 
   function motionFor(view, dt) {
     if (view.orbit) return view;
+    if (view.chapter === 'hero') return { ...view, pose: journeyPose('hero', view.progress) };
     if (view.anatomy) {
       const tour = anatomyTour(view.progress);
       return { ...view, tour, pose: { ...journeyPose('deconstruction', 0), rotationX: tour.rotationX, rotationY: tour.rotationY, rotationZ: tour.rotationZ } };
@@ -562,7 +564,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       key.castShadow = isHero;
       heroWorld.group.visible = isHero; scene.fog = isHero ? heroWorld.fog : null; shadowPlane.visible = !isHero && !view.anatomy;
       if (isHero) {
-        expandHeroCamera(camera, heroProductGate(rect, view.progress, environment.innerWidth <= 700), worldRect);
+        expandHeroCamera(camera, rect, worldRect);
         heroWorld.update(worldTime, view.progress, dt, camera, rig, key, rim);
         updateHeroShadow(view.progress);
       }
@@ -667,6 +669,10 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
       // opening pose until the Intro finishes avoids a second arrival/fade.
       heroReadyTime = worldTime - (covered ? .45 : 0);
     }
+    const filmCover = document.documentElement.classList.contains('site-intro-playing') && !document.documentElement.hasAttribute('data-intro-revealing');
+    if (heroShowcaseStart === null && !filmCover) heroShowcaseStart = worldTime - (current.progress > .025 ? 2.8 : 0);
+    const arrivalProgress = fixedWorldTime !== null ? 1 : clamp((worldTime - (heroShowcaseStart ?? worldTime)) / 2.8);
+    const modelEntrance = arrivalProgress * arrivalProgress * (3 - 2 * arrivalProgress);
     const liveBlend = fixedWorldTime === null && matchingPoster && current.progress < .025 ? clamp((worldTime - heroReadyTime) / .45) : 1;
     const blendValue = liveBlend.toFixed(4);
     if (root.style.getPropertyValue('--hero-live-blend') !== blendValue) root.style.setProperty('--hero-live-blend', blendValue);
@@ -682,12 +688,27 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     }
     const { pose } = current;
     camera.position.set(0, pose.cameraY, cameraZ);
-    expandHeroCamera(camera, heroProductGate(current.rect, current.progress, environment.innerWidth <= 700), stageRect);
-    rig.rotation.set(pose.rotationX, pose.rotationY, pose.rotationZ, 'XYZ');
+    const gate = heroProductGate(current.rect, current.progress, environment.innerWidth <= 900);
+    expandHeroCamera(camera, gate, stageRect);
+    const heroPose = pose;
+    rig.rotation.set(heroPose.rotationX, heroPose.rotationY, heroPose.rotationZ, 'XYZ');
     key.castShadow = true;
     lightFor('hero', current.progress);
     heroWorld.group.visible = true; scene.fog = heroWorld.fog; shadowPlane.visible = false;
-    heroWorld.update(worldTime, current.progress, dt, camera, rig, key, rim, matchingPoster ? 1 : (bus?.state?.entrance ?? 1), renderer.domElement.height, waveLight, liveBlend);
+    heroWorld.update(worldTime, current.progress, dt, camera, rig, key, rim, modelEntrance, renderer.domElement.height, waveLight, liveBlend);
+    // Fit the current shot, not the farthest pose in the entire tour. The old
+    // chapter-wide distance silently cancelled every directed camera approach.
+    // The expanding optical gate and current silhouette still protect the type.
+    rig.updateMatrixWorld(true);
+    camera.position.z = .6;
+    const fitOptions = { fov: camera.fov, aspect: gate.width / gate.height, y: camera.position.y, fill: pose.fill };
+    for (const asset of selectedAssets) {
+      asset.points.forEach((point,index) => {
+        asset.worldPoints[index].copy(point).applyMatrix4(rig.matrixWorld);
+        asset.worldPoints[index].x -= camera.position.x;
+      });
+      camera.position.z = widestCameraZ(camera.position.z, asset.worldPoints, fitOptions);
+    }
     renderer.toneMappingExposure = pose.exposure * environmentFor('hero').exposure;
     updateHeroShadow(current.progress);
     renderer.setScissorTest(false); renderer.setViewport(0, 0, width, height);
@@ -706,6 +727,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
         wave: { x: waveLight.target.position.x - rig.position.x, strength: waveLight.intensity / 20 }, blend: liveBlend,
         surface: heroWorld.group.position.toArray(), calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
         buffer: [renderer.domElement.width, renderer.domElement.height],
+        entrance: modelEntrance, liveRotation: rig.rotation.toArray().slice(0,3),
         productBounds: { left: Math.min(...projected.map(p => p[0])), right: Math.max(...projected.map(p => p[0])), top: Math.min(...projected.map(p => p[1])), bottom: Math.max(...projected.map(p => p[1])) } });
       overlay.dataset.motion = JSON.stringify([{ chapter: 'hero', model: overlay.dataset.model,
         pose: [pose.rotationX, pose.rotationY, pose.rotationZ], camera: cameraZ, scale: selectedAssets[0].group.scale.toArray() }]);

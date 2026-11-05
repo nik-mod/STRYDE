@@ -8,14 +8,16 @@ export class RequestError extends Error {
     super(message);
   }
 }
+export function isStoreOrigin(request: Request, env: Record<string, string | undefined> = process.env) {
+  const site = new URL(env.SITE_URL || "http://localhost:3000");
+  const origins = new Set([site.origin]);
+  if (env.NODE_ENV === "development" && ["localhost", "127.0.0.1"].includes(site.hostname)) {
+    for (const host of ["localhost", "127.0.0.1"]) { const local = new URL(site); local.hostname = host; origins.add(local.origin); }
+  }
+  return origins.has(request.headers.get("origin") || "") && request.headers.get("sec-fetch-site") !== "cross-site";
+}
 export function guardMutation(request: Request) {
-  const origin = request.headers.get("origin");
-  const allowed = new URL(process.env.SITE_URL || "http://localhost:3000")
-    .origin;
-  if (
-    origin !== allowed ||
-    request.headers.get("sec-fetch-site") === "cross-site"
-  )
+  if (!isStoreOrigin(request))
     throw new RequestError("Please use the store to update your bag.", 403);
   if (!request.headers.get("content-type")?.startsWith("application/json"))
     throw new RequestError("JSON required.", 415);

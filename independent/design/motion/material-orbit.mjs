@@ -1,6 +1,6 @@
 const clamp = value => Math.max(0, Math.min(1, value));
 const smooth = value => { const p = clamp(value); return p * p * p * (p * (p * 6 - 15) + 10); };
-export const MATERIAL_ORBIT_CAMERA = { z: 6.6, y: .08, fov: 32 };
+export const MATERIAL_ORBIT_CAMERA = { z: 6.7, y: .08, fov: 32 };
 
 // One ring, two 120-degree advances, three reading holds. This same projection
 // drives the real models and the photographic fallback, including reverse seeks.

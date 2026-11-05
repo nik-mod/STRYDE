@@ -1,5 +1,6 @@
 import { chapterState } from './contracts.mjs';
 import { heroPosterFrame } from '../hero-poster-framing.mjs';
+import { heroDirection } from '../journey-poses.mjs';
 
 // The accessible heading remains intact. Split only its decorative rendering,
 // then restore it so theme-editor remounts never nest the glyph wrappers.
@@ -40,13 +41,11 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
   if (!stage) return;
   const line1 = root.querySelector('[data-hero-line-1]');
   const line2 = root.querySelector('[data-hero-line-2]');
-  const firstFrame = line1?.closest?.('.hero-line') || line1;
-  const secondFrame = line2?.closest?.('.hero-line') || line2;
   const art = root.querySelector('[data-hero-art]');
   const arrival = root.querySelector('[data-hero-arrival]') || art;
   const copy = root.querySelector('[data-hero-copy]');
+  const type = root.querySelector('[data-hero-type]');
   const foot = root.querySelector('[data-hero-foot]');
-  const atmosphere = root.querySelector('.hero-atmo');
   const first = splitDisplayLine(line1), second = splitDisplayLine(line2);
   const document = root.ownerDocument || (typeof globalThis.document === 'object' ? globalThis.document : null);
   const environment = document?.defaultView || window;
@@ -57,8 +56,15 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
     for (const [key, value] of Object.entries(frame)) root.style.setProperty(`--hero-poster-${key}`, `${value}px`);
   };
   syncPoster(); environment.addEventListener?.('resize', syncPoster);
-  const travel = mobile ? .75 : 1.0;
+  const portrait = () => environment.innerWidth <= 900 && environment.innerHeight > environment.innerWidth;
+  const travel = () => portrait() || mobile ? .80 : 1.65;
   const entrance = { progress: 1 };
+  const film = { progress: 0 };
+  // Register the baseline in the caller's GSAP context for media-query cleanup.
+  // Reusable setters avoid allocating a new tween on every scrub update.
+  if (type) gsap.set(type, { scale:1, y:0, transformOrigin:'0% 50%' });
+  const setTypeScale = type ? gsap.quickSetter(type, 'scale') : () => {};
+  const setTypeY = type ? gsap.quickSetter(type, 'y', 'px') : () => {};
   let intro = null, cancelOpening = () => {};
   const settleIntro = () => {
     cancelOpening();
@@ -68,10 +74,10 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
     defaults: { ease: 'none' },
     scrollTrigger: {
       trigger: root, start: () => `top ${parseFloat(environment.getComputedStyle?.(root).getPropertyValue('--preview-height')) || 0}px`,
-      end: () => `+=${Math.round(stage.offsetHeight * travel)}`,
+      end: () => `+=${Math.round(stage.offsetHeight * travel())}`,
       pin: stage, pinSpacing: true, scrub: true, invalidateOnRefresh: true,
       onUpdate: self => {
-        if (intro && self.progress > 0) {
+        if (intro && self.progress > .002) {
           settleIntro();
           timeline.invalidate().progress(0, true).progress(self.progress, true);
         }
@@ -79,51 +85,46 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
       },
     },
   });
-  // Counter-travel in the two lines opens space for the shoe's inspection turn.
+  // One source of shot direction owns the optical gate and the reading space.
+  // Type yields space for the upper inspection, then opens with the reveal.
   timeline
-    .fromTo(firstFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' },
-      { xPercent: mobile ? -3 : -8, y: mobile ? -22 : -70, rotation: -3, scale: .9, duration: 1, immediateRender: false }, 0)
-    .fromTo(secondFrame, { xPercent: 0, y: 0, scale: 1, transformOrigin: '0% 50%' },
-      { xPercent: mobile ? 3 : 8, y: mobile ? 8 : 16, rotation: 2, scale: .94, duration: 1, immediateRender: false }, 0)
+    .to(film, { progress: 1, duration: 1, onUpdate: () => {
+      const shot = heroDirection(film.progress), narrow = portrait();
+      setTypeScale(narrow ? 1-(1-shot.typeScale)*.24 : shot.typeScale);
+      setTypeY(shot.typeY*(narrow ? .22 : 1));
+      bus.publish(chapterState(0, film.progress, timeline.scrollTrigger?.direction));
+    } }, 0)
     .fromTo(foot, { opacity: 1, y: 0 }, { opacity: .85, y: -12, duration: 1, immediateRender: false }, 0);
   if (copy) timeline.fromTo(copy, { opacity: 1, y: 0 }, { opacity: .8, y: -4, duration: .84, immediateRender: false }, 0);
   // The same blue ink deepens as recessed wave faces travel behind the word.
   // This preserves its legibility without a panel, halo or new scroll owner.
   if (line2) timeline.fromTo(line2, { color: '#2053a4' },
-    { color: '#12325b', duration: .75, ease: 'none', immediateRender: false }, 0)
-    .to(line2, { color: '#153e78', duration: .25, ease: 'none' }, .75);
+    { color: '#153e78', duration: .5, immediateRender: false }, 0)
+    .to(line2, { color: '#2053a4', duration: .25 }, .5)
+    .to(line2, { color: '#153e78', duration: .25 }, .75);
   // The atmosphere is a full-bleed reference surface. Moving its rectangle
   // upward exposed a flat strip at the bottom of the Hero.
-
-  // Inner ink owns the repeating wave; outer glyphs own the opening reveal.
-  // Offscreen timelines pause, and the parent matchMedia disables all motion
-  // for reduced-motion visitors. No second animation clock is introduced.
-  const ink = [...root.querySelectorAll('.hero-glyph-motion')];
-  const letterWave = gsap.timeline({ repeat: -1, repeatDelay: 1.2, scrollTrigger: {
-    trigger: root, start: 'top bottom', end: 'bottom top', toggleActions: 'play pause resume pause',
-  } });
-  letterWave.to(ink, { yPercent: -9, rotation: -2, scaleY: 1.06, duration: .65,
-    stagger: .055, ease: 'sine.inOut' })
-    .to(ink, { yPercent: 0, rotation: 0, scaleY: 1, duration: .8, stagger: .055, ease: 'sine.inOut' }, .7);
 
   if ((environment.scrollY || 0) <= 24) {
     // Create inside the caller's GSAP context, but keep it paused until the
     // site intro has released the page. No delayed untracked animation exists.
     intro = gsap.timeline({ paused: true, onUpdate: () => {
-      if (!timeline.scrollTrigger?.progress) bus.publish({ ...chapterState(0, 0), entrance: entrance.progress });
+      if ((timeline.scrollTrigger?.progress || 0) < .002) bus.publish({ ...chapterState(0, 0), entrance: entrance.progress });
     } });
-    intro.fromTo(entrance, { progress: 0 }, { progress: 1, duration: 1.4, ease: 'power3.out' }, 0);
+    intro.fromTo(entrance, { progress: 0 }, { progress: 1, duration: 2.8, ease: 'power2.inOut' }, 0);
     const letters = (glyphs, fallback, at) => {
       if (glyphs.length) {
         intro.fromTo(glyphs,
-          { yPercent: 125, opacity: 0, rotationX: 65, rotationZ: -7, '--glyph-fill': 1 },
-          { yPercent: 0, opacity: 1, rotationX: 0, rotationZ: 0, '--glyph-fill': 1,
-            duration: 1.05, stagger: { each: .045, from: 'start' }, ease: 'expo.out' }, at);
+          { yPercent: 110, xPercent: 0, scale: 1, opacity: 1, rotationX: 0, rotationY: 0, rotationZ: 0, '--glyph-fill': 1 },
+          { yPercent: 0, xPercent: 0, scale: 1, opacity: 1, rotationX: 0, rotationY: 0, rotationZ: 0, '--glyph-fill': 1,
+            duration: 1.15, stagger: .035, ease: 'expo.out' }, at);
       } else intro.fromTo(fallback, { yPercent: 110 }, { yPercent: 0, duration: .95, ease: 'expo.out' }, at);
     };
     letters(first.glyphs, line1, 0);
-    letters(second.glyphs, line2, .28);
-    if (arrival && !hasModel) intro.fromTo(arrival, { opacity: 1, scale: .98, xPercent: 0, y: 12, rotation: 0 }, { opacity: 1, scale: 1, xPercent: 0, y: 0, rotation: 0, duration: 1.4, ease: 'power3.out' }, 0);
+    letters(second.glyphs, line2, .45);
+    const poster = root.querySelector('[data-hero-poster]');
+    if (poster) gsap.set(poster, { scale:1,rotation:0,y:0 });
+    if (arrival && !hasModel) intro.fromTo(arrival, { opacity: 1, scale: .98, xPercent: 0, y: 12, rotation: 0 }, { opacity: 1, scale: 1, xPercent: 0, y: 0, rotation: 0, duration: 2.8, ease: 'power2.inOut' }, 0);
     if (copy) intro.fromTo(copy, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, .35);
     const caption = root.querySelector('[data-hero-caption]');
     if (caption) {
@@ -133,7 +134,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
     if (foot) intro.fromTo(foot, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .65, ease: 'power3.out' }, .45);
     cancelOpening = waitForHeroOpening(document, environment, () => {
       if (!intro) return;
-      if ((environment.scrollY || 0) > 24 || timeline.scrollTrigger?.progress > 0) settleIntro();
+      if ((environment.scrollY || 0) > 24 || timeline.scrollTrigger?.progress > .002) settleIntro();
       else intro.play();
     });
   }

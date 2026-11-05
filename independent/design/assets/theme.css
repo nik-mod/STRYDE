@@ -2352,8 +2352,7 @@ a.hero-name:hover {
 /* Materials — pinned macro journey (desktop classes applied by JS) */
 
 /* Avoid re-blurring a moving WebGL surface behind fixed viewport chrome. */
-body .site-header,
-body .journey-nav {
+body .site-header {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }

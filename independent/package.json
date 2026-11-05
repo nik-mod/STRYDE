@@ -5,7 +5,9 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "admin:setup": "node scripts/setup-admin.mjs",
-    "dev": "npm run dev --prefix storefront",
+    "dev": "node scripts/dev-local.mjs",
+    "dev:check": "node scripts/dev-local.mjs --check",
+    "dev:storefront": "npm run dev --prefix storefront",
     "build": "npm run build --prefix storefront",
     "test": "npm run test --prefix storefront",
     "db:dev": "node scripts/postgres.mjs",

@@ -7,15 +7,15 @@
 .form-look { position:relative; min-height:620px; isolation:isolate; background:var(--edit-paper); }
 .form-look-type { position:absolute; top:4%; left:0; width:66%; color:var(--look-accent); opacity:.10; font-size:clamp(88px,13vw,225px); line-height:.78; letter-spacing:-.085em; font-weight:850; }
 .form-look-type > span { display:block; }
-.form-look-art { position:absolute; inset:4% 36% 10% 0; display:grid; place-items:center; overflow:hidden; background:#fff; pointer-events:none; }
+.form-look-art { position:absolute; inset:4% 36% 10% 0; display:grid; place-items:center; overflow:hidden; background:transparent; mix-blend-mode:multiply; pointer-events:none; }
 .form-look-art img { display:block; width:100%; height:100%; object-fit:contain; transform:none; }
 .form-look-copy { position:absolute; left:68%; right:0; top:25%; }
 .form-look-index { font-size:10px; font-weight:700; letter-spacing:.14em; display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid #12334133; padding-bottom:15px; margin:0 0 24px; }
 .form-look-copy h3 { font-size:clamp(32px,3.4vw,64px); line-height:1.02; letter-spacing:-.055em; margin:0 0 22px; font-weight:750; }
 .form-look-deck { font-size:clamp(15px,1.2vw,21px); line-height:1.35; margin:0 0 12px; font-weight:650; }
 .form-look-body { font-size:clamp(13px,1.05vw,18px); line-height:1.6; max-width:34ch; opacity:.8; margin:0; }
-.form-look-spec { margin:30px 0 0; font-size:11px; line-height:1.5; }
-.form-look-spec > div { display:flex; justify-content:space-between; gap:15px; border-top:1px solid #12334126; padding:12px 0; }
+.form-look-spec { margin:16px 0 0; font-size:11px; line-height:1.5; }
+.form-look-spec > div { display:flex; justify-content:space-between; gap:15px; border-top:1px solid #12334126; padding:8px 0; }
 .form-look-spec dt { opacity:.6; text-transform:uppercase; letter-spacing:.09em; }
 .form-look-spec dd { margin:0; text-align:right; }
 .form-rail { display:none; }
@@ -25,7 +25,7 @@
   [data-form-edit].is-form-sequenced .coll-stage { flex:1; min-height:0; margin-top:28px; position:relative; }
   .is-form-sequenced .form-look { position:absolute; inset:0 0 50px; min-height:0; background:var(--edit-paper); }
   .is-form-sequenced .form-look-type { top:6%; }
-  .is-form-sequenced .form-look-copy { top:17%; }
+  .is-form-sequenced .form-look-copy { top:4%; }
   .is-form-sequenced .form-rail { position:absolute; z-index:8; bottom:0; width:100%; display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding-bottom:10px; }
   .form-rail-stop { position:relative; font-size:11px; font-weight:650; letter-spacing:.03em; padding:0 0 14px; }
   .form-rail-number { margin-right:16px; opacity:.5; font-size:10px; }

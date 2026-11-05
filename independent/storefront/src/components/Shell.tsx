@@ -1,4 +1,5 @@
 import { design } from "@/lib/design";
+import { headers } from "next/headers";
 export async function Shell({
   children,
   home = false,
@@ -7,9 +8,10 @@ export async function Shell({
   home?: boolean;
 }) {
   const header = await design("header.html");
-  const navigation = home
-    ? header
-    : header.replace(/<a data-home-only\b[^>]*>[\s\S]*?<\/a>/g, "");
+  const path = (await headers()).get("x-stryde-path") || "/";
+  const navigation = header.replace(/<a href="([^"]+)"/g, (tag, href) =>
+    href === path ? `${tag} aria-current="page"` : tag,
+  );
   return (
     <div className="document-shell">
       {home && (
@@ -38,13 +40,6 @@ export async function Shell({
         className="markup-fragment"
         dangerouslySetInnerHTML={{ __html: await design("footer.html") }}
       />
-      <nav className="policy-links" aria-label="Store information">
-        <a href="/policies/returns">Returns</a>
-        <a href="/policies/shipping">Shipping</a>
-        <a href="/policies/privacy">Privacy</a>
-        <a href="/policies/terms">Terms</a>
-        <a href="/pages/contact">Contact</a>
-      </nav>
     </div>
   );
 }

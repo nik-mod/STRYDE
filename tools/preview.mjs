@@ -234,7 +234,7 @@ export function createPreviewServer({ handleRequest, transformHTML = html => htm
       // independent collection, rather than exposing unreviewed Takeout cutouts.
       if (req.socket.localPort === 9292 && (req.method === 'GET' || req.method === 'HEAD') &&
           existsSync(resolve(root, 'independent/storefront/package.json')) &&
-          (url.pathname.startsWith('/collections/') || url.pathname === '/search' ||
+          (url.pathname === '/' || url.pathname.startsWith('/collections/') || url.pathname === '/search' ||
            /^\/products\/(?:pair-\d+|stockx-[a-z0-9-]+)$/.test(url.pathname))) {
         const target = new URL('http://localhost:3000');
         target.pathname = /^\/products\/pair-\d+$/.test(url.pathname) ? '/collections/all' : url.pathname;

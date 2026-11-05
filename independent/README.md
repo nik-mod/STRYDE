@@ -23,29 +23,21 @@ npm ci --prefix backend --legacy-peer-deps
 node scripts/init-local.mjs
 ```
 
-Keep a database terminal open:
-
-```powershell
-npm run db:dev
-```
-
-This runs isolated PostgreSQL binaries bound to 127.0.0.1:5433. It installs no global database, service or OS user. Local data persists under `.data/postgres` and is ignored by Git. An existing PostgreSQL instance can instead be configured with `backend/.env`.
-
-In a second terminal, initialize and start Medusa:
-
-```powershell
-npm run backend:migrate
-npm run backend:seed:test
-npm run backend:dev
-```
-
-In a third terminal:
+For this initialized workspace, start the complete local stack with one command:
 
 ```powershell
 npm run dev
 ```
 
-Open [the independent storefront](http://localhost:3000). The [original reference](http://localhost:9292) stays available. The [Medusa admin](http://127.0.0.1:9000/app) requires your own administrator. Create it using `npm run admin:setup`; the interactive command hides password input and avoids putting credentials in source or command-line arguments. Guest checkout is implemented; customer accounts are deferred until there is a reason to collect/store account credentials.
+The runner checks PostgreSQL, Medusa and the storefront in order. It reuses healthy services and starts missing ones, waiting for readiness before continuing. PostgreSQL stays bound to 127.0.0.1:5433 and preserves its data under `.data/postgres`. No migration, seed, reset or administrator creation runs automatically. Keep the terminal open; Ctrl+C stops only services this runner created.
+
+```powershell
+npm run dev:check
+```
+
+This checks readiness without starting or changing services. For a brand-new database only, run `npm run db:dev` in one terminal, then `npm run backend:migrate` and `npm run backend:seed:test` once in another before using the combined runner. Existing databases do not need to be reseeded. Individual `db:dev`, `backend:dev` and `dev:storefront` commands remain available for targeted work or a separately configured backend. The storefront returns a real unavailable response if commerce cannot be reached; it does not invent successful operations.
+
+Open [the independent storefront](http://127.0.0.1:3000). The [original reference](http://localhost:9292) stays available. The [Medusa admin](http://127.0.0.1:9000/app) requires your own administrator. Create it using `npm run admin:setup`; the interactive command hides password input and avoids putting credentials in source or command-line arguments. Guest checkout is implemented; customer accounts are deferred until there is a reason to collect/store account credentials.
 
 The seed creates 14 labeled, generic test products with concept imagery, USD test prices, sizes 40/41/42 and test stock. Size 42 has zero stock. These are actual Medusa database records, separate from the unverified branded photographic references in the original project. The seed writes its publishable API key and region into the ignored storefront environment file. It refuses production. Re-running it preserves existing products and orders; it does not reset stock.
 

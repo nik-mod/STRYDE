@@ -830,7 +830,6 @@
    brand study shows the whole render (contain) instead of cropping it, and
    the chapter rail gains breathing room from the viewport edge. */
 .chapter-brand .brand-visual > img { object-fit: contain; object-position: center; }
-.journey-nav { right: clamp(14px, 2vw, 36px); }
 
 /* Hero motion composition. The arrival wrapper is deliberately separate from
    the scroll and pointer layers so an early scroll cannot strand the shoe. */

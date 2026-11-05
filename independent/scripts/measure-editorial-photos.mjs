@@ -11,7 +11,8 @@ const file = resolve(root, 'storefront/src/data/stockx-editorial.json');
 const rows = JSON.parse(await readFile(file, 'utf8'));
 let measured = 0;
 for (const row of rows.filter(hasSharpSneakerPhoto)) for (const photo of row.photos) {
-  if (!/^\/assets\/(stockx-edit|stockx-archive)\/[a-zA-Z0-9-]+\.(webp|jpg|png)$/.test(photo.src)) continue;
+  if (!/^\/assets\/(stockx-edit|stockx-archive|replacement-photos)\/[a-zA-Z0-9-]+\.(webp|jpg|png)$/.test(photo.src)) continue;
+  if (photo.bounds && photo.width && photo.height) continue;
   const source = resolve(root, 'design', photo.src.slice(1));
   const metadata = await sharp(source).metadata();
   const { data, info } = await sharp(source).resize({ width: 384, height: 384, fit: 'inside', withoutEnlargement: true }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });

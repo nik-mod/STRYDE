@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: origin },
     { url: `${origin}/collections/all` },
+    ...["/pages/about", "/pages/contact", "/policies/shipping", "/policies/returns", "/policies/privacy", "/policies/terms"].map(path => ({ url: `${origin}${path}` })),
     ...products
       .filter((p) => !p.metadata?.development_fixture)
       .map((p) => ({ url: `${origin}/products/${p.handle}` })),

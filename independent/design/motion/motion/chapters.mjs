@@ -1,3 +1,4 @@
+import { mountCollectionChapter } from './collection-chapters.mjs';
 import { mountFormEdit } from './form-edit.mjs';
 import { mountCollectionHover } from './collection-hover.mjs';
 import { brandStudyPhase } from '../journey-poses.mjs';
@@ -188,6 +189,27 @@ function materials(root, gsap, { mobile }) {
 /* --------------------------------------------------- 04 — technology */
 
 function technology(root, gsap, { mobile }) {
+  if (!mobile && window.innerWidth > 1000 && window.innerHeight >= 720) {
+    root.classList.add('is-tech-sequenced');
+    const rows = [...root.querySelectorAll('.tech-row')];
+    const views = [...root.querySelectorAll('.tech-view')];
+    const cursor = { progress: 0 };
+    const render = () => {
+      root.dataset.techProgress = String(cursor.progress);
+      const active = Math.min(2, Math.floor(cursor.progress * 3));
+      root.dataset.techActive = String(active);
+      rows.forEach((row, i) => { row.classList.toggle('is-tech-active', i === active); });
+      views.forEach((view, i) => view.classList.toggle('is-active', i === active));
+    };
+    const sequence = gsap.timeline({ scrollTrigger: {
+      trigger: root, start: 'top top', end: () => `+=${Math.round(innerHeight * 1.8)}`,
+      pin: true, scrub: .4, invalidateOnRefresh: true,
+    } });
+    sequence.to(cursor, { progress: 1, duration: 1, ease: 'none', onUpdate: render });
+    render();
+    return () => { root.classList.remove('is-tech-sequenced'); delete root.dataset.techProgress; delete root.dataset.techActive; rows.forEach(row => row.classList.remove('is-tech-active')); };
+  }
+
   const stack = root.querySelector('[data-tech-stack]');
   const views = [...root.querySelectorAll('.tech-view')];
   const image = root.querySelector('.tech-visual img');
@@ -436,6 +458,21 @@ function brandStudio(root, gsap, { mobile }) {
   const buttons = [...root.querySelectorAll('[data-brand-step]')];
   const caption = root.querySelector('[data-brand-caption]');
   const contact = root.querySelectorAll('.brand-contact-sheet figure');
+  const poster = root.querySelector('[data-brand-model]');
+  const originalPoster = poster ? { src: poster.getAttribute('src'), srcset: poster.getAttribute('srcset') } : null;
+  const posterViews = ['profile', 'top', 'sole'];
+  const showPoster = index => {
+    if (!poster) return;
+    const src = `/assets/tn-${posterViews[index]}-2800.webp`;
+    const nextImage = new Image();
+    nextImage.onload = () => {
+      if (disposed || phase !== index) return;
+      poster.srcset = `/assets/tn-${posterViews[index]}-1000.webp 1000w, ${src} 2800w`;
+      poster.src = src;
+    };
+    nextImage.src = src;
+  };
+
   if (contact.length) gsap.fromTo(contact, { y: 24, rotation: 1.5 }, { y: 0, rotation: 0, stagger: .08, ease: 'power2.out', scrollTrigger: { trigger: root, start: 'top 75%', end: 'top 5%', scrub: .6 } });
   const checkpoint = brandResizeCheckpoints.get(root);
   brandResizeCheckpoints.delete(root);
@@ -453,7 +490,8 @@ function brandStudio(root, gsap, { mobile }) {
     const next = brandStudyPhase(progress);
     if (phase === next) return;
     phase = next;
-    buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === phase)));
+    showPoster(phase);
+    buttons.forEach((button, index) => button.setAttribute('aria-pressed', String(Number(button.dataset.brandStep) === phase)));
     if (caption) caption.textContent = ['Follow the sidewall.', 'Light across the upper.', 'Turn to the foundation.'][phase];
   };
   const timeline = gsap.timeline({ scrollTrigger: {
@@ -480,7 +518,7 @@ function brandStudio(root, gsap, { mobile }) {
   }
   const click = event => {
     const button = event.target.closest?.('[data-brand-step]');
-    if (!canPin || !button) return;
+    if (!button) return;
     const index = Number(button.dataset.brandStep), progress = [.04, .32, .72][index];
     if (!Number.isFinite(progress)) return;
     const trigger = timeline.scrollTrigger;
@@ -497,6 +535,7 @@ function brandStudio(root, gsap, { mobile }) {
     root.ownerDocument.removeEventListener('shopify:section:unload', onUnload, true);
     root.removeEventListener('click', click);
     root.classList.remove('is-brand-pinned');
+    if (poster && originalPoster) { poster.setAttribute('src', originalPoster.src); poster.setAttribute('srcset', originalPoster.srcset); }
     delete root.dataset.brandProgress;
     if (stops) stops.hidden = true;
   };
@@ -684,11 +723,12 @@ function sceneFlow(root, gsap) {
 }
 
 export function mountChapter(root, { gsap, mobile, fine }) {
+  if (root.hasAttribute('data-art-direction')) return mountCollectionChapter(root, { gsap, mobile });
   const controller = CONTROLLERS[root.dataset.chapter];
   if (!controller) return undefined;
   const dispose = controller(root, gsap, { mobile, fine }) || undefined;
   mountEditorialDetails(root, gsap);
-  if (!mobile && !root.hasAttribute?.('data-brand-live')) {
+  if (!mobile && !root.hasAttribute?.('data-brand-live') && !root.classList.contains('is-tech-sequenced')) {
     sceneFlow(root, gsap);
 
   }

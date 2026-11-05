@@ -9,6 +9,8 @@ const surface = /* glsl */`
   uniform float worldTime;
   uniform float worldProgress;
   uniform float worldStrength;
+  uniform vec2 worldPointer;
+  uniform float worldPress;
   uniform vec2 worldProductCenter;
   varying vec3 vTerrain;
   varying vec3 vWaveNormal;
@@ -27,32 +29,23 @@ const surface = /* glsl */`
     float side = 0.52 + 0.48 * sideU * sideU * (3.0 - 2.0 * sideU);
     float sideDx = 0.48 * sideU * (1.0 - sideU);
     // Recovered from aa3d365's original three-crest signature wave.
-    float aPhase = x * 0.58 + t * 0.48;
-    float bPhase = x * 0.4 - t * 0.31 + 1.4;
+    float aPhase = x * 0.58 + t * 0.48 + worldPointer.x * .12 + worldPress * .24;
+    float bPhase = x * 0.4 - t * 0.31 + 1.4 - worldPointer.x * .10;
     float cPhase = x * 0.31 + t * 0.23;
-    float aAmp = 1.6 + 0.28 * sin(t * 0.6 + x * 0.3) + p * 0.24;
-    float bAmp = 3.15 + 0.36 * sin(t * 0.45 - x * 0.2);
-    float cAmp = 4.35 + 0.32 * cos(t * 0.35 + x * 0.4);
+    float aAmp = .38 + .08 * sin(t * 0.6 + x * 0.3) + p * 0.24;
+    float bAmp = .65 + .12 * sin(t * 0.45 - x * 0.2);
+    float cAmp = .95 + .16 * cos(t * 0.35 + x * 0.4);
     // Wind travels through separate depth planes. Scroll opens the valley and
     // draws its far crest past the camera, rather than dissolving the world.
     vec3 field = crest(point, -2.0 + 0.85 * sin(aPhase) - p * 1.10, 0.493 * cos(aPhase),
-      side * aAmp, sideDx * aAmp + side * 0.084 * cos(t * 0.6 + x * 0.3), 0.72 + p * 0.26);
+      side * aAmp, sideDx * aAmp + side * 0.024 * cos(t * 0.6 + x * 0.3), 1.05 + p * 0.26);
     field += crest(point, -4.8 + 1.10 * sin(bPhase) + p * 1.8, 0.44 * cos(bPhase),
-      side * bAmp, sideDx * bAmp - side * 0.072 * cos(t * 0.45 - x * 0.2), 0.92);
+      side * bAmp, sideDx * bAmp - side * 0.024 * cos(t * 0.45 - x * 0.2), 1.35);
     field += crest(point, -7.4 + 1.0 * sin(cPhase) + p * 2.2, 0.31 * cos(cPhase),
-      side * cAmp, sideDx * cAmp - side * 0.128 * sin(t * 0.35 + x * 0.4), 1.1);
-    float micro = x * 1.3 + z * 0.7 + t * 0.55;
-    field += vec3(0.035 * sin(micro), 0.0455 * cos(micro), 0.0245 * cos(micro));
-    // Smaller wind folds travel across the large crests. Their analytical
-    // derivatives keep the same geometry and a single lighting pass.
-    float fold = z * 5.2 + x * 1.45 + 0.6 * sin(x * 0.8 - t * 0.38) - t * 0.85;
-    float foldDx = 1.45 + 0.48 * cos(x * 0.8 - t * 0.38);
-    float envelope = 0.5 + 0.5 * sin(z * 0.6 + x * 0.2 - t * 0.24);
-    float envelopeDx = 0.1 * cos(z * 0.6 + x * 0.2 - t * 0.24);
-    float envelopeDz = 0.3 * cos(z * 0.6 + x * 0.2 - t * 0.24);
-    field += vec3(0.045 * envelope * sin(fold),
-      0.045 * (envelopeDx * sin(fold) + envelope * cos(fold) * foldDx),
-      0.045 * (envelopeDz * sin(fold) + envelope * cos(fold) * 5.2));
+      side * cAmp, sideDx * cAmp - side * 0.064 * sin(t * 0.35 + x * 0.4), 1.6);
+    // Broad, quiet floor folds support the suspended wave sculpture.
+    float fold = z * 1.9 + x * .55 - t * .18;
+    field += vec3(.014 * sin(fold), .0077 * cos(fold), .0266 * cos(fold));
     // A clear basin protects the whole sneaker throughout the transformation.
     vec2 basinPoint = point - worldProductCenter;
     vec2 basinU = clamp((abs(basinPoint) - vec2(2.15, 1.4)) / vec2(0.95, 1.1), 0.0, 1.0);
@@ -77,9 +70,9 @@ export function createHeroWorld({ scene, root, compact }) {
   const group = new THREE.Group(); group.name = 'Hero living landscape'; group.visible = false;
   const geometry = new THREE.PlaneGeometry(26, 24, compact ? 96 : 112, compact ? 160 : 192);
   geometry.rotateX(-Math.PI / 2);
-  const uniforms = { worldTime: { value: 0 }, worldProgress: { value: 0 }, worldStrength: { value: 1 }, worldProductCenter: { value: new THREE.Vector2() }, worldExit: { value: 0 }, worldViewportHeight: { value: 1 } };
+  const uniforms = { worldTime: { value: 0 }, worldPointer: { value: new THREE.Vector2() }, worldPress: { value: 0 }, worldProgress: { value: 0 }, worldStrength: { value: 1 }, worldProductCenter: { value: new THREE.Vector2() }, worldExit: { value: 0 }, worldViewportHeight: { value: 1 } };
   const material = new THREE.MeshStandardMaterial({
-    color: 0x98c6de, roughness: .47, metalness: 0, envMapIntensity: .38,
+    color: 0x98c6de, roughness: .34, metalness: .04, envMapIntensity: .65,
     side: THREE.DoubleSide, transparent: true, forceSinglePass: true,
   });
   const surfaceColor = new THREE.Color(), restingColor = material.color.clone();
@@ -105,6 +98,8 @@ export function createHeroWorld({ scene, root, compact }) {
       `);
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', /* glsl */`
       #include <common>
+      uniform float worldTime;
+      uniform float worldPress;
       uniform float worldExit;
       uniform float worldViewportHeight;
       varying vec3 vTerrain;
@@ -159,10 +154,13 @@ export function createHeroWorld({ scene, root, compact }) {
         // Silver-blue ceramic in the midtones, ocean-blue only on turned-away
         // faces, icy neutral light confined to the highest upward crests.
         vec3 powder = mix(vec3(.40, .57, .73), vec3(.64, .78, .90), smoothstep(-.8, 2.8, vTerrain.y));
-        powder = mix(powder, vec3(.10, .25, .43), recess * .72);
+        powder = mix(powder, vec3(.055, .18, .36), recess * .78);
         powder = mix(powder, vec3(.20, .39, .57), vWaveOcclusion * .36);
         float crestLight = crest * smoothstep(.35, .95, orientation);
         powder = mix(powder, vec3(.82, .91, .97), crestLight * .85);
+        // A broad moving light ribbon follows the sculptural faces.
+        float silk = pow(.5 + .5 * sin(vTerrain.x * .72 + vTerrain.z * .45 - worldTime * .38), 10.0);
+        powder = mix(powder, vec3(.94, .98, 1.0), silk * (1.0 - recess) * (.27 + worldPress * .12));
         vec3 tonal = mix(vec3(.94, .97, 1.015), vec3(1.025, 1.015, .99), mineral);
         float slopeShade = .93 + .07 * abs(sculpturalNormal.y);
         diffuseColor.rgb *= powder * tonal * slopeShade
@@ -199,14 +197,61 @@ export function createHeroWorld({ scene, root, compact }) {
         reflectedLight.indirectSpecular *= 1.0 - vWaveOcclusion * .25;
       `);
   };
-  material.customProgramCacheKey = () => 'stryde-silver-ceramic-v13';
+  material.customProgramCacheKey = () => 'stryde-wave-sculpture-v17';
   const terrain = new THREE.Mesh(geometry, material);
   terrain.name = 'Continuous animated satin terrain'; terrain.receiveShadow = true;
   // The plane's undeformed bounds do not include the high crests.
   terrain.frustumCulled = false;
-  group.add(terrain); scene.add(group);
+  group.add(terrain);
+  // Open satin folds echo the shoe's wave cage. The elliptical
+  // cross section gives the folds a real edge and continuous specular light.
+  // Both stay above the low floor and behind the product's depth plane.
+  const ribbonResources = [];
+  const sculpture = new THREE.Group(); sculpture.name = 'Scroll-directed wave sculpture';
+  group.add(sculpture);
+  function addRibbon(color, vertical, depth, phase, breadth) {
+    const steps = compact ? 96 : 160, across = 16, positions=[], indices=[];
+    const tangent=new THREE.Vector3(), normal=new THREE.Vector3(), binormal=new THREE.Vector3(), up=new THREE.Vector3(0,1,0);
+    for(let i=0;i<=steps;i++) {
+      // Two open, tapered folds echo the upper's flowing cage. They form a
+      // rear architectural frame rather than another closed oval protagonist.
+      const u=i/steps, turn=-.18+u*Math.PI*1.38+phase, height=compact ? .50 : 1;
+      const x=.85-Math.cos(turn)*(compact ? 2.5 : 3.0);
+      const y=(.82+Math.sin(turn)*.92+vertical)*height-(compact ? .30 : 0);
+      const z=-3.5+Math.sin(turn)*.72+depth;
+      tangent.set(Math.sin(turn)*(compact ? 2.5 : 3.0),Math.cos(turn)*.92*height,Math.cos(turn)*.72).normalize();
+      normal.copy(up).addScaledVector(tangent,-up.dot(tangent)).normalize();
+      binormal.crossVectors(tangent,normal).normalize();
+      const twist=Math.sin(turn)*.9+phase;
+      for(let j=0;j<=across;j++) {
+        const angle=j/across*Math.PI*2;
+        const taper=.12+.88*Math.sin(Math.PI*u)**.65;
+        const v=Math.cos(angle)*breadth*.5*taper, edge=Math.sin(angle)*.075*taper;
+        const n=v*Math.cos(twist)-edge*Math.sin(twist), b=v*Math.sin(twist)+edge*Math.cos(twist);
+        positions.push(x+normal.x*n+binormal.x*b,y+normal.y*n+binormal.y*b,z+normal.z*n+binormal.z*b);
+        if(i<steps && j<across) {const n=i*(across+1)+j;indices.push(n,n+across+1,n+1,n+1,n+across+1,n+across+2);}
+      }
+    }
+    const ribbonGeometry=new THREE.BufferGeometry();
+    ribbonGeometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    ribbonGeometry.setIndex(indices); ribbonGeometry.computeVertexNormals();
+    const ribbonMaterial=new THREE.MeshStandardMaterial({color,roughness:.3,metalness:.22,envMapIntensity:.9,side:THREE.DoubleSide,transparent:true,forceSinglePass:true});
+    ribbonMaterial.onBeforeCompile=shader=>{
+      shader.uniforms.ribbonTime=uniforms.worldTime;
+      shader.uniforms.ribbonPointer=uniforms.worldPointer;
+      shader.uniforms.ribbonPress=uniforms.worldPress;
+      shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float ribbonTime;\nuniform vec2 ribbonPointer;\nuniform float ribbonPress;')
+        .replace('#include <begin_vertex>','vec3 transformed=position; transformed.y += sin(position.x*.42-ribbonTime*.18)*(.12+ribbonPress*.12); transformed.z += sin(position.x*.28+ribbonTime*.14)*.18 + ribbonPointer.x*.12;');
+    };
+    ribbonMaterial.customProgramCacheKey=()=> 'stryde-satin-ribbon-v2';
+    const mesh=new THREE.Mesh(ribbonGeometry,ribbonMaterial);mesh.name='Sculptural wave ribbon';mesh.frustumCulled=false;
+    sculpture.add(mesh); ribbonResources.push({geometry:ribbonGeometry,material:ribbonMaterial});
+  }
+  addRibbon(0xc7e1ef,.24,-.35,0,.64);
+  addRibbon(0x5a9dc8,-.08,-1.05,.16,.28);
+  scene.add(group);
   const stage = root.querySelector('[data-hero-stage]');
-  let pointerX = 0, pointerY = 0, targetX = 0, targetY = 0;
+  let pointerX = 0, pointerY = 0, targetX = 0, targetY = 0, pressing = 0, press = 0;
   const pointer = event => {
     if (event.pointerType === 'touch') return;
     const rect = stage.getBoundingClientRect();
@@ -214,6 +259,10 @@ export function createHeroWorld({ scene, root, compact }) {
     targetY = Math.max(-1, Math.min(1, (event.clientY - rect.top) / rect.height * 2 - 1));
   };
   const leave = () => { targetX = targetY = 0; };
+  const hold = event => { if (event.pointerType !== 'touch' && event.button === 0 && !event.target?.closest?.('a,button')) pressing = 1; };
+  const release = () => { pressing = 0; };
+  stage.addEventListener('pointerdown', hold, { passive:true });
+  stage.addEventListener('pointerup', release); stage.addEventListener('pointercancel', release); stage.addEventListener('pointerleave', release);
   stage.addEventListener('pointermove', pointer, { passive: true });
   stage.addEventListener('pointerleave', leave);
   const fog = new THREE.Fog(0xc5e2ee, 11, 27);
@@ -229,41 +278,35 @@ export function createHeroWorld({ scene, root, compact }) {
         material.color.copy(restingColor).lerp(surfaceColor, exit);
       } else { fog.color.set(0xc5e2ee); material.color.copy(restingColor); }
       material.opacity = (1 - exit) * surfaceBlend;
+      ribbonResources.forEach(resource=>{resource.material.opacity=material.opacity;});
       uniforms.worldExit.value = exit;
       uniforms.worldViewportHeight.value = viewportHeight;
       const direction = heroDirection(progress);
-      uniforms.worldTime.value = time * 2.1;
+      uniforms.worldTime.value = time * 1.3;
       uniforms.worldProgress.value = direction.world;
-      uniforms.worldStrength.value = direction.strength * 1.12;
+      uniforms.worldStrength.value = direction.strength * (1.18 + Math.sin(time * .55) * .10);
       const damping = 1 - Math.exp(-dt * 4.5);
       pointerX += (targetX - pointerX) * damping; pointerY += (targetY - pointerY) * damping;
-      const truck = Math.sin(time * .32) * .16 + direction.truck + pointerX * .22;
-      const lift = Math.sin(time * .40) * .025 + direction.lift - pointerY * .035;
-      camera.position.x = truck; camera.position.y += lift;
-      camera.position.z *= direction.dolly * (1 + (1 - entrance) * .04);
-      camera.rotation.set(Math.sin(progress * Math.PI) * .016 - pointerY * .004,
-        -Math.sin(progress * Math.PI) * .055 + pointerX * .008, 0);
-      // A floating product reacts independently of the landscape. Fade that
-      // freedom out before the authored transition to the next model.
-      rig.position.set(truck, lift + .035 * (1 - entrance), 0);
-      const breathe = Math.max(0, Math.min(1, (1 - progress) / .35)) * entrance * surfaceBlend;
-      rig.position.y += Math.sin(time * 1.1) * .085 * breathe;
-      rig.position.y += Math.sin(Math.PI * progress) ** 2 * .12;
-      rig.rotation.x += (Math.sin(time * .68) * .065 - pointerY * .10) * breathe;
-      rig.rotation.y += (Math.sin(time * .55) * .14 + pointerX * .22) * breathe;
-      rig.rotation.z += (Math.sin(time * .75) * .025 - pointerX * .018) * breathe;
-      rig.rotation.x += .30 * (1 - entrance);
-      rig.rotation.y += .56 * (1 - entrance);
-      rig.rotation.z -= .025 * (1 - entrance);
-      group.position.set(truck * .5 + Math.sin(time * .35) * .14, 0, direction.world * .42);
+      press += (pressing - press) * (1 - Math.exp(-3 * dt));
+      uniforms.worldPointer.value.set(pointerX, pointerY);
+      uniforms.worldPress.value = press * (1-progress);
+      // Inspection is deterministic: scrolling owns the shoe and camera. Idle
+      // movement belongs only to the backdrop, without rocking the sneaker.
+      camera.position.x = direction.truck * .08;
+      camera.position.z *= direction.dolly;
+      camera.rotation.set(0,0,0);
+      rig.position.set(0,direction.lift*.6,0);
+      group.position.set(Math.sin(time*.23)*.08+pointerX*.06,0,direction.world*.20);
+      sculpture.rotation.set(-.06*direction.frame, direction.sculpture+Math.sin(time*.18)*.02, -.08*direction.frame);
+      sculpture.position.set(.28+direction.frame*.6,-direction.frame*.22,-direction.frame*.85);
       // The clearance follows the actual product in terrain-local space.
       // The old independent Z drift let a crest pass through the sneaker
       // late in the Hero, which looked like the product fading/disappearing.
       uniforms.worldProductCenter.value.set(rig.position.x - group.position.x, rig.position.z - group.position.z);
-      key.position.set(-4.5 + direction.light * 7.8 + Math.sin(time * .2) * .5,
+      key.position.set(-4.5 + direction.light * 7.8 + Math.sin(time * .35) * 1.3,
         3.5 + Math.cos(time * .18) * .2, 2.6);
       key.intensity = 2.45 + Math.sin(time * .2) * .12;
-      rim.position.set(-3.0, 2.5, -2.5); rim.intensity = 1.85;
+      rim.position.set(-3.0 + Math.sin(time * .23) * 1.2, 2.5, -2.5); rim.intensity = 1.85 + Math.sin(time * .3) * .25;
       if (waveLight) {
         const wave = heroWave(progress), x = rig.position.x + wave.x;
         waveLight.position.set(x, 1.25, 2.6);
@@ -273,8 +316,10 @@ export function createHeroWorld({ scene, root, compact }) {
 
     },
     dispose() {
+      stage.removeEventListener('pointerdown', hold); stage.removeEventListener('pointerup', release); stage.removeEventListener('pointercancel', release); stage.removeEventListener('pointerleave', release);
       stage.removeEventListener('pointermove', pointer); stage.removeEventListener('pointerleave', leave);
       scene.remove(group); geometry.dispose(); material.dispose();
+      ribbonResources.forEach(resource=>{resource.geometry.dispose();resource.material.dispose();});
     },
   };
 }

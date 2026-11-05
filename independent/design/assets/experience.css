@@ -238,9 +238,6 @@
 .template-index .finale-index a { min-height: 38px; display: inline-flex; align-items: center; gap: 10px; }
 .template-index .site-footer { padding-block: 34px; }
 .template-index .footer-meta { font-size: clamp(12px, .8vw, 18px); }
-.template-index .journey-nav { right: 16px; padding: 0; border: 0; background: transparent; color: var(--ink); gap: 3px; }
-.template-index .journey-nav a { width: 34px; height: 34px; opacity: .65; font-size: 11px; background: rgba(238, 245, 247, .8); border-left: 0; }
-.template-index .journey-nav a[aria-current] { background: var(--ink); color: white; opacity: 1; }
 .template-index .journey-progress { position: fixed; bottom: 0; left: 0; right: 0; height: 3px; z-index: 120; pointer-events: none; background: rgba(16, 43, 59, .12); }
 .template-index .journey-progress > * { display: block; width: 100%; height: 100%; background: var(--film-cobalt); transform-origin: left; }
 

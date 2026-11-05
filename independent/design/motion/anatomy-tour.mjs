@@ -36,14 +36,15 @@ export function anatomyTour(progress) {
 export function anatomyCamera(aspect, zoom, points = [], cameraY = .04, fov = 32) {
   let distance = Math.max(2.85, 4.7 / Math.max(.5, aspect));
   let nearest = .35;
-  // Establish the full-shot distance, then apply the directed detail zoom.
-  // Fitting the entire hull AFTER zoom used to cancel every close-up.
+  let silhouetteDistance = .35;
+  // Keep the complete rotated silhouette inside the product window. Detail
+  // zoom may approach this gate, but must never crop the toe, heel or outsole.
   const tangent = Math.tan(fov * Math.PI / 360) * .9;
   for (const point of points) {
     nearest = Math.max(nearest, point.z + .35);
-    distance = Math.max(distance,
+    silhouetteDistance = Math.max(silhouetteDistance,
       point.z + Math.abs(point.x) / (tangent * aspect),
       point.z + Math.abs(point.y - cameraY) / tangent);
   }
-  return Math.max(nearest, distance / Math.max(1, zoom));
+  return Math.max(nearest, silhouetteDistance, distance / Math.max(1, zoom));
 }

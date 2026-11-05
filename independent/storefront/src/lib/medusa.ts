@@ -9,6 +9,7 @@ export class CommerceError extends Error {
     super(message);
   }
 }
+let lastConnectionWarning = 0;
 export async function medusa<T>(
   path: string,
   body?: unknown,
@@ -49,12 +50,13 @@ export async function medusa<T>(
     return await response.json();
   } catch (error) {
     if (error instanceof CommerceError) throw error;
-    console.error(
-      JSON.stringify({
-        event: "commerce.connection.failed",
-        error: error instanceof Error ? error.name : "unknown",
-      }),
-    );
+    // A recoverable service outage is rendered as an unavailable state by the
+    // caller. Keep a bounded operational warning without a development overlay
+    // for every request; unexpected HTTP failures above still log as errors.
+    if (Date.now() - lastConnectionWarning > 60000) {
+      lastConnectionWarning = Date.now();
+      console.warn(JSON.stringify({ event: "commerce.connection.failed", error: error instanceof Error ? error.name : "unknown" }));
+    }
     throw new CommerceError(
       "Commerce is temporarily unavailable. Please try again.",
     );

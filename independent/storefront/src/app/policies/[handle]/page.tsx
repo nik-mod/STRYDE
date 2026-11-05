@@ -1,46 +1,25 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Shell } from "@/components/Shell";
-const policies: Record<string, { title: string; content: string }> = {
-  returns: {
-    title: "Returns",
-    content:
-      "Commercial sales are not open yet. The merchant must publish the approved return window, condition requirements, return address, refund method, costs and exceptions before accepting orders. Test orders do not create shipments or charges.",
-  },
-  shipping: {
-    title: "Shipping",
-    content:
-      "International shipping is not enabled. Service areas, carrier agreements, actual rates, delivery estimates, duties and customs responsibilities must be confirmed before commercial checkout opens. Development shipping rates are test data.",
-  },
-  privacy: {
-    title: "Privacy",
-    content:
-      "This development store uses an essential, signed bag cookie to maintain your cart. Delivery information entered during test checkout is stored in the local commerce database. Use fictional test details. A production privacy notice identifying the business, contact, processors, retention and applicable privacy rights is required before launch.",
-  },
-  terms: {
-    title: "Terms",
-    content:
-      "This store is in development. Test products, prices and inventory are not commercial offers. No real payments are accepted. Business identity, merchandise identity, sales terms, applicable consumer rights and dispute handling must be reviewed and published before launch.",
-  },
-};
-export default async function Policy({
-  params,
-}: {
-  params: Promise<{ handle: string }>;
-}) {
-  const policy = policies[(await params).handle];
+import { Arrow } from "@/components/Information";
+import { storePolicies } from "@/lib/store-information";
+type Props = { params: Promise<{ handle: string }> };
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const handle = (await params).handle;
+  const policy = Object.hasOwn(storePolicies, handle) ? storePolicies[handle] : undefined;
+  return { title: policy?.title || "Store information" };
+}
+export default async function Policy({ params }: Props) {
+  const handle = (await params).handle, policy = Object.hasOwn(storePolicies, handle) ? storePolicies[handle] : undefined;
   if (!policy) notFound();
-  return (
-    <Shell>
-      <section className="commerce-panel">
-        <p className="fixture-label">
-          Store information · Preparation in progress
-        </p>
-        <h1>{policy.title}.</h1>
-        <p>{policy.content}</p>
-        <a className="text-link" href="/">
-          Back to STRYDE ↗
-        </a>
-      </section>
-    </Shell>
-  );
+  return <Shell><article className={`information-page policy-page policy-${handle}`} data-information>
+    <header className="information-heading"><h1>{policy.title}<span>.</span></h1><p>{policy.introduction}</p></header>
+    <div className="policy-layout">
+      <aside className="policy-sidebar"><nav aria-label="Store information">{Object.entries(storePolicies).map(([key, p]) => <a key={key} href={`/policies/${key}`} aria-current={key === handle ? "page" : undefined}>{p.title}<Arrow diagonal /></a>)}</nav><a className="information-back" href="/collections/all">Back to the collection <Arrow /></a></aside>
+      <div className="policy-reading"><div className="publication-note"><strong>Policies in preparation</strong><p>Commercial checkout is closed while the details below are finalized.</p></div>
+        {policy.sections.map((section, index) => <section key={section.id} id={section.id} className="policy-section" data-info-reveal><h2>{section.title}</h2><p>{section.text}</p>{index === 0 && <nav className="policy-contents" aria-label="On this page">{policy.sections.slice(1).map(item => <a key={item.id} href={`#${item.id}`}>{item.title}<Arrow diagonal /></a>)}</nav>}{section.pending && <><h3>Details awaiting approval</h3><ul>{section.pending.map(item => <li key={item}>{item}</li>)}</ul></>}</section>)}
+        <div className="policy-help"><h2>A question about the store?</h2><a href="/pages/contact">Contact STRYDE <Arrow /></a></div>
+      </div>
+    </div>
+  </article></Shell>;
 }

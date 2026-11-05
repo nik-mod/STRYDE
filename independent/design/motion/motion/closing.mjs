@@ -11,19 +11,22 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
   const compact = mobile || document.defaultView.innerWidth <= 900;
   const sequence = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
     trigger: root, start: compact ? 'top 65%' : 'top top',
-    end: compact ? 'bottom 25%' : () => `+=${Math.round(document.defaultView.innerHeight * .6)}`,
-    pin: compact ? false : stage, pinSpacing: true, scrub: true, invalidateOnRefresh: true,
+    end: compact ? 'bottom 25%' : () => `+=${Math.round(document.defaultView.innerHeight * 1.15)}`,
+    pin: compact ? false : stage, pinSpacing: true, scrub: .55, invalidateOnRefresh: true,
   } });
   if (compact) {
     sequence.fromTo(focus, { y: 22, rotationX: 5 }, { y: -8, rotationX: 0, duration: 1 }, 0);
+  } else if (root.classList.contains('collection-ending')) {
+    sequence.fromTo(focus, { yPercent: 4, rotationZ: -3 }, { yPercent: -4, rotationZ: 1, duration: 1 }, 0)
+      .fromTo(archive, { y: 22 }, { y: -12, stagger: .06, duration: .8 }, 0);
   } else {
     // Anticipation -> one complete, identifiable photograph. The other shoes
     // leave as separate photographs, never morphing into an unrelated GLB.
-    sequence.fromTo(focus, { xPercent: 0, yPercent: 0, scale: 1, rotationY: -12, rotationZ: -5 },
-      { xPercent: -8, yPercent: -2, scale: 1.12, rotationY: 0, rotationZ: -1, duration: .6 }, 0)
+    sequence.fromTo(focus, { xPercent: 0, yPercent: 0, scale: 1, rotationY: -8, rotationZ: -3 },
+      { xPercent: -8, yPercent: -2, scale: 1.04, rotationY: 0, rotationZ: -1, duration: .6 }, 0)
       .to(focus, { xPercent: -5, yPercent: -6, scale: 1.04, rotationZ: 0, duration: .4 }, .6)
       .to(archive, { xPercent: index => -25 - index * 12, y: 24, autoAlpha: 0, duration: .38, stagger: .035 }, .05)
-      .to(copy, { yPercent: -18, opacity: .82, duration: .6 }, .1)
+      .to(copy, { yPercent: -18, opacity: 1, duration: .6 }, .1)
       .to(actions, { y: -8, duration: .7 }, .15);
   }
   // Chapter exposure matching owns surface color through the footer handoff.
@@ -39,7 +42,7 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
       const letters = [...(word?.querySelectorAll?.('[data-footer-letter]') || [])];
       const commerce = footer.querySelector('.signature-commerce');
       const identity = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        trigger: footer, start: 'top 115%', end: 'top 65%', scrub: true, invalidateOnRefresh: true,
+        trigger: footer, start: 'top 110%', end: 'top 25%', scrub: .85, invalidateOnRefresh: true,
       } });
       // The only monumental STRYDE mark is the real, linked footer wordmark.
       // It rises as the photographic stage releases, then stays fully readable.
@@ -47,8 +50,8 @@ export function mountClosingCampaign(root, gsap, { mobile }) {
         word.classList.add('is-letter-revealing');
         gsap.set(letters, { yPercent: 115, rotationX: -24, scaleY: 1.12, backgroundPositionX: '0%' });
         identity.fromTo(letters, { yPercent: 115, rotationX: -24, scaleY: 1.12, backgroundPositionX: '0%' },
-          { yPercent: 0, rotationX: 0, scaleY: 1, backgroundPositionX: '100%', duration: .62,
-            stagger: .055, force3D: true }, 0);
+          { yPercent: 0, rotationX: 0, scaleY: 1, backgroundPositionX: '100%', duration: 1.15,
+            stagger: .09, force3D: true }, 0);
       } else {
         identity.fromTo(word, { yPercent: 38, rotationX: -28, color: '#527f94', opacity: .65 },
           { yPercent: 0, rotationX: 0, color: '#dcecf2', opacity: 1, duration: .78 }, 0);

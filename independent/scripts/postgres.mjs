@@ -48,4 +48,5 @@ async function stop() {
 }
 process.on("SIGINT", stop);
 process.on("SIGTERM", stop);
+process.on("message", message => { if (message === "stop") void stop(); });
 setInterval(() => {}, 60000);

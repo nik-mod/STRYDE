@@ -12,6 +12,7 @@ const mountPredictiveSearch = () => () => {};
 import { createScope, createScheduler, waitForIntroCompletion } from './motion/lifecycle.mjs';
 import { mountHero } from './motion/hero.mjs';
 import { mountChapter } from './motion/chapters.mjs';
+import { mountRailDrag } from './motion/collection-chapters.mjs';
 import { mountHeader } from './motion/header.mjs';
 import { mountEnvironments } from './motion/environments.mjs';
 import { mountMagnetic } from './motion/magnetic.mjs';
@@ -19,6 +20,7 @@ import { mountListing } from './motion/listing.mjs';
 import { mountNavigation } from './motion/navigation.mjs';
 import { mountTriggerInspection } from './motion/inspection.mjs';
 import { mountSiteIntro, shouldPlaySiteIntro } from './motion/site-intro.mjs';
+import { mountInformation } from './motion/information.mjs';
 
 gsap.registerPlugin(ScrollTrigger);
 // All high-frequency work shares GSAP's clock. No second requestAnimationFrame loop.
@@ -121,7 +123,8 @@ function mountHeroSection(root) {
 }
 
 function mountChapterSection(root) {
-  const photographs = root.matches('[data-form-edit]') ? mountPhotoFraming(root, { images: '.form-look-art img', hostSelector: '.form-look-art', fill: .86 }) : null;
+  const staticDrag = root.dataset.artDirection === 'rotation' && reduceQuery.matches ? mountRailDrag(root, null, null) : null;
+  const photographs = root.dataset.artDirection === 'macro' ? mountPhotoFraming(root, { images: '.macro-plate > img', hostSelector: '.macro-plate', fill: .86 }) : root.matches('[data-form-edit]') ? mountPhotoFraming(root, { images: '.form-look-art img', hostSelector: '.form-look-art', fill: .86 }) : root.hasAttribute('data-real-products') ? mountPhotoFraming(root, { images: '[data-catalog-shot]', hostSelector: '[data-photo-window]', fill: .82 }) : null;
   const media = gsap.matchMedia();
   const context = gsap.context(() => {
     media.add({ motion: '(prefers-reduced-motion: no-preference)', mobile: '(max-width: 700px)', materialsFlow: '(max-width: 1180px), (max-height: 640px)', portraitTablet: '(min-width: 701px) and (max-width: 1000px) and (orientation: portrait)', collectionFlow: '(max-width: 900px), (hover: none) and (pointer: coarse)', fine: '(hover: hover) and (pointer: fine)', ...(root.dataset.chapter === 'brand' ? { brandFit: '(min-height: 740px)' } : {}), ...(root.dataset.chapter === 'deconstruction' ? { anatomyFit: '(min-width: 1001px) and (min-height: 720px)' } : {}) }, ({ conditions }) => {
@@ -130,7 +133,7 @@ function mountChapterSection(root) {
       return mountChapter(root, { gsap, mobile: flow, fine: conditions.fine });
     });
   }, root);
-  return () => { media.revert(); context.revert(); photographs?.dispose(); };
+  return () => { media.revert(); context.revert(); photographs?.dispose(); staticDrag?.(); };
 }
 
 let environmentDispose = null;
@@ -145,6 +148,8 @@ function mount(scope = document) {
   ensureEnvironments(scope);
   const header = scope.matches?.('.site-header') ? scope : scope.querySelector?.('.site-header');
   if (header && !instances.has(header)) instances.set(header, mountHeader(header));
+  const information = scope.querySelector?.('[data-information]');
+  if (information && !instances.has(information)) instances.set(information, mountInformation(information, { gsap }));
   const roots = [...scope.querySelectorAll('[data-hero], [data-chapter], [data-product-section], [data-listing-section], [data-cart-page], [data-recommendations-url], [data-predictive-root]')];
   if (scope.matches?.('[data-hero], [data-chapter], [data-product-section], [data-listing-section], [data-cart-page], [data-recommendations-url], [data-predictive-root]')) roots.push(scope);
   for (const root of roots) {
