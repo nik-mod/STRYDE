@@ -30,7 +30,7 @@ export function mountFormEdit(root, gsap, { mobile }) {
   const progress = [...root.querySelectorAll('[data-form-progress]')];
   looks.forEach((look, index) => {
     const at = index;
-    const art = look.querySelector('.form-look-art');
+    const art = look.querySelector('.form-look-art img');
     const type = look.querySelectorAll('.form-look-type > span');
     const copy = look.querySelectorAll('.form-look-copy > *');
     gsap.set(look, { zIndex: index + 1, clipPath: index ? closed : full });
@@ -39,10 +39,10 @@ export function mountFormEdit(root, gsap, { mobile }) {
         .fromTo(art, { xPercent: 18, yPercent: 4, rotation: -3, scale: 1 },
           { xPercent: 0, yPercent: 0, rotation: 0, scale: 1, duration: .62, ease: 'power3.out' }, at)
         .fromTo(type, { xPercent: 65 }, { xPercent: 0, stagger: .05, duration: .6, ease: 'power3.out' }, at + .04)
-        .fromTo(copy, { y: 40, clipPath: 'inset(100% 0% 0% 0%)' },
-          { y: 0, clipPath: 'inset(0% 0% 0% 0%)', stagger: .035, duration: .35, ease: 'power3.out' }, at + .24);
+        .fromTo(copy, { y: 16, opacity: 0 },
+          { y: 0, opacity: 1, stagger: .025, duration: .24, ease: 'power3.out' }, at + .08);
       const previous = looks[index - 1];
-      timeline.to(previous.querySelector('.form-look-art'), { xPercent: -18, yPercent: -3, rotation: 3, scale: 1, duration: .55, ease: 'power2.inOut' }, at)
+      timeline.to(previous.querySelector('.form-look-art img'), { xPercent: -18, yPercent: -3, rotation: 3, scale: 1, duration: .55, ease: 'power2.inOut' }, at)
         .to(previous.querySelectorAll('.form-look-type > span'), { xPercent: -24, duration: .45, ease: 'power2.inOut' }, at);
     } else {
       timeline.fromTo(art, { rotation: 0, yPercent: 3, scale: 1 }, { rotation: 0, yPercent: 0, scale: 1, duration: .65, ease: 'none' }, 0);

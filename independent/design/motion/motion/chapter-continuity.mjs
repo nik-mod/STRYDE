@@ -3,7 +3,7 @@
 export const CHAPTER_SURFACES = Object.freeze({
   hero: '#b9dced', deconstruction: '#eef5f7', materials: '#bfdfea',
   technology: '#092e46', collection: '#d5e1e7', featured: '#eef5f7',
-  brand: '#061e30', finale: '#0b354c', footer: '#061e30',
+  brand: '#b8cdd9', finale: '#d5e2e8', footer: '#061e30',
 });
 const clamp = p => Math.max(0, Math.min(1, p));
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));

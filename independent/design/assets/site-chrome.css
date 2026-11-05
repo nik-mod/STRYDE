@@ -1,0 +1,25 @@
+/* Shared navigation and a single, useful footer directory. */
+@media(min-width:901px) { .site-header { grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); } }
+.site-header > * { min-width:0; }
+.site-header .header-actions { justify-self:end; flex-wrap:nowrap; }
+.site-header .desktop-nav { gap: clamp(24px, 3vw, 52px); }
+.site-header .desktop-nav a { min-height: 44px; display: inline-flex; align-items: center; font-size: 12px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+.site-header a:focus-visible, .site-footer a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+.mobile-menu-panel a[aria-current="page"] { text-decoration: underline; text-underline-offset: 8px; }
+body .site-footer[data-signature-footer] { background: #061e30; color: #dcecf2; }
+.template-index .site-footer[data-signature-footer] { min-height: 0; gap: 24px; }
+body .site-footer[data-signature-footer] .signature-directory { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 30px; flex: initial; padding-block: 20px 28px; }
+body .site-footer[data-signature-footer] .signature-directory nav { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; flex-wrap: nowrap; gap: 0; font-size: 15px; }
+.site-footer .footer-group-title { margin: 0 0 12px; color: #a3c1d0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+body .site-footer[data-signature-footer] .signature-directory a { display: inline-flex; align-items: center; min-height: 40px; font-size: 15px; color: #dcecf2; text-decoration: none; text-underline-offset: 6px; }
+body .site-footer[data-signature-footer] .signature-directory a:hover { text-decoration: underline; color: #88d9ee; }
+body:not(.template-index) .site-footer[data-signature-footer] { gap: 32px; padding-top: 48px; }
+body:not(.template-index) .signature-wordmark { font-size: clamp(40px,6vw,88px); letter-spacing: -.04em; }
+body:not(.template-index) .site-footer[data-signature-footer] .footer-meta { grid-column: 1 / -1; border-color: #315064; color: #bdd7e4; }
+body .site-footer[data-signature-footer] .footer-meta { font-size: 12px; }
+@media(max-width:700px) {
+  body .site-footer[data-signature-footer] .signature-directory { grid-template-columns: 1.1fr 1.3fr .8fr; gap: 14px; padding-block: 10px 18px; }
+  .site-footer .footer-group-title { font-size: 10px; letter-spacing: .04em; }
+  body .site-footer[data-signature-footer] .signature-directory a { min-height: 44px; font-size: 13px; }
+  body:not(.template-index) .site-footer[data-signature-footer] { gap: 26px; padding-top: 32px; }
+}

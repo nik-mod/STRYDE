@@ -47,6 +47,9 @@ export default async function RootLayout({
       ? ["commerce-transitions"]
       : []),
     ...(template !== "index" ? ["footer"] : []),
+    "site-chrome",
+    ...(template === "page" ? ["information"] : []),
+    ...(path.startsWith("/policies/") ? ["policy-editorial"] : []),
   ];
   const styles = await Promise.all(
     css.map(async (name) => ({

@@ -1,4 +1,5 @@
 import { design } from "@/lib/design";
+import { headers } from "next/headers";
 import { NewsletterForm } from "./NewsletterForm";
 export async function Shell({
   children,
@@ -20,6 +21,10 @@ export async function Shell({
   navigation = navigation.replace(
     '<a href="/search">Search</a>\n        <a href="/cart">Your bag (0)</a>',
     '<a href="/account">Account</a>\n        <a href="/search">Search</a>\n        <a href="/cart">Your bag (0)</a>',
+  );
+  const path = (await headers()).get("x-stryde-path") || "/";
+  navigation = navigation.replace(/<a href="([^"]+)"/g, (tag, href) =>
+    href === path ? `${tag} aria-current="page"` : tag,
   );
   return (
     <div className="document-shell">

@@ -7,8 +7,8 @@
 .closing-heading > span:last-child { color: #88d9ee; }
 .closing-editorial > p { max-width: 31ch; margin: 26px 0 0; font-size: clamp(15px,1.15vw,22px); line-height: 1.55; color: #bdd7e4; }
 .closing-gallery { position: absolute; inset: 0 var(--gutter); perspective: 1500px; }
-.closing-photo { position: absolute; display: flex; flex-direction: column; justify-content: center; color: #102b3b; background: #cbdfe8; padding: 14px; text-decoration: none; transform-style: preserve-3d; box-shadow: 0 24px 44px #03131e55; }
-.closing-photo img { display: block; width: 100%; min-height: 0; flex: 1; object-fit: contain; mix-blend-mode: multiply; }
+.closing-photo { position: absolute; display: flex; flex-direction: column; justify-content: center; color: #dcecf2; background: transparent; padding: 14px; text-decoration: none; transform-style: preserve-3d; box-shadow: none; }
+.closing-photo img { display: block; width: 100%; min-height: 0; flex: 1; object-fit: contain; mix-blend-mode: normal; }
 .closing-photo > span { display: flex; align-items: center; gap: 12px; padding-top: 14px; font-size: 9px; letter-spacing: .09em; }
 .closing-photo strong { font-size: 14px; font-weight: 650; letter-spacing: -.015em; }
 .closing-photo > span svg { width: 20px; height: 20px; margin-left: auto; }
@@ -62,7 +62,7 @@
   .closing-heading { font-size: clamp(48px,12.5vw,92px); }
   .closing-editorial > p { margin-top: 18px; font-size: 14px; max-width: 34ch; }
   .closing-gallery { position: relative; inset: auto; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
-  .closing-photo { position: relative; inset: auto!important; width: 100%; height: auto; padding: 10px; box-shadow: 0 14px 24px #03131e33; }
+  .closing-photo { position: relative; inset: auto!important; width: 100%; height: auto; padding: 10px; box-shadow: none; }
   .closing-photo-focus { grid-column: 1 / -1; grid-row: 1; transform: none; padding: 18px; }
   .closing-photo-focus img { height: 55vw; max-height: 380px; }
   .closing-photo-focus > span { padding-top: 14px; }
@@ -86,3 +86,11 @@
   .closing-photo { transform: none; }
 }
 .no-js .closing-photo { transform: none; }
+
+/* The ending presents original transparent model renders on the shared field. */
+.closing-product-window { position:relative; flex:1; width:100%; min-height:0; }
+.closing-product-window img { position:absolute; inset:0; height:100%; width:100%; object-fit:contain; }
+.closing-photo-focus { border:0; }
+.closing-photo-archive { border-bottom:1px solid #7da4bb66; }
+.closing-photo-focus > span { border-color:#7da4bb66; }
+@media(max-width:900px) { .closing-product-window { flex:none; height:60vw; min-height:220px; } .closing-photo-focus .closing-product-window img { height:100%; max-height:none; } }

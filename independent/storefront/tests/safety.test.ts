@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { permitted, liveCheckoutEnabled } from "../src/lib/policy";
 import {
   guardMutation,
+  isStoreOrigin,
   body,
   addressSchema,
   RequestError,
@@ -135,6 +136,16 @@ test("mutations reject cross-site requests and non-JSON", () => {
       ),
     (error: unknown) => error instanceof RequestError && error.status === 415,
   );
+});
+test("cart and contact share development-only loopback origin handling", () => {
+  const request = (origin: string, site = "same-origin") => new Request("http://127.0.0.1:3000/api/cart", { headers: { origin, "sec-fetch-site": site } });
+  for (const mode of ["development", "production"]) {
+    const env = { SITE_URL: "http://localhost:3000", NODE_ENV: mode };
+    assert.equal(isStoreOrigin(request("http://localhost:3000"), env), true);
+    assert.equal(isStoreOrigin(request("http://127.0.0.1:3000"), env), mode === "development");
+    assert.equal(isStoreOrigin(request("https://attacker.example"), env), false);
+    assert.equal(isStoreOrigin(request("http://localhost:3000", "cross-site"), env), false);
+  }
 });
 test("oversized bodies are canceled before JSON parsing", async () => {
   const request = new Request("http://localhost:3000/api/checkout", {
