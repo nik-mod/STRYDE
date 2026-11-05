@@ -73,6 +73,7 @@ export default defineMiddlewares({
       matcher: "/store/stryde/order-track",
       method: ["POST"],
       bodyParser: { sizeLimit: "1kb" },
+      middlewares: [authenticate("customer", ["session", "bearer"])],
     },
     {
       matcher: "/store/carts/:id/complete",

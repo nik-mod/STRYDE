@@ -4,6 +4,11 @@
 .template-index :is(h2,h3) { text-wrap: balance; }
 .template-index :is(.chapter-heading,.feat-title,.form-look-copy h3,.brand-studio-head h2) { letter-spacing: -.035em; }
 .template-index .chapter-deconstruction[data-anatomy] .chapter-heading { font-size: clamp(36px, 4.1vw, 72px); line-height: 1; }
+.decon-collection-action { display:inline-flex; align-items:center; gap:28px; min-height:48px; margin-top:20px; color:#102b3b; font-size:14px; font-weight:600; text-decoration:underline; text-underline-offset:6px; }
+.decon-collection-action svg { transition:transform .3s; }
+.decon-collection-action:hover svg { transform:translateX(5px); }
+.has-chapter-continuity .decon-introduction h2 { transform:translateY(calc((1 - var(--decon-arrival,1))*18px)); }
+.has-chapter-continuity .decon-intro-copy { transform:translateX(calc((1 - var(--decon-arrival,1))*22px)); }
 .template-index .chapter-deconstruction[data-anatomy] .chapter-intro,
 .template-index :is(.tech-brief,.mat-copy > p:not(.mat-index),.form-look-body,.feat-story,.brand-editor-note) { font-size: var(--editorial-body); line-height: 1.55; max-width: 40ch; text-wrap: pretty; opacity: 1; }
 .template-index .chapter-materials .chapter-heading { font-size: clamp(36px, 4vw, 72px); line-height: 1; }
@@ -25,7 +30,7 @@
 .template-index a:focus-visible { outline: 2px solid currentColor; outline-offset: 6px; }
 /* Hero: type and product share a horizon; the lower rule anchors the composition. */
 .template-index .hero[data-hero] .hero-editorial { top: 47%; width: 42%; gap: clamp(28px, 3vw, 48px); }
-.template-index .hero[data-hero] .hero-art { left:48%; right:4%; top:19%; bottom:19%; }
+.template-index .hero[data-hero] .hero-art { left:48%; right:4%; top:17%; bottom:25%; }
 .template-index .hero[data-hero] .hero-type { font-size: clamp(66px, 8.2vw, 200px); line-height: .94; gap: .07em; }
 .template-index .hero[data-hero] .hero-type .hero-line-2 .hero-line-inner { font-variation-settings: 'wght' 780, 'wdth' 76; }
 .hero-glyph-motion { display: inline-block; transform-origin: 50% 80%; }
@@ -44,7 +49,7 @@
 @media (max-width: 900px) and (orientation: portrait) {
   .template-index .hero[data-hero] .hero-editorial { display: contents; }
   .template-index .hero[data-hero] .hero-type { top: 18%; font-size: clamp(52px, 14.4vw, 112px); }
-  .template-index .hero[data-hero] .hero-art { top: 39%; bottom: 25%; left: 4%; right: 4%; }
+  .template-index .hero[data-hero] .hero-art { top: 36%; bottom: 28%; left: 4%; right: 4%; }
   .template-index .hero[data-hero] .hero-foot { bottom: 16%; }
   .template-index .hero[data-hero] .hero-actions { width: 100%; gap: 20px; }
   .template-index .hero[data-hero] .hero-cart { min-width: 0; flex: 1; }
@@ -158,6 +163,10 @@
  .collection-ending .ending-thumb { height:20vw; flex:none; }
 }
 @media(prefers-reduced-motion:reduce) { .macro-track { display:block; } .macro-plate { height:65vh; } .macro-plate img { transform:none; } }
+@media(prefers-reduced-motion:reduce) {
+ .has-chapter-continuity .decon-introduction h2,.has-chapter-continuity .decon-intro-copy { transform:none; }
+ .decon-collection-action svg { transition:none; }
+}
 
 .macro-caption-stack { position:absolute; inset:0; pointer-events:none; }
 .macro-caption-stack .macro-caption { left:0; right:0; width:auto; }

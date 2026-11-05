@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
+  // Keep production validation from replacing the running preview's caches.
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   output: "standalone",
   poweredByHeader: false,
   devIndicators: false,

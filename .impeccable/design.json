@@ -3,6 +3,15 @@
   "generatedAt": "2026-10-26T14:43:55.844Z",
   "title": "Design System: STRYDE",
   "extensions": {
+    "independentHeroRefinement": {
+      "date": "2026-11-05",
+      "supersedes": "Earlier Hero fitted-once, fixed-frame, closed-loop and pin-duration descriptions; existing tokens remain unchanged.",
+      "direction": "Shared scroll progress synchronizes current-shot silhouette fitting, yielding typography, larger wave crests and light across arrival, orbit, upper detail, larger heel reveal and release.",
+      "handoff": "Natural unpinning moves the product toward the incoming Drift study, opens the wave landscape and introduces a real collection action through the existing continuity clock, without another pinned hold.",
+      "pinTravel": { "desktop": 1.65, "portraitOrSmall": 0.8 },
+      "fallback": "Static full-product imagery and native navigation for reduced motion and no JavaScript.",
+      "evidence": "independent/evidence/cinematic-overhaul/REPORT.md"
+    },
     "colorMeta": {
       "film-blue": {
         "role": "primary",

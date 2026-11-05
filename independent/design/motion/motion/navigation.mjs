@@ -75,6 +75,10 @@ export function mountNavigation({ document, environment = window, getScroller, o
     event.preventDefault();
     const clearance = (document.querySelector('.site-header')?.offsetHeight || 0) + (document.querySelector('.preview-notice')?.offsetHeight || 0) + 18;
     if (environment.location.hash !== `#${id}`) environment.history.pushState(null, '', `#${encodeURIComponent(id)}`);
+    // Interior content can grow after hydration (FAQ answers, order results,
+    // footer). Refresh dimensions and reconcile native keyboard/focus scroll
+    // before comparing the next programmatic target with Lenis's cached one.
+    scroller.resize?.();
     scroller.start();
     // A numeric destination avoids Lenis adding CSS scroll-margin and scroll-padding
     // on top of the explicit fixed-header clearance.

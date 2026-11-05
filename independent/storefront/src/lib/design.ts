@@ -25,10 +25,14 @@ export const experienceSource = () => assetSource("motion/experience.js");
 export async function design(name: string) {
   if (!/^[a-z-]+\.(html|css|js)$/.test(name))
     throw new Error("Invalid design resource");
+  // Markup changes must reach the local preview without restarting commerce.
+  // Production resources are immutable for the lifetime of a deployment.
+  if (process.env.NODE_ENV === "development")
+    return (await readFile(resolve(process.cwd(), "design", name), "utf8")).replace(/\r\n?/g, "\n");
   if (!cache.has(name))
     cache.set(
       name,
-      await readFile(resolve(process.cwd(), "design", name), "utf8"),
+      (await readFile(resolve(process.cwd(), "design", name), "utf8")).replace(/\r\n?/g, "\n"),
     );
   return cache.get(name)!;
 }

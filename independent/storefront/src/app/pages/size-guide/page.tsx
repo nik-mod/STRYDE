@@ -1,48 +1,17 @@
 import { Shell } from "@/components/Shell";
+import { CustomerPage } from "@/components/CustomerPage";
+import { Arrow } from "@/components/Information";
+import { fitChartFor } from "@/lib/fit-guide";
 export const metadata = { title: "Size guide" };
-const ROWS: [string, string, string, string][] = [
-  ["EU 40", "US 7", "UK 6", "25.0 cm"],
-  ["EU 41", "US 8", "UK 7", "25.8 cm"],
-  ["EU 42", "US 9", "UK 8", "26.7 cm"],
-  ["EU 43", "US 10", "UK 9", "27.5 cm"],
-];
-export default function SizeGuide() {
-  return (
-    <Shell>
-      <section className="commerce-panel">
-        <h1>Size guide.</h1>
-        <p>
-          STRYDE pairs run true to size in EU sizing. Measure your foot from
-          heel to longest toe in the evening, standing, and pick the closest
-          size — when in doubt, take the larger one.
-        </p>
-        <table className="size-table">
-          <thead>
-            <tr>
-              <th scope="col">EU</th>
-              <th scope="col">US (men)</th>
-              <th scope="col">UK</th>
-              <th scope="col">Foot length</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ROWS.map((row) => (
-              <tr key={row[0]}>
-                {row.map((cell) => (
-                  <td key={cell}>{cell}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p>
-          Between sizes or wide feet? Go half a size up. The sculpted midsole
-          has a roomy forefoot; the heel cage locks without pressure.
-        </p>
-        <p>
-          <a href="/collections/all">Back to the collection ↗</a>
-        </p>
-      </section>
-    </Shell>
-  );
+export default async function SizeGuide({ searchParams }: { searchParams: Promise<{ brand?: string; product?: string }> }) {
+  const { brand, product } = await searchParams;
+  const chart = fitChartFor(brand, product);
+  return <Shell><CustomerPage title="Find your" accent="fit." introduction="A good fit starts with your feet. Measure first, then match the exact brand and model.">
+    <div className="fit-measure"><div className="fit-diagram"><svg viewBox="0 0 460 280" role="img" aria-label="Measure in a straight line from the heel to the longest toe, with the heel against a wall"><path className="measure-wall" d="M46 240h365" /><path d="M139 239C113 239 103 226 106 207C108 186 121 176 122 156C123 140 113 130 110 111C108 96 106 83 103 71C88 48 93 26 107 24C125 21 134 37 129 58C137 35 158 33 164 48C168 56 161 68 157 74C172 56 190 60 193 73C197 82 187 92 182 98C198 81 211 88 211 101C211 110 201 116 197 123C208 111 220 120 216 131C210 149 192 163 182 184C176 195 178 213 171 225C165 236 153 240 139 239Z" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M291 24v215M282 33l9-9 9 9M282 230l9 9 9-9M261 24h45M261 239h45" fill="none" stroke="currentColor" strokeWidth="1.5" /><text x="322" y="137" fill="currentColor">cm</text></svg><span>Heel to longest toe</span></div><div><h2>Measure. Then match.</h2><ol className="measure-steps"><li><strong>Stand naturally.</strong><p>Place a sheet of paper on a flat floor, with your heel against a wall. Wear the socks you intend to use.</p></li><li><strong>Mark your length.</strong><p>Mark the end of your longest toe. Measure the straight distance from the wall to that mark in centimetres.</p></li><li><strong>Check both feet.</strong><p>Keep the longer measurement. Compare it with the manufacturer’s guidance for your exact pair.</p></li></ol></div></div>
+    <section className="fit-chart"><div className="fit-chart-heading"><h2>Your size, in context.</h2><p>{chart ? chart.label : "Conversions vary by brand, model and sizing system. Our collection charts are awaiting verification."}</p></div>
+    <div className="fit-table-scroll" role="region" aria-label="Size conversion reference" tabIndex={0}><table className="fit-table"><caption>{chart ? `Verified ${chart.verifiedAt} · ${chart.source}` : "Provisional reference — current demo EU options only. US, UK and foot-length conversions are not yet verified; do not use this table to choose a purchase size."}</caption><thead><tr><th scope="col">EU</th><th scope="col">US</th><th scope="col">UK</th><th scope="col">Foot length</th></tr></thead><tbody>{(chart?.rows || ["40", "41", "42", "43"].map(eu => ({ eu, us: "—", uk: "—", footLength: "—" }))).map(row => <tr key={row.eu}><th scope="row">{row.eu}</th><td>{row.us}</td><td>{row.uk}</td><td>{row.footLength}</td></tr>)}</tbody></table></div>
+    {!chart && <p className="fit-chart-note">A dash means unverified, not unavailable. Sizes shown on individual product pages may differ.</p>}</section>
+    <section className="fit-between"><h2>Between sizes?<br /><em>Know the pair.</em></h2><div><p>There is no single “size up” rule for every sneaker. Width, shape and the model’s construction all affect the fit. Check the exact model’s verified guidance before ordering.</p><a className="customer-link" href="/collections/all">Continue to the collection <Arrow /></a></div></section>
+  </CustomerPage></Shell>;
 }
+

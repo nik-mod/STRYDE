@@ -1,5 +1,6 @@
 import { getEditorialEntries } from "@/lib/editorial-catalog";
 import { catalogPage } from "@/lib/reference-catalog.mjs";
+import { WishlistButton } from "./WishlistButton";
 function Arrow() {
   return (
     <svg
@@ -97,7 +98,7 @@ export function EditorialCatalog({
           <span>
             <b>{state.all}</b> sneakers. Find your next pair.
           </span>
-          <span>Photo studies · Purchases unavailable</span>
+          <span>Explore the shopping UI · Sample sizes & prices</span>
         </div>
       </header>
       <div className="photo-shop collection-browser" data-photo-shop>
@@ -251,6 +252,7 @@ export function EditorialCatalog({
               style={{ "--card-order": index } as React.CSSProperties}
               key={item.id}
             >
+              <WishlistButton handle={item.url.slice("/products/".length)} compact />
               <a
                 className="photo-shop-image"
                 data-product-open

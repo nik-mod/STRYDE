@@ -1,0 +1,15 @@
+"use client";
+import { useEffect, useState } from "react";
+const KEY="stryde_wishlist", EVENT="stryde:wishlist-changed";
+type State={handles:string[];ready:boolean;signedIn:boolean;error:string;busy:boolean};
+const INITIAL_STATE:State={handles:[],ready:false,signedIn:false,error:"",busy:false};
+let current:State=INITIAL_STATE, pending:Promise<void>|null=null;
+function read(){try{const value=JSON.parse(localStorage.getItem(KEY)||"[]");return Array.isArray(value)?[...new Set(value.filter((v):v is string=>typeof v==="string"&&/^[a-z0-9-]{1,120}$/.test(v)))].slice(0,200):[];}catch{return[];}}
+function emit(){window.dispatchEvent(new Event(EVENT));}
+async function request(path:string,value?:unknown){const r=await fetch(`/api${path}`,{method:value?"POST":"GET",headers:value?{"Content-Type":"application/json"}:{},...(value?{body:JSON.stringify(value)}:{}),cache:"no-store"});const data=await r.json();if(!r.ok)throw new Error(data.message||"Saved pairs could not be updated.");return data;}
+async function initialize(){if(pending)return pending;pending=(async()=>{const guest=read();current={...current,handles:guest};try{const auth=await request("/auth/me");if(auth.customer){current={...current,signedIn:true};const remote=await request("/account/wishlist");const saved=Array.isArray(remote.wishlist)?remote.wishlist.filter((v:unknown)=>typeof v==="string"):[];current={...current,handles:[...new Set([...saved,...guest])].slice(0,200)};for(const handle of guest.filter(h=>!saved.includes(h)))await request("/account/wishlist",{action:"add",handle});}}catch{current={...current,error:"Account syncing is unavailable. Browser-saved pairs are still shown."};}current={...current,ready:true};emit();})();return pending;}
+export function useWishlist(){const [state,setState]=useState(INITIAL_STATE);useEffect(()=>{const update=()=>setState({...current,handles:[...current.handles]});const storage=(event:StorageEvent)=>{if(event.key===KEY){current={...current,handles:read()};update();}};window.addEventListener(EVENT,update);window.addEventListener("storage",storage);void initialize().then(update);return()=>{window.removeEventListener(EVENT,update);window.removeEventListener("storage",storage);};},[]);async function toggle(handle:string){if(!state.ready||current.busy)return;const previous=current,adding=!current.handles.includes(handle),next=adding?[...current.handles,handle].slice(0,200):current.handles.filter(h=>h!==handle);current={...current,handles:next,error:"",busy:true};emit();try{if(adding&&previous.handles.length>=200)throw new Error("Your wishlist is full. Remove a pair before saving another.");if(current.signedIn)await request("/account/wishlist",{action:adding?"add":"remove",handle});localStorage.setItem(KEY,JSON.stringify(next));}catch(error){current={...previous,error:error instanceof DOMException ? "Your browser could not save this pair. Allow local storage and try again." : (error as Error).message};}current={...current,busy:false};emit();}return{...state,toggle,clearError:()=>{current={...current,error:""};emit();}};}
+
+
+
+

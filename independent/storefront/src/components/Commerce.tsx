@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import type { Cart } from "@/lib/types";
 import { money } from "@/lib/types";
 import { mediaFor } from "@/lib/product-media";
+import { PreviewBagDrawer } from "./PreviewShopping";
+import { CatalogWishlistBridge } from "./WishlistButton";
 export async function commerceRequest<T>(
   path: string,
   value?: unknown,
@@ -94,6 +96,9 @@ export function BagLines({
   );
 }
 export function Commerce({ testMode }: { testMode: boolean }) {
+  return <>{testMode ? <PreviewBagDrawer /> : <LiveCommerce testMode={false} />}<CatalogWishlistBridge /></>;
+}
+function LiveCommerce({ testMode }: { testMode: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
@@ -137,6 +142,8 @@ export function Commerce({ testMode }: { testMode: boolean }) {
   useEffect(() => {
     const count =
       cart?.items.reduce((sum, line) => sum + line.quantity, 0) ?? 0;
+    const sync = () => {
+    if (!document.querySelector(".document-shell[data-hydrated]")) return;
     document.querySelectorAll("[data-cart-count]").forEach((node) => {
       node.textContent = String(count);
     });
@@ -145,6 +152,10 @@ export function Commerce({ testMode }: { testMode: boolean }) {
       .forEach((node) =>
         node.setAttribute("aria-label", `Your bag (${count})`),
       );
+    };
+    sync();
+    document.addEventListener("stryde:page-ready", sync);
+    return () => document.removeEventListener("stryde:page-ready", sync);
   }, [cart]);
   async function update(id: string, quantity: number) {
     setBusy(true);

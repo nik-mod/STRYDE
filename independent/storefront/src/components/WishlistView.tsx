@@ -1,91 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
-import { mediaFor } from "@/lib/product-media";
+import { useEffect,useState } from "react";
+import { useWishlist } from "@/lib/wishlist-state";
+import { AccountShell,ShopEmpty } from "./ShopUI";
+import { ShopLoading } from "./PreviewShopping";
+import { WishlistButton } from "./WishlistButton";
+import { Arrow } from "./Information";
 import type { Product } from "@/lib/types";
-import { money } from "@/lib/types";
-export function WishlistView({ signedIn }: { signedIn: boolean }) {
-  const [handles, setHandles] = useState<string[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const load = async () => {
-      let list: string[] = [];
-      if (signedIn) {
-        const remote = await fetch("/api/account/wishlist")
-          .then((r) => r.json())
-          .catch(() => null);
-        list = remote?.wishlist ?? [];
-      }
-      if (!list.length) {
-        try {
-          list = JSON.parse(localStorage.getItem("stryde_wishlist") || "[]");
-        } catch {}
-      }
-      setHandles(list);
-      if (list.length) {
-        const params = new URLSearchParams({ limit: "50" });
-        for (const handle of list.slice(0, 50)) params.append("handle", handle);
-        const result = await fetch(`/api/wishlist-products?${params}`)
-          .then((r) => r.json())
-          .catch(() => null);
-        setProducts(result?.products ?? []);
-      }
-      setReady(true);
-    };
-    void load();
-  }, [signedIn]);
-  return (
-    <section className="commerce-panel">
-      <h1>Your wishlist.</h1>
-      <p>
-        <a href="/account">← Back to account</a>
-      </p>
-      {!ready ? (
-        <p>Loading…</p>
-      ) : products.length ? (
-        <div className="photo-shop-grid" data-grid-density="comfortable">
-          {products.map((item) => (
-            <article className="photo-shop-card" key={item.id}>
-              <a className="photo-shop-image" href={`/products/${item.handle}`}>
-                <span className="photo-shop-photo">
-                  {item.thumbnail && (
-                    <img
-                      src={mediaFor(item, item.thumbnail, 720).src}
-                      width={1000}
-                      height={1000}
-                      alt={item.title}
-                      loading="lazy"
-                    />
-                  )}
-                </span>
-              </a>
-              <div className="photo-shop-info">
-                <div>
-                  <h2>
-                    <a href={`/products/${item.handle}`}>{item.title}</a>
-                  </h2>
-                  <p className="photo-shop-price">
-                    {item.variants[0]?.calculated_price
-                      ? money(
-                          item.variants[0].calculated_price.calculated_amount,
-                          item.variants[0].calculated_price.currency_code,
-                        )
-                      : ""}
-                  </p>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <p>
-          Nothing saved yet — tap ♡ on any pair.{" "}
-          <a href="/collections/all">Explore the collection ↗</a>
-        </p>
-      )}
-      {handles.length > products.length && ready && (
-        <p className="micro">Some saved pairs are no longer available.</p>
-      )}
-    </section>
-  );
-}
+export function WishlistView({signedIn}:{signedIn:boolean}){const{handles,ready}=useWishlist(),[products,setProducts]=useState<Product[]>([]),[loaded,setLoaded]=useState(false),[message,setMessage]=useState("");const handleKey=handles.join(",");useEffect(()=>{let active=true;if(!ready)return;setLoaded(false);setMessage("");if(!handles.length){setProducts([]);setLoaded(true);return;}void(async()=>{try{const pages=[];for(let i=0;i<handles.length;i+=50){const params=new URLSearchParams();for(const handle of handles.slice(i,i+50))params.append("handle",handle);pages.push(fetch(`/api/wishlist-products?${params}`).then(async r=>{if(!r.ok)throw new Error();return r.json();}));}const results=await Promise.all(pages);if(active)setProducts(results.flatMap(r=>r.products||[]));}catch{if(active)setMessage("Your saved pairs couldn’t load. Refresh the page to try again.");}finally{if(active)setLoaded(true);}})();return()=>{active=false;};},[handleKey,ready]);return <AccountShell title="Worth keeping." description="A little space for the pairs you keep coming back to." active="/account/wishlist"><div className="account-section-heading"><h2>Your wishlist <span>{handles.length}</span></h2><p>{signedIn?"Saved to your account and this browser.":"Saved in this browser. Sign in to sync with your account."}</p></div>{message&&<p className="shop-error-text" role="alert">{message}</p>}{!ready||!loaded?<ShopLoading/>:products.length?<><div className="wishlist-grid">{products.map(item=><article key={item.id} className="wishlist-pair"><div><a href={`/products/${item.handle}`} className="wishlist-image">{item.thumbnail&&<img src={item.thumbnail} alt={item.title} width={400} height={320}/>}</a><WishlistButton handle={item.handle} compact/></div><h3><a href={`/products/${item.handle}`}>{item.title}</a></h3><a href={`/products/${item.handle}`} className="shop-text-link">Explore the pair<Arrow/></a></article>)}</div>{handles.length>products.length&&<p className="shop-muted">Some saved pairs could not be found in the current collection.</p>}</>:!message?<ShopEmpty title="Keep a pair close.">Save a sneaker using its heart button. Your favorites will be waiting here.</ShopEmpty>:null}</AccountShell>;}
+

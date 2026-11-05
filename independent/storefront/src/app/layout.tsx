@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+
 import { headers } from "next/headers";
 import { design, experienceSource, assetSource } from "@/lib/design";
 import { Commerce } from "@/components/Commerce";
@@ -49,7 +49,9 @@ export default async function RootLayout({
     ...(template !== "index" ? ["footer"] : []),
     "site-chrome",
     ...(template === "page" ? ["information"] : []),
+    ...(["/pages/size-guide", "/pages/faq", "/orders/track"].includes(path) ? ["customer-care"] : []),
     ...(path.startsWith("/policies/") ? ["policy-editorial"] : []),
+    "shopping-ui",
   ];
   const styles = await Promise.all(
     css.map(async (name) => ({
@@ -103,14 +105,9 @@ export default async function RootLayout({
         )}
         {children}
         <Commerce testMode={isTestMode()} />
-        <Script
-          id="stryde-experience"
-          type="module"
-          src={await experienceSource()}
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+
       </body>
     </html>
   );
 }
+

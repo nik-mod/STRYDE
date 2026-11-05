@@ -1,64 +1,9 @@
 import { Shell } from "@/components/Shell";
 import { AccountAuth } from "@/components/AccountAuth";
-import { getCustomer, customerOrders } from "@/lib/customer";
+import { AccountShell,ShopEmpty } from "@/components/ShopUI";
+import { Arrow } from "@/components/Information";
+import { getCustomer,customerOrders } from "@/lib/customer";
 import { money } from "@/lib/types";
-export const metadata = { title: "Your orders" };
-export const dynamic = "force-dynamic";
-export default async function AccountOrders() {
-  const customer = await getCustomer();
-  if (!customer)
-    return (
-      <Shell>
-        <AccountAuth redirectTo="/account/orders" />
-      </Shell>
-    );
-  let orders: Awaited<ReturnType<typeof customerOrders>> = [];
-  try {
-    orders = await customerOrders();
-  } catch {}
-  return (
-    <Shell>
-      <section className="commerce-panel">
-        <h1>Your orders.</h1>
-        <p>
-          <a href="/account">← Back to account</a>
-        </p>
-        {orders.length ? (
-          <ul className="account-order-list">
-            {orders.map((order) => (
-              <li key={order.id} className="account-order">
-                <p className="bag-summary">
-                  <strong>#{order.display_id}</strong> ·{" "}
-                  {money(order.total, order.currency_code)} · {order.status} ·{" "}
-                  {new Date(order.created_at).toLocaleDateString("en-US")}
-                </p>
-                <ul>
-                  {(order.items ?? []).map((item, index) => (
-                    <li key={index}>
-                      {item.quantity} × {item.title} —{" "}
-                      {money(item.unit_price * item.quantity, order.currency_code)}
-                    </li>
-                  ))}
-                </ul>
-                {order.shipping_address && (
-                  <p className="micro">
-                    Shipping to {order.shipping_address.city},{" "}
-                    {(order.shipping_address.country_code ?? "").toUpperCase()}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>
-            No orders yet.{" "}
-            <a href="/collections/all">Explore the collection.</a>
-          </p>
-        )}
-        <p>
-          <a href="/orders/track">Track an order ↗</a>
-        </p>
-      </section>
-    </Shell>
-  );
-}
+export const metadata={title:"Your orders"};export const dynamic="force-dynamic";
+export default async function Page(){const customer=await getCustomer();if(!customer)return <Shell><AccountAuth redirectTo="/account/orders"/></Shell>;let orders:Awaited<ReturnType<typeof customerOrders>>=[],error="";try{orders=await customerOrders();}catch{error="Your orders couldn’t load. Refresh this page to try again.";}return <Shell><AccountShell title="Your order history." description="Your order history and the details behind each purchase." active="/account/orders"><div className="account-section-heading"><h2>Your orders</h2><p>Order status is the store’s internal record, not a live carrier update.</p></div>{error?<p className="shop-error-text" role="alert">{error}</p>:orders.length?<div className="order-history">{orders.map(order=><details key={order.id} className="order-history-item"><summary><span><strong>Order #{order.display_id}</strong><small>{new Date(order.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})}</small></span><span className="order-status">{order.status.replaceAll("_"," ")}</span><span>{money(order.total,order.currency_code)}</span><Arrow/></summary><div className="order-history-body"><ul>{(order.items||[]).map((item,index)=><li key={index}>{item.thumbnail&&<img src={item.thumbnail} alt="" width={90} height={75}/>}<span>{item.title}<small>Quantity {item.quantity}</small></span><span>{money(item.unit_price*item.quantity,order.currency_code)}</span></li>)}</ul>{order.shipping_address&&<p className="shop-muted">Destination: {order.shipping_address.city}, {(order.shipping_address.country_code||"").toUpperCase()}</p>}<a className="shop-text-link" href="/orders/track">Check order status<Arrow/></a></div></details>)}</div>:<ShopEmpty title="Your story starts with a pair.">There are no orders in your account yet. Take a look around the collection.</ShopEmpty>}<a className="shop-text-link" href="/pages/contact">A question about an order?<Arrow/></a></AccountShell></Shell>;}
+

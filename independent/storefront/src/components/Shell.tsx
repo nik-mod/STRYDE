@@ -1,12 +1,15 @@
-import { design } from "@/lib/design";
+import { design, experienceSource } from "@/lib/design";
 import { headers } from "next/headers";
-import { NewsletterForm } from "./NewsletterForm";
+import { Footer } from "./Footer";
+import { HydratedShell } from "./HydratedShell";
 export async function Shell({
   children,
   home = false,
+  enhance = true,
 }: {
   children: React.ReactNode;
   home?: boolean;
+  enhance?: boolean;
 }) {
   const header = await design("header.html");
   let navigation = home
@@ -19,15 +22,17 @@ export async function Shell({
     '<a class="header-search-link" href="/account">Account</a>\n    <a class="header-search-link" href="/search">Search</a>',
   );
   navigation = navigation.replace(
-    '<a href="/search">Search</a>\n        <a href="/cart">Your bag (0)</a>',
-    '<a href="/account">Account</a>\n        <a href="/search">Search</a>\n        <a href="/cart">Your bag (0)</a>',
+    /(<nav\b[^>]*class="mobile-menu-panel"[^>]*>)([\s\S]*?)(<\/nav>)/,
+    (whole, opening, items, closing) => items.includes('href="/account"')
+      ? whole
+      : `${opening}<a href="/account">Account</a>${items}${closing}`,
   );
   const path = (await headers()).get("x-stryde-path") || "/";
   navigation = navigation.replace(/<a href="([^"]+)"/g, (tag, href) =>
     href === path ? `${tag} aria-current="page"` : tag,
   );
   return (
-    <div className="document-shell">
+    <HydratedShell source={await experienceSource()} enhance={enhance}>
       {home && (
         <div
           className="markup-fragment"
@@ -50,24 +55,7 @@ export async function Shell({
           dangerouslySetInnerHTML={{ __html: await design("journey.html") }}
         />
       )}
-      <div
-        className="markup-fragment"
-        dangerouslySetInnerHTML={{ __html: await design("footer.html") }}
-      />
-      <nav className="policy-links" aria-label="Store information">
-        <a href="/collections/all">Collection</a>
-        <a href="/pages/size-guide">Size guide</a>
-        <a href="/pages/faq">FAQ</a>
-        <a href="/orders/track">Track order</a>
-        <a href="/pages/contact">Contact</a>
-        <a href="/policies/returns">Returns</a>
-        <a href="/policies/shipping">Shipping</a>
-        <a href="/policies/privacy">Privacy</a>
-        <a href="/policies/terms">Terms</a>
-      </nav>
-      <div className="newsletter-band">
-        <NewsletterForm />
-      </div>
-    </div>
+      <Footer />
+    </HydratedShell>
   );
 }

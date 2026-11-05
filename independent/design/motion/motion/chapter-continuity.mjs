@@ -55,6 +55,11 @@ export function mountChapterContinuity({ document, scheduler, onActive }) {
     body.dataset.gradeFrom = state.from; body.dataset.gradeTo = state.to;
     body.dataset.gradeProgress = state.progress.toFixed(4);
     body.style.setProperty('--hero-surface-exit', state.from === 'hero' && state.to === 'deconstruction' ? state.progress.toFixed(4) : '0');
+    const incoming = chapters.find(chapter => chapter.name === 'deconstruction');
+    if (incoming) {
+      const arrival = clamp((environment.innerHeight-incoming.top)/(environment.innerHeight*.55));
+      body.style.setProperty('--decon-arrival', String(arrival*arrival*(3-2*arrival)));
+    }
     const studioPresence = state.from === 'brand' ? 1 - state.progress : state.to === 'brand' ? state.progress : 0;
     body.style.setProperty('--journey-studio-light', `rgba(23, 62, 86, ${studioPresence.toFixed(3)})`);
     body.classList.toggle('journey-light-ink', state.light);
@@ -69,6 +74,7 @@ export function mountChapterContinuity({ document, scheduler, onActive }) {
     body.style.removeProperty('--journey-surface'); body.style.removeProperty('--journey-ink');
     body.style.removeProperty('--journey-studio-light');
     body.style.removeProperty('--hero-surface-exit');
+    body.style.removeProperty('--decon-arrival');
     delete body.dataset.gradeFrom; delete body.dataset.gradeTo; delete body.dataset.gradeProgress;
   };
 }

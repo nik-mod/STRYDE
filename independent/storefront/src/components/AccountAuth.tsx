@@ -1,143 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { commerceRequest } from "./Commerce";
-export function AccountAuth({
-  redirectTo = "/account",
-}: {
-  redirectTo?: string;
-}) {
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setBusy(true);
-    setMessage("");
-    const data = new FormData(event.currentTarget);
-    try {
-      if (mode === "login") {
-        await commerceRequest("/auth/login", {
-          email: data.get("email"),
-          password: data.get("password"),
-        });
-      } else {
-        await commerceRequest("/auth/register", {
-          email: data.get("email"),
-          password: data.get("password"),
-          first_name: data.get("first_name"),
-          last_name: data.get("last_name"),
-        });
-      }
-      window.location.href = redirectTo;
-    } catch (error) {
-      setMessage((error as Error).message);
-      setBusy(false);
-    }
-  }
-  return (
-    <section className="commerce-panel">
-      <h1>{mode === "login" ? "Sign in." : "Create your account."}</h1>
-      <p>
-        {mode === "login"
-          ? "Your bag, orders and addresses in one place."
-          : "Track orders, save addresses and keep a wishlist."}
-      </p>
-      {message && (
-        <p role="alert" className="commerce-message">
-          {message}
-        </p>
-      )}
-      <form className="checkout-form" onSubmit={submit}>
-        {mode === "register" && (
-          <>
-            <label>
-              First name
-              <input required name="first_name" maxLength={100} />
-            </label>
-            <label>
-              Last name
-              <input required name="last_name" maxLength={100} />
-            </label>
-          </>
-        )}
-        <label className="wide">
-          Email
-          <input required type="email" name="email" autoComplete="email" maxLength={254} />
-        </label>
-        <label className={mode === "login" ? "wide" : undefined}>
-          Password
-          <input
-            required
-            type="password"
-            name="password"
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-            minLength={8}
-            maxLength={200}
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={busy}
-          className="button button-dark wide"
-        >
-          {busy
-            ? "Working…"
-            : mode === "login"
-              ? "Sign in ↗"
-              : "Create account ↗"}
-        </button>
-      </form>
-      <p>
-        {mode === "login" ? (
-          <>
-            New here?{" "}
-            <button
-              type="button"
-              className="text-link"
-              onClick={() => {
-                setMode("register");
-                setMessage("");
-              }}
-            >
-              Create an account
-            </button>
-          </>
-        ) : (
-          <>
-            Already have an account?{" "}
-            <button
-              type="button"
-              className="text-link"
-              onClick={() => {
-                setMode("login");
-                setMessage("");
-              }}
-            >
-              Sign in
-            </button>
-          </>
-        )}
-      </p>
-    </section>
-  );
+import { Arrow } from "./Information";
+import { ShopIcon, ShopPage } from "./ShopUI";
+export function AccountAuth({ redirectTo = "/account" }: { redirectTo?: string }) {
+ const [mode, setMode] = useState<"login" | "register">("login"), [message, setMessage] = useState(""), [errors, setErrors] = useState<Record<string,string>>({}), [busy, setBusy] = useState(false), [show, setShow] = useState(false);
+ const alert = useRef<HTMLParagraphElement>(null);
+ useEffect(() => { if (message) alert.current?.focus(); }, [message]);
+ async function submit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault(); if (busy) return; const form = event.currentTarget, data = new FormData(form), value = Object.fromEntries(data) as Record<string,string>, invalid:Record<string,string> = {};
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email || "")) invalid.email = "Enter a valid email address.";
+  if (!value.password || value.password.length < 8) invalid.password = "Use at least 8 characters.";
+  if (mode === "register") for (const name of ["first_name", "last_name"]) if (!value[name]?.trim()) invalid[name] = `Enter your ${name === "first_name" ? "first" : "last"} name.`;
+  setErrors(invalid); setMessage(""); if (Object.keys(invalid).length) { form.querySelector<HTMLInputElement>(`[name="${Object.keys(invalid)[0]}"]`)?.focus(); return; }
+  setBusy(true);
+  try { await commerceRequest(mode === "login" ? "/auth/login" : "/auth/register", { email: value.email.trim(), password: value.password, ...(mode === "register" ? { first_name: value.first_name.trim(), last_name: value.last_name.trim() } : {}) }); window.location.href = redirectTo.startsWith("/account") ? redirectTo : "/account"; } catch (error) { setMessage((error as Error).message); setBusy(false); }
+ }
+ function field(name:string,label:string,type="text",autoComplete?:string) { return <label className={name === "email" || name === "password" ? "shop-wide" : undefined}>{label}<div className={name === "password" ? "password-control" : undefined}><input type={name === "password" && show ? "text" : type} name={name} autoComplete={autoComplete} required maxLength={name === "email" ? 254 : name === "password" ? 200 : 100} aria-invalid={!!errors[name]} aria-describedby={errors[name] ? `auth-${name}-error` : undefined} disabled={busy}/>{name === "password" && <button type="button" aria-label={show ? "Hide password" : "Show password"} aria-pressed={show} onClick={() => setShow(!show)}><ShopIcon name="eye" size={19}/><span>{show ? "Hide" : "Show"}</span></button>}</div>{errors[name] && <span className="shop-error-text" id={`auth-${name}-error`}>{errors[name]}</span>}</label>; }
+ return <ShopPage title="Your next move" accent="starts here." description="Save the pairs you love and keep your orders and addresses close."><div className="auth-spread"><aside className="auth-story"><ShopIcon name="heart" size={48}/><h2>Good pairs.<br/>All in one place.</h2><p>Your wishlist, order history and address book, with a little less searching next time.</p><a href="/account/wishlist">Your saved pairs<Arrow/></a><a href="/collections/all">Keep exploring<Arrow/></a></aside><div className="auth-form-panel"><div className="auth-tabs" role="group" aria-label="Account access">{(["login","register"] as const).map(item => <button type="button" disabled={busy} aria-pressed={mode === item} key={item} onClick={() => { setMode(item); setMessage(""); setErrors({}); }}>{item === "login" ? "Sign in" : "Create account"}</button>)}</div><h2>{mode === "login" ? "Welcome back." : "Make yourself at home."}</h2><p>{mode === "login" ? "Sign in with your email and password." : "A few details to start your account."}</p><form className="shop-form" noValidate onSubmit={submit} aria-busy={busy}><div className="shop-field-grid">{mode === "register" && <>{field("first_name","First name","text","given-name")}{field("last_name","Last name","text","family-name")}</>}{field("email","Email","email","email")}{field("password","Password","password",mode === "login" ? "current-password" : "new-password")}</div>{mode === "register" && <p className="shop-muted">Use at least 8 characters. Read our <a href="/policies/privacy">privacy information</a> before creating an account.</p>}{message && <p ref={alert} tabIndex={-1} className="shop-error-text" role="alert">{message}</p>}<button type="submit" disabled={busy} className="shop-button">{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}<Arrow/></button>{mode === "login" && <a className="shop-text-link" href="/account/forgot-password">Forgot your password?<Arrow/></a>}</form></div></div></ShopPage>;
 }
 export function LogoutButton() {
-  const [busy, setBusy] = useState(false);
-  return (
-    <button
-      type="button"
-      className="button"
-      disabled={busy}
-      onClick={async () => {
-        setBusy(true);
-        try {
-          await commerceRequest("/auth/logout", {});
-        } finally {
-          window.location.href = "/account";
-        }
-      }}
-    >
-      {busy ? "Signing out…" : "Sign out"}
-    </button>
-  );
+ const [busy,setBusy]=useState(false),[message,setMessage]=useState("");
+ return <div className="account-signout"><button type="button" className="shop-text-button" disabled={busy} onClick={async()=>{setBusy(true);setMessage("");try{await commerceRequest("/auth/logout",{});window.location.href="/account";}catch{setMessage("Sign out didn’t complete. Please try again.");setBusy(false);}}}>{busy ? "Signing out…" : "Sign out"}<Arrow/></button>{message && <p role="alert" className="shop-error-text">{message}</p>}</div>;
 }
+

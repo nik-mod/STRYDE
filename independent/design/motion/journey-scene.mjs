@@ -112,6 +112,7 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
   const depthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: THREE.BackSide });
   let renderer, reflection, shadow, shadowPlane, shadowTexture, heroWorld;
   const heroStage = root.querySelector('[data-hero-stage]');
+  const heroPinTop = parseFloat(environment.getComputedStyle(root).getPropertyValue('--preview-height')) || 0;
   const matchingPoster = Boolean(root.querySelector('[data-hero-poster]'));
   let worldTime = 0;
   let heroReadyTime = null, heroShowcaseStart = null;
@@ -688,7 +689,8 @@ async function createJourneyScene({ root, url, scheduler, signal, bus, ScrollTri
     }
     const { pose } = current;
     camera.position.set(0, pose.cameraY, cameraZ);
-    const gate = heroProductGate(current.rect, current.progress, environment.innerWidth <= 900);
+    const releaseProgress = clamp((heroPinTop-stageRect.top)/Math.max(1,stageRect.height*.75));
+    const gate = heroProductGate(current.rect, current.progress, environment.innerWidth <= 900, releaseProgress);
     expandHeroCamera(camera, gate, stageRect);
     const heroPose = pose;
     rig.rotation.set(heroPose.rotationX, heroPose.rotationY, heroPose.rotationZ, 'XYZ');

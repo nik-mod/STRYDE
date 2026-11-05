@@ -15,6 +15,11 @@ export async function Catalog({
       (entry): entry is [string, string] => typeof entry[1] === "string",
     ),
   );
+  // The local photo collection is the browsing source, even when checkout
+  // fixtures exist in Medusa. Fixtures must never replace the sneaker edit.
+  // Commercial mode continues to use the approved Medusa catalog below.
+  if (isTestMode() && (!collection || collection === "all"))
+    return <EditorialCatalog params={params} />;
   const query = params.q?.slice(0, 100) || "";
   const page = Math.max(1, Number.parseInt(params.page || "1") || 1);
   let result: Awaited<ReturnType<typeof catalogPage>> | null = null;
@@ -30,13 +35,6 @@ export async function Catalog({
     error = (cause as Error).message;
   }
   const all = result?.products ?? [];
-  if (
-    isTestMode() &&
-    !error &&
-    !result?.total &&
-    (!collection || collection === "all")
-  )
-    return <EditorialCatalog params={params} />;
   const sort = ["price-asc", "price-desc", "title"].includes(params.sort || "")
     ? params.sort
     : "title";

@@ -59,12 +59,17 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
   const portrait = () => environment.innerWidth <= 900 && environment.innerHeight > environment.innerWidth;
   const travel = () => portrait() || mobile ? .80 : 1.65;
   const entrance = { progress: 1 };
-  const film = { progress: 0 };
-  // Register the baseline in the caller's GSAP context for media-query cleanup.
-  // Reusable setters avoid allocating a new tween on every scrub update.
-  if (type) gsap.set(type, { scale:1, y:0, transformOrigin:'0% 50%' });
-  const setTypeScale = type ? gsap.quickSetter(type, 'scale') : () => {};
-  const setTypeY = type ? gsap.quickSetter(type, 'y', 'px') : () => {};
+  const originalTypeTransform = type?.style.transform || '';
+  const originalTypeOrigin = type?.style.transformOrigin || '';
+  const directShot = (progress, direction = 1) => {
+    const shot = heroDirection(progress), narrow = portrait();
+    if (type) {
+      const scale = narrow ? 1-(1-shot.typeScale)*.24 : shot.typeScale;
+      type.style.transformOrigin = '0% 50%';
+      type.style.transform = `translate3d(0,${shot.typeY*(narrow ? .22 : 1)}px,0) scale(${scale})`;
+    }
+    bus.publish(chapterState(0, progress, direction));
+  };
   let intro = null, cancelOpening = () => {};
   const settleIntro = () => {
     cancelOpening();
@@ -81,20 +86,14 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
           settleIntro();
           timeline.invalidate().progress(0, true).progress(self.progress, true);
         }
-        bus.publish(chapterState(0, self.progress, self.direction));
+        directShot(self.progress, self.direction);
       },
+      onRefresh: self => directShot(self.progress, self.direction),
     },
   });
   // One source of shot direction owns the optical gate and the reading space.
-  // Type yields space for the upper inspection, then opens with the reveal.
-  timeline
-    .to(film, { progress: 1, duration: 1, onUpdate: () => {
-      const shot = heroDirection(film.progress), narrow = portrait();
-      setTypeScale(narrow ? 1-(1-shot.typeScale)*.24 : shot.typeScale);
-      setTypeY(shot.typeY*(narrow ? .22 : 1));
-      bus.publish(chapterState(0, film.progress, timeline.scrollTrigger?.direction));
-    } }, 0)
-    .fromTo(foot, { opacity: 1, y: 0 }, { opacity: .85, y: -12, duration: 1, immediateRender: false }, 0);
+  // Type yields space through inspection and reveal, then reopens for release.
+  timeline.fromTo(foot, { opacity: 1, y: 0 }, { opacity: .85, y: -12, duration: 1, immediateRender: false }, 0);
   if (copy) timeline.fromTo(copy, { opacity: 1, y: 0 }, { opacity: .8, y: -4, duration: .84, immediateRender: false }, 0);
   // The same blue ink deepens as recessed wave faces travel behind the word.
   // This preserves its legibility without a panel, halo or new scroll owner.
@@ -140,6 +139,7 @@ export function mountHero(root, { gsap, bus, mobile, hasModel = false, surface =
   }
   return () => {
     environment.removeEventListener?.('resize', syncPoster);
+    if (type) { type.style.transform = originalTypeTransform; type.style.transformOrigin = originalTypeOrigin; }
     for (const key of ['width', 'height', 'left', 'top']) root.style?.removeProperty?.(`--hero-poster-${key}`);
     cancelOpening(); intro?.kill(); first.restore(); second.restore();
   };

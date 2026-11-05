@@ -4,6 +4,7 @@ import { commerceRequest } from "./Commerce";
 import { PromoForm } from "./PromoForm";
 import type { Cart, ShippingOption } from "@/lib/types";
 import { money } from "@/lib/types";
+import { PreviewCheckout } from "./PreviewShopping";
 const TEST_CARD = "4242 4242 4242 4242";
 function formatCardNumber(value: string) {
   const digits = value.replace(/\D/g, "").slice(0, 19);
@@ -15,6 +16,9 @@ function formatExpiry(value: string) {
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
 export function Checkout({ testMode }: { testMode: boolean }) {
+  return testMode ? <PreviewCheckout /> : <LiveCheckout testMode={false} />;
+}
+function LiveCheckout({ testMode }: { testMode: boolean }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [options, setOptions] = useState<ShippingOption[]>([]);
   const [message, setMessage] = useState("");

@@ -16,6 +16,9 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }) {
   const handle = (await params).handle;
+  const preview = isTestMode() ? editorialProduct(handle) : undefined;
+  if (preview)
+    return { title: preview.title, robots: { index: false, follow: false } };
   try {
     const item = await product(handle);
     if (item)
@@ -41,9 +44,10 @@ export default async function ProductPage({
   searchParams: Promise<{ variant?: string }>;
 }) {
   const handle = (await params).handle;
-  // Medusa catalog products take precedence: the archive handles become real
-  // commerce pages with sizes, bag and checkout. Handles without a Medusa
-  // record fall back to the editorial reference presentation in test mode.
+  // The local collection uses explicitly illustrative shopping data. Keep the
+  // exact catalog photo and preview bag together; production uses Medusa below.
+  if (isTestMode() && editorialProduct(handle))
+    return <Shell><EditorialProduct handle={handle} /></Shell>;
   let item;
   let commerceError = "";
   try {

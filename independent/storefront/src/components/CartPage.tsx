@@ -4,7 +4,11 @@ import { BagLines, commerceRequest } from "./Commerce";
 import { PromoForm } from "./PromoForm";
 import type { Cart } from "@/lib/types";
 import { money } from "@/lib/types";
+import { PreviewCart } from "./PreviewShopping";
 export function CartPage({ testMode }: { testMode: boolean }) {
+  return testMode ? <PreviewCart /> : <LiveCartPage testMode={false} />;
+}
+function LiveCartPage({ testMode }: { testMode: boolean }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);

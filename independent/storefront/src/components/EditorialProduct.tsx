@@ -1,6 +1,7 @@
 import { Gallery } from "./Gallery";
 import type { Product } from "@/lib/types";
 import { findEditorialProduct } from "@/lib/editorial-catalog";
+import { PreviewProductPurchase } from "./PreviewProductPurchase";
 export const editorialProduct = findEditorialProduct;
 export function EditorialProduct({ handle }: { handle: string }) {
   const item = editorialProduct(handle);
@@ -38,7 +39,7 @@ export function EditorialProduct({ handle }: { handle: string }) {
             <p className="studio-product-color">{item.colorway}</p>
           </div>
           <p className="studio-product-description">{item.description}</p>
-          <p className="studio-preview-label">Collection preview</p>
+          <PreviewProductPurchase handle={handle} title={item.title} image={item.photos[0].src} />
           <dl className="studio-product-facts">
             <div>
               <dt>Brand</dt>
@@ -52,8 +53,7 @@ export function EditorialProduct({ handle }: { handle: string }) {
             )}
           </dl>
           <p className="studio-preview-note">
-            Photography reference · Product availability and pricing are not yet
-            confirmed.
+            Product photography reference. Real prices, size availability and stock will be supplied later.
           </p>
           <a
             className="studio-collection-return"

@@ -32,9 +32,9 @@ const surface = /* glsl */`
     float aPhase = x * 0.58 + t * 0.48 + worldPointer.x * .12 + worldPress * .24;
     float bPhase = x * 0.4 - t * 0.31 + 1.4 - worldPointer.x * .10;
     float cPhase = x * 0.31 + t * 0.23;
-    float aAmp = .38 + .08 * sin(t * 0.6 + x * 0.3) + p * 0.24;
-    float bAmp = .65 + .12 * sin(t * 0.45 - x * 0.2);
-    float cAmp = .95 + .16 * cos(t * 0.35 + x * 0.4);
+    float aAmp = .52 + .08 * sin(t * 0.6 + x * 0.3) + p * 0.24;
+    float bAmp = 1.50 + .12 * sin(t * 0.45 - x * 0.2);
+    float cAmp = 2.75 + .16 * cos(t * 0.35 + x * 0.4);
     // Wind travels through separate depth planes. Scroll opens the valley and
     // draws its far crest past the camera, rather than dissolving the world.
     vec3 field = crest(point, -2.0 + 0.85 * sin(aPhase) - p * 1.10, 0.493 * cos(aPhase),
@@ -203,52 +203,8 @@ export function createHeroWorld({ scene, root, compact }) {
   // The plane's undeformed bounds do not include the high crests.
   terrain.frustumCulled = false;
   group.add(terrain);
-  // Open satin folds echo the shoe's wave cage. The elliptical
-  // cross section gives the folds a real edge and continuous specular light.
-  // Both stay above the low floor and behind the product's depth plane.
-  const ribbonResources = [];
-  const sculpture = new THREE.Group(); sculpture.name = 'Scroll-directed wave sculpture';
-  group.add(sculpture);
-  function addRibbon(color, vertical, depth, phase, breadth) {
-    const steps = compact ? 96 : 160, across = 16, positions=[], indices=[];
-    const tangent=new THREE.Vector3(), normal=new THREE.Vector3(), binormal=new THREE.Vector3(), up=new THREE.Vector3(0,1,0);
-    for(let i=0;i<=steps;i++) {
-      // Two open, tapered folds echo the upper's flowing cage. They form a
-      // rear architectural frame rather than another closed oval protagonist.
-      const u=i/steps, turn=-.18+u*Math.PI*1.38+phase, height=compact ? .50 : 1;
-      const x=.85-Math.cos(turn)*(compact ? 2.5 : 3.0);
-      const y=(.82+Math.sin(turn)*.92+vertical)*height-(compact ? .30 : 0);
-      const z=-3.5+Math.sin(turn)*.72+depth;
-      tangent.set(Math.sin(turn)*(compact ? 2.5 : 3.0),Math.cos(turn)*.92*height,Math.cos(turn)*.72).normalize();
-      normal.copy(up).addScaledVector(tangent,-up.dot(tangent)).normalize();
-      binormal.crossVectors(tangent,normal).normalize();
-      const twist=Math.sin(turn)*.9+phase;
-      for(let j=0;j<=across;j++) {
-        const angle=j/across*Math.PI*2;
-        const taper=.12+.88*Math.sin(Math.PI*u)**.65;
-        const v=Math.cos(angle)*breadth*.5*taper, edge=Math.sin(angle)*.075*taper;
-        const n=v*Math.cos(twist)-edge*Math.sin(twist), b=v*Math.sin(twist)+edge*Math.cos(twist);
-        positions.push(x+normal.x*n+binormal.x*b,y+normal.y*n+binormal.y*b,z+normal.z*n+binormal.z*b);
-        if(i<steps && j<across) {const n=i*(across+1)+j;indices.push(n,n+across+1,n+1,n+1,n+across+1,n+across+2);}
-      }
-    }
-    const ribbonGeometry=new THREE.BufferGeometry();
-    ribbonGeometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
-    ribbonGeometry.setIndex(indices); ribbonGeometry.computeVertexNormals();
-    const ribbonMaterial=new THREE.MeshStandardMaterial({color,roughness:.3,metalness:.22,envMapIntensity:.9,side:THREE.DoubleSide,transparent:true,forceSinglePass:true});
-    ribbonMaterial.onBeforeCompile=shader=>{
-      shader.uniforms.ribbonTime=uniforms.worldTime;
-      shader.uniforms.ribbonPointer=uniforms.worldPointer;
-      shader.uniforms.ribbonPress=uniforms.worldPress;
-      shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nuniform float ribbonTime;\nuniform vec2 ribbonPointer;\nuniform float ribbonPress;')
-        .replace('#include <begin_vertex>','vec3 transformed=position; transformed.y += sin(position.x*.42-ribbonTime*.18)*(.12+ribbonPress*.12); transformed.z += sin(position.x*.28+ribbonTime*.14)*.18 + ribbonPointer.x*.12;');
-    };
-    ribbonMaterial.customProgramCacheKey=()=> 'stryde-satin-ribbon-v2';
-    const mesh=new THREE.Mesh(ribbonGeometry,ribbonMaterial);mesh.name='Sculptural wave ribbon';mesh.frustumCulled=false;
-    sculpture.add(mesh); ribbonResources.push({geometry:ribbonGeometry,material:ribbonMaterial});
-  }
-  addRibbon(0xc7e1ef,.24,-.35,0,.64);
-  addRibbon(0x5a9dc8,-.08,-1.05,.16,.28);
+  // The landscape is the sculpture: its large crests open around the product
+  // from the shared scroll direction. No floating overhead hoop is retained.
   scene.add(group);
   const stage = root.querySelector('[data-hero-stage]');
   let pointerX = 0, pointerY = 0, targetX = 0, targetY = 0, pressing = 0, press = 0;
@@ -278,7 +234,6 @@ export function createHeroWorld({ scene, root, compact }) {
         material.color.copy(restingColor).lerp(surfaceColor, exit);
       } else { fog.color.set(0xc5e2ee); material.color.copy(restingColor); }
       material.opacity = (1 - exit) * surfaceBlend;
-      ribbonResources.forEach(resource=>{resource.material.opacity=material.opacity;});
       uniforms.worldExit.value = exit;
       uniforms.worldViewportHeight.value = viewportHeight;
       const direction = heroDirection(progress);
@@ -297,16 +252,15 @@ export function createHeroWorld({ scene, root, compact }) {
       camera.rotation.set(0,0,0);
       rig.position.set(0,direction.lift*.6,0);
       group.position.set(Math.sin(time*.23)*.08+pointerX*.06,0,direction.world*.20);
-      sculpture.rotation.set(-.06*direction.frame, direction.sculpture+Math.sin(time*.18)*.02, -.08*direction.frame);
-      sculpture.position.set(.28+direction.frame*.6,-direction.frame*.22,-direction.frame*.85);
       // The clearance follows the actual product in terrain-local space.
       // The old independent Z drift let a crest pass through the sneaker
       // late in the Hero, which looked like the product fading/disappearing.
       uniforms.worldProductCenter.value.set(rig.position.x - group.position.x, rig.position.z - group.position.z);
       key.position.set(-4.5 + direction.light * 7.8 + Math.sin(time * .35) * 1.3,
         3.5 + Math.cos(time * .18) * .2, 2.6);
-      key.intensity = 2.45 + Math.sin(time * .2) * .12;
-      rim.position.set(-3.0 + Math.sin(time * .23) * 1.2, 2.5, -2.5); rim.intensity = 1.85 + Math.sin(time * .3) * .25;
+      const reveal = Math.max(0,1-Math.abs(progress-.75)/.25);
+      key.intensity = 2.45 + reveal*.15 + Math.sin(time * .2) * .12;
+      rim.position.set(-3.0 + Math.sin(time * .23) * 1.2, 2.5, -2.5); rim.intensity = 1.85 + reveal*.35 + Math.sin(time * .3) * .25;
       if (waveLight) {
         const wave = heroWave(progress), x = rig.position.x + wave.x;
         waveLight.position.set(x, 1.25, 2.6);
@@ -319,7 +273,6 @@ export function createHeroWorld({ scene, root, compact }) {
       stage.removeEventListener('pointerdown', hold); stage.removeEventListener('pointerup', release); stage.removeEventListener('pointercancel', release); stage.removeEventListener('pointerleave', release);
       stage.removeEventListener('pointermove', pointer); stage.removeEventListener('pointerleave', leave);
       scene.remove(group); geometry.dispose(); material.dispose();
-      ribbonResources.forEach(resource=>{resource.geometry.dispose();resource.material.dispose();});
     },
   };
 }

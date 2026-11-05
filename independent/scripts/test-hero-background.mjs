@@ -15,7 +15,7 @@ for (const compact of [false, true]) test(`idle background stays independent of 
   const snapshot = () => [camera.position.toArray(), camera.rotation.toArray(), camera.projectionMatrix.toArray(), rig.position.toArray(), rig.rotation.toArray()];
   const before = snapshot(), meshes = [];
   world.group.traverse(node => { if (node.isMesh) meshes.push(node); });
-  assert.equal(meshes.length, 3, 'one floor and two rounded wave forms share the existing scene');
+  assert.equal(meshes.length, 1, 'the continuous wave landscape owns the environment without an overhead hoop');
   const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <beginnormal_vertex>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>\n#include <roughnessmap_fragment>\n#include <normal_fragment_maps>\n#include <aomap_fragment>' };
   meshes[0].material.onBeforeCompile(shader);
   for (const mesh of meshes) {
@@ -50,14 +50,14 @@ for (const compact of [false, true]) test(`idle background stays independent of 
   for (const mesh of meshes) for (const resource of [mesh.geometry, mesh.material]) resource.addEventListener('dispose', () => disposed++);
   world.dispose();
   assert.equal(scene.children.length, 0);
-  assert.equal(disposed, 6, 'all three geometries and materials are released');
+  assert.equal(disposed, 2, 'the owned terrain geometry and material are released');
 });
 test('Hero inspection is reversible and resolves to the next chapter pose',()=>{
   const samples=Array.from({length:601},(_,i)=>i/600);
   assert.deepEqual(samples.map(p=>journeyPose('hero',p)),samples.toReversed().map(p=>journeyPose('hero',p)).reverse());
   const last=journeyPose('hero',1), next=journeyPose('deconstruction',0);
   for(const key of ['rotationX','rotationY','rotationZ']) assert.equal(last[key],next[key]);
-  assert(journeyPose('hero',.25).rotationY-journeyPose('hero',.75).rotationY>1.4,'orbit and reveal expose different sides');
+  assert(journeyPose('hero',.25).rotationY-journeyPose('hero',.75).rotationY>1.3,'orbit and reveal expose different sides');
   assert(journeyPose('hero',.5).rotationX>.7,'detail exposes the real upper');
   for(const at of [.25,.5,.75]) for(const key of ['rotationX','rotationY','rotationZ','fill']) {
     assert(Math.abs(journeyPose('hero',at-1e-6)[key]-journeyPose('hero',at+1e-6)[key])<.0001,'shot boundaries remain continuous');

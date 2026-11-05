@@ -82,7 +82,7 @@ export function Gallery({ product }: { product: Product }) {
         </div>
       )}
       <p className="studio-gallery-help">
-        {images.length} views<span>Click to explore the details</span>
+        {images.length} {images.length === 1 ? "view" : "views"}<span>Click to explore the details</span>
       </p>
       {images
         .map((image) => mediaFor(product, image.url).attribution)

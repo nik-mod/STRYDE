@@ -1,88 +1,9 @@
 import { Shell } from "@/components/Shell";
 import { AccountAuth, LogoutButton } from "@/components/AccountAuth";
+import { AccountShell } from "@/components/ShopUI";
+import { Arrow } from "@/components/Information";
 import { getCustomer, customerOrders } from "@/lib/customer";
 import { money } from "@/lib/types";
 export const metadata = { title: "Your account" };
 export const dynamic = "force-dynamic";
-export default async function Account() {
-  const customer = await getCustomer();
-  if (!customer)
-    return (
-      <Shell>
-        <AccountAuth />
-      </Shell>
-    );
-  let orders: Awaited<ReturnType<typeof customerOrders>> = [];
-  try {
-    orders = await customerOrders();
-  } catch {}
-  return (
-    <Shell>
-      <section className="commerce-panel">
-        <h1>Your account.</h1>
-        <p>
-          {customer.first_name} {customer.last_name} · {customer.email}
-        </p>
-        <div className="account-grid">
-          <div>
-            <h2>Orders</h2>
-            {orders.length ? (
-              <ul className="account-order-list">
-                {orders.slice(0, 3).map((order) => (
-                  <li key={order.id}>
-                    <a href="/account/orders">
-                      #{order.display_id} · {money(order.total, order.currency_code)}{" "}
-                      · {order.status}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>
-                No orders yet.{" "}
-                <a href="/collections/all">Find your next move.</a>
-              </p>
-            )}
-            <p>
-              <a className="button" href="/account/orders">
-                All orders ↗
-              </a>
-            </p>
-          </div>
-          <div>
-            <h2>Addresses</h2>
-            {customer.addresses?.length ? (
-              <ul className="account-order-list">
-                {customer.addresses.slice(0, 3).map((address) => (
-                  <li key={address.id}>
-                    {address.address_1}, {address.city}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No saved addresses yet.</p>
-            )}
-            <p>
-              <a className="button" href="/account/addresses">
-                Manage addresses ↗
-              </a>
-            </p>
-          </div>
-          <div>
-            <h2>Wishlist</h2>
-            <p>Pairs you have saved for later.</p>
-            <p>
-              <a className="button" href="/account/wishlist">
-                View wishlist ↗
-              </a>
-            </p>
-          </div>
-        </div>
-        <p>
-          <a href="/orders/track">Track a guest order ↗</a> ·{" "}
-          <LogoutButton />
-        </p>
-      </section>
-    </Shell>
-  );
-}
+export default async function Account(){const customer=await getCustomer();if(!customer)return <Shell><AccountAuth/></Shell>;let orders:Awaited<ReturnType<typeof customerOrders>>=[],orderError="";try{orders=await customerOrders();}catch{orderError="Order history couldn’t load. Open your orders to try again.";}return <Shell><AccountShell title="Your own corner." description="Saved pairs, familiar details and the next move. All together."><section className="account-welcome"><div><h2>Hello{customer.first_name?`, ${customer.first_name}`:""}.</h2><p>{customer.email}</p></div><LogoutButton/></section><div className="account-overview-links"><a href="/account/orders"><div><h2>Your orders</h2><p>See the details of your purchases.</p></div><Arrow/></a><a href="/account/addresses"><div><h2>Address book</h2><p>{customer.addresses?.length?`${customer.addresses.length} saved ${customer.addresses.length===1?"address":"addresses"}.`:"Make the next checkout a little easier."}</p></div><Arrow/></a><a href="/account/wishlist"><div><h2>Your wishlist</h2><p>The pairs you want to come back to.</p></div><Arrow/></a></div><section className="account-recent"><div className="account-section-heading"><h2>Recent orders</h2><a href="/account/orders">View all<Arrow/></a></div>{orderError?<p className="shop-error-text" role="alert">{orderError}</p>:orders.length?<ul className="account-recent-list">{orders.slice(0,3).map(order=><li key={order.id}><a href="/account/orders"><span>Order #{order.display_id}<small>{new Date(order.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})}</small></span><span>{money(order.total,order.currency_code)}</span><Arrow/></a></li>)}</ul>:<div className="account-inline-empty"><p>No orders yet. There’s a whole collection to explore.</p><a className="shop-text-link" href="/collections/all">Find your next pair<Arrow/></a></div>}</section></AccountShell></Shell>;}

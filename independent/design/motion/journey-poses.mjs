@@ -41,10 +41,10 @@ const pose = (rotationX, rotationY, rotationZ, fill = .94, cameraY = .04, exposu
 // so X tilts reveal the actual top/outsole rather than rolling a side image.
 const TRACKS = {
   hero: [
-    [0, pose(.14, -.38, -.045, .82)],
+    [0, pose(.30, -.10, -.055, .82)],
     [.25, pose(.32, .72, .025, .86)],
     [.50, pose(.78, .16, -.035, .94, .10)],
-    [.75, pose(.12, -.78, -.105, .92, .05, .98)],
+    [.75, pose(.24, -.64, -.11, .99, .06, .98)],
     [1, pose(.18, -.10, 0, .88)],
   ],
   deconstruction: [
@@ -106,23 +106,28 @@ export function journeyPose(chapter, progress) {
 // all consume the existing Hero progress; there is no additional scroll clock.
 export function heroDirection(progress) {
   return tourThrough([
-    [0, { dolly: 1, truck: 0, lift: 0, world: 0, strength: .85, light: 0, frame: 0, typeScale: 1, typeY: 0, sculpture: -.20 }],
-    [.25, { dolly: 1, truck: .55, lift: .03, world: .50, strength: .72, light: .28, frame: .35, typeScale: .88, typeY: -15, sculpture: -.58 }],
-    [.50, { dolly: 1, truck: -.18, lift: .06, world: 1.12, strength: .48, light: .60, frame: 1, typeScale: .70, typeY: -42, sculpture: -.85 }],
-    [.75, { dolly: 1, truck: -.40, lift: .08, world: 1.70, strength: .62, light: .84, frame: .65, typeScale: .85, typeY: -18, sculpture: .18 }],
-    [1, { dolly: 1, truck: 0, lift: 0, world: 2.20, strength: .40, light: 1, frame: 0, typeScale: .94, typeY: -10, sculpture: .34 }],
+    [0, { dolly: 1, truck: 0, lift: 0, world: 0, strength: 1.10, light: 0, frame: 0, typeScale: 1, typeY: 0, sculpture: -.20 }],
+    [.25, { dolly: 1, truck: .55, lift: .03, world: .50, strength: .98, light: .28, frame: .35, typeScale: .88, typeY: -15, sculpture: -.58 }],
+    [.50, { dolly: 1, truck: -.18, lift: .06, world: 1.12, strength: .78, light: .60, frame: 1, typeScale: .70, typeY: -42, sculpture: -.85 }],
+    [.75, { dolly: 1, truck: -.40, lift: .08, world: 1.70, strength: .95, light: .84, frame: 2.05, typeScale: .65, typeY: -32, sculpture: .32 }],
+    [1, { dolly: 1, truck: 0, lift: 0, world: 2.20, strength: .90, light: 1, frame: 0, typeScale: .94, typeY: -10, sculpture: .34 }],
   ], progress);
 }
 
 // A virtual camera gate, not a DOM/model scale. It opens into the space yielded
 // by the headline, then resolves to the original gate before the handoff.
-export function heroProductGate(rect, progress, compact = false) {
+export function heroProductGate(rect, progress, compact = false, release = 0) {
   const p = clamp(progress);
-  if (p === 0 || p === 1) return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
   const { frame } = heroDirection(p);
-  if (compact) return { left: rect.left, top: rect.top - rect.height * .06 * frame, width: rect.width, height: rect.height * (1 + .12 * frame) };
-  return { ...rect, left: rect.left - rect.width * .22 * frame, top: rect.top - rect.height * .06 * frame,
-    width: rect.width * (1 + .22 * frame), height: rect.height * (1 + .12 * frame) };
+  const departure = smooth(release);
+  const gate = compact
+    ? { left:rect.left, top:rect.top-rect.height*.06*frame, width:rect.width, height:rect.height*(1+.12*frame) }
+    : { left:rect.left-rect.width*.22*frame, top:rect.top-rect.height*.06*frame, width:rect.width*(1+.22*frame), height:rect.height*(1+.12*frame) };
+  // During natural unpinning the product travels toward the incoming left
+  // study while its depth frame opens. No added hold or second scroll owner.
+  gate.left -= rect.width * (compact ? .04 : .20) * departure;
+  gate.top += rect.height * .12 * departure;
+  return gate;
 }
 
 export function brandStudyPhase(progress) {

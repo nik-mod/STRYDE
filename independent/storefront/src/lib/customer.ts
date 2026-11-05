@@ -137,13 +137,13 @@ async function writeCustomerCookie(token: string) {
 export async function customerOrders(): Promise<OrderSummary[]> {
   const token = await readCustomerToken();
   if (!token) return [];
-  const result = await medusa<{ customer: { orders: OrderSummary[] } }>(
-    "/customers/me?fields=*orders",
+  const result = await medusa<{ orders: OrderSummary[] }>(
+    "/orders?fields=*items,*shipping_address&limit=100&order=-created_at",
     undefined,
     "GET",
     token,
   );
-  return (result.customer?.orders ?? []).sort((a, b) =>
+  return (result.orders ?? []).sort((a, b) =>
     b.display_id - a.display_id,
   );
 }
@@ -160,7 +160,7 @@ export async function addCustomerAddress(address: {
   if (!token) throw new CommerceError("Sign in to save addresses.", 401);
   const result = await medusa<{ customer: Customer }>(
     "/customers/me/addresses",
-    { addresses: [address] },
+    address,
     "POST",
     token,
   );
@@ -169,13 +169,13 @@ export async function addCustomerAddress(address: {
 export async function deleteCustomerAddress(id: string): Promise<Customer> {
   const token = await readCustomerToken();
   if (!token) throw new CommerceError("Sign in to manage addresses.", 401);
-  const result = await medusa<{ customer: Customer }>(
+  const result = await medusa<{ parent: Customer }>(
     `/customers/me/addresses/${id}`,
     undefined,
     "DELETE",
     token,
   );
-  return result.customer;
+  return result.parent;
 }
 export async function updateCustomerMetadata(
   metadata: Record<string, unknown>,
