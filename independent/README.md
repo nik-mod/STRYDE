@@ -39,9 +39,24 @@ This checks readiness without starting or changing services. For a brand-new dat
 
 Open [the independent storefront](http://127.0.0.1:3000). The [original reference](http://localhost:9292) stays available. The [Medusa admin](http://127.0.0.1:9000/app) requires your own administrator. Create it using `npm run admin:setup`; the interactive command hides password input and avoids putting credentials in source or command-line arguments. Guest checkout is implemented; customer accounts are deferred until there is a reason to collect/store account credentials.
 
-The seed creates 14 labeled, generic test products with concept imagery, USD test prices, sizes 40/41/42 and test stock. Size 42 has zero stock. These are actual Medusa database records, separate from the unverified branded photographic references in the original project. The seed writes its publishable API key and region into the ignored storefront environment file. It refuses production. Re-running it preserves existing products and orders; it does not reset stock.
+The seed builds the store catalog from the project's own visible sneaker
+collection (`storefront/src/data/stockx-editorial.json`): the same entries and
+photographs the storefront has always presented, now backed by real Medusa
+records so every pair can be bought at a flat **$140.00** (test pricing set by
+the owner), in sizes EU 40–43 with no stock limits. Archive photos keep their
+`archive_reference` provenance metadata: they are sellable in the local test
+store only, never in production, until the media registry's owner confirmation
+exists. The seed writes its publishable API key and region into the ignored
+storefront environment file. It refuses production. Re-running it preserves
+existing products and orders.
 
-Use fictional details in test checkout. Test address → backend shipping quote → shipping selection → Medusa test provider → actual development order. Confirmation explicitly says no real payment, shipment or email. Order management belongs to Medusa Admin. No card field is collected and no live bank adapter is configured.
+Checkout runs address → shipping quote → shipping selection → test-mode card
+payment → Medusa order. The payment step is a development-only gateway: use
+`4242 4242 4242 4242`, any future expiry and any CVC; a card ending `0002`
+simulates a decline. Card details are validated transiently in memory (Luhn,
+expiry, CVC), never persisted or logged, and no bank, PSP or live gateway is
+contacted. Confirmation explicitly says no real payment, shipment or email.
+Order management belongs to Medusa Admin.
 
 ## Validation
 

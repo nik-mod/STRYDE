@@ -39,6 +39,11 @@ export type Cart = {
     product?: { metadata: Record<string, unknown> | null };
   }[];
   subtotal: number;
+  // Medusa includes selected shipping in `subtotal` once a method exists;
+  // `item_subtotal` is the goods-only figure used for the bag header.
+  item_subtotal?: number;
+  discount_total?: number;
+  promotions?: { code?: string }[];
   total: number;
   shipping_total: number;
   tax_total: number;

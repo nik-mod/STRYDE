@@ -30,7 +30,14 @@ module.exports = defineConfig({
       connection: {
         ssl:
           process.env.DATABASE_SSL === "true"
-            ? { rejectUnauthorized: true }
+            ? {
+                // Hosted providers (e.g. Supabase) present a standard public
+                // CA chain; local VPN/proxy setups can break Node's chain
+                // verification. Set DATABASE_SSL_STRICT=false explicitly to
+                // still encrypt but skip chain verification.
+                rejectUnauthorized:
+                  process.env.DATABASE_SSL_STRICT !== "false",
+              }
             : false,
       },
     },

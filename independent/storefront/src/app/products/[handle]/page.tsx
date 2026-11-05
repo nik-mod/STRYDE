@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Shell } from "@/components/Shell";
 import { Gallery } from "@/components/Gallery";
+import { WishlistButton } from "@/components/WishlistButton";
 import {
   EditorialProduct,
   editorialProduct,
@@ -15,20 +16,22 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }) {
   const handle = (await params).handle;
+  try {
+    const item = await product(handle);
+    if (item)
+      return {
+        title: item.title,
+        ...(item.metadata?.development_fixture
+          ? { robots: { index: false, follow: false } }
+          : {}),
+      };
+  } catch {
+    // Fall through to the editorial reference title.
+  }
   const reference = isTestMode() ? editorialProduct(handle) : undefined;
   if (reference)
     return { title: reference.title, robots: { index: false, follow: false } };
-  try {
-    const item = await product(handle);
-    return {
-      title: item?.title || "Product",
-      ...(item?.metadata?.development_fixture
-        ? { robots: { index: false, follow: false } }
-        : {}),
-    };
-  } catch {
-    return { title: "Product" };
-  }
+  return { title: "Product" };
 }
 export default async function ProductPage({
   params,
@@ -38,7 +41,17 @@ export default async function ProductPage({
   searchParams: Promise<{ variant?: string }>;
 }) {
   const handle = (await params).handle;
-  if (isTestMode() && /^stockx-/.test(handle)) {
+  // Medusa catalog products take precedence: the archive handles become real
+  // commerce pages with sizes, bag and checkout. Handles without a Medusa
+  // record fall back to the editorial reference presentation in test mode.
+  let item;
+  let commerceError = "";
+  try {
+    item = await product(handle);
+  } catch (cause) {
+    commerceError = (cause as Error).message;
+  }
+  if (!item && isTestMode() && /^stockx-/.test(handle)) {
     if (!editorialProduct(handle)) notFound();
     return (
       <Shell>
@@ -46,19 +59,12 @@ export default async function ProductPage({
       </Shell>
     );
   }
-  let item;
-  let error = "";
-  try {
-    item = await product((await params).handle);
-  } catch (cause) {
-    error = (cause as Error).message;
-  }
-  if (error)
+  if (commerceError && !item)
     return (
       <Shell>
         <section className="commerce-panel">
           <h1>The collection</h1>
-          <p role="alert">{error}</p>
+          <p role="alert">{commerceError}</p>
           <a href="/collections/all">Return to collection</a>
         </section>
       </Shell>
@@ -76,9 +82,10 @@ export default async function ProductPage({
         <div className="studio-product-layout">
           <Gallery product={item} />
           <div className="studio-product-information">
-            <div className="studio-product-title">
-              <h1>{item.title}</h1>
-            </div>
+          <div className="studio-product-title">
+            <h1>{item.title}</h1>
+          </div>
+          <WishlistButton handle={item.handle} />
             {item.metadata?.development_fixture === true && (
               <p className="fixture-label">
                 Development fixture · Not commercial merchandise

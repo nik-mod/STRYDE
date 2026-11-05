@@ -98,7 +98,7 @@ export default async function RootLayout({
       >
         {isTestMode() && (
           <aside className="preview-notice" role="note">
-            STRYDE · LOCAL PREVIEW · CHECKOUT NOT OPEN
+            STRYDE · LOCAL TEST STORE · TEST PAYMENTS ONLY — NO REAL CHARGES
           </aside>
         )}
         {children}

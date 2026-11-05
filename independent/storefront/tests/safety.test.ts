@@ -39,6 +39,64 @@ test("unreviewed merchandise never enters commercial catalog", () => {
     true,
   );
 });
+test("approved owned concept media can back a saleable product", () => {
+  const concept = {
+    metadata: {
+      commerce_approved: true,
+      identity_verified: true,
+      sale_permitted: true,
+      stryde_media: {
+        approved: true,
+        images: [
+          {
+            source: "concept",
+            license_status: "owned",
+          },
+        ],
+      },
+    },
+  };
+  assert.equal(permitted(concept, false), true);
+  // A concept record claiming an unearned stockx provenance stays blocked.
+  assert.equal(
+    permitted(
+      {
+        metadata: {
+          ...concept.metadata,
+          stryde_media: {
+            approved: true,
+            images: [
+              { source: "stockx", license_status: "owned" },
+            ],
+          },
+        },
+      },
+      false,
+    ),
+    false,
+  );
+});
+test("archive references sell in the test store but never in production", () => {
+  const archive = {
+    metadata: {
+      commerce_approved: true,
+      identity_verified: true,
+      sale_permitted: true,
+      stryde_media: {
+        approved: true,
+        images: [
+          {
+            source: "stockx",
+            license_status: "archive_reference",
+            match_status: "archive_reference",
+          },
+        ],
+      },
+    },
+  };
+  assert.equal(permitted(archive, true), true);
+  assert.equal(permitted(archive, false), false);
+});
 test("fixtures are allowed only in explicit development mode", () => {
   assert.equal(
     permitted({ metadata: { development_fixture: true } }, false),
