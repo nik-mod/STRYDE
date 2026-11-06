@@ -1,4 +1,5 @@
 import { Shell } from "@/components/Shell";
+import { CareNavigation } from "@/components/CareNavigation";
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
 import { Arrow } from "@/components/Information";
@@ -9,6 +10,7 @@ export default function Contact() {
   return (
     <Shell>
       <div className="information-page contact-page" data-information>
+        <CareNavigation/>
         <div className="contact-layout">
           <header className="contact-introduction"><h1>Let’s<br /><em>talk.</em></h1><p>A question about a pair.<br />A detail you want to know.<br />Start here.</p></header>
           <div className="contact-form-panel"><ContactForm ready={config.ready} initialToken={createContactService().token()} /></div>

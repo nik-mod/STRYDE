@@ -1,10 +1,26 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http";
 import { publicationGuard } from "../lib/product-publication";
 import { adminMediaGuard } from "../lib/admin-media-guard";
+import { catalogAssetRedirect } from "../lib/catalog-asset-redirect";
 // The public Store API is reachable independently of Next. Guard it here too.
 // No environment flag can activate unimplemented live payments.
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/hooks/stryde-payments/:bank",
+      method: ["POST"],
+      bodyParser: { preserveRawBody: true, sizeLimit: "16kb" },
+      middlewares: [],
+    },
+    {
+      matcher: "/assets/*",
+      method: ["GET", "HEAD"],
+      middlewares: [(req, res, next) => {
+        const target = catalogAssetRedirect(req.originalUrl, process.env.STOREFRONT_URL || process.env.STORE_CORS?.split(",")[0] || "");
+        if (target) { res.redirect(307, target); return; }
+        next();
+      }],
+    },
     {
       matcher: "/admin/stryde/*",
       middlewares: [
@@ -106,7 +122,7 @@ export default defineMiddlewares({
             data?.provider_id !== "pp_system_default"
           ) {
             res.status(403).json({
-              message: "Only the local test payment provider is configured.",
+              message: "Bank payment sessions must use the protected STRYDE checkout flow.",
             });
             return;
           }

@@ -8,12 +8,13 @@ import net from 'node:net';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const env = await readFile(resolve(root, 'backend/.env'), 'utf8');
 const database = new URL(env.match(/^DATABASE_URL=(.+)$/m)?.[1]?.trim() || '');
-if (!['127.0.0.1', 'localhost'].includes(database.hostname)) throw new Error('Local startup requires a loopback database.');
+const localDatabase = ['127.0.0.1', 'localhost'].includes(database.hostname);
+if (!localDatabase && !/^STRYDE_ALLOW_REMOTE_DATABASE=true\s*$/m.test(env)) throw new Error('Remote database requires STRYDE_ALLOW_REMOTE_DATABASE=true.');
 const children = [];
 let stopping = false;
 const pause = ms => new Promise(done => setTimeout(done, ms));
-const open = port => new Promise(done => {
-  const socket = net.connect({ host: '127.0.0.1', port });
+const open = (port, host = '127.0.0.1') => new Promise(done => {
+  const socket = net.connect({ host, port });
   const finish = value => { socket.destroy(); done(value); };
   socket.once('connect', () => finish(true)); socket.once('error', () => finish(false)); socket.setTimeout(1000, () => finish(false));
 });
@@ -56,11 +57,11 @@ async function shutdown(code = 0) {
 process.once('SIGINT', () => void shutdown()); process.once('SIGTERM', () => void shutdown());
 try {
   if (process.argv.includes('--check')) {
-    const state = { database: await open(Number(database.port)), backend: await healthy(9000, '/health'), storefront: await healthy(3000, '/api/health') };
+    const state = { database: await open(Number(database.port || 5432), database.hostname), backend: await healthy(9000, '/health'), storefront: await healthy(3000, '/api/health') };
     console.log(JSON.stringify(state)); process.exit(Object.values(state).every(Boolean) ? 0 : 1);
   }
-  if (!await open(Number(database.port))) start('PostgreSQL', resolve(root, 'scripts/postgres.mjs'), [], root, true);
-  await waitFor(() => open(Number(database.port)), 'PostgreSQL', 30000);
+  if (localDatabase && !await open(Number(database.port))) start('PostgreSQL', resolve(root, 'scripts/postgres.mjs'), [], root, true);
+  await waitFor(() => open(Number(database.port || 5432), database.hostname), 'PostgreSQL', 30000);
   if (!await healthy(9000, '/health')) {
     if (await open(9000)) throw new Error('Port 9000 is occupied by an unhealthy service.');
     start('Medusa', resolve(root, 'backend/node_modules/@medusajs/cli/cli.js'), ['develop','--host','127.0.0.1'], resolve(root, 'backend'));

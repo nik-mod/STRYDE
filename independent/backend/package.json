@@ -17,6 +17,7 @@
     "@medusajs/framework": "2.22.2",
     "@medusajs/medusa": "2.22.2",
     "@medusajs/ui": "4.2.9",
+    "pg": "8.23.1",
     "sharp": "0.35.5"
   },
   "devDependencies": {

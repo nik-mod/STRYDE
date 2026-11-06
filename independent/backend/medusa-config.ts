@@ -1,4 +1,6 @@
 import { loadEnv, defineConfig } from "@medusajs/framework/utils";
+import { readFileSync } from "node:fs";
+import { bankProviderModules } from "./src/lib/bank-payments/config";
 loadEnv(process.env.NODE_ENV || "development", process.cwd());
 const required = (name: string) => {
   const value = process.env[name];
@@ -21,8 +23,8 @@ if (production) {
     )
       throw new Error(`${name} must use HTTPS in production`);
 }
-// There is intentionally no live payment provider or default secret.
-// Production checkout is additionally denied by the API middleware.
+// Bank adapters are opt-in with bank-issued sandbox credentials only.
+// Production checkout remains denied until merchant certification is complete.
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: required("DATABASE_URL"),
@@ -31,6 +33,7 @@ module.exports = defineConfig({
         ssl:
           process.env.DATABASE_SSL === "true"
             ? {
+                ...(process.env.DATABASE_SSL_CA_FILE ? { ca: readFileSync(process.env.DATABASE_SSL_CA_FILE, "utf8") } : {}),
                 // Hosted providers (e.g. Supabase) present a standard public
                 // CA chain; local VPN/proxy setups can break Node's chain
                 // verification. Set DATABASE_SSL_STRICT=false explicitly to
@@ -53,6 +56,8 @@ module.exports = defineConfig({
   admin: { disable: process.env.DISABLE_ADMIN === "true" },
   modules: [
     { resolve: "./src/modules/catalog-media" },
+    { resolve: "./src/modules/payment-operations" },
+    { resolve: "@medusajs/medusa/payment", options: { providers: bankProviderModules() } },
     {
       resolve: "@medusajs/medusa/file",
       options: {

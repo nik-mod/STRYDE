@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Shell } from "@/components/Shell";
+import { CareNavigation } from "@/components/CareNavigation";
 import { Arrow } from "@/components/Information";
 import { storePolicies } from "@/lib/store-information";
 type Props = { params: Promise<{ handle: string }> };
@@ -13,6 +14,7 @@ export default async function Policy({ params }: Props) {
   const handle = (await params).handle, policy = Object.hasOwn(storePolicies, handle) ? storePolicies[handle] : undefined;
   if (!policy) notFound();
   return <Shell><article className={`information-page policy-page policy-${handle}`} data-information>
+    <CareNavigation/>
     <header className="information-heading"><h1>{policy.title}<span>.</span></h1><p>{policy.introduction}</p></header>
     <div className="policy-layout">
       <aside className="policy-sidebar"><nav aria-label="Store information">{Object.entries(storePolicies).map(([key, p]) => <a key={key} href={`/policies/${key}`} aria-current={key === handle ? "page" : undefined}>{p.title}<Arrow diagonal /></a>)}</nav><a className="information-back" href="/collections/all">Back to the collection <Arrow /></a></aside>

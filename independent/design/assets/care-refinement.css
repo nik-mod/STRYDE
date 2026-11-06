@@ -1,0 +1,85 @@
+/* Customer care uses the established shopping palette and native controls. */
+.care-route-nav{margin-bottom:54px;border-block:1px solid #a0b8c5;padding:18px 0;color:#102b3b}
+.care-route-links{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,80px)}
+.care-route-group>span{display:block;font-size:13px;font-weight:600;color:#36596b;margin-bottom:10px}
+.care-route-group>div{display:flex;justify-content:space-between;gap:12px}
+.care-route-group a{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:14px;text-decoration:none;white-space:nowrap;transition:color .2s}
+.care-route-group a svg{width:14px;height:14px;opacity:0;transform:translate(-3px,3px);transition:opacity .2s,transform .2s}
+.care-route-group a:hover,.care-route-group a[aria-current]{color:#2053a4}
+.care-route-group a[aria-current]{font-weight:650;text-decoration:underline;text-underline-offset:8px;text-decoration-thickness:2px}
+.care-route-group a:is(:hover,:focus-visible) svg{opacity:1;transform:none}
+.care-route-select{display:none}
+.contact-page .care-route-nav{color:#eef5f7;border-color:#537284}
+.contact-page .care-route-group>span,.contact-page .care-route-select{color:#c9e2ed}
+.contact-page .care-route-group a:is(:hover,[aria-current]){color:#88d9ee}
+.care-route-nav :is(a,select):focus-visible{outline:2px solid #2053a4;outline-offset:5px}
+.contact-page .care-route-nav a:focus-visible,.contact-page .contact-context a:focus-visible,.faq-layout .customer-aside a:focus-visible,.policy-page .policy-sidebar a:focus-visible,.customer-page .tracking-context a:focus-visible{outline:2px solid #88d9ee;outline-offset:5px}
+.customer-page .fit-table-caption{font-size:14px;color:#36596b;line-height:1.65;margin-top:24px;max-width:75ch}
+.customer-page,.contact-page,.policy-page{padding-top:calc(var(--header-height) + var(--preview-height) + 30px)}
+.customer-heading{padding-block:8px 52px;gap:7vw;align-items:center}
+.customer-heading h1{font-size:clamp(62px,7vw,96px);font-variation-settings:'wght' 850,'wdth' 82;line-height:.98}
+.customer-heading>p{font-size:clamp(18px,1.5vw,23px);max-width:33ch}
+.customer-split{padding-block:56px 76px}
+.faq-layout .customer-aside{background:#102f43;color:#eef5f7;padding:28px}
+.faq-layout .customer-aside nav a{color:#eef5f7;border-color:#537284;line-height:1.5;padding-block:12px}
+.faq-layout .customer-aside nav a:hover{color:#88d9ee}
+.faq-layout .customer-aside>.customer-note{color:#c9e2ed;max-width:none}
+.faq-group>h2{font-size:27px;color:#2053a4;padding-bottom:22px}
+.faq-group+.faq-group{margin-top:60px}
+.faq-item button{padding:26px 0;font-weight:550}
+.faq-item.is-open{background:#e0edf3;padding-inline:22px}
+.faq-item{transition:background .25s,padding .25s}
+.faq-answer-copy{line-height:1.75}
+.fit-diagram{padding:48px 32px;min-height:360px;display:flex;flex-direction:column;justify-content:center}
+.fit-measure{padding-block:56px 72px}
+.measure-steps li{padding-bottom:28px}
+.fit-chart{padding:36px 0 60px;border-top:1px solid #a0b8c5}
+.fit-table{background:#e0edf3}
+.fit-table tbody tr:nth-child(even){background:#e8f1f5}
+.fit-table :is(th,td){padding:23px 26px}
+.tracking-layout{grid-template-columns:1fr 1.1fr}
+.tracking-context{padding:46px 40px}
+.tracking-context>svg{width:150px;height:120px;margin-bottom:36px}
+.tracking-tool{padding:36px 0 0 clamp(32px,5vw,80px)}
+.tracking-session{background:#e0edf3;padding:20px 24px;border:0}
+.customer-support{background:#dceaf1;margin-inline:calc(-1 * var(--gutter));padding:40px var(--gutter);border:0}
+.customer-support>div{max-width:50ch}
+.customer-support>a{background:#102f43;color:#eef5f7;padding:16px 24px;text-decoration:none}
+.policy-page .information-heading{padding-block:8px 48px;grid-template-columns:1fr 1fr;gap:7vw}
+.policy-page .information-heading h1{font-size:clamp(64px,7.5vw,96px);line-height:1;font-variation-settings:'wght' 850,'wdth' 82}
+.policy-page .information-heading>p{font-size:clamp(18px,1.5vw,23px);max-width:35ch}
+.policy-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:clamp(40px,7vw,112px);padding-top:44px}
+.policy-sidebar{position:sticky;top:calc(var(--header-height) + var(--preview-height) + 24px);display:block;align-self:start;padding:26px;background:#102f43;color:#eef5f7;border:0;margin:0}
+.policy-sidebar nav{display:grid;gap:0}
+.policy-sidebar nav a{justify-content:space-between;color:#eef5f7;font-size:16px;border-bottom:1px solid #537284;padding-block:15px;min-height:54px}
+.policy-sidebar nav a svg{display:block;width:17px}
+.policy-sidebar nav a[aria-current]{color:#88d9ee;text-decoration:none}
+.policy-sidebar>.information-back{color:#c9e2ed;font-size:13px;line-height:1.5;display:flex;margin-top:28px}
+.policy-page .policy-reading,.policy-shipping .policy-reading,.policy-privacy .policy-reading{display:block;max-width:820px;min-width:0}
+.policy-reading>.publication-note{display:block;background:#e0edf3;padding:22px 26px;margin-bottom:8px;border:0}
+.policy-reading>.publication-note strong{font-size:14px}
+.policy-reading>.publication-note p{margin-top:7px;font-size:14px;line-height:1.6}
+.policy-page .policy-section,.policy-page .policy-section:first-of-type{padding:36px 0;border-bottom:1px solid #a0b8c5}
+.policy-page .policy-section h2,.policy-page .policy-section:first-of-type h2{font-size:clamp(27px,2.5vw,34px);font-weight:650;max-width:none;letter-spacing:-.025em;line-height:1.15}
+.policy-page .policy-section p,.policy-page .policy-section:first-of-type p{font-size:17px;line-height:1.8;max-width:70ch}
+.policy-page .policy-section h3{font-size:15px;color:#2053a4;margin-top:26px}
+.policy-page .policy-section ul{display:block;padding-left:20px;margin-top:14px}
+.policy-page .policy-section li{font-size:16px;padding-bottom:10px;line-height:1.65}
+.policy-contents{max-width:none;margin-top:24px}
+.policy-help{padding-block:30px 60px}
+.policy-help h2{font-size:24px}
+.policy-terms .information-heading{padding:36px 40px 44px}
+.contact-layout{margin-top:8px;gap:0 clamp(40px,7vw,112px)}
+.contact-page .contact-introduction h1{font-size:clamp(76px,8vw,112px);line-height:.94}
+.contact-form-panel{background:#dceaf1;padding:38px}
+.contact-form input,.contact-form textarea,.contact-form select{background:#eef5f7}
+.contact-context{padding-top:40px}
+@media(max-width:1050px){.care-route-links{gap:28px}.care-route-group>div{gap:10px}.care-route-group a{font-size:13px}.care-route-group a svg{display:none}.policy-layout{grid-template-columns:190px minmax(0,1fr);gap:36px}.policy-sidebar{padding:20px}}
+@media(max-width:700px){
+ .care-route-nav{margin-bottom:32px;padding:16px 0}.care-route-links{display:none}.care-route-select{display:grid;gap:10px;font-size:13px;font-weight:550;color:#36596b}.care-route-select select{width:100%;border:1px solid #7897a8;background:#e0edf3;color:#102b3b;min-height:50px;padding:12px;font:inherit;font-size:16px;border-radius:0}
+ .customer-heading{padding-block:0 32px;gap:22px}.customer-heading h1{font-size:clamp(52px,13.5vw,72px)}.customer-split{padding-block:32px 44px}.faq-layout .customer-aside{position:static;padding:22px}.faq-group+.faq-group{margin-top:40px}.faq-item button{font-size:18px;padding-block:22px}.faq-item.is-open{padding-inline:16px}.faq-answer-copy{padding-right:0;font-size:16px}
+ .fit-measure{padding-block:32px 44px}.fit-diagram{min-height:300px;padding:32px 24px}.fit-chart{padding-block:28px 36px}.fit-chart-heading{display:block}.fit-chart-heading>p{margin-top:18px}.fit-table :is(th,td){padding:18px 20px}.tracking-layout{grid-template-columns:1fr;gap:0}.tracking-context{padding:30px 26px}.tracking-context>svg{width:110px;height:85px;margin-bottom:24px}.tracking-tool{padding:32px 0 0}.customer-support{display:grid;gap:24px;padding-block:30px}.customer-support>a{justify-self:start}
+ .policy-page .information-heading{grid-template-columns:1fr;padding-block:0 30px;gap:22px}.policy-page .information-heading h1{font-size:clamp(56px,15vw,76px)}.policy-layout{display:flex;flex-direction:column;gap:28px;padding-top:28px}.policy-sidebar{position:static;width:100%;padding:20px 24px}.policy-sidebar nav{grid-template-columns:1fr 1fr;gap:0 22px}.policy-sidebar>.information-back{margin-top:20px}.policy-page .policy-section,.policy-page .policy-section:first-of-type{padding-block:28px}.policy-page .policy-section p,.policy-page .policy-section:first-of-type p{font-size:16px}.policy-terms .information-heading{padding:28px 24px 32px}.publication-note{padding:20px!important}.policy-help{padding-bottom:40px}
+ .contact-page .contact-introduction h1{font-size:84px}.contact-form-panel{padding:30px 24px}.contact-layout{margin-top:0}.contact-context{padding-top:32px}
+}
+@media(prefers-reduced-motion:reduce){.care-route-nav *,.faq-item{transition:none!important}}

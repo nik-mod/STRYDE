@@ -52,6 +52,7 @@ export default async function RootLayout({
     ...(["/pages/size-guide", "/pages/faq", "/orders/track"].includes(path) ? ["customer-care"] : []),
     ...(path.startsWith("/policies/") ? ["policy-editorial"] : []),
     "shopping-ui",
+    ...(["/pages/size-guide", "/pages/faq", "/orders/track", "/pages/contact"].includes(path) || path.startsWith("/policies/") ? ["care-refinement"] : []),
   ];
   const styles = await Promise.all(
     css.map(async (name) => ({
