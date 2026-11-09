@@ -1,6 +1,9 @@
 import { getEditorialEntries } from "@/lib/editorial-catalog";
 import { catalogPage } from "@/lib/reference-catalog.mjs";
 import { WishlistButton } from "./WishlistButton";
+import { ShopIcon } from "./ShopUI";
+import { CollectionOpening } from "./CollectionOpening";
+
 function Arrow() {
   return (
     <svg
@@ -16,8 +19,10 @@ function Arrow() {
 }
 export function EditorialCatalog({
   params,
+  searchOnly = false,
 }: {
   params: Record<string, string | undefined>;
+  searchOnly?: boolean;
 }) {
   const entries = getEditorialEntries();
   const query = new URLSearchParams(
@@ -25,109 +30,45 @@ export function EditorialCatalog({
       (e): e is [string, string] => typeof e[1] === "string",
     ),
   );
-  const state: any = catalogPage(entries, query, "/collections/all");
+  const pathname = searchOnly ? "/search" : "/collections/all";
+  const state: any = catalogPage(entries, query, pathname);
+  const pairs = searchOnly ? [] : state.featured.map((item: (typeof entries)[number]) => ({
+      href: item.url,
+      title: item.displayTitle,
+      caption: item.brand,
+      image: item.cover,
+      bounds: item.coverBounds,
+  }));
   return (
     <section
       className="page-shell collection-page collection-studio"
       data-listing-section
       data-section-id="restored-collection"
     >
-      <header
-        className="collection-masthead"
-        data-collection-masthead
-        data-listing-heading
-      >
-        <div className="collection-masthead-top">
-          <span>STRYDE / THE FOOTWEAR EDIT</span>
-          <span>Good shoes. New perspectives.</span>
-        </div>
-        <div className="collection-masthead-copy">
-          <p className="collection-eyebrow">
-            <span /> THE COLLECTION
-          </p>
-          <h1>
-            <span>FIND YOUR</span>
-            <em>NEXT MOVE.</em>
-          </h1>
-          <div className="collection-masthead-bottom">
-            <p>
-              Different shapes. Different stories.
-              <br />
-              Find the pair that feels like you.
-            </p>
-            <a href="#CollectionGallery" className="collection-explore">
-              Explore the edit <Arrow />
-            </a>
-          </div>
-        </div>
-        <div
-          className="collection-masthead-art"
-          aria-label="From the collection"
-        >
-          <div className="collection-orbit" aria-hidden="true">
-            <span>EVERYDAY / ANYWHERE</span>
-          </div>
-          <span className="collection-art-mark" aria-hidden="true">
-            S/
-          </span>
-          {state.featured.map((item: any, index: number) => (
-            <a
-              href={item.url}
-              className={`collection-hero-piece collection-hero-piece-${index + 1}`}
-              key={item.id}
-              aria-label={`Explore ${item.title}`}
-            >
-              <div className="collection-hero-media">
-                <img
-                  data-catalog-hero-image
-                  src={item.cover}
-                  width={1000}
-                  height={1000}
-                  loading="eager"
-                  decoding="async"
-                  alt={`${item.title} — ${item.colorway}`}
-                />
-              </div>
-              <span className="collection-hero-caption">
-                0{index + 1} / {item.brand}
-              </span>
-            </a>
-          ))}
-        </div>
-        <div className="collection-masthead-foot">
-          <span>
-            <b>{state.all}</b> sneakers. Find your next pair.
-          </span>
-          <span>Explore the shopping UI · Sample sizes & prices</span>
-        </div>
-      </header>
+      <CollectionOpening
+        title={searchOnly ? "Search sneakers" : "Sneaker edit"}
+        description="From the Samba’s low gum sole to the sculpted New Balance 9060."
+        pairs={pairs}
+        editorial
+      />
       <div className="photo-shop collection-browser" data-photo-shop>
         <div className="collection-gallery-heading" id="CollectionGallery">
-          <h2>
-            All sneakers<span>.</span>
-          </h2>
-          <span>{state.all} pairs</span>
+          {!searchOnly && <h2>All sneakers</h2>}
+          <p data-photo-results role="status" aria-live="polite">
+            {state.total ? `${state.rangeStart}–${state.rangeEnd} of ${state.total.toLocaleString("en")} ${state.total === 1 ? "pair" : "pairs"}` : "No pairs found"}
+          </p>
         </div>
         <div className="collection-toolbar">
           <form
             className="collection-browser-controls"
             method="get"
-            action="/collections/all"
+            action={pathname}
             data-catalog-form
             role="search"
             aria-label="Browse the collection"
           >
             <label className="collection-search">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                aria-hidden="true"
-              >
-                <circle cx="10.5" cy="10.5" r="6.5" />
-                <path d="m16 16 5 5" />
-              </svg>
+              <ShopIcon name="search" size={20} />
               <span className="sr-only">Search the collection</span>
               <input
                 id="CollectionSearch"
@@ -188,16 +129,13 @@ export function EditorialCatalog({
           </form>
         </div>
         <div className="collection-browser-meta">
-          <p data-photo-results role="status" aria-live="polite">
-            {state.rangeStart}–{state.rangeEnd} of {state.total} pairs
-          </p>
           <div className="collection-meta-actions">
             <a
               href={state.clearUrl}
               data-catalog-reset
               hidden={!state.hasFilters}
             >
-              Clear filters ×
+              Clear filters <ShopIcon name="close" size={14} />
             </a>
             <div
               className="collection-density"
@@ -234,7 +172,7 @@ export function EditorialCatalog({
         >
           {state.activeFilters.map((filter: any) => (
             <a href={filter.url} data-catalog-remove key={filter.label}>
-              {filter.label} <span aria-hidden="true">×</span>
+              {filter.label} <ShopIcon name="close" size={14} />
               <span className="sr-only">Remove filter</span>
             </a>
           ))}
@@ -257,11 +195,8 @@ export function EditorialCatalog({
                 className="photo-shop-image"
                 data-product-open
                 href={item.url}
-                aria-label={`View ${item.title}`}
+                aria-label={`View ${[item.displayTitle, item.displayColorway].filter(Boolean).join(", ")}`}
               >
-                <span className="photo-shop-card-top">
-                  <span>{item.brand}</span>
-                </span>
                 <span
                   className="photo-shop-photo"
                   data-product-transition-frame
@@ -288,10 +223,10 @@ export function EditorialCatalog({
                 <div>
                   <h2>
                     <a data-product-open href={item.url}>
-                      {item.title}
+                      {item.displayTitle}
                     </a>
                   </h2>
-                  <p className="photo-shop-colorway">{item.colorway}</p>
+                  <p className="photo-shop-colorway">{item.displayColorway}</p>
                 </div>
               </div>
             </article>

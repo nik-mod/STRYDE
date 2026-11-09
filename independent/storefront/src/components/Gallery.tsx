@@ -1,11 +1,14 @@
 import type { Product } from "@/lib/types";
 import { mediaFor } from "@/lib/product-media";
+import { Arrow } from "./Information";
+import { ShopIcon } from "./ShopUI";
 export function Gallery({ product }: { product: Product }) {
   const images = product.images?.length
     ? product.images
     : product.thumbnail
       ? [{ id: "cover", url: product.thumbnail }]
       : [];
+  const hasMultipleViews = images.length > 1;
   if (!images.length)
     return (
       <div className="studio-gallery">
@@ -15,7 +18,12 @@ export function Gallery({ product }: { product: Product }) {
       </div>
     );
   return (
-    <div className="studio-gallery" data-product-gallery data-gallery-normalize={product.metadata?.editorial_reference ? "" : undefined}>
+    <div
+      className="studio-gallery"
+      data-product-gallery
+      data-gallery-single={hasMultipleViews ? undefined : ""}
+      data-gallery-normalize={product.metadata?.editorial_reference ? "" : undefined}
+    >
       <figure className="studio-gallery-stage">
         <a
           className="studio-gallery-open"
@@ -35,26 +43,25 @@ export function Gallery({ product }: { product: Product }) {
               fetchPriority="high"
             />
           </span>
-          <span className="studio-gallery-zoom">+ Enlarge</span>
+          <span className="studio-gallery-zoom"><ShopIcon name="expand" size={18} /><span>Enlarge</span></span>
         </a>
-        <figcaption className="studio-gallery-caption">
-          <span data-gallery-caption>View 01</span>
-          <span data-gallery-count>
+        {hasMultipleViews && (
+          <figcaption className="studio-gallery-caption" data-gallery-count>
             01 / {String(images.length).padStart(2, "0")}
-          </span>
-        </figcaption>
-        {images.length > 1 && (
+          </figcaption>
+        )}
+        {hasMultipleViews && (
           <div className="studio-gallery-controls">
             <button type="button" data-gallery-prev aria-label="Previous image">
-              ←
+              <span className="gallery-arrow-back"><Arrow/></span>
             </button>
             <button type="button" data-gallery-next aria-label="Next image">
-              →
+              <Arrow/>
             </button>
           </div>
         )}
       </figure>
-      {images.length > 1 && (
+      {hasMultipleViews && (
         <div className="studio-gallery-thumbnails" aria-label="Product views">
           {images.map((image, index) => (
             <a
@@ -81,9 +88,6 @@ export function Gallery({ product }: { product: Product }) {
           ))}
         </div>
       )}
-      <p className="studio-gallery-help">
-        {images.length} {images.length === 1 ? "view" : "views"}<span>Click to explore the details</span>
-      </p>
       {images
         .map((image) => mediaFor(product, image.url).attribution)
         .filter(
@@ -100,21 +104,21 @@ export function Gallery({ product }: { product: Product }) {
         aria-label="Product image viewer"
       >
         <div className="studio-lightbox-toolbar">
-          <span data-lightbox-count />
+          {hasMultipleViews && <span data-lightbox-count />}
           <button
             type="button"
             data-lightbox-zoom
             aria-label="Zoom image"
             aria-pressed="false"
           >
-            + Zoom
+            <ShopIcon name="zoom" size={18} /> Zoom
           </button>
           <button
             type="button"
             data-lightbox-close
             aria-label="Close image viewer"
           >
-            ×
+            <ShopIcon name="close"/>
           </button>
         </div>
         <div className="studio-lightbox-canvas" data-lightbox-canvas>
@@ -127,15 +131,15 @@ export function Gallery({ product }: { product: Product }) {
             draggable={false}
           />
         </div>
-        <div className="studio-lightbox-navigation">
+        {hasMultipleViews && <div className="studio-lightbox-navigation">
           <button type="button" data-lightbox-prev aria-label="Previous image">
-            ←
+            <span className="gallery-arrow-back"><Arrow/></span>
           </button>
           <span>Use arrow keys to browse</span>
           <button type="button" data-lightbox-next aria-label="Next image">
-            →
+            <Arrow/>
           </button>
-        </div>
+        </div>}
       </dialog>
     </div>
   );

@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import { registerCustomer } from "@/lib/customer";
+import { CommerceError } from "@/lib/medusa";
 import { body, guardMutation, RequestError } from "@/lib/security";
 const input = z
   .object({
-    email: z.email().max(254),
+    email: z.string().trim().pipe(z.email().max(254)).transform(value => value.toLowerCase()),
     password: z.string().min(8).max(200),
     first_name: z.string().trim().min(1).max(100),
     last_name: z.string().trim().min(1).max(100),
@@ -23,11 +24,11 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    const known = error instanceof RequestError;
+    const known = error instanceof RequestError || error instanceof CommerceError;
     return NextResponse.json(
       {
         message:
-          known || error instanceof Error
+          known
             ? (error as Error).message
             : "Registration is temporarily unavailable.",
       },

@@ -1,8 +1,11 @@
+import { headers } from "next/headers";
+import { Arrow } from "./Information";
 import { catalogPage, CATALOG_PAGE_SIZE } from "@/lib/medusa";
 import { money, type Product } from "@/lib/types";
 import { mediaFor } from "@/lib/product-media";
 import { isTestMode } from "@/lib/policy";
 import { EditorialCatalog } from "./EditorialCatalog";
+import { CollectionOpening } from "./CollectionOpening";
 export async function Catalog({
   params,
   collection,
@@ -10,6 +13,7 @@ export async function Catalog({
   params: Record<string, string | undefined>;
   collection?: string;
 }) {
+  const searchOnly = (await headers()).get("x-stryde-path") === "/search";
   params = Object.fromEntries(
     Object.entries(params).filter(
       (entry): entry is [string, string] => typeof entry[1] === "string",
@@ -19,7 +23,7 @@ export async function Catalog({
   // fixtures exist in Medusa. Fixtures must never replace the sneaker edit.
   // Commercial mode continues to use the approved Medusa catalog below.
   if (isTestMode() && (!collection || collection === "all"))
-    return <EditorialCatalog params={params} />;
+    return <EditorialCatalog params={params} searchOnly={searchOnly} />;
   const query = params.q?.slice(0, 100) || "";
   const page = Math.max(1, Number.parseInt(params.page || "1") || 1);
   let result: Awaited<ReturnType<typeof catalogPage>> | null = null;
@@ -51,6 +55,12 @@ export async function Catalog({
     );
   const pages = Math.max(1, Math.ceil((result?.count ?? 0) / CATALOG_PAGE_SIZE));
   const shown = sorted;
+  const collectionTitle = result?.collections.find((item) => item.handle === collection)?.title || "All sneakers";
+  const pairs = searchOnly || query || page > 1 || params.category ? [] : (result?.featured ?? []).flatMap((item) => {
+    if (!item.thumbnail) return [];
+    const media = mediaFor(item, item.thumbnail, 720);
+    return [{ href: `/products/${item.handle}`, title: item.title, image: media.src, srcSet: media.srcSet }];
+  });
   const pageUrl = (number: number) => {
     const search = new URLSearchParams(
       Object.entries(params).filter(
@@ -65,74 +75,10 @@ export async function Catalog({
       className="page-shell collection-page collection-studio"
       data-listing-section
     >
-      <header
-        className="collection-masthead"
-        data-collection-masthead
-        data-listing-heading
-      >
-        <div className="collection-masthead-top">
-          <span>STRYDE / THE FOOTWEAR EDIT</span>
-          <span>Good shoes. New perspectives.</span>
-        </div>
-        <div className="collection-masthead-copy">
-          <p className="collection-eyebrow">
-            <span /> THE COLLECTION
-          </p>
-          <h1>
-            <span>FIND YOUR</span>
-            <em>NEXT MOVE.</em>
-          </h1>
-          <div className="collection-masthead-bottom">
-            <p>
-              Different shapes. Different stories.
-              <br />
-              Find the pair that feels like you.
-            </p>
-            <a href="#CollectionGallery" className="collection-explore">
-              Explore the edit ↗
-            </a>
-          </div>
-        </div>
-        <div className="collection-masthead-art" aria-label="From the collection">
-          <div className="collection-orbit" aria-hidden="true">
-            <span>EVERYDAY / ANYWHERE</span>
-          </div>
-          <span className="collection-art-mark" aria-hidden="true">
-            S/
-          </span>
-          {(result?.featured ?? []).map((item, index) => (
-            <a
-              href={`/products/${item.handle}`}
-              className={`collection-hero-piece collection-hero-piece-${index + 1}`}
-              key={item.id}
-              aria-label={`Explore ${item.title}`}
-            >
-              <div className="collection-hero-media">
-                {item.thumbnail && (
-                  <img
-                    data-catalog-hero-image
-                    src={mediaFor(item, item.thumbnail, 720).src}
-                    srcSet={mediaFor(item, item.thumbnail).srcSet}
-                    sizes="(max-width: 700px) 80vw, 40vw"
-                    width={1000}
-                    height={1000}
-                    alt={item.title}
-                  />
-                )}
-              </div>
-              <span className="collection-hero-caption">
-                0{index + 1} / STRYDE
-              </span>
-            </a>
-          ))}
-        </div>
-        <div className="collection-masthead-foot">
-          <span>
-            <b>{result?.total ?? 0}</b> pairs in the edit.
-          </span>
-          <span>Find your next move.</span>
-        </div>
-      </header>
+      <CollectionOpening
+        title={searchOnly ? "Search sneakers" : collectionTitle}
+        pairs={pairs}
+      />
       <div id="CollectionGallery" className="photo-shop collection-browser">
         <form
           className="independent-filters"
@@ -182,7 +128,7 @@ export async function Catalog({
             </select>
           </label>
           <button className="button button-dark" type="submit">
-            Apply ↗
+            Apply
           </button>
         </form>
         <div className="collection-browser-meta">
@@ -233,9 +179,7 @@ export async function Catalog({
                     <span>Photography pending approval</span>
                   )}
                 </span>
-                <span className="photo-shop-open" aria-hidden="true">
-                  ↗
-                </span>
+                <span className="photo-shop-open" aria-hidden="true"><Arrow diagonal/></span>
                 <span className="photo-shop-discover" aria-hidden="true">
                   Explore the pair
                 </span>

@@ -78,7 +78,8 @@ export async function registerCustomer(input: {
     "/auth/customer/emailpass/register",
     { email: input.email, password: input.password },
     "POST",
-  ).catch(() => {
+  ).catch((error) => {
+    if (!(error instanceof CommerceError) || ![400, 409].includes(error.status)) throw error;
     throw new CommerceError(
       "An account with this email already exists. Try signing in instead.",
       409,
@@ -104,7 +105,8 @@ export async function loginCustomer(input: {
     "/auth/customer/emailpass",
     { email: input.email, password: input.password },
     "POST",
-  ).catch(() => {
+  ).catch((error) => {
+    if (!(error instanceof CommerceError) || error.status !== 401) throw error;
     throw new CommerceError("Email or password is incorrect.", 401);
   });
   const customer = await medusa<{ customer: Customer }>(

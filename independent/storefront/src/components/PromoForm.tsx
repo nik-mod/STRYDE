@@ -63,7 +63,7 @@ export function PromoForm({
           />
         </label>
         <button type="submit" className="button" disabled={busy}>
-          {busy ? "…" : "Apply ↗"}
+          {busy ? "…" : "Apply "}
         </button>
       </form>
       {message && (

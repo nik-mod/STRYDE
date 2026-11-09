@@ -89,14 +89,16 @@ export function catalogPage(entries, params = new URLSearchParams(), pathname = 
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 12h16m-7-7 7 7-7 7"/></svg>';
+const closeIcon = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg>';
 function cardMarkup(item, index) {
+  const title = item.displayTitle || item.title;
+  const colorway = item.displayColorway || item.colorway || (item.identified ? item.brand : 'Photo study');
   return `<article class="photo-shop-card" data-photo-card data-product-id="${escapeHTML(item.id)}" style="--card-order:${index}">
     <button type="button" class="wishlist-button is-compact" data-catalog-wishlist data-wishlist-handle="${escapeHTML(item.url.slice('/products/'.length))}" aria-label="Save to wishlist" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
-    <a class="photo-shop-image" data-product-open href="${escapeHTML(item.url)}" aria-label="View ${escapeHTML(item.title)}">
-      <span class="photo-shop-card-top"><span>${escapeHTML(item.brand || 'Footwear')}</span></span>
+    <a class="photo-shop-image" data-product-open href="${escapeHTML(item.url)}" aria-label="View ${escapeHTML([title, colorway].filter(Boolean).join(', '))}">
       <span class="photo-shop-photo" data-product-transition-frame><img data-product-cover data-studio-ground="${escapeHTML(item.studioGround)}" data-photo-bounds="${escapeHTML(item.coverBounds)}" src="${escapeHTML(item.cover)}" width="1000" height="1000" loading="${index < 3 ? 'eager' : 'lazy'}" alt="${escapeHTML(item.title)}">${item.alternate ? `<img class="photo-shop-alternate" data-studio-ground="${escapeHTML(item.alternateStudioGround)}" data-photo-bounds="${escapeHTML(item.alternateBounds)}" src="${escapeHTML(item.alternate)}" width="1000" height="1000" loading="lazy" alt="">` : ''}</span>
       <span class="photo-shop-open" aria-hidden="true">${arrow}</span><span class="photo-shop-discover" aria-hidden="true">Explore the pair</span>
-    </a><div class="photo-shop-info"><div><h2><a data-product-open href="${escapeHTML(item.url)}">${escapeHTML(item.title)}</a></h2><p class="photo-shop-colorway">${escapeHTML(item.colorway || (item.identified ? item.brand : 'Photo study'))}</p></div></div>
+    </a><div class="photo-shop-info"><div><h2><a data-product-open href="${escapeHTML(item.url)}">${escapeHTML(title)}</a></h2><p class="photo-shop-colorway">${escapeHTML(colorway)}</p></div></div>
   </article>`;
 }
 function paginationMarkup(state) {
@@ -217,8 +219,8 @@ export function mountPhotoFraming(root, { images = '.photo-shop-image img, [data
   root.addEventListener('error', event => { if (event.target.matches?.(images)) pending(event.target); }, { capture: true, signal: listeners.signal });
   const observer = doc.defaultView.ResizeObserver ? new doc.defaultView.ResizeObserver(fitAll) : null;
   observer?.observe(root.querySelector('[data-catalog-grid]') || root);
-  const masthead = root.querySelector('.collection-masthead-art');
-  if (masthead) observer?.observe(masthead);
+  const opening = root.querySelector('.collection-masthead-art');
+  if (opening) observer?.observe(opening);
   fitAll();
   return { refresh: fitAll, dispose() { listeners.abort(); observer?.disconnect(); cache.clear(); } };
 }
@@ -270,7 +272,7 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
     pickers.sync();
     if (activeFilters) {
       activeFilters.hidden = !state.activeFilters.length;
-      activeFilters.innerHTML = state.activeFilters.map(filter => `<a href="${escapeHTML(filter.url)}" data-catalog-remove>${escapeHTML(filter.label)} <span aria-hidden="true">×</span><span class="sr-only">Remove filter</span></a>`).join('');
+      activeFilters.innerHTML = state.activeFilters.map(filter => `<a href="${escapeHTML(filter.url)}" data-catalog-remove>${escapeHTML(filter.label)} ${closeIcon}<span class="sr-only">Remove filter</span></a>`).join('');
     }
   };
   const render = async (url, { history = 'push', scroll = false, focus = false, scrollTarget = galleryStart } = {}) => {
@@ -282,6 +284,7 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
       try {
         const endpoint = new URL(entries.endpoint, environment.location.origin);
         endpoint.search = url.search;
+        if (url.pathname === '/search') endpoint.searchParams.set('view', 'search');
         const response = await environment.fetch(endpoint, {signal: requestController.signal});
         if (!response.ok) throw new Error('Catalog request failed');
         state = await response.json();
@@ -307,7 +310,9 @@ export function mountCollectionStudio(section, { captureScroll, restoreScroll, s
       // One page dissolve owns this update. Replaying twelve entrance masks
       // beneath it used to make the incoming edit feel staggered and unfinished.
       revealCards(false);
-      result.textContent = `${state.rangeStart}–${state.rangeEnd} of ${state.total} ${state.total === 1 ? 'pair' : 'pairs'}`;
+      result.textContent = state.total
+        ? `${state.rangeStart}–${state.rangeEnd} of ${state.total.toLocaleString('en')} ${state.total === 1 ? 'pair' : 'pairs'}`
+        : 'No pairs found';
       pagination.innerHTML = paginationMarkup(state);
       empty.hidden = state.total > 0;
       reset.hidden = !state.hasFilters;

@@ -1,6 +1,6 @@
 // Keep the current edit on screen while the next page's opening photographs
 // decode. Requests are replaceable: a quick second click or Back owns the result.
-export function prepareCatalogImages(items, environment, signal, timeout = 900) {
+export function prepareCatalogImages(items, environment, signal, timeout = 220) {
   if (!environment.Image || signal.aborted) return Promise.resolve();
   return new Promise(resolve => {
     const images = [];
@@ -15,7 +15,7 @@ export function prepareCatalogImages(items, environment, signal, timeout = 900) 
     };
     const timer = setTimeout(finish, timeout);
     signal.addEventListener('abort', finish, { once: true });
-    Promise.all(items.slice(0, 6).map(item => {
+    Promise.all(items.slice(0, 3).map(item => {
       const image = new environment.Image();
       images.push(image);
       image.src = item.cover;
@@ -63,8 +63,8 @@ export function createCatalogTransition({ document, root, grid, environment = do
         } else {
           await commit();
           if (motion && active() && grid.animate) {
-            animation = grid.animate([{ opacity: .5, transform: `translateY(8px)` }, { opacity: 1, transform: 'none' }], {
-              duration: 260, easing: 'cubic-bezier(.16,1,.3,1)',
+            animation = grid.animate([{ opacity: .78, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], {
+              duration: 170, easing: 'cubic-bezier(.16,1,.3,1)',
             });
             await animation.finished.catch(() => {});
           }

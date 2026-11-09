@@ -45,6 +45,8 @@ export function mountProductGallery(root) {
   const thumbs = [...gallery.querySelectorAll('[data-product-thumbnail]')];
   const sources = thumbs.length ? thumbs.map(thumb => ({ src: thumb.dataset.imageUrl, alt: thumb.dataset.imageAlt || '', bounds: thumb.dataset.photoBounds || '' })) : [{ src: image.src, alt: image.alt, bounds: image.dataset.photoBounds || '' }];
   const dialog = gallery.querySelector('[data-gallery-dialog]');
+  const galleryCount = gallery.querySelector('[data-gallery-count]');
+  const lightboxCount = dialog?.querySelector('[data-lightbox-count]');
   const largeImage = dialog?.querySelector('[data-lightbox-image]');
   const largeCanvas = dialog?.querySelector('[data-lightbox-canvas]');
   const zoom = dialog?.querySelector('[data-lightbox-zoom]');
@@ -55,7 +57,7 @@ export function mountProductGallery(root) {
   const visibleThumbnails = new Set();
   const error = root.ownerDocument.createElement('p');
   error.className = 'studio-gallery-error'; error.setAttribute('role', 'status'); error.hidden = true;
-  error.textContent = 'Image unavailable. Choose another view.';
+  error.textContent = sources.length > 1 ? 'Image unavailable. Choose another view.' : 'Image unavailable.';
   gallery.querySelector('.studio-gallery-stage').append(error);
   const loading = root.ownerDocument.createElement('p');
   loading.className = 'studio-gallery-loading'; loading.setAttribute('role', 'status'); loading.hidden = true; loading.textContent = 'Loading image…';
@@ -89,7 +91,7 @@ export function mountProductGallery(root) {
     Object.assign(picture.style, Object.fromEntries(Object.entries(geometry).map(([key, value]) => [key, `${value}px`])));
   };
   const fitAll = () => {
-    fit(image, gallery.querySelector('[data-gallery-open]'));
+    fit(image, gallery.querySelector('[data-gallery-open]'), .9);
     thumbs.forEach(thumb => fit(thumb.querySelector('img'), thumb, .8, !visibleThumbnails.has(thumb)));
     if (dialog?.open && !dialog.classList.contains('is-zoomed')) fit(largeImage, largeCanvas, .9);
   };
@@ -138,16 +140,15 @@ export function mountProductGallery(root) {
       else thumb.removeAttribute('aria-current');
     });
     const count = external ? 'Variant view' : `${number(index + 1)} / ${number(sources.length)}`;
-    gallery.querySelector('[data-gallery-count]').textContent = count;
-    gallery.querySelector('[data-gallery-caption]').textContent = external ? 'Variant view' : `View ${number(index + 1)}`;
+    if (galleryCount) galleryCount.textContent = count;
     if (largeImage) { largeImage.src = source.src; largeImage.alt = source.alt; largeImage.dataset.photoBounds = source.bounds || ''; }
-    if (dialog) dialog.querySelector('[data-lightbox-count]').textContent = count;
+    if (lightboxCount) lightboxCount.textContent = count;
     resetZoom();
     fitAll();
     if (image.complete && image.naturalWidth) { gallery.setAttribute('aria-busy', 'false'); loading.hidden = true; }
     animation?.cancel();
     if (animate && !environment.matchMedia('(prefers-reduced-motion: reduce)').matches && image.animate) {
-      animation = image.animate([{ opacity: .25, transform: 'translateX(10px) scale(.99)' }, { opacity: 1, transform: 'translateX(0) scale(1)' }], { duration: 280, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      animation = image.animate([{ opacity: .65 }, { opacity: 1 }], { duration: 160, easing: 'ease-out' });
     }
   };
   const show = next => { external = null; index = galleryIndex(next, sources.length); update(); };
@@ -181,10 +182,10 @@ export function mountProductGallery(root) {
     if (active) { largeImage.classList.remove('has-content-framing'); largeImage.removeAttribute('style'); } else fitAll();
   });
   on(gallery, 'keydown', event => {
-    if (event.altKey || event.ctrlKey || event.metaKey || /INPUT|SELECT|TEXTAREA/.test(event.target.tagName)) return;
+    if (sources.length < 2 || event.altKey || event.ctrlKey || event.metaKey || /INPUT|SELECT|TEXTAREA/.test(event.target.tagName)) return;
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); show(index + (event.key === 'ArrowRight' ? 1 : -1)); }
   });
-  for (const surface of [gallery.querySelector('.studio-gallery-stage'), largeCanvas]) {
+  for (const surface of sources.length > 1 ? [gallery.querySelector('.studio-gallery-stage'), largeCanvas] : []) {
     on(surface, 'pointerdown', event => { if (event.pointerType === 'touch' && !dialog?.classList.contains('is-zoomed')) swipeStart = { x: event.clientX, y: event.clientY }; }, { passive: true });
     on(surface, 'pointerup', event => {
       if (!swipeStart) return;

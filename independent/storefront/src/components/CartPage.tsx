@@ -63,13 +63,13 @@ function LiveCartPage({ testMode }: { testMode: boolean }) {
             <p className="fixture-label">Test checkout · No real payment</p>
           )}
           <a className="button button-dark" href="/checkout">
-            Continue to {testMode ? "test " : ""}checkout ↗
+            Continue to {testMode ? "test " : ""}checkout
           </a>
         </>
       ) : (
         <p>
           Your bag is empty.{" "}
-          <a href="/collections/all">Explore the collection ↗</a>
+          <a href="/collections/all">Explore the collection </a>
         </p>
       )}
     </section>

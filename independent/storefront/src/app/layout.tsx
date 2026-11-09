@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 
 import { headers } from "next/headers";
-import { design, experienceSource, assetSource } from "@/lib/design";
+import { design, assetSource } from "@/lib/design";
 import { Commerce } from "@/components/Commerce";
 import { isTestMode } from "@/lib/policy";
 import "./independent.css";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL || "http://localhost:3000"),
   title: { default: "STRYDE — Beyond Ordinary", template: "%s — STRYDE" },
-  description: "The STRYDE footwear edit. Different shapes. Different stories.",
+  description: "Explore the STRYDE sneaker edit, from low-profile court shoes to layered trail runners.",
+  icons: {
+    icon: [{ url: "/favicon.ico?v=2", sizes: "16x16 32x32 48x48", type: "image/x-icon" }, { url: "/favicon.svg?v=2", sizes: "any", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" }],
+  },
   robots:
     process.env.NODE_ENV === "production"
       ? { index: true, follow: true }
@@ -52,6 +56,7 @@ export default async function RootLayout({
     ...(["/pages/size-guide", "/pages/faq", "/orders/track"].includes(path) ? ["customer-care"] : []),
     ...(path.startsWith("/policies/") ? ["policy-editorial"] : []),
     "shopping-ui",
+    "experience-polish",
     ...(["/pages/size-guide", "/pages/faq", "/orders/track", "/pages/contact"].includes(path) || path.startsWith("/policies/") ? ["care-refinement"] : []),
   ];
   const styles = await Promise.all(
@@ -64,8 +69,8 @@ export default async function RootLayout({
     <html lang="en" className="js" suppressHydrationWarning>
       <head>
         {template === "index" && <>
-          <link rel="preload" as="fetch" href="/assets/nike-tn-blue-white.glb" crossOrigin="anonymous" />
-          <link rel="preload" as="fetch" href="/assets/studio-environment.hdr" crossOrigin="anonymous" />
+          <link rel="preload" as="fetch" href="/assets/nike-tn-blue-white.glb" crossOrigin="anonymous" media="(prefers-reduced-motion: no-preference)" fetchPriority="low" />
+          <link rel="preload" as="fetch" href="/assets/studio-environment.hdr" crossOrigin="anonymous" media="(prefers-reduced-motion: no-preference)" fetchPriority="low" />
         </>}
         <link
           rel="preload"

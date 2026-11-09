@@ -28,6 +28,8 @@ export function mountCatalogPickers(form) {
     button.setAttribute('aria-haspopup', 'listbox');
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-labelledby', `${label.id} ${button.id}`);
+    const selectedLabel = doc.createElement('span');
+    button.append(selectedLabel);
     const list = doc.createElement('div');
     list.id = `CatalogOptions-${select.name}`;
     list.className = 'collection-picker-options'; list.hidden = true;
@@ -117,7 +119,7 @@ export function mountCatalogPickers(form) {
       if (next !== undefined) { event.preventDefault(); options[next].focus(); }
     }, { signal: listeners.signal });
     const sync = () => {
-      button.textContent = select.selectedOptions[0]?.textContent || select.options[0].textContent;
+      selectedLabel.textContent = select.selectedOptions[0]?.textContent || select.options[0].textContent;
       options.forEach((option, index) => option.setAttribute('aria-selected', String(index === select.selectedIndex)));
     };
     wrapper.append(button, list); sync(); pickers.push({ ...picker, sync, wrapper });

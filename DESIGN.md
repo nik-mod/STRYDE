@@ -370,3 +370,8 @@ Campaign palette additions: the closing product wall uses ice #c8e2ed, blue emph
 For `independent/`, this note supersedes earlier Hero descriptions of a camera fitted once, a fixed product frame, a closed loop and earlier pin durations. Existing color, typography and component tokens are unchanged. The shared GSAP Hero progress now directs arrival, front orbit, closer upper inspection, a larger illuminated heel reveal, and release. Each shot fits the actual rotated GLB silhouette to a responsive optical gate. The lettering yields reading space during inspection and reveal; the whole sneaker remains contained. The larger continuous wave landscape replaces the overhead ring, with scroll-directed crest travel and ambient deformation. Ambient motion belongs to the environment; the product and camera remain scroll-directed.
 
 Desktop pin travel is 1.65 stage heights; portrait and small-screen travel is .8. During natural unpinning, the product travels toward the incoming left study, the wave landscape opens, and the existing continuity clock introduces the Drift heading and a real collection action. There is no additional pinned hold. The original opening film and later chapter structure remain. Reduced-motion and no-JavaScript visitors retain the static image and native actions. Current source and verification details live in `independent/evidence/cinematic-overhaul/REPORT.md`; physical-device frame pacing and live commerce remain outside that evidence.
+
+## Icon preference
+
+The owner requires no emojis in website UI. Use the existing authored SVG icon system instead of emoji or emoji-style text glyphs. The independent storefront favicon uses a light STRYDE S monogram on navy, with SVG, ICO and Apple touch variants.
+

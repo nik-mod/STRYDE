@@ -181,7 +181,7 @@ function LiveCheckout({ testMode }: { testMode: boolean }) {
                   disabled={busy}
                   className="button button-dark wide"
                 >
-                  Save details & calculate shipping ↗
+                  Save details & calculate shipping
                 </button>
               </form>
               {options.length > 0 && (
@@ -227,7 +227,7 @@ function LiveCheckout({ testMode }: { testMode: boolean }) {
                     <strong>{money(cart.total, cart.currency_code)}</strong>
                   </p>
                   <p>Card details are entered on the bank’s secure page.</p>
-                  <a href="/checkout/payment" className="button button-dark">Choose bank payment ↗</a>
+                  <a href="/checkout/payment" className="button button-dark">Choose bank payment </a>
                   <p>
                     <a href="/policies/returns">Returns</a> ·{" "}
                     <a href="/policies/terms">Terms</a> ·{" "}

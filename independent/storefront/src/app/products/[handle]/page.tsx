@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Shell } from "@/components/Shell";
 import { Gallery } from "@/components/Gallery";
+import { Arrow } from "@/components/Information";
 import { WishlistButton } from "@/components/WishlistButton";
 import {
   EditorialProduct,
@@ -79,7 +80,7 @@ export default async function ProductPage({
       <section className="studio-product page-shell" data-product-section>
         <nav className="studio-breadcrumbs" aria-label="Breadcrumbs">
           <a data-collection-return href="/collections/all">
-            ← Back to Collection
+            <Arrow /> Back to collection
           </a>
           <span>{item.collection?.title || "Footwear"}</span>
         </nav>

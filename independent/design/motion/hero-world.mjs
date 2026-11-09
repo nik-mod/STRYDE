@@ -33,8 +33,8 @@ const surface = /* glsl */`
     float bPhase = x * 0.4 - t * 0.31 + 1.4 - worldPointer.x * .10;
     float cPhase = x * 0.31 + t * 0.23;
     float aAmp = .52 + .08 * sin(t * 0.6 + x * 0.3) + p * 0.24;
-    float bAmp = 1.50 + .12 * sin(t * 0.45 - x * 0.2);
-    float cAmp = 2.75 + .16 * cos(t * 0.35 + x * 0.4);
+    float bAmp = 1.70 + .12 * sin(t * 0.45 - x * 0.2);
+    float cAmp = 3.00 + .16 * cos(t * 0.35 + x * 0.4);
     // Wind travels through separate depth planes. Scroll opens the valley and
     // draws its far crest past the camera, rather than dissolving the world.
     vec3 field = crest(point, -2.0 + 0.85 * sin(aPhase) - p * 1.10, 0.493 * cos(aPhase),
@@ -237,7 +237,7 @@ export function createHeroWorld({ scene, root, compact }) {
       uniforms.worldExit.value = exit;
       uniforms.worldViewportHeight.value = viewportHeight;
       const direction = heroDirection(progress);
-      uniforms.worldTime.value = time * 1.3;
+      uniforms.worldTime.value = time * 1.05;
       uniforms.worldProgress.value = direction.world;
       uniforms.worldStrength.value = direction.strength * (1.18 + Math.sin(time * .55) * .10);
       const damping = 1 - Math.exp(-dt * 4.5);

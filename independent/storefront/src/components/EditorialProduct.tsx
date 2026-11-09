@@ -1,11 +1,14 @@
 import { Gallery } from "./Gallery";
+import { Arrow } from "./Information";
 import type { Product } from "@/lib/types";
-import { findEditorialProduct } from "@/lib/editorial-catalog";
+import { editorialDisplayColorway, editorialDisplayTitle, findEditorialProduct } from "@/lib/editorial-catalog";
 import { PreviewProductPurchase } from "./PreviewProductPurchase";
 export const editorialProduct = findEditorialProduct;
 export function EditorialProduct({ handle }: { handle: string }) {
   const item = editorialProduct(handle);
   if (!item) return null;
+  const title = editorialDisplayTitle(item);
+  const colorway = editorialDisplayColorway(item);
   const product: Product = {
     id: item.id,
     handle,
@@ -27,16 +30,15 @@ export function EditorialProduct({ handle }: { handle: string }) {
     >
       <nav className="studio-breadcrumbs" aria-label="Breadcrumbs">
         <a data-collection-return href="/collections/all">
-          ← Back to Collection
+          <Arrow /> Back to collection
         </a>
-        <span>{item.brand}</span>
       </nav>
       <div className="studio-product-layout">
         <Gallery product={product} />
         <div className="studio-product-information">
           <div className="studio-product-title">
-            <h1>{item.title}</h1>
-            <p className="studio-product-color">{item.colorway}</p>
+            <h1>{title}</h1>
+            <p className="studio-product-color">{colorway}</p>
           </div>
           <p className="studio-product-description">{item.description}</p>
           <PreviewProductPurchase handle={handle} title={item.title} image={item.photos[0].src} />
@@ -52,16 +54,6 @@ export function EditorialProduct({ handle }: { handle: string }) {
               </div>
             )}
           </dl>
-          <p className="studio-preview-note">
-            Product photography reference. Real prices, size availability and stock will be supplied later.
-          </p>
-          <a
-            className="studio-collection-return"
-            data-collection-return
-            href="/collections/all"
-          >
-            <span>Back to Collection</span>↗
-          </a>
           <details className="studio-photo-details">
             <summary>About this photograph +</summary>
             <div>

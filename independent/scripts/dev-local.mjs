@@ -72,7 +72,7 @@ try {
     // Use the existing asset pipeline without launching another shell.
     const assets = spawn(process.execPath, [resolve(root, 'scripts/build-motion.mjs')], { cwd: root, windowsHide: true, stdio: 'inherit' });
     if (await new Promise(done => { assets.once('exit', done); assets.once('error', () => done(1)); }) !== 0) throw new Error('Asset build failed.');
-    start('Storefront', resolve(root, 'storefront/node_modules/next/dist/bin/next'), ['dev','--hostname','127.0.0.1','--port','3000'], resolve(root, 'storefront'));
+    start('Storefront', resolve(root, 'storefront/node_modules/next/dist/bin/next'), ['dev','--webpack','--hostname','127.0.0.1','--port','3000'], resolve(root, 'storefront'));
     await waitFor(() => healthy(3000, '/api/health'), 'Storefront');
   }
   console.log('[STRYDE] Ready: http://127.0.0.1:3000 — commerce: http://127.0.0.1:9000');

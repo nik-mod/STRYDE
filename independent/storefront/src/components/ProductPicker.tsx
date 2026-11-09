@@ -97,7 +97,7 @@ export function ProductPicker({
         {busy
           ? "Adding…"
           : variant && available(variant)
-            ? "Add to bag ↗"
+            ? "Add to bag "
             : "Sold out"}
       </button>
       <p role="status" aria-live="polite">

@@ -5,6 +5,7 @@ import { money } from "@/lib/types";
 import { mediaFor } from "@/lib/product-media";
 import { PreviewBagDrawer } from "./PreviewShopping";
 import { CatalogWishlistBridge } from "./WishlistButton";
+import { ShopIcon } from "./ShopUI";
 export async function commerceRequest<T>(
   path: string,
   value?: unknown,
@@ -70,7 +71,7 @@ export function BagLines({
                 onClick={() => update(line.id, line.quantity - 1)}
                 aria-label={`Decrease quantity for ${line.title}`}
               >
-                −
+                <ShopIcon name="minus" size={16} />
               </button>
               <span>{line.quantity}</span>
               <button
@@ -79,7 +80,7 @@ export function BagLines({
                 onClick={() => update(line.id, line.quantity + 1)}
                 aria-label={`Increase quantity for ${line.title}`}
               >
-                +
+                <ShopIcon name="plus" size={16} />
               </button>
               <button
                 disabled={busy}
@@ -199,7 +200,7 @@ function LiveCommerce({ testMode }: { testMode: boolean }) {
               aria-label="Close bag"
               onClick={() => dialog.current?.close()}
             >
-              ×
+              <ShopIcon name="close" size={18} />
             </button>
           </header>
           {message && (
@@ -213,7 +214,7 @@ function LiveCommerce({ testMode }: { testMode: boolean }) {
             <div className="cart-drawer-empty">
               <p>Your bag is empty.</p>
               <a className="button" href="/collections/all">
-                Explore the collection ↗
+                Explore the collection
               </a>
             </div>
           )}
@@ -238,10 +239,10 @@ function LiveCommerce({ testMode }: { testMode: boolean }) {
               </p>
             )}
             <a className="button button-dark button-full" href="/checkout">
-              {testMode ? "Continue to test checkout" : "Review checkout"} ↗
+              {testMode ? "Continue to test checkout" : "Review checkout"}
             </a>
             <a className="text-link" href="/cart">
-              View bag ↗
+              View bag
             </a>
           </footer>
         )}
